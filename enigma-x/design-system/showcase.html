@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enigma X — Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-primary);
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ── */
+    .sc-wrap { display: flex; min-height: 100vh; }
+
+    .sc-sidenav {
+      width: 210px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      scrollbar-width: none;
+    }
+    .sc-sidenav::-webkit-scrollbar { display: none; }
+
+    .sc-logo {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+    .sc-logo-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      letter-spacing: 0.04em;
+    }
+    .sc-logo-name span { color: var(--color-brand-dark); }
+    .sc-logo-sub {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-top: 2px;
+      letter-spacing: 0.03em;
+    }
+
+    .sc-nav { padding: 10px 0; flex: 1; }
+    .sc-nav a {
+      display: block;
+      padding: 7px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: color 0.1s, background 0.1s;
+    }
+    .sc-nav a:hover { color: var(--color-brand-dark); background: var(--color-brand-ghost); }
+    .sc-nav a.active { color: var(--color-brand-dark); font-weight: 600; }
+
+    .sc-nav-group {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-tertiary);
+      padding: 14px 18px 4px;
+    }
+
+    /* ── Main ── */
+    .sc-main {
+      flex: 1;
+      min-width: 0;
+      padding: 48px 56px;
+    }
+
+    /* ── Section ── */
+    .sc-section {
+      max-width: 900px;
+      margin-bottom: 64px;
+      scroll-margin-top: 32px;
+    }
+    .sc-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      color: var(--color-brand-dark);
+      margin-bottom: 6px;
+    }
+    .sc-section-heading {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    /* ── Row / group ── */
+    .sc-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .sc-row.column { flex-direction: column; align-items: flex-start; }
+    .sc-row.center { align-items: center; }
+
+    /* ── Label ── */
+    .sc-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--color-text-tertiary);
+      margin-bottom: 8px;
+    }
+    .sc-group { }
+    .sc-group + .sc-group { margin-top: 20px; }
+
+    /* ── Color swatches ── */
+    .sc-swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .sc-swatch {
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+    .sc-swatch-color {
+      height: 56px;
+    }
+    .sc-swatch-info {
+      padding: 8px 10px;
+      background: var(--color-surface);
+    }
+    .sc-swatch-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .sc-swatch-val {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-text-tertiary);
+      margin-top: 2px;
+    }
+
+    /* ── Type specimen ── */
+    .sc-type-row {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .sc-type-meta {
+      min-width: 80px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      flex-shrink: 0;
+    }
+
+    /* ── Demo surface ── */
+    .sc-demo {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .sc-demo-dark {
+      background: #1A1F36;
+      border-color: #2a3050;
+    }
+
+    /* ── Divider within section ── */
+    .sc-sep {
+      height: 1px;
+      background: var(--color-border);
+      margin: 28px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="sc-wrap">
+
+  <!-- ── SIDENAV ── -->
+  <nav class="sc-sidenav">
+    <div class="sc-logo">
+      <div class="sc-logo-name">ENIGMA <span>X</span></div>
+      <div class="sc-logo-sub">Design System</div>
+    </div>
+    <div class="sc-nav">
+      <div class="sc-nav-group">Foundation</div>
+      <a href="#colors">Colors</a>
+      <a href="#typography">Typography</a>
+      <a href="#spacing">Spacing & Sizing</a>
+
+      <div class="sc-nav-group">Controls</div>
+      <a href="#buttons">Buttons</a>
+      <a href="#options">Option Toggles</a>
+      <a href="#inputs">Inputs</a>
+      <a href="#select">Select</a>
+      <a href="#checkbox">Checkbox</a>
+
+      <div class="sc-nav-group">Display</div>
+      <a href="#badges">Badges</a>
+      <a href="#labels">Section Labels</a>
+      <a href="#tabs">Tabs</a>
+      <a href="#tables">Tables</a>
+
+      <div class="sc-nav-group">Trading UI</div>
+      <a href="#pricepanel">Price Panel</a>
+      <a href="#ticker">Ticker Bar</a>
+      <a href="#nav">Navigation</a>
+
+      <div class="sc-nav-group">Feedback</div>
+      <a href="#cards">Cards</a>
+      <a href="#toast">Toast</a>
+      <a href="#otp">OTP Input</a>
+    </div>
+  </nav>
+
+  <!-- ── MAIN ── -->
+  <main class="sc-main">
+
+    <!-- HEADER -->
+    <div style="margin-bottom:56px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:var(--color-brand-dark);margin-bottom:6px;">Component Library</div>
+      <h1 style="font-size:32px;font-weight:700;letter-spacing:-.02em;color:var(--color-text-primary);">Enigma X Design System</h1>
+      <p style="font-size:15px;color:var(--color-text-secondary);margin-top:8px;line-height:1.6;">Tokens, components, and patterns for the Enigma X trading platform.<br>DM Sans + DM Mono · 4px radius · Light mode only.</p>
+    </div>
+
+
+    <!-- ════ COLORS ════ -->
+    <section class="sc-section" id="colors">
+      <div class="sc-section-title">Foundation</div>
+      <h2 class="sc-section-heading">Colors</h2>
+
+      <div class="sc-label">Brand</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#7AEFEF;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Brand</div><div class="sc-swatch-val">#7AEFEF</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#3DBFBF;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Brand Dark</div><div class="sc-swatch-val">#3DBFBF</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#5ADADA;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Brand Dim</div><div class="sc-swatch-val">#5ADADA</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:rgba(122,239,239,0.094);border:1px solid var(--color-border);"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Brand Ghost</div><div class="sc-swatch-val">rgba(122,239,239,.09)</div></div>
+        </div>
+      </div>
+
+      <div class="sc-label">Surfaces</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#F7F8F8;border-bottom:1px solid var(--color-border);"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">BG / Grey 0</div><div class="sc-swatch-val">#F7F8F8</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#FFFFFF;border-bottom:1px solid var(--color-border);"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Surface / White</div><div class="sc-swatch-val">#FFFFFF</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#DEE8ED;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Border / Grey 1</div><div class="sc-swatch-val">#DEE8ED</div></div>
+        </div>
+      </div>
+
+      <div class="sc-label">Text</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#1A1F36;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Primary / Grey 3</div><div class="sc-swatch-val">#1A1F36</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#7C9CAC;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Secondary / Grey 2</div><div class="sc-swatch-val">#7C9CAC</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#A8BECD;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Tertiary</div><div class="sc-swatch-val">#A8BECD</div></div>
+        </div>
+      </div>
+
+      <div class="sc-label">Status / Trading</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#4DCC9B;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Success / Gain</div><div class="sc-swatch-val">#4DCC9B</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#E5686A;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Danger / Loss / BID</div><div class="sc-swatch-val">#E5686A</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#F59E0B;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Pending / Orange</div><div class="sc-swatch-val">#F59E0B</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#7AEFEF;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Active / ASK</div><div class="sc-swatch-val">#7AEFEF</div></div>
+        </div>
+      </div>
+
+      <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:6px;padding:16px 20px;">
+        <div style="font-size:12px;font-weight:700;color:var(--color-text-primary);margin-bottom:10px;">Trading color convention — never reverse</div>
+        <div style="display:flex;gap:24px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:50%;background:#E5686A;"></div>
+            <span style="font-size:13px;color:var(--color-text-secondary);">BID prices · SELL side · Loss P&L</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:50%;background:#7AEFEF;"></div>
+            <span style="font-size:13px;color:var(--color-text-secondary);">ASK prices · BUY side · Active</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:50%;background:#4DCC9B;"></div>
+            <span style="font-size:13px;color:var(--color-text-secondary);">Gain P&L · Success</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ TYPOGRAPHY ════ -->
+    <section class="sc-section" id="typography">
+      <div class="sc-section-title">Foundation</div>
+      <h2 class="sc-section-heading">Typography</h2>
+
+      <div class="sc-label">DM Sans — UI text</div>
+      <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:6px;overflow:hidden;margin-bottom:20px;">
+        <div class="sc-type-row" style="padding:14px 20px;">
+          <div class="sc-type-meta">38px / 700</div>
+          <div style="font-size:38px;font-weight:700;letter-spacing:-.02em;line-height:1.1;">Spot Trading</div>
+        </div>
+        <div class="sc-type-row" style="padding:14px 20px;">
+          <div class="sc-type-meta">24px / 700</div>
+          <div style="font-size:24px;font-weight:700;line-height:1.2;">Sign in to Enigma</div>
+        </div>
+        <div class="sc-type-row" style="padding:14px 20px;">
+          <div class="sc-type-meta">20px / 600</div>
+          <div style="font-size:20px;font-weight:600;">Spot Balances</div>
+        </div>
+        <div class="sc-type-row" style="padding:14px 20px;">
+          <div class="sc-type-meta">16px / 600</div>
+          <div style="font-size:16px;font-weight:600;">Enter your credentials</div>
+        </div>
+        <div class="sc-type-row" style="padding:14px 20px;">
+          <div class="sc-type-meta">14px / 400</div>
+          <div style="font-size:14px;font-weight:400;color:var(--color-text-secondary);">Trade BTC-USD and other crypto pairs in real time with live bid/ask pricing.</div>
+        </div>
+        <div class="sc-type-row" style="padding:14px 20px;border-bottom:none;">
+          <div class="sc-type-meta">12px / 600</div>
+          <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-tertiary);">Section Label / Table Header</div>
+        </div>
+      </div>
+
+      <div class="sc-label">DM Mono — prices, numbers, codes</div>
+      <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:6px;overflow:hidden;margin-bottom:20px;">
+        <div class="sc-type-row" style="padding:14px 20px;">
+          <div class="sc-type-meta">38px / 600</div>
+          <div style="font-family:var(--font-mono);font-size:38px;font-weight:600;letter-spacing:.18em;color:var(--color-text-primary);">294716</div>
+        </div>
+        <div class="sc-type-row" style="padding:14px 20px;">
+          <div class="sc-type-meta">32px / 600</div>
+          <div style="font-family:var(--font-mono);font-size:32px;font-weight:600;color:var(--color-status-danger);">61,349.29</div>
+        </div>
+        <div class="sc-type-row" style="padding:14px 20px;">
+          <div class="sc-type-meta">32px / 600</div>
+          <div style="font-family:var(--font-mono);font-size:32px;font-weight:600;color:var(--color-brand);">61,447.52</div>
+        </div>
+        <div class="sc-type-row" style="padding:14px 20px;">
+          <div class="sc-type-meta">13px / 500</div>
+          <div style="font-family:var(--font-mono);font-size:13px;color:var(--color-text-primary);">UAT-TRD-000-ABC · 60,943.75 · 2026-07-22 13:44:30</div>
+        </div>
+        <div class="sc-type-row" style="padding:14px 20px;border-bottom:none;">
+          <div class="sc-type-meta">10px / 600</div>
+          <div style="display:flex;gap:16px;">
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--color-status-success);">+0.27%</span>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--color-status-danger);">-1.98%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sc-label">Eyebrow labels</div>
+      <div class="sc-demo">
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div>
+            <span class="eyebrow">Step 1 of 2</span>
+            <h2 style="font-size:24px;font-weight:700;margin-top:4px;">Verify your identity</h2>
+          </div>
+          <div>
+            <span class="section-label">Spot Balances</span>
+          </div>
+          <div>
+            <span class="section-label">Trades Blotter</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ SPACING ════ -->
+    <section class="sc-section" id="spacing">
+      <div class="sc-section-title">Foundation</div>
+      <h2 class="sc-section-heading">Spacing & Sizing</h2>
+
+      <div class="sc-label">Control heights</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary);width:60px;">32px</div>
+          <div style="height:32px;background:var(--color-brand-ghost);border:1px solid var(--color-brand-ghost-border);border-radius:var(--radius);display:flex;align-items:center;padding:0 12px;font-size:12px;color:var(--color-brand-dark);">Chip / Badge</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary);width:60px;">36px</div>
+          <div style="height:36px;background:var(--color-surface);border:1.5px solid var(--color-border);border-radius:var(--radius);display:flex;align-items:center;padding:0 12px;font-size:13px;">Small button</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary);width:60px;">48px</div>
+          <div style="height:48px;background:var(--color-surface-2);border:1.5px solid var(--color-border);border-radius:var(--radius);display:flex;align-items:center;padding:0 14px;font-size:14px;color:var(--color-text-tertiary);">Input / Danger button</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary);width:60px;">50px</div>
+          <div style="height:50px;background:var(--color-brand);border-radius:var(--radius);display:flex;align-items:center;padding:0 20px;font-size:16px;font-weight:600;">Primary button</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-tertiary);width:60px;">56px</div>
+          <div style="height:56px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);display:flex;align-items:center;padding:0 16px;font-size:14px;color:var(--color-text-secondary);">Navigation bar</div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ BUTTONS ════ -->
+    <section class="sc-section" id="buttons">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Buttons</h2>
+
+      <div class="sc-label">Variants</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <button class="btn btn-primary"><span class="btn-label">Primary</span><span class="btn-spinner"></span></button>
+          <button class="btn btn-outline">Outlined</button>
+          <button class="btn btn-dark">Dark</button>
+          <button class="btn btn-danger">Danger</button>
+        </div>
+      </div>
+
+      <div class="sc-label">Sizes</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <button class="btn btn-primary">Default (50px)</button>
+          <button class="btn btn-primary btn-sm">Small (36px)</button>
+          <button class="btn btn-outline btn-sm">Small Outline</button>
+        </div>
+      </div>
+
+      <div class="sc-label">States</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <button class="btn btn-primary">Default</button>
+          <button class="btn btn-primary loading">
+            <span class="btn-label">Loading</span>
+            <span class="btn-spinner"></span>
+          </button>
+          <button class="btn btn-primary" disabled>Disabled</button>
+          <button class="btn btn-outline" disabled>Disabled</button>
+        </div>
+      </div>
+
+      <div class="sc-label">Icon buttons & link</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <button class="btn-icon" title="Refresh">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M1.5 8a6.5 6.5 0 1 0 1.1-3.6M1.5 1v3.5H5"/>
+            </svg>
+          </button>
+          <button class="btn-icon" title="Filter">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M2 4h12M4 8h8M6 12h4"/>
+            </svg>
+          </button>
+          <button class="btn-icon" title="More">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <circle cx="8" cy="3" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="8" cy="13" r="1.2"/>
+            </svg>
+          </button>
+          <span style="width:1px;height:24px;background:var(--color-border);"></span>
+          <button class="btn-link">Forgot password?</button>
+          <button class="btn-link" disabled>Disabled link</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ OPTION TOGGLES ════ -->
+    <section class="sc-section" id="options">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Option Toggles</h2>
+
+      <div class="sc-label">Button group (radio style)</div>
+      <div class="sc-demo">
+        <div class="sc-row">
+          <div class="option-group">
+            <button class="option active">Option</button>
+            <button class="option">Option</button>
+            <button class="option">Option</button>
+          </div>
+          <div class="option-group">
+            <button class="option">Option</button>
+            <button class="option active">Option</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sc-label">BUY / SELL toggle</div>
+      <div class="sc-demo">
+        <div class="sc-row">
+          <div class="option-group" id="side-toggle">
+            <button class="option" onclick="setSide(this,'sell')">SELL</button>
+            <button class="option active" onclick="setSide(this,'buy')">BUY</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sc-label">Order type chips</div>
+      <div class="sc-demo">
+        <div class="sc-row">
+          <button class="option-chip active">Market</button>
+          <button class="option-chip">Limit</button>
+          <button class="option-chip">FOK</button>
+          <button class="option-chip">GTC</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ INPUTS ════ -->
+    <section class="sc-section" id="inputs">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Inputs</h2>
+
+      <div class="sc-demo">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+
+          <!-- Text -->
+          <div class="field">
+            <label class="field-label">Email address</label>
+            <div class="field-wrap">
+              <input type="email" class="field-input" placeholder="you@company.com">
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="field">
+            <label class="field-label">Password</label>
+            <div class="field-wrap">
+              <input type="password" class="field-input" placeholder="••••••••" id="pw-demo">
+              <button class="field-toggle" onclick="toggleDemo()" type="button">
+                <svg id="pw-eye" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <ellipse cx="9" cy="9" rx="7" ry="4"/><circle cx="9" cy="9" r="1.5"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Search -->
+          <div class="field">
+            <label class="field-label">Search</label>
+            <div class="field-wrap">
+              <span class="field-prefix-icon">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <circle cx="6" cy="6" r="4"/><path d="M10 10l2.5 2.5"/>
+                </svg>
+              </span>
+              <input type="search" class="field-input with-prefix" placeholder="Search">
+            </div>
+          </div>
+
+          <!-- Quantity -->
+          <div class="field">
+            <label class="field-label">Quantity</label>
+            <div class="field-wrap">
+              <input type="number" class="field-input input-qty" placeholder="0.00000000" min="0" step="0.00000001">
+            </div>
+          </div>
+
+          <!-- Error state -->
+          <div class="field">
+            <label class="field-label">Password</label>
+            <div class="field-wrap">
+              <input type="password" class="field-input error" value="wrongpass">
+            </div>
+            <span class="field-error show">Incorrect password. Please try again.</span>
+          </div>
+
+          <!-- Filled / active -->
+          <div class="field">
+            <label class="field-label">Instrument</label>
+            <div class="field-wrap">
+              <input type="text" class="field-input" value="BTC-USD">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ SELECT ════ -->
+    <section class="sc-section" id="select">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Select / Dropdown</h2>
+
+      <div class="sc-demo">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div class="field">
+            <label class="field-label">Order type</label>
+            <div class="select-wrap">
+              <select class="select-native">
+                <option value="" disabled selected>Please select</option>
+                <option>Market</option>
+                <option>Limit</option>
+                <option>FOK</option>
+                <option>GTC</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Instrument</label>
+            <div class="select-wrap">
+              <select class="select-native">
+                <option>BTC-USD</option>
+                <option>ETH-USD</option>
+                <option>SOL-USD</option>
+                <option>USDT-USD</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ CHECKBOX ════ -->
+    <section class="sc-section" id="checkbox">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Checkbox</h2>
+
+      <div class="sc-demo">
+        <div class="sc-row column">
+          <label class="checkbox-row checked" onclick="this.classList.toggle('checked')">
+            <span class="cb-box">
+              <svg class="cb-check" viewBox="0 0 10 10" fill="none">
+                <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="cb-label">Selected</span>
+          </label>
+          <label class="checkbox-row" onclick="this.classList.toggle('checked')">
+            <span class="cb-box">
+              <svg class="cb-check" viewBox="0 0 10 10" fill="none">
+                <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="cb-label">Not selected</span>
+          </label>
+          <label class="checkbox-row indeterminate">
+            <span class="cb-box">
+              <svg class="cb-check" viewBox="0 0 10 10" fill="none" style="opacity:1;">
+                <path d="M2 5h6" stroke="var(--color-brand-dark)" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span class="cb-label">Indeterminate (All)</span>
+          </label>
+          <label class="checkbox-row" style="pointer-events:none;opacity:0.5;">
+            <span class="cb-box"></span>
+            <span class="cb-label">Disabled</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ BADGES ════ -->
+    <section class="sc-section" id="badges">
+      <div class="sc-section-title">Display</div>
+      <h2 class="sc-section-heading">Badges</h2>
+
+      <div class="sc-label">Order type</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <span class="badge badge-market">Market</span>
+          <span class="badge badge-limit">Limit</span>
+        </div>
+      </div>
+
+      <div class="sc-label">Trade side</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <span class="badge-buy" style="font-size:13px;font-weight:600;">BUY</span>
+          <span class="badge-sell" style="font-size:13px;font-weight:600;">SELL</span>
+        </div>
+      </div>
+
+      <div class="sc-label">Status</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <span class="badge badge-success">Active</span>
+          <span class="badge badge-danger">Failed</span>
+          <span class="badge badge-pending">Pending</span>
+          <span class="badge badge-active">Live</span>
+        </div>
+      </div>
+
+      <div class="sc-label">Environment & currency</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <span class="badge-env">UAT</span>
+          <span class="badge-env">PROD</span>
+          <span class="currency-chip">BTC</span>
+          <span class="currency-chip">USD</span>
+          <span class="currency-chip">ETH</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ SECTION LABELS ════ -->
+    <section class="sc-section" id="labels">
+      <div class="sc-section-title">Display</div>
+      <h2 class="sc-section-heading">Section Labels</h2>
+
+      <div class="sc-demo">
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div>
+            <div class="sc-label" style="margin-bottom:4px;">Gray section label (table headings)</div>
+            <span class="section-label">Spot Balances</span>
+          </div>
+          <div>
+            <div class="sc-label" style="margin-bottom:4px;">Teal eyebrow (above screen titles)</div>
+            <div>
+              <span class="eyebrow">Authentication Required</span>
+              <div style="font-size:24px;font-weight:700;margin-top:4px;">Verify your identity</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ TABS ════ -->
+    <section class="sc-section" id="tabs">
+      <div class="sc-section-title">Display</div>
+      <h2 class="sc-section-heading">Tabs</h2>
+
+      <div class="sc-demo" style="padding:0;">
+        <div class="tab-bar" id="demo-tabs">
+          <button class="tab active" onclick="switchTab(this)">Trades Blotter</button>
+          <button class="tab" onclick="switchTab(this)">Balance Movement</button>
+          <button class="tab" onclick="switchTab(this)">Order History</button>
+        </div>
+        <div style="padding:20px 28px;font-size:13px;color:var(--color-text-secondary);">Tab content appears here.</div>
+      </div>
+    </section>
+
+
+    <!-- ════ TABLES ════ -->
+    <section class="sc-section" id="tables">
+      <div class="sc-section-title">Display</div>
+      <h2 class="sc-section-heading">Tables</h2>
+
+      <div class="sc-label">Bid / Ask order book</div>
+      <div class="sc-demo" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="col-bid">BID</th>
+              <th class="col-qty">Qty</th>
+              <th class="col-ask" style="text-align:right;">ASK</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-bid col-price">61,349.29</td>
+              <td class="col-qty">1</td>
+              <td class="col-ask col-price" style="text-align:right;">61,447.52</td>
+            </tr>
+            <tr>
+              <td class="col-bid col-price">61,319.62</td>
+              <td class="col-qty">10</td>
+              <td class="col-ask col-price" style="text-align:right;">61,477.00</td>
+            </tr>
+            <tr>
+              <td class="col-bid col-price">61,290.34</td>
+              <td class="col-qty">100</td>
+              <td class="col-ask col-price" style="text-align:right;">61,580.47</td>
+            </tr>
+            <tr>
+              <td class="col-bid col-price">61,260.87</td>
+              <td class="col-qty">1000</td>
+              <td class="col-ask col-price" style="text-align:right;">61,535.94</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sc-label">Trades blotter</div>
+      <div class="sc-demo" style="padding:0;overflow:auto;">
+        <table class="data-table" style="min-width:700px;">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Instrument</th>
+              <th>Order Type</th>
+              <th>TIF</th>
+              <th>Side</th>
+              <th class="col-qty">Quantity</th>
+              <th class="col-price">Exec. Price</th>
+              <th>User</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-id" style="font-family:var(--font-mono);font-size:12px;color:var(--color-text-secondary);">UAT-TRD-000...</td>
+              <td>BTC-USD</td>
+              <td><span class="badge badge-limit">Limit</span></td>
+              <td style="color:var(--color-text-secondary);">GTC</td>
+              <td><span class="badge-sell">SELL</span></td>
+              <td class="col-qty">1.00</td>
+              <td class="col-price">60,943.75</td>
+              <td style="color:var(--color-text-secondary);">uat_trader_1</td>
+            </tr>
+            <tr>
+              <td class="col-id" style="font-family:var(--font-mono);font-size:12px;color:var(--color-text-secondary);">UAT-TRD-001...</td>
+              <td>BTC-USD</td>
+              <td><span class="badge badge-market">Market</span></td>
+              <td style="color:var(--color-text-secondary);">FOK</td>
+              <td><span class="badge-buy">BUY</span></td>
+              <td class="col-qty">2.00</td>
+              <td class="col-price">60,943.75</td>
+              <td style="color:var(--color-text-secondary);">uat_trader_1</td>
+            </tr>
+            <tr>
+              <td class="col-id" style="font-family:var(--font-mono);font-size:12px;color:var(--color-text-secondary);">UAT-TRD-002...</td>
+              <td>ETH-USD</td>
+              <td><span class="badge badge-limit">Limit</span></td>
+              <td style="color:var(--color-text-secondary);">GTC</td>
+              <td><span class="badge-sell">SELL</span></td>
+              <td class="col-qty">10.00</td>
+              <td class="col-price">1,667.32</td>
+              <td style="color:var(--color-text-secondary);">uat_trader_2</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sc-label">Balances</div>
+      <div class="sc-demo" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead>
+            <tr><th>Asset</th><th class="col-qty">Quantity</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>USD</td>
+              <td class="col-qty" style="color:var(--color-status-success);">2,000,000.00</td>
+            </tr>
+            <tr>
+              <td>EUR</td>
+              <td class="col-qty" style="color:var(--color-status-success);">1,000,000.00</td>
+            </tr>
+            <tr>
+              <td>BTC</td>
+              <td class="col-qty" style="color:var(--color-status-danger);">-12.50</td>
+            </tr>
+            <tr>
+              <td>ETH</td>
+              <td class="col-qty" style="color:var(--color-status-danger);">-240.00</td>
+            </tr>
+            <tr>
+              <td>SOL</td>
+              <td class="col-qty" style="color:var(--color-status-success);">5,000.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <!-- ════ PRICE PANEL ════ -->
+    <section class="sc-section" id="pricepanel">
+      <div class="sc-section-title">Trading UI</div>
+      <h2 class="sc-section-heading">BID / ASK Price Panel</h2>
+
+      <div class="sc-demo">
+        <div style="max-width:480px;">
+          <div style="margin-bottom:12px;font-size:12px;color:var(--color-text-secondary);">BTC-USD · 98.23 spread · MKT</div>
+          <div class="price-panel">
+            <div class="price-side price-side-bid">
+              <span class="price-label">BID</span>
+              <span class="price-value">61,349</span>
+              <span class="price-sub">.29000000</span>
+            </div>
+            <div class="price-side price-side-ask">
+              <span class="price-label">ASK</span>
+              <span class="price-value">61,447</span>
+              <span class="price-sub">.52000000</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ TICKER ════ -->
+    <section class="sc-section" id="ticker">
+      <div class="sc-section-title">Trading UI</div>
+      <h2 class="sc-section-heading">Ticker Bar</h2>
+
+      <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:6px;overflow:hidden;">
+        <div class="ticker-bar">
+          <div class="ticker-item">
+            <span class="ticker-pair">BTC-USD</span>
+            <span class="ticker-price">64,988</span>
+            <span class="ticker-delta down">-1.98%</span>
+          </div>
+          <div class="ticker-item">
+            <span class="ticker-pair">ETH-USD</span>
+            <span class="ticker-price">1,667.32</span>
+            <span class="ticker-delta down">-1.66%</span>
+          </div>
+          <div class="ticker-item">
+            <span class="ticker-pair">USDT-USD</span>
+            <span class="ticker-price">0.99942</span>
+            <span class="ticker-delta up">+0.00%</span>
+          </div>
+          <div class="ticker-item">
+            <span class="ticker-pair">USDT-EUR</span>
+            <span class="ticker-price">0.87848</span>
+            <span class="ticker-delta up">+0.39%</span>
+          </div>
+          <div class="ticker-item">
+            <span class="ticker-pair">SOL-USD</span>
+            <span class="ticker-price">142.60</span>
+            <span class="ticker-delta up">+2.14%</span>
+          </div>
+          <div class="ticker-item">
+            <span class="ticker-pair">ADA-USD</span>
+            <span class="ticker-price">0.43</span>
+            <span class="ticker-delta down">-2.87%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ NAVIGATION ════ -->
+    <section class="sc-section" id="nav">
+      <div class="sc-section-title">Trading UI</div>
+      <h2 class="sc-section-heading">Navigation Bar</h2>
+
+      <div style="border-radius:6px;overflow:hidden;border:1px solid var(--color-border);">
+        <nav class="top-nav">
+          <div class="nav-brand">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+              <rect width="30" height="30" rx="6" fill="#1A1F36"/>
+              <path d="M8 10 L15 10 L22 20 M8 20 L15 20 L22 10" stroke="#7AEFEF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="nav-logo-text" style="font-size:15px;font-weight:700;letter-spacing:.06em;">ENIGMA</span>
+          </div>
+          <span class="badge-env">UAT</span>
+          <div class="nav-spacer"></div>
+          <div class="nav-actions">
+            <span style="font-family:var(--font-mono);font-size:12px;color:var(--color-text-secondary);">13:30:29 UTC +00:00</span>
+            <div class="nav-exposure">
+              <span class="nav-exposure-label">Exposure</span>
+              <span class="nav-exposure-value">$5,000,000</span>
+            </div>
+            <div class="nav-avatar">YH</div>
+          </div>
+        </nav>
+      </div>
+    </section>
+
+
+    <!-- ════ CARDS ════ -->
+    <section class="sc-section" id="cards">
+      <div class="sc-section-title">Feedback</div>
+      <h2 class="sc-section-heading">Cards / Panels</h2>
+
+      <div class="sc-demo" style="padding:0;overflow:hidden;">
+        <div class="card-header">
+          <span class="card-title">Spot Trader</span>
+          <button class="btn-icon" title="Refresh">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M1 7a6 6 0 1 0 1-3.2M1 1v3h3"/>
+            </svg>
+          </button>
+        </div>
+        <div class="card-body" style="padding:20px 24px;">
+          <p style="font-size:13px;color:var(--color-text-secondary);">Card body content — form fields, tables, or data go here.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ TOAST ════ -->
+    <section class="sc-section" id="toast">
+      <div class="sc-section-title">Feedback</div>
+      <h2 class="sc-section-heading">Toast</h2>
+
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <button class="btn btn-outline btn-sm" onclick="showToast('Order submitted successfully.')">Success toast</button>
+          <button class="btn btn-outline btn-sm" onclick="showToast('Authentication failed. Please try again.', 'danger')">Danger toast</button>
+        </div>
+        <p style="font-size:12px;color:var(--color-text-tertiary);margin-top:16px;">Appears bottom-center, dismisses after 3 seconds.</p>
+      </div>
+
+      <!-- Toast element -->
+      <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+    </section>
+
+
+    <!-- ════ OTP ════ -->
+    <section class="sc-section" id="otp">
+      <div class="sc-section-title">Feedback</div>
+      <h2 class="sc-section-heading">OTP Input (Authenticator)</h2>
+
+      <div class="sc-demo">
+        <div style="margin-bottom:16px;">
+          <span class="eyebrow">Verification code</span>
+          <div style="font-size:18px;font-weight:700;margin-top:4px;margin-bottom:16px;">Enter the 6-digit code</div>
+        </div>
+        <div class="otp-row" id="otp-row">
+          <input class="otp-slot" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1">
+          <input class="otp-slot" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+          <input class="otp-slot" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+          <input class="otp-slot" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+          <input class="otp-slot" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+          <input class="otp-slot" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+        </div>
+        <p style="font-size:12px;color:var(--color-text-tertiary);margin-top:16px;">Type digits — auto-advances. Backspace moves back.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+
+<script>
+  /* ── Option toggle ── */
+  function setSide(el, side) {
+    el.closest('.option-group').querySelectorAll('.option').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  document.querySelectorAll('.option-group .option').forEach(btn => {
+    btn.addEventListener('click', function() {
+      this.closest('.option-group').querySelectorAll('.option').forEach(o => o.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.option-chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      const group = this.closest('.sc-row') || this.parentNode;
+      group.querySelectorAll('.option-chip').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  /* ── Password toggle ── */
+  function toggleDemo() {
+    const inp = document.getElementById('pw-demo');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+
+  /* ── Tabs ── */
+  function switchTab(el) {
+    el.closest('.tab-bar').querySelectorAll('.tab').forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+    });
+    el.classList.add('active');
+    el.setAttribute('aria-selected', 'true');
+  }
+
+  /* ── Toast ── */
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (type ? ' ' + type : '');
+    void t.offsetWidth;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  /* ── OTP auto-advance ── */
+  const otpSlots = document.querySelectorAll('#otp-row .otp-slot');
+  otpSlots.forEach((slot, i) => {
+    slot.addEventListener('input', () => {
+      slot.value = slot.value.replace(/\D/g, '').slice(-1);
+      slot.classList.toggle('filled', slot.value !== '');
+      if (slot.value && i < otpSlots.length - 1) otpSlots[i + 1].focus();
+    });
+    slot.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !slot.value && i > 0) otpSlots[i - 1].focus();
+    });
+  });
+
+  /* ── Active nav on scroll ── */
+  const sections = document.querySelectorAll('.sc-section');
+  const navLinks = document.querySelectorAll('.sc-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const link = document.querySelector(`.sc-nav a[href="#${entry.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Enigma Authenticator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <script type="module" src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs"></script>
+  <style>
+    :root {
+      --c-bg:           #F7F8F8;
+      --c-surface:      #FFFFFF;
+      --c-surface-2:    #F7F8F8;
+      --c-primary:      #7AEFEF;
+      --c-primary-dark: #3DBFBF;
+      --c-primary-dim:  #3DBFBF;
+      --c-primary-ghost:#7AEFEF18;
+      --c-black:        #000000;
+      --c-text:         #1A1F36;
+      --c-text-2:       #7C9CAC;
+      --c-text-3:       #A8BECD;
+      --c-border:       #DEE8ED;
+      --c-danger:       #E5686A;
+      --c-success:      #4DCC9B;
+      --font-sans: 'DM Sans', -apple-system, sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Focus rings for keyboard/accessibility */
+    button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+      outline: 2px solid var(--c-primary-dark);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--c-bg);
+      min-height: 100dvh;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Shell ─── */
+    .shell {
+      width: min(390px, 100vw);
+      height: min(844px, 100dvh);
+      background: var(--c-bg);
+      border-radius: min(44px, 4vw);
+      box-shadow: 0 24px 64px rgba(0,0,0,.18), 0 0 0 2px rgba(0,0,0,.07);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      position: relative;
+    }
+
+    /* ─── Status bar ─── */
+    .status-bar {
+      height: 44px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 28px 0;
+      color: var(--c-text);
+    }
+    .status-bar .time { font-family: var(--font-mono); font-size: 16px; font-weight: 600; }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
+    .status-icons svg { width: 16px; height: 16px; fill: var(--c-text); }
+
+    /* ─── Screen stack ─── */
+    .screens {
+      flex: 1; min-height: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .screen {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      display: flex; flex-direction: column;
+      overflow-y: auto; overflow-x: hidden;
+      scrollbar-width: none;
+      transition: transform .38s cubic-bezier(.4,0,.2,1), opacity .3s ease;
+      will-change: transform;
+    }
+    .screen::-webkit-scrollbar { display: none; }
+
+    /* Base screen positions — s-faceid is a separate overlay at shell level */
+    #s-home       { transform: translateX(0);    opacity: 1; }
+    #s-pwfallback { transform: translateX(100%); opacity: 0; }
+
+    /* ─── Push notification banner — iOS style ─── */
+    .push-banner {
+      position: absolute; top: 0; left: 0; right: 0;
+      z-index: 300; padding: 10px 10px 0;
+      transform: translateY(-130%);
+      transition: transform .42s cubic-bezier(.32,0,.04,1);
+      pointer-events: none;
+    }
+    .push-banner.show { transform: translateY(0); pointer-events: auto; }
+    .push-banner-inner {
+      /* iOS 26 Liquid Glass: dark-transparent, background bleeds through blurred */
+      background: rgba(0,0,0,0.20);
+      backdrop-filter: blur(48px);
+      -webkit-backdrop-filter: blur(48px);
+      border-radius: 22px;
+      padding: 10px 12px 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow:
+        0 6px 32px rgba(0,0,0,0.18),
+        inset 0 2px 0 rgba(255,255,255,0.22);
+      cursor: pointer;
+    }
+    /* Top row: icon + app name + time */
+    .push-banner-top {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+    }
+    .push-banner-appname {
+      font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.80);
+      text-transform: uppercase; letter-spacing: .02em; flex: 1;
+    }
+    .push-banner-time { font-size: 12px; color: rgba(255,255,255,0.60); }
+    /* Content row: large icon + text */
+    .push-banner-content { display: flex; align-items: center; gap: 10px; }
+    .push-banner-app-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--c-primary-dark); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .push-banner-app-icon svg { width: 22px; height: 22px; }
+    .push-banner-body { flex: 1; min-width: 0; }
+    .push-banner-title { font-size: 14px; font-weight: 700; color: rgba(255,255,255,1.0); line-height: 1.3; }
+    .push-banner-sub   { font-size: 12px; color: rgba(255,255,255,0.78); margin-top: 2px; line-height: 1.4; }
+
+    /* ─── Common ─── */
+    .eyebrow {
+      font-size: 10px; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--c-primary-dark);
+    }
+    .screen-title { font-size: 24px; font-weight: 700; line-height: 1.2; color: var(--c-text); margin-top: 6px; }
+    .screen-sub   { font-size: 14px; color: var(--c-text-2); line-height: 1.55; margin-top: 6px; }
+
+    .btn-primary {
+      width: 100%; height: 52px;
+      background: var(--c-primary); border: none;
+      border-radius: 4px; font-family: var(--font-sans);
+      font-size: 16px; font-weight: 600; color: #000;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .12s, transform .08s;
+    }
+    .btn-primary:hover  { background: #5ADADA; }
+    .btn-primary:active { transform: scale(.98); }
+    .btn-primary:disabled { background: var(--c-text-3); color: var(--c-text-2); cursor: not-allowed; }
+
+    .btn-danger {
+      width: 100%; height: 48px;
+      background: transparent; border: 1.5px solid var(--c-danger);
+      border-radius: 4px; font-family: var(--font-sans);
+      font-size: 14px; font-weight: 600; color: var(--c-danger);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .12s;
+    }
+    .btn-danger:hover { background: rgba(229,104,106,.06); }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: absolute; bottom: 32px; left: 16px; right: 16px;
+      background: var(--c-black); color: #fff;
+      border-radius: 4px; padding: 14px 16px;
+      font-size: 14px; font-weight: 500;
+      transform: translateY(80px); opacity: 0;
+      transition: transform .28s cubic-bezier(.4,0,.2,1), opacity .28s ease;
+      z-index: 999; text-align: center;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.danger { background: var(--c-danger); }
+
+
+    /* ─── Launch screen ─── */
+    #s-launch {
+      position: absolute; inset: 0;
+      z-index: 40;          /* below Face ID (z-index 50) */
+      background: #fff;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 40px;
+      padding-bottom: 18%;  /* shift content above visual center */
+      transition: opacity .3s ease;
+      pointer-events: auto;
+    }
+    #s-launch.hidden { opacity: 0; pointer-events: none; }
+    .launch-app-name {
+      font-size: 18px; font-weight: 700; color: var(--c-text);
+      letter-spacing: -.02em;
+    }
+
+    /* ─── Face ID overlay — 3 explicit layers ─── */
+
+    /* Layer wrapper — covers full shell */
+    #s-faceid {
+      position: absolute; inset: 0;
+      z-index: 50;
+      opacity: 1; pointer-events: auto;
+      transition: opacity .25s ease;
+      display: flex; flex-direction: column;
+    }
+    #s-faceid.hidden { opacity: 0; pointer-events: none; }
+
+    /* LAYER 2: Subtle blur — background stays clearly visible */
+    .faceid-blur-bg {
+      position: absolute; inset: 0;
+      background: rgba(235,235,235,.12);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      pointer-events: none;
+    }
+
+    /* Content positioner — sits above blur */
+    .faceid-wrap {
+      position: relative; z-index: 1;
+      flex: 1; min-height: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 0 24px 80px;
+      text-align: center;
+      gap: 0;
+    }
+    /* Blur fades in smoothly from the start */
+    #s-faceid:not(.hidden) .faceid-blur-bg {
+      animation: blurFadeIn .65s ease both;
+    }
+    @keyframes blurFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    /* Content fades in 0.25s after — blur already in progress */
+    #s-faceid:not(.hidden) .faceid-wrap {
+      animation: faceIDContentIn .2s ease .25s both;
+    }
+    @keyframes faceIDContentIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .faceid-bottom { display: flex; flex-direction: column; align-items: center; margin-top: 32px; }
+
+    /* LAYER 3: Dark Apple-style Face ID card — floats on top of blur */
+    .faceid-card {
+      background: transparent;
+      padding: 0;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0;
+      margin-bottom: 20px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── iPhone Face ID — Lottie animation ── */
+    .fid-wrapper {
+      width: 180px; height: 180px;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: block;
+    }
+
+
+    /* Text below the card */
+    .faceid-locked-label {
+      font-size: 16px; font-weight: 600;
+      color: var(--c-text);
+      letter-spacing: -.01em;
+    }
+    .faceid-sub { display: none; }
+
+    /* Passcode pill — iOS style */
+    .faceid-fallback-link {
+      font-size: 14px; font-weight: 600;
+      color: var(--c-text-2);
+      background: rgba(0,0,0,.06);
+      border: none; border-radius: 4px;
+      padding: 12px 28px; cursor: pointer;
+      font-family: var(--font-sans);
+      letter-spacing: -.01em;
+      margin-top: 12px;
+      transition: background .15s, color .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .faceid-fallback-link:hover  { background: rgba(0,0,0,.10); color: var(--c-text); }
+    .faceid-fallback-link:active { background: rgba(0,0,0,.15); }
+
+    /* Home screen logo — visible through the blur as Layer 1 */
+    .home-logo-banner {
+      display: flex; flex-direction: row; align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px 14px; gap: 10px;
+      background: var(--c-primary-dark);
+      flex-shrink: 0;
+    }
+    .home-logo-banner-left {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .home-logo-icon {
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,0.22);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .home-logo-name {
+      font-size: 16px; font-weight: 700; color: #fff;
+      letter-spacing: -.02em;
+    }
+
+    /* ─── Home / Session management screen ─── */
+    #s-home { background: var(--c-bg); padding: 0; }
+    .status-bar--teal { background: var(--c-primary-dark) !important; color: rgba(255,255,255,0.9) !important; }
+    .status-bar--teal .status-icons svg { fill: rgba(255,255,255,0.9) !important; }
+    .home-header {
+      padding: 24px 24px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .home-header-left { display: flex; flex-direction: column; gap: 2px; }
+    .home-header-left .eyebrow { margin-bottom: 2px; }
+    .home-header-left .screen-title { font-size: 20px; }
+    .home-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--c-primary); display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: var(--c-black);
+    }
+    .home-scroll { flex: 1; overflow-y: auto; padding: 0 24px 32px; scrollbar-width: none; }
+    .home-scroll::-webkit-scrollbar { display: none; }
+
+    /* Current session card */
+    .session-current {
+      background: var(--c-surface);
+      border-radius: 4px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+      margin-bottom: 20px;
+    }
+    .session-current-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    }
+    .session-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--c-primary); flex-shrink: 0;
+      box-shadow: 0 0 0 4px var(--c-primary-ghost);
+      animation: dotpulse 2.4s ease infinite;
+    }
+    @keyframes dotpulse {
+      0%, 100% { box-shadow: 0 0 0 4px var(--c-primary-ghost); }
+      50%       { box-shadow: 0 0 0 6px transparent; }
+    }
+    .session-current-label { font-size: 12px; font-weight: 700; color: var(--c-primary); text-transform: uppercase; letter-spacing: .08em; }
+    .session-current-time  { font-size: 12px; color: var(--c-text-3); margin-left: auto; }
+    .session-rows { display: flex; flex-direction: column; gap: 10px; }
+    .session-row { display: flex; align-items: flex-start; gap: 10px; }
+    .session-row-icon {
+      width: 30px; height: 30px; border-radius: 4px;
+      background: var(--c-surface-2);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .session-row-icon svg { width: 16px; height: 16px; fill: var(--c-text-2); }
+    .session-row-body { flex: 1; min-width: 0; }
+    .session-row-label { font-size: 12px; color: var(--c-text-3); font-weight: 600; text-transform: uppercase; letter-spacing: .07em; }
+    .session-row-val   { font-size: 14px; color: var(--c-text); font-weight: 600; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Other sessions */
+    .other-sessions-label {
+      font-size: 12px; font-weight: 700; color: var(--c-text-3); text-transform: uppercase;
+      letter-spacing: .1em; margin-bottom: 10px; padding: 0;
+    }
+    .session-compact {
+      background: var(--c-surface);
+      border-radius: 8px; padding: 14px 14px;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 8px;
+      transition: opacity .23s, transform .23s;
+    }
+    .session-compact-flag {
+      width: 36px; height: 36px; border-radius: 4px;
+      background: var(--c-surface-2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 12px; font-weight: 700; color: var(--c-text-2);
+      letter-spacing: .04em; text-align: center;
+      font-family: var(--font-sans);
+    }
+    .session-compact-body { flex: 1; min-width: 0; }
+    .session-compact-loc  { font-size: 14px; font-weight: 600; color: var(--c-text); }
+    .session-compact-meta { font-size: 12px; color: var(--c-text-3); margin-top: 2px; }
+    .session-compact-signout {
+      background: none; border: 1px solid var(--c-danger);
+      border-radius: 4px; font-family: var(--font-sans);
+      font-size: 12px; font-weight: 600; color: var(--c-danger);
+      padding: 8px 14px; cursor: pointer; white-space: nowrap;
+      min-height: 36px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sessions-empty { font-size: 14px; color: var(--c-text-3); text-align: center; padding: 20px 0; display: none; }
+
+    /* ─── Password fallback screen ─── */
+    #s-pwfallback {
+      background: var(--c-surface);
+      display: flex; flex-direction: column;
+    }
+    .fb-top {
+      padding: 32px 24px 28px;
+      border-bottom: 1px solid var(--c-border);
+    }
+    .fb-back {
+      background: none; border: none; cursor: pointer;
+      font-family: var(--font-sans); font-size: 14px; font-weight: 500;
+      color: var(--c-text-3); padding: 10px 8px 10px 0; display: flex; align-items: center; gap: 6px;
+      margin-bottom: 16px; min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .fb-form { padding: 28px 24px 32px; flex: 1; display: flex; flex-direction: column; }
+    .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .input-group label {
+      font-size: 12px; font-weight: 600; color: var(--c-text-2);
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+    .input-wrap { position: relative; }
+    .input-field {
+      width: 100%; height: 48px;
+      padding: 0 44px 0 14px;
+      background: var(--c-surface-2); border: 1.5px solid var(--c-border);
+      border-radius: 4px;
+      font-family: var(--font-sans); font-size: 16px; color: var(--c-text);
+      outline: none; transition: border-color .18s, box-shadow .18s;
+      -webkit-appearance: none;
+    }
+    .input-field:focus {
+      border-color: var(--c-primary);
+      background: var(--c-surface);
+      box-shadow: 0 0 0 4px var(--c-primary-ghost);
+    }
+    .input-field::placeholder { color: var(--c-text-3); }
+    .input-toggle {
+      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; padding: 0; cursor: pointer; color: var(--c-text-3);
+      width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .input-toggle svg { width: 18px; height: 18px; display: block; }
+    .fb-submit { margin-top: auto; padding-top: 16px; }
+
+    /* ─── Sign-out confirmation dialog ─── */
+    .confirm-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,.4);
+      z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .confirm-overlay.show { opacity: 1; pointer-events: auto; }
+    .confirm-dialog {
+      background: var(--c-surface);
+      border-radius: 14px;
+      width: calc(100% - 48px);
+      max-width: 320px;
+      padding: 20px 20px 12px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.2);
+      transform: scale(.95);
+      transition: transform .2s ease;
+      text-align: center;
+    }
+    .confirm-overlay.show .confirm-dialog { transform: scale(1); }
+    .confirm-title {
+      font-size: 16px; font-weight: 700;
+      color: var(--c-text); letter-spacing: -.01em;
+      margin-bottom: 6px;
+    }
+    .confirm-body {
+      font-size: 14px; color: var(--c-text-2);
+      line-height: 1.45; margin-bottom: 18px;
+    }
+    .confirm-actions {
+      display: flex; gap: 8px;
+    }
+    .confirm-btn {
+      flex: 1; padding: 14px 8px; border-radius: 4px;
+      font-family: var(--font-sans); font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none; transition: opacity .15s;
+      min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .confirm-btn:active { opacity: .7; }
+    .confirm-btn-cancel {
+      background: var(--c-surface-2);
+      color: var(--c-text-2);
+    }
+    .confirm-btn-danger {
+      background: var(--c-danger);
+      color: #fff;
+    }
+
+    /* ─── Bottom sheet ─── */
+    .sheet-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,.45);
+      opacity: 0; pointer-events: none;
+      transition: opacity .35s ease;
+      z-index: 100;
+    }
+    .sheet-overlay.show { opacity: 1; pointer-events: auto; }
+
+    .bottom-sheet {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: var(--c-surface);
+      border-radius: 8px 8px 0 0;
+      transform: translateY(100%);
+      transition: transform .42s cubic-bezier(.32,0,.04,1);
+      z-index: 101;
+      max-height: 88%;
+      overflow: hidden;
+      box-shadow: 0 -8px 40px rgba(0,0,0,.18);
+    }
+    .bottom-sheet.open { transform: translateY(0); }
+
+    .sheet-handle {
+      width: 36px; height: 4px; border-radius: 4px;
+      background: var(--c-border);
+      margin: 12px auto 4px; flex-shrink: 0;
+    }
+
+    /* Map area */
+    .sheet-map {
+      flex-shrink: 0; height: 160px; position: relative;
+      overflow: hidden; margin: 0 16px; border-radius: 4px;
+      background: var(--c-border);
+    }
+    .sheet-map svg { width: 100%; height: 100%; }
+    .map-location-pill {
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
+      border-radius: 4px; padding: 6px 12px 6px 8px;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 600; color: var(--c-text);
+      box-shadow: 0 2px 8px rgba(0,0,0,.12); white-space: nowrap;
+    }
+    .map-location-pill .loc-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--c-primary); flex-shrink: 0;
+    }
+
+    /* Sheet body */
+    .sheet-body {
+      overflow-y: auto; padding: 16px 20px 32px;
+      scrollbar-width: none;
+    }
+    .sheet-body::-webkit-scrollbar { display: none; }
+
+    .sheet-section-title {
+      font-size: 10px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--c-text-3);
+      margin-bottom: 10px;
+    }
+    .sheet-info-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      margin-bottom: 18px;
+    }
+    .sheet-info-item { display: flex; flex-direction: column; gap: 4px; }
+    .sheet-info-label { font-size: 10px; color: var(--c-text-3); font-weight: 600; text-transform: uppercase; letter-spacing: .07em; }
+    .sheet-info-val   { font-size: 14px; color: var(--c-text); font-weight: 600; }
+
+    /* OTP code in sheet */
+    .sheet-code-card {
+      background: var(--c-surface-2); border-radius: 8px;
+      padding: 16px; margin-bottom: 10px;
+    }
+    .sheet-code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .sheet-code-label { font-size: 12px; font-weight: 700; color: var(--c-text-3); text-transform: uppercase; letter-spacing: .08em; }
+    .sheet-code-expiry.urgent { color: var(--c-danger); }
+    .sheet-otp {
+      font-family: var(--font-mono); font-size: 38px; font-weight: 600;
+      color: var(--c-text); letter-spacing: .18em;
+      display: flex; justify-content: center; align-items: center;
+      margin-bottom: 12px;
+    }
+    .sheet-otp.used { color: var(--c-text-3); text-decoration: line-through; letter-spacing: .1em; font-size: 26px; }
+    .sheet-code-expiry { font-size: 14px; font-weight: 600; color: var(--c-text-2); font-family: var(--font-mono); }
+    .sheet-copy-btn {
+      width: 100%; height: 52px;
+      background: var(--c-primary); border: none; border-radius: 8px;
+      font-family: var(--font-sans); font-size: 16px; font-weight: 600; color: var(--c-black);
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-top: 16px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sheet-copy-btn:active { opacity: .85; }
+    .sheet-copy-btn:disabled { background: var(--c-text-3); color: var(--c-text-2); cursor: not-allowed; }
+    .sheet-block-link {
+      display: block; width: 100%; text-align: center;
+      font-size: 14px; color: var(--c-danger); font-weight: 500;
+      cursor: pointer; background: none; border: none;
+      font-family: var(--font-sans);
+      padding: 16px 0 4px;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ─── Confirmed state (inside sheet) ─── */
+    .sheet-confirmed {
+      text-align: center; padding: 12px 0;
+    }
+    .sheet-confirmed-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--c-primary-ghost);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 12px;
+    }
+    .sheet-confirmed-icon svg { width: 28px; height: 28px; fill: var(--c-primary); }
+    .sheet-confirmed h3 { font-size: 18px; font-weight: 700; color: var(--c-text); margin-bottom: 4px; }
+    .sheet-confirmed p  { font-size: 14px; color: var(--c-text-2); }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ─── Launch screen ─── -->
+  <div id="s-launch">
+    <svg width="108" height="108" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M13.5997 36.9331V34.5121L15.7256 35.4391V30.2742L19.9785 31.4062V37.1221L39.234 28.7333V24.3074L36.3801 24.9364V26.6263L38.385 26.0364V27.6083L28.9913 31.0282V28.8113L35.1911 26.9993V25.2384L28.9913 26.5983V24.3814L39.985 22.7224V29.8533L19.9935 39.999L13.5997 36.9331ZM0 29.8503V17.0206L8.3418 15.8486V21.9644L6.92683 21.8465V17.9796L4.5019 18.1445V21.6665L1.60796 21.4305V19.8895L3.4509 19.9055V18.2155L0.78297 18.3885V25.8254L1.61596 26.0774V22.9774L2.50494 23.1114V27.9383L0.801982 27.2993V28.7773L5.67585 30.9622V29.1153L3.47593 28.2973V26.5993L8.36179 28.0733V26.0364L3.47992 24.9364V23.2624L13.6007 24.8184V22.3994L9.93875 22.1084V19.9535L15.7386 19.9855V7.09083L19.9915 5.71586V2.85392L11.6647 6.27385V8.54578L13.5966 7.85481V10.2757L8.38178 11.7847V13.8217L6.96684 14.1276V10.2597L9.93374 9.19077V4.88288L19.9935 0L35.2071 7.53881V9.31577L32.4182 8.12879V10.0947L32.3782 10.0628L30.7532 9.48976V7.40681L22.5234 3.9159V6.58184L28.9743 8.85378V11.0707L32.3862 12.0217V13.9876L27.0023 12.8557V10.5127L22.5024 9.25577V11.9207L19.9565 11.3947V14.2556L35.1871 16.3556V21.6465L33.8612 21.7465V18.0465L30.7722 17.8466V22.0135L24.8634 22.4684V19.9615L28.9783 19.9295V17.7126L19.9645 17.1226V19.9845L22.5104 19.9695V27.9873L19.9645 28.5463V22.8294L15.7126 22.5384V27.6993L9.91275 26.3783V28.5333L13.5747 29.6333V32.0542L6.92182 29.5783V31.5122L11.6427 33.6262V35.8991L0 29.8503ZM22.5374 30.6912L24.8924 29.9993V24.9834L27.0343 24.6604V31.7122L22.5394 33.3552L22.5374 30.6912ZM36.3951 19.9065L39.249 19.8905V12.4997L40.001 12.7667V21.3205L36.3961 21.5955L36.3951 19.9065ZM37.4541 18.3065V16.7066L36.3951 16.5576V14.8676H36.4031L38.408 15.2776V18.3595L37.4541 18.3065ZM11.6747 15.4066L9.93676 15.6586V13.4997L9.94476 13.4917L13.6067 12.7127V17.5556L11.6747 17.6886V15.4066ZM0.0100095 9.88975L8.36179 5.66786L8.36979 5.68386V7.71981L5.68586 8.87578V10.7237L4.53889 11.1327V9.37277L0.811991 10.9837V12.4627L2.51794 11.8487V13.4607L5.67085 12.5487V14.3796L1.62896 15.2446V13.7197L0.796977 13.9557V15.4336L0.0130002 15.5996L0.0100095 9.88975ZM33.8892 14.3316V10.6047L36.3961 11.4847V8.12879L39.985 9.89776V11.3207L37.4551 10.2517V11.8637L38.409 12.2017V13.7427L35.2161 12.8427V14.6026L33.8892 14.3316Z" fill="#3DBFBF"/>
+    </svg>
+    <p class="launch-app-name">Enigma Authenticator</p>
+  </div>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span class="time" id="sb-time">9:41</span>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24"><path d="M1.5 8.5C4 5.5 7.8 3.5 12 3.5s8 2 10.5 5l-2 2C18.5 8 15.5 6.5 12 6.5S5.5 8 3.5 10.5l-2-2zm3.5 3.5C6.5 9.5 9 8 12 8s5.5 1.5 7 4l-2 2c-1-1.5-2.8-3-5-3s-4 1.5-5 3l-2-2zm3.5 3.5c1-1 2.2-1.5 3.5-1.5s2.5.5 3.5 1.5l-3.5 4-3.5-4z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <!-- ─── Screens ─── -->
+  <!-- ─── Push notification banner (overlays everything) ─── -->
+  <div class="push-banner" id="push-banner" onclick="openFromBanner()">
+    <div class="push-banner-inner">
+      <!-- Top row: app name + time (no icon) -->
+      <div class="push-banner-top">
+        <span class="push-banner-appname">Enigma Authenticator</span>
+        <span class="push-banner-time">now</span>
+      </div>
+      <!-- Content row: Enigma logo icon + message -->
+      <div class="push-banner-content">
+        <div class="push-banner-app-icon">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="26" height="26"><path d="M13.5997 36.9331V34.5121L15.7256 35.4391V30.2742L19.9785 31.4062V37.1221L39.234 28.7333V24.3074L36.3801 24.9364V26.6263L38.385 26.0364V27.6083L28.9913 31.0282V28.8113L35.1911 26.9993V25.2384L28.9913 26.5983V24.3814L39.985 22.7224V29.8533L19.9935 39.999L13.5997 36.9331ZM0 29.8503V17.0206L8.3418 15.8486V21.9644L6.92683 21.8465V17.9796L4.5019 18.1445V21.6665L1.60796 21.4305V19.8895L3.4509 19.9055V18.2155L0.78297 18.3885V25.8254L1.61596 26.0774V22.9774L2.50494 23.1114V27.9383L0.801982 27.2993V28.7773L5.67585 30.9622V29.1153L3.47593 28.2973V26.5993L8.36179 28.0733V26.0364L3.47992 24.9364V23.2624L13.6007 24.8184V22.3994L9.93875 22.1084V19.9535L15.7386 19.9855V7.09083L19.9915 5.71586V2.85392L11.6647 6.27385V8.54578L13.5966 7.85481V10.2757L8.38178 11.7847V13.8217L6.96684 14.1276V10.2597L9.93374 9.19077V4.88288L19.9935 0L35.2071 7.53881V9.31577L32.4182 8.12879V10.0947L32.3782 10.0628L30.7532 9.48976V7.40681L22.5234 3.9159V6.58184L28.9743 8.85378V11.0707L32.3862 12.0217V13.9876L27.0023 12.8557V10.5127L22.5024 9.25577V11.9207L19.9565 11.3947V14.2556L35.1871 16.3556V21.6465L33.8612 21.7465V18.0465L30.7722 17.8466V22.0135L24.8634 22.4684V19.9615L28.9783 19.9295V17.7126L19.9645 17.1226V19.9845L22.5104 19.9695V27.9873L19.9645 28.5463V22.8294L15.7126 22.5384V27.6993L9.91275 26.3783V28.5333L13.5747 29.6333V32.0542L6.92182 29.5783V31.5122L11.6427 33.6262V35.8991L0 29.8503ZM22.5374 30.6912L24.8924 29.9993V24.9834L27.0343 24.6604V31.7122L22.5394 33.3552L22.5374 30.6912ZM36.3951 19.9065L39.249 19.8905V12.4997L40.001 12.7667V21.3205L36.3961 21.5955L36.3951 19.9065ZM37.4541 18.3065V16.7066L36.3951 16.5576V14.8676H36.4031L38.408 15.2776V18.3595L37.4541 18.3065ZM11.6747 15.4066L9.93676 15.6586V13.4997L9.94476 13.4917L13.6067 12.7127V17.5556L11.6747 17.6886V15.4066ZM0.0100095 9.88975L8.36179 5.66786L8.36979 5.68386V7.71981L5.68586 8.87578V10.7237L4.53889 11.1327V9.37277L0.811991 10.9837V12.4627L2.51794 11.8487V13.4607L5.67085 12.5487V14.3796L1.62896 15.2446V13.7197L0.796977 13.9557V15.4336L0.0130002 15.5996L0.0100095 9.88975ZM33.8892 14.3316V10.6047L36.3961 11.4847V8.12879L39.985 9.89776V11.3207L37.4551 10.2517V11.8637L38.409 12.2017V13.7427L35.2161 12.8427V14.6026L33.8892 14.3316Z" fill="white"/></svg>
+        </div>
+        <div class="push-banner-body">
+          <div class="push-banner-title">Sign-in requested</div>
+          <div class="push-banner-sub">London · Chrome · 82.43.201.15</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Face ID overlay: Layer 2 (blur) + Layer 3 (dark card) over Layer 1 (app) ─── -->
+  <div id="s-faceid" class="hidden">
+
+    <!-- Layer 2: light frosted blur — app content shows through -->
+    <div class="faceid-blur-bg"></div>
+
+    <!-- Layer 3 content: dark card + labels below it -->
+    <div class="faceid-wrap">
+
+      <!-- Dark Apple-style Face ID card — Lottie is the only content -->
+      <div class="faceid-card" id="fid-frame-wrap">
+        <div class="fid-wrapper" id="fid-wrapper">
+          <dotlottie-player
+            id="fid-lottie"
+            src="https://lottie.host/2c89c12e-4c0d-41a6-ae13-30b2ce7a964a/kjwDIWFPeM.lottie"
+            loop
+            style="display:block;width:180px;height:180px;"
+          ></dotlottie-player>
+        </div>
+      </div>
+
+      <!-- Labels sit on the blurred layer, below the card -->
+      <p class="faceid-locked-label">Enigma Authenticator locked</p>
+      <p class="faceid-sub" id="faceid-sub"></p>
+
+      <div class="faceid-bottom">
+        <button class="faceid-fallback-link" onclick="goToPwFallback()">Use Passcode</button>
+      </div>
+    </div>
+
+  </div><!-- /#s-faceid -->
+
+  <div class="screens">
+
+    <!-- SCREEN: Home / Sessions -->
+    <div class="screen" id="s-home">
+
+      <!-- Logo banner — visible through the blur as Layer 1 -->
+      <div class="home-logo-banner">
+        <div class="home-logo-banner-left">
+          <div class="home-logo-icon">
+            <svg width="30" height="30" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13.5997 36.9331V34.5121L15.7256 35.4391V30.2742L19.9785 31.4062V37.1221L39.234 28.7333V24.3074L36.3801 24.9364V26.6263L38.385 26.0364V27.6083L28.9913 31.0282V28.8113L35.1911 26.9993V25.2384L28.9913 26.5983V24.3814L39.985 22.7224V29.8533L19.9935 39.999L13.5997 36.9331ZM0 29.8503V17.0206L8.3418 15.8486V21.9644L6.92683 21.8465V17.9796L4.5019 18.1445V21.6665L1.60796 21.4305V19.8895L3.4509 19.9055V18.2155L0.78297 18.3885V25.8254L1.61596 26.0774V22.9774L2.50494 23.1114V27.9383L0.801982 27.2993V28.7773L5.67585 30.9622V29.1153L3.47593 28.2973V26.5993L8.36179 28.0733V26.0364L3.47992 24.9364V23.2624L13.6007 24.8184V22.3994L9.93875 22.1084V19.9535L15.7386 19.9855V7.09083L19.9915 5.71586V2.85392L11.6647 6.27385V8.54578L13.5966 7.85481V10.2757L8.38178 11.7847V13.8217L6.96684 14.1276V10.2597L9.93374 9.19077V4.88288L19.9935 0L35.2071 7.53881V9.31577L32.4182 8.12879V10.0947L32.3782 10.0628L30.7532 9.48976V7.40681L22.5234 3.9159V6.58184L28.9743 8.85378V11.0707L32.3862 12.0217V13.9876L27.0023 12.8557V10.5127L22.5024 9.25577V11.9207L19.9565 11.3947V14.2556L35.1871 16.3556V21.6465L33.8612 21.7465V18.0465L30.7722 17.8466V22.0135L24.8634 22.4684V19.9615L28.9783 19.9295V17.7126L19.9645 17.1226V19.9845L22.5104 19.9695V27.9873L19.9645 28.5463V22.8294L15.7126 22.5384V27.6993L9.91275 26.3783V28.5333L13.5747 29.6333V32.0542L6.92182 29.5783V31.5122L11.6427 33.6262V35.8991L0 29.8503ZM22.5374 30.6912L24.8924 29.9993V24.9834L27.0343 24.6604V31.7122L22.5394 33.3552L22.5374 30.6912ZM36.3951 19.9065L39.249 19.8905V12.4997L40.001 12.7667V21.3205L36.3961 21.5955L36.3951 19.9065ZM37.4541 18.3065V16.7066L36.3951 16.5576V14.8676H36.4031L38.408 15.2776V18.3595L37.4541 18.3065ZM11.6747 15.4066L9.93676 15.6586V13.4997L9.94476 13.4917L13.6067 12.7127V17.5556L11.6747 17.6886V15.4066ZM0.0100095 9.88975L8.36179 5.66786L8.36979 5.68386V7.71981L5.68586 8.87578V10.7237L4.53889 11.1327V9.37277L0.811991 10.9837V12.4627L2.51794 11.8487V13.4607L5.67085 12.5487V14.3796L1.62896 15.2446V13.7197L0.796977 13.9557V15.4336L0.0130002 15.5996L0.0100095 9.88975ZM33.8892 14.3316V10.6047L36.3961 11.4847V8.12879L39.985 9.89776V11.3207L37.4551 10.2517V11.8637L38.409 12.2017V13.7427L35.2161 12.8427V14.6026L33.8892 14.3316Z" fill="white"/>
+            </svg>
+          </div>
+          <p class="home-logo-name">Enigma Authenticator</p>
+        </div>
+      </div>
+
+      <div class="home-header">
+        <div class="home-header-left">
+          <h1 class="screen-title">Your devices</h1>
+        </div>
+      </div>
+
+      <div class="home-scroll">
+        <div id="all-sessions">
+          <!-- Active sessions label + London card -->
+          <p class="other-sessions-label" id="label-active" style="display:none; color: var(--c-success);">Active now</p>
+          <div class="session-compact" id="sess-london" style="display:none; border: 1.5px solid var(--c-border); flex-direction: column; align-items: stretch; gap: 0; padding: 16px;">
+            <!-- Header row -->
+            <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:14px;">
+              <div class="session-dot" style="flex-shrink:0; margin-top:6px;"></div>
+              <div style="flex:1; min-width:0;">
+                <span class="session-compact-loc">London, UK</span>
+                <div class="session-compact-meta" style="margin-top:2px;"><span id="sess-london-time">just now</span></div>
+              </div>
+            </div>
+            <!-- Detail grid — neutral light grey -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; background:var(--c-surface-2); border-radius: 8px; padding:12px 14px;">
+              <div>
+                <div style="font-size:10px;font-weight:700;color:var(--c-text-3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px;">Browser</div>
+                <div style="font-size:12px;font-weight:600;color:var(--c-text);">Chrome 126</div>
+              </div>
+              <div>
+                <div style="font-size:10px;font-weight:700;color:var(--c-text-3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px;">Device</div>
+                <div style="font-size:12px;font-weight:600;color:var(--c-text);">MacBook Pro</div>
+              </div>
+              <div>
+                <div style="font-size:10px;font-weight:700;color:var(--c-text-3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px;">OS</div>
+                <div style="font-size:12px;font-weight:600;color:var(--c-text);">macOS 14</div>
+              </div>
+              <div>
+                <div style="font-size:10px;font-weight:700;color:var(--c-text-3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px;">IP Address</div>
+                <div style="font-size:12px;font-weight:600;color:var(--c-text);font-family:var(--font-mono);">82.43.201.15</div>
+              </div>
+            </div>
+          </div>
+
+          <p class="other-sessions-label" style="margin-top:16px; margin-bottom:10px;">Recent sign-ins</p>
+          <div class="session-compact" id="sess-ny">
+            <div class="session-compact-flag">US</div>
+            <div class="session-compact-body">
+              <div class="session-compact-loc">New York, US</div>
+              <div class="session-compact-meta">Firefox · Windows · 2h ago</div>
+            </div>
+            <button class="session-compact-signout" onclick="signOutSession('sess-ny','New York')">Sign out</button>
+          </div>
+          <div class="session-compact" id="sess-sg">
+            <div class="session-compact-flag">SG</div>
+            <div class="session-compact-body">
+              <div class="session-compact-loc">Singapore</div>
+              <div class="session-compact-meta">Safari · iPhone · 5h ago</div>
+            </div>
+            <button class="session-compact-signout" onclick="signOutSession('sess-sg','Singapore')">Sign out</button>
+          </div>
+          <div class="session-compact" id="sess-am">
+            <div class="session-compact-flag">NL</div>
+            <div class="session-compact-body">
+              <div class="session-compact-loc">Amsterdam, NL</div>
+              <div class="session-compact-meta">Chrome · Windows · 1d ago</div>
+            </div>
+            <button class="session-compact-signout" onclick="signOutSession('sess-am','Amsterdam')">Sign out</button>
+          </div>
+          <p class="sessions-empty" id="sessions-empty" style="display:none;">No other active sessions.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: Password fallback -->
+    <div class="screen" id="s-pwfallback">
+
+      <!-- Header section -->
+      <div class="fb-top">
+        <button class="fb-back" onclick="backToFaceID()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to Face ID
+        </button>
+        <p class="eyebrow" style="margin-bottom:6px;">Identity Verification</p>
+        <h2 class="screen-title" style="font-size:22px; margin-top:0; margin-bottom:6px;">Sign in with password</h2>
+        <p class="screen-sub" style="margin:0; font-size:14px;">Face ID wasn't available. Enter your credentials to continue.</p>
+      </div>
+
+      <!-- Form section -->
+      <div class="fb-form">
+        <div class="input-group">
+          <label for="fb-email">Email Address</label>
+          <div class="input-wrap">
+            <input type="email" class="input-field" id="fb-email" placeholder="you@enigma.io" autocomplete="email" />
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="fb-pw">Password</label>
+          <div class="input-wrap">
+            <input type="password" class="input-field" id="fb-pw" placeholder="Enter your password" autocomplete="current-password" />
+            <button class="input-toggle" type="button" onclick="this.previousElementSibling.type=this.previousElementSibling.type==='password'?'text':'password'" aria-label="Toggle password visibility">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="fb-submit">
+          <button class="btn-primary" id="fb-btn" onclick="doFbLogin()">Confirm Identity</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /screens -->
+
+  <!-- ─── Sign-out confirmation dialog ─── -->
+  <div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-dialog">
+      <p class="confirm-title" id="confirm-title">Sign out session?</p>
+      <p class="confirm-body" id="confirm-body">This will immediately end the session and require re-authentication on that device.</p>
+      <div class="confirm-actions">
+        <button class="confirm-btn confirm-btn-cancel" onclick="cancelSignOut()">Cancel</button>
+        <button class="confirm-btn confirm-btn-danger" onclick="confirmSignOut()">Sign out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Bottom Sheet overlay ─── -->
+  <div class="sheet-overlay" id="sheet-overlay"></div>
+
+  <!-- ─── Bottom Sheet ─── -->
+  <div class="bottom-sheet" id="sign-in-sheet">
+    <div class="sheet-handle"></div>
+
+    <!-- Map -->
+    <div class="sheet-map">
+      <!-- London city map SVG -->
+      <svg viewBox="0 0 358 160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <!-- Base background -->
+        <rect width="358" height="160" fill="#DEE8ED"/>
+        <!-- City blocks -->
+        <rect x="10" y="8" width="60" height="28" rx="3" fill="#C8D6DF"/>
+        <rect x="78" y="8" width="44" height="28" rx="3" fill="#C8D6DF"/>
+        <rect x="130" y="8" width="52" height="22" rx="3" fill="#C8D6DF"/>
+        <rect x="190" y="8" width="38" height="28" rx="3" fill="#C8D6DF"/>
+        <rect x="236" y="8" width="62" height="22" rx="3" fill="#C8D6DF"/>
+        <rect x="306" y="8" width="44" height="28" rx="3" fill="#C8D6DF"/>
+        <rect x="10" y="44" width="38" height="36" rx="3" fill="#C8D6DF"/>
+        <rect x="56" y="44" width="56" height="36" rx="3" fill="#C8D6DF"/>
+        <rect x="120" y="44" width="28" height="18" rx="3" fill="#C8D6DF"/>
+        <rect x="156" y="44" width="44" height="36" rx="3" fill="#C8D6DF"/>
+        <rect x="208" y="44" width="32" height="20" rx="3" fill="#C8D6DF"/>
+        <rect x="248" y="44" width="50" height="36" rx="3" fill="#C8D6DF"/>
+        <rect x="306" y="44" width="44" height="36" rx="3" fill="#C8D6DF"/>
+        <!-- Thames river -->
+        <path d="M0 100 Q60 90 120 105 Q180 120 240 105 Q300 90 358 100 L358 125 Q300 115 240 130 Q180 145 120 130 Q60 115 0 125 Z" fill="#A8BECD" opacity=".9"/>
+        <path d="M0 105 Q60 95 120 110 Q180 125 240 110 Q300 95 358 105" fill="none" stroke="#94AABB" stroke-width="1.5"/>
+        <!-- Waterloo Bridge hint -->
+        <rect x="158" y="98" width="42" height="6" rx="3" fill="#A8BECD"/>
+        <!-- Bottom city blocks -->
+        <rect x="10" y="134" width="52" height="22" rx="3" fill="#C8D6DF"/>
+        <rect x="70" y="134" width="40" height="22" rx="3" fill="#C8D6DF"/>
+        <rect x="118" y="134" width="62" height="22" rx="3" fill="#C8D6DF"/>
+        <rect x="188" y="134" width="44" height="22" rx="3" fill="#C8D6DF"/>
+        <rect x="240" y="134" width="56" height="22" rx="3" fill="#C8D6DF"/>
+        <rect x="304" y="134" width="46" height="22" rx="3" fill="#C8D6DF"/>
+        <!-- Roads -->
+        <line x1="0" y1="88" x2="358" y2="88" stroke="#F7F8F8" stroke-width="5"/>
+        <line x1="179" y1="0" x2="179" y2="88" stroke="#F7F8F8" stroke-width="5"/>
+        <line x1="179" y1="128" x2="179" y2="160" stroke="#F7F8F8" stroke-width="4"/>
+        <line x1="0" y1="40" x2="358" y2="40" stroke="#F7F8F8" stroke-width="3.5"/>
+        <!-- Green park patch -->
+        <rect x="20" y="50" width="28" height="22" rx="4" fill="#8BEEC8" opacity=".5"/>
+        <!-- Drop pin -->
+        <circle cx="179" cy="68" r="14" fill="#3DBFBF" opacity=".18"/>
+        <circle cx="179" cy="68" r="8" fill="#3DBFBF"/>
+        <circle cx="179" cy="68" r="3.5" fill="white"/>
+        <path d="M179 76 L179 84" stroke="#3DBFBF" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <div class="map-location-pill">
+        <div class="loc-dot"></div>
+        London, United Kingdom
+      </div>
+    </div>
+
+    <!-- Sheet body -->
+    <div class="sheet-body">
+      <p class="sheet-section-title">Sign-in details</p>
+      <div class="sheet-info-grid">
+        <div class="sheet-info-item">
+          <span class="sheet-info-label">Browser</span>
+          <span class="sheet-info-val">Chrome 126</span>
+        </div>
+        <div class="sheet-info-item">
+          <span class="sheet-info-label">OS</span>
+          <span class="sheet-info-val">macOS 14</span>
+        </div>
+        <div class="sheet-info-item">
+          <span class="sheet-info-label">IP Address</span>
+          <span class="sheet-info-val">82.43.201.15</span>
+        </div>
+        <div class="sheet-info-item">
+          <span class="sheet-info-label">Time</span>
+          <span class="sheet-info-val" id="sheet-time">9:41 AM</span>
+        </div>
+      </div>
+
+      <!-- OTP code card -->
+      <div class="sheet-code-card" id="sheet-code-section">
+        <div class="sheet-code-header">
+          <span class="sheet-code-label">One-time code</span>
+          <span class="sheet-code-expiry" id="sheet-expiry">3:00</span>
+        </div>
+        <div class="sheet-otp" id="sheet-otp">482 716</div>
+        <button class="sheet-copy-btn" id="sheet-copy-btn" onclick="copyCode()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Copy code
+        </button>
+      </div>
+
+      <button class="sheet-block-link" onclick="blockRequest()">This wasn't me — Block sign-in</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+</div><!-- /shell -->
+
+<script>
+  /* ─── Screen navigation ─── */
+  const SCREEN_ORDER = ['s-home','s-pwfallback'];
+  let currentScreen = 's-home';
+
+  // 'unlock' = normal app open, just show sessions after auth
+  // 'signin' = approving a web sign-in, show sessions + sheet after auth
+  let faceIDContext = 'unlock';
+
+  function goToScreen(id) {
+    const targetIdx = SCREEN_ORDER.indexOf(id);
+    SCREEN_ORDER.forEach((sid, i) => {
+      const el = document.getElementById(sid);
+      const diff = i - targetIdx;
+      el.style.transform = diff === 0 ? 'translateX(0)' : `translateX(${diff < 0 ? -100 : 100}%)`;
+      el.style.opacity   = diff === 0 ? '1' : '0';
+    });
+    currentScreen = id;
+    document.querySelector('.status-bar').classList.toggle('status-bar--teal', id === 's-home');
+  }
+
+  /* ─── Face ID overlay show/hide ─── */
+  function showFaceIDOverlay() {
+    document.getElementById('s-faceid').classList.remove('hidden');
+  }
+  function hideFaceIDOverlay() {
+    document.getElementById('s-faceid').classList.add('hidden');
+  }
+
+  /* ─── Launch screen ─── */
+  function showLaunch(callback) {
+    const launch = document.getElementById('s-launch');
+    launch.classList.remove('hidden');
+    // After delay, show Face ID on top — launch screen stays visible underneath
+    setTimeout(callback, 1800);
+  }
+  function hideLaunchScreen() {
+    document.getElementById('s-launch').classList.add('hidden');
+  }
+
+  /* ─── Status bar clock ─── */
+  function updateClock() {
+    const now = new Date();
+    let h = now.getHours(), m = now.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    const str = `${h}:${String(m).padStart(2,'0')}`;
+    document.getElementById('sb-time').textContent = str;
+  }
+  updateClock(); setInterval(updateClock, 10000);
+  document.querySelector('.status-bar').classList.add('status-bar--teal');
+
+  // On cold open: launch screen → Face ID
+  showLaunch(() => {
+    showFaceIDOverlay();
+    resetFrame();
+    startFaceID();
+  });
+
+  /* Sheet time */
+  (function(){
+    const d = new Date();
+    let h = d.getHours(), m = d.getMinutes(), ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    document.getElementById('sheet-time').textContent = `${h}:${String(m).padStart(2,'0')} ${ampm}`;
+  })();
+
+  /* ─── Toast ─── */
+  let toastTimer;
+  function showToast(msg, type='') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast' + (type ? ' '+type : '') + ' show';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      el.classList.remove('show');
+    }, 3000);
+  }
+
+  /* ─── Push notification banner ─── */
+  let bannerDismissTimer;
+  let appUnlocked = false; // true once user has completed first auth
+
+  function showPushBanner() {
+    const banner = document.getElementById('push-banner');
+    banner.classList.add('show');
+    // Auto-dismiss after 9s if not tapped
+    clearTimeout(bannerDismissTimer);
+    bannerDismissTimer = setTimeout(() => hidePushBanner(), 9000);
+  }
+
+  function hidePushBanner() {
+    clearTimeout(bannerDismissTimer);
+    document.getElementById('push-banner').classList.remove('show');
+  }
+
+  function openFromBanner() {
+    hidePushBanner();
+    faceIDContext = 'signin';
+    hideFaceIDOverlay();
+    if (appUnlocked) {
+      // Already in the app — skip launch screen, go straight to Face ID
+      showFaceIDOverlay();
+      resetFrame();
+      startFaceID();
+    } else {
+      // Cold open — show launch screen first
+      showLaunch(() => {
+        showFaceIDOverlay();
+        resetFrame();
+        startFaceID();
+      });
+    }
+  }
+
+  /* ─── Face ID ─── */
+  let faceIDTimer;
+
+  function afterAuthSuccess() {
+    hideFaceIDOverlay();
+    hideLaunchScreen();
+    goToScreen('s-home');
+    appUnlocked = true; // mark app as open — no launch screen on subsequent Face ID prompts
+    if (faceIDContext === 'signin') {
+      setTimeout(() => showSignInSheet(), 400);
+    }
+    faceIDContext = 'unlock';
+  }
+
+  function resetFrame() {
+    const w = document.getElementById('fid-wrapper');
+    const lottie = document.getElementById('fid-lottie');
+    if (w) w.className = 'fid-wrapper';
+    if (lottie) lottie.stop();
+  }
+
+  function startFaceID() {
+    const w      = document.getElementById('fid-wrapper');
+    const lottie = document.getElementById('fid-lottie');
+    w.className = 'fid-wrapper';
+    if (lottie) lottie.stop();
+    void w.offsetWidth;
+    setTimeout(() => {
+      w.classList.add('active');
+      if (lottie) lottie.play();
+    }, 60);
+    clearTimeout(faceIDTimer);
+    faceIDTimer = setTimeout(() => {
+      w.classList.add('completed');
+      if (lottie) lottie.stop();
+      afterAuthSuccess();
+    }, 2200);
+  }
+
+  // Tap card to retry if not already scanning
+  document.getElementById('fid-frame-wrap').addEventListener('click', () => {
+    const w = document.getElementById('fid-wrapper');
+    if (w && !w.classList.contains('active')) {
+      startFaceID();
+    }
+  });
+
+  // App starts locked — overlay is visible by default, auto-start Face ID scan
+  setTimeout(startFaceID, 600);
+
+  function goToPwFallback() {
+    clearTimeout(faceIDTimer);
+    resetFrame();
+    hideFaceIDOverlay();
+    hideLaunchScreen();
+    const btn = document.getElementById('fb-btn');
+    btn.textContent = 'Confirm Identity'; btn.disabled = false;
+    document.getElementById('fb-email').value = '';
+    document.getElementById('fb-pw').value = '';
+    clearTimeout(fbLoginTimer);
+    goToScreen('s-pwfallback');
+  }
+
+  function backToFaceID() {
+    clearTimeout(fbLoginTimer);
+    document.getElementById('fb-btn').textContent = 'Confirm Identity';
+    document.getElementById('fb-btn').disabled = false;
+    goToScreen('s-home');
+    showFaceIDOverlay();
+    setTimeout(startFaceID, 200);
+  }
+
+  /* ─── Password fallback ─── */
+  let fbLoginTimer;
+  function doFbLogin() {
+    const email = document.getElementById('fb-email').value.trim();
+    const pw    = document.getElementById('fb-pw').value;
+    if (!email || pw.length < 4) { showToast('Enter your email and password.'); return; }
+    const btn = document.getElementById('fb-btn');
+    btn.textContent = 'Verifying…'; btn.disabled = true;
+    clearTimeout(fbLoginTimer);
+    fbLoginTimer = setTimeout(() => {
+      btn.textContent = 'Confirm Identity'; btn.disabled = false;
+      afterAuthSuccess();
+    }, 1400);
+  }
+
+  /* ─── Reveal "this device" session after sign-in confirmed ─── */
+  function revealCurrentSession() {
+    const d = new Date();
+    let h = d.getHours(), m = d.getMinutes(), ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    document.getElementById('sess-london-time').textContent = `${h}:${String(m).padStart(2,'0')} ${ampm}`;
+    const label = document.getElementById('label-active');
+    if (label) label.style.display = 'block';
+    const el = document.getElementById('sess-london');
+    el.style.display = 'flex';
+    el.style.opacity = '0'; el.style.transform = 'scale(.97)';
+    requestAnimationFrame(() => {
+      el.style.transition = 'opacity .3s ease, transform .3s ease';
+      el.style.opacity = '1'; el.style.transform = '';
+    });
+  }
+
+  /* ─── Sign-out other sessions ─── */
+  let _pendingSignOutId = null;
+  let _pendingSignOutLoc = null;
+
+  function signOutSession(id, location) {
+    _pendingSignOutId  = id;
+    _pendingSignOutLoc = location;
+    document.getElementById('confirm-title').textContent = `Sign out ${location} session?`;
+    document.getElementById('confirm-body').textContent  =
+      `This will immediately end the ${location} session and require re-authentication on that device.`;
+    document.getElementById('confirm-overlay').classList.add('show');
+  }
+
+  function confirmSignOut() {
+    document.getElementById('confirm-overlay').classList.remove('show');
+    const el = document.getElementById(_pendingSignOutId);
+    if (!el) return;
+    el.style.transition = 'opacity .23s ease, transform .23s ease';
+    el.style.opacity    = '0';
+    el.style.transform  = 'scale(.97)';
+    setTimeout(() => {
+      el.remove();
+      if (!document.querySelectorAll('#other-sessions .session-compact').length) {
+        document.getElementById('sessions-empty').style.display = 'block';
+      }
+    }, 230);
+    showToast(`Signed out of ${_pendingSignOutLoc} session.`);
+    _pendingSignOutId = _pendingSignOutLoc = null;
+  }
+
+  function cancelSignOut() {
+    document.getElementById('confirm-overlay').classList.remove('show');
+    _pendingSignOutId = _pendingSignOutLoc = null;
+  }
+
+  /* ─── Bottom sheet ─── */
+  let expiryInterval;
+  const EXPIRY_SECS = 180;
+  let expirySecsLeft = EXPIRY_SECS;
+
+  function formatCountdown(secs) {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${String(s).padStart(2,'0')}`;
+  }
+
+  function showSignInSheet() {
+    resetCodeCard(); // always start from clean state
+    document.getElementById('sheet-overlay').classList.add('show');
+    document.getElementById('sign-in-sheet').classList.add('open');
+    startExpiryTimer();
+  }
+
+  function dismissSignInSheet() {
+    clearInterval(expiryInterval);
+    const sheet   = document.getElementById('sign-in-sheet');
+    const overlay = document.getElementById('sheet-overlay');
+    sheet.classList.remove('open');
+    overlay.classList.remove('show');
+    // Reset code card state after animation
+    setTimeout(resetCodeCard, 450);
+  }
+
+  function resetCodeCard() {
+    expirySecsLeft = EXPIRY_SECS;
+    document.getElementById('sheet-expiry').textContent = formatCountdown(EXPIRY_SECS);
+    document.getElementById('sheet-expiry').className = 'sheet-code-expiry';
+    document.getElementById('sheet-otp').textContent = '482 716';
+    document.getElementById('sheet-otp').className = 'sheet-otp';
+    const copyBtn = document.getElementById('sheet-copy-btn');
+    copyBtn.textContent = '';
+    copyBtn.disabled = false;
+    copyBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy code';
+    // Remove confirmed state if present
+    const confirmed = document.querySelector('.sheet-confirmed');
+    if (confirmed) confirmed.remove();
+    const codeSection = document.getElementById('sheet-code-section');
+    codeSection.style.display = '';
+    codeSection.style.opacity = '';
+    codeSection.style.transition = '';
+    document.querySelector('.sheet-block-link').style.display = '';
+  }
+
+  function startExpiryTimer() {
+    clearInterval(expiryInterval);
+    expirySecsLeft = EXPIRY_SECS;
+    const exLabel = document.getElementById('sheet-expiry');
+    exLabel.textContent = formatCountdown(EXPIRY_SECS);
+    expiryInterval = setInterval(() => {
+      expirySecsLeft--;
+      exLabel.textContent = formatCountdown(expirySecsLeft);
+      if (expirySecsLeft <= 30) {
+        exLabel.classList.add('urgent');
+      }
+      if (expirySecsLeft <= 0) {
+        clearInterval(expiryInterval);
+        dismissSignInSheet();
+        showToast('Code expired. Please request a new sign-in.');
+      }
+    }, 1000);
+  }
+
+  function copyCode() {
+    const code = '482716';
+    try { navigator.clipboard.writeText(code); } catch(e) {}
+    const btn = document.getElementById('sheet-copy-btn');
+    btn.innerHTML = '✓ Copied!';
+    btn.disabled = true;
+    showToast('Code copied to clipboard.');
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy code';
+      btn.disabled = false;
+    }, 2000);
+  }
+
+  function blockRequest() {
+    clearInterval(expiryInterval);
+    dismissSignInSheet();
+    setTimeout(() => {
+      goToScreen('s-home');
+      showToast('Sign-in blocked. Attempt has been logged.', 'danger');
+    }, 150);
+  }
+
+  /* ─── BroadcastChannel ─── */
+  function handleCodeUsed() {
+    clearInterval(expiryInterval);
+    const codeSection = document.getElementById('sheet-code-section');
+    const blockLink   = document.querySelector('.sheet-block-link');
+    codeSection.style.transition = 'opacity .2s';
+    codeSection.style.opacity = '0';
+    if (blockLink) blockLink.style.display = 'none';
+    setTimeout(() => {
+      codeSection.style.display = 'none';
+      const confirmed = document.createElement('div');
+      confirmed.className = 'sheet-confirmed';
+      confirmed.innerHTML = `
+        <div class="sheet-confirmed-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <h3>Sign-in confirmed</h3>
+        <p>You're now signed in on Chrome · London</p>
+      `;
+      codeSection.parentNode.insertBefore(confirmed, codeSection.nextSibling);
+      setTimeout(() => {
+        dismissSignInSheet();
+        setTimeout(() => revealCurrentSession(), 500);
+      }, 2800);
+    }, 220);
+  }
+
+  try {
+    const authChannel = new BroadcastChannel('enigma_auth');
+    authChannel.onmessage = (e) => {
+      if (e.data?.type === 'sign_in_request') showPushBanner();
+      if (e.data?.type === 'code_used') handleCodeUsed();
+    };
+  } catch(e) {}
+</script>
+</body>
+</html>

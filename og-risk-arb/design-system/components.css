@@ -1,0 +1,970 @@
+/* ============================================================
+   OG Risk Arb — Component Styles
+   Oscar Gruss Risk Arbitrage — Deal Tracking & Research Platform
+   Requires: tokens.css loaded first
+   ============================================================ */
+
+/* ─── RESET ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+input:focus-visible,
+select:focus-visible { outline: none; } /* use border + box-shadow instead */
+
+
+/* ============================================================
+   SIDEBAR (left icon-only nav)
+   ============================================================ */
+
+.sidebar {
+  width: var(--w-sidebar);
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+  gap: 4px;
+  flex-shrink: 0;
+  z-index: var(--z-sidebar);
+  overflow: hidden;
+}
+
+/* OG logo circle at top */
+.sidebar-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: var(--font-bold);
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* Nav item */
+.sidebar-item {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-tertiary);
+  background: transparent;
+  border: none;
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    color var(--duration-fast) var(--ease-default);
+  flex-shrink: 0;
+}
+.sidebar-item:hover {
+  background: var(--color-brand-ghost);
+  color: var(--color-brand);
+}
+.sidebar-item.active {
+  background: rgba(27, 140, 140, 0.10);
+  color: var(--color-brand);
+}
+.sidebar-item svg {
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+}
+
+/* Sidebar spacer and bottom section */
+.sidebar-spacer { flex: 1; }
+.sidebar-bottom { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+
+
+/* ============================================================
+   TAB BAR (deal tabs)
+   ============================================================ */
+
+.tab-bar {
+  display: flex;
+  align-items: stretch;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--h-tab);
+  padding: 0 var(--space-7);
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color var(--duration-fast),
+    border-color var(--duration-fast);
+}
+.tab:hover { color: var(--color-text-primary); }
+.tab.active {
+  color: var(--color-text-primary);
+  font-weight: var(--font-semibold);
+  border-bottom-color: var(--color-brand);
+}
+
+/* Tab close button */
+.tab-close {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--duration-fast), background var(--duration-fast);
+  color: var(--color-text-tertiary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.tab:hover .tab-close,
+.tab.active .tab-close { opacity: 1; }
+.tab-close:hover { background: rgba(0,0,0,0.07); color: var(--color-text-secondary); }
+.tab-close svg { width: 10px; height: 10px; }
+
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: var(--h-btn);
+  padding: 0 var(--space-7);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default),
+    color var(--duration-fast) var(--ease-default),
+    opacity var(--duration-fast) var(--ease-default),
+    transform var(--duration-instant) var(--ease-default);
+}
+.btn:active { transform: scale(0.98); }
+
+/* Dark fill — "Edit Deal", "Save Changes" */
+.btn-dark {
+  background: var(--color-text-primary);
+  color: #FFFFFF;
+}
+.btn-dark:hover { opacity: 0.85; }
+
+/* Brand fill — teal fill */
+.btn-brand {
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
+}
+.btn-brand:hover { background: var(--color-brand-hover); }
+
+/* Outlined — "Cancel", secondary actions */
+.btn-outline {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+.btn-outline:hover {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+/* Ghost / teal text */
+.btn-ghost {
+  background: transparent;
+  color: var(--color-brand);
+  border: none;
+  padding: 0 var(--space-3);
+}
+.btn-ghost:hover { background: var(--color-brand-ghost); }
+
+/* Large (primary action) */
+.btn-lg { height: var(--h-btn-lg); padding: 0 20px; font-size: var(--text-md); }
+
+/* Small (compact) */
+.btn-sm { height: var(--h-btn-sm); padding: 0 10px; font-size: var(--text-sm); }
+
+/* Disabled */
+.btn:disabled,
+.btn[disabled] {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  border-color: var(--color-disabled-bg);
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 1;
+}
+
+/* Icon button */
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+.btn-icon:hover {
+  background: var(--color-brand-ghost);
+  color: var(--color-brand);
+}
+.btn-icon svg { width: var(--icon-md); height: var(--icon-md); }
+
+/* Link style */
+.btn-link {
+  background: none;
+  border: none;
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--color-brand);
+  cursor: pointer;
+  padding: 2px 0;
+  text-decoration: none;
+  transition: opacity var(--duration-fast);
+}
+.btn-link:hover { opacity: 0.75; text-decoration: underline; text-underline-offset: 3px; }
+
+
+/* ============================================================
+   OPEN / CLOSED TOGGLE (segmented control)
+   ============================================================ */
+
+.toggle-group {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.toggle-group .toggle-btn {
+  height: 32px;
+  padding: 0 14px;
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: none;
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+.toggle-group .toggle-btn:not(:last-child) {
+  border-right: 1px solid var(--color-border);
+}
+.toggle-group .toggle-btn.active {
+  background: var(--color-text-primary);
+  color: #FFFFFF;
+  font-weight: var(--font-semibold);
+}
+
+
+/* ============================================================
+   FILTER PILLS (deal type chips)
+   ============================================================ */
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 28px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--duration-fast),
+    border-color var(--duration-fast),
+    color var(--duration-fast);
+}
+.filter-pill.active {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: var(--color-text-on-brand);
+  font-weight: var(--font-semibold);
+}
+.filter-pill:hover:not(.active) {
+  border-color: var(--color-brand-ghost-border);
+  color: var(--color-brand);
+}
+.filter-pill-count {
+  font-weight: var(--font-semibold);
+}
+
+
+/* ============================================================
+   SEARCH BAR
+   ============================================================ */
+
+.search-wrap {
+  position: relative;
+  width: 100%;
+}
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+.search-icon svg { width: var(--icon-sm); height: var(--icon-sm); }
+
+.search-input {
+  width: 100%;
+  height: var(--h-input);
+  padding: 0 var(--space-7) 0 32px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  outline: none;
+  transition:
+    border-color var(--duration-normal),
+    box-shadow var(--duration-normal);
+  -webkit-appearance: none;
+}
+.search-input:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: var(--shadow-focus);
+}
+.search-input::placeholder { color: var(--color-text-tertiary); }
+
+
+/* ============================================================
+   FORM INPUTS
+   ============================================================ */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.field-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  letter-spacing: 0.03em;
+}
+.field-wrap { position: relative; }
+
+.field-input {
+  width: 100%;
+  height: var(--h-input);
+  padding: 0 var(--space-7);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  outline: none;
+  transition:
+    border-color var(--duration-normal),
+    box-shadow var(--duration-normal),
+    background var(--duration-normal);
+  -webkit-appearance: none;
+}
+.field-input:focus {
+  border-color: var(--color-border-focus);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-focus);
+}
+.field-input::placeholder { color: var(--color-text-tertiary); }
+.field-input.error {
+  border-color: var(--color-status-negative);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+}
+
+.field-error {
+  font-size: var(--text-sm);
+  color: var(--color-status-negative);
+  display: none;
+}
+.field-error.show { display: block; }
+
+/* Textarea */
+.field-textarea {
+  resize: vertical;
+  min-height: 80px;
+  padding: var(--space-3) var(--space-7);
+  height: auto;
+}
+
+
+/* ============================================================
+   SELECT / DROPDOWN
+   ============================================================ */
+
+.select-wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+.select-wrap::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid var(--color-text-tertiary);
+  pointer-events: none;
+}
+.select-native {
+  width: 100%;
+  height: var(--h-input);
+  padding: 0 32px 0 var(--space-7);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color var(--duration-normal);
+}
+.select-native:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: var(--shadow-focus);
+}
+
+
+/* ============================================================
+   DEAL STATUS BADGES
+   ============================================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--h-badge);
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* Deal status */
+.badge-definitive {
+  background: var(--badge-definitive-bg);
+  color: var(--badge-definitive-text);
+}
+.badge-cash {
+  background: var(--badge-cash-bg);
+  color: var(--badge-cash-text);
+}
+.badge-proposal {
+  background: var(--badge-proposal-bg);
+  color: var(--badge-proposal-text);
+}
+.badge-terminated {
+  background: var(--badge-terminated-bg);
+  color: var(--badge-terminated-text);
+}
+
+/* Neutral / sector tags */
+.badge-neutral {
+  background: var(--badge-neutral-bg);
+  color: var(--badge-neutral-text);
+}
+
+/* % change */
+.badge-positive { color: var(--color-status-positive); font-weight: var(--font-semibold); }
+.badge-negative { color: var(--color-status-negative); font-weight: var(--font-semibold); }
+
+
+/* ============================================================
+   DEAL LIST TABLE
+   ============================================================ */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+}
+.data-table th {
+  padding: var(--space-3) var(--space-5);
+  text-align: left;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-tertiary);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+  user-select: none;
+}
+.data-table th.sortable { cursor: pointer; }
+.data-table th.sortable:hover { color: var(--color-text-secondary); }
+
+.data-table td {
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+.data-table tbody tr { transition: background var(--duration-instant); }
+.data-table tbody tr:hover { background: rgba(27, 140, 140, 0.04); }
+.data-table tbody tr.highlighted { background: var(--color-brand-ghost); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+
+/* Deal title link */
+.data-table .col-deal-title {
+  color: var(--color-text-link);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity var(--duration-fast);
+}
+.data-table .col-deal-title:hover { opacity: 0.75; text-decoration: underline; text-underline-offset: 3px; }
+
+/* Date columns */
+.data-table .col-date {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+/* Sort icon */
+.sort-icon {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-left: 4px;
+  opacity: 0.4;
+  vertical-align: middle;
+}
+th.sort-asc .sort-icon,
+th.sort-desc .sort-icon { opacity: 1; color: var(--color-brand); }
+
+
+/* ============================================================
+   CARD / PANEL
+   ============================================================ */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.card-header {
+  padding: var(--space-5) var(--space-7);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+.card-title {
+  font-size: var(--text-md);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  flex: 1;
+}
+.card-body { padding: var(--space-7); }
+
+/* Section header within card */
+.card-section-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-3);
+}
+
+
+/* ============================================================
+   ACCORDION (deal detail sections)
+   ============================================================ */
+
+.accordion {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.accordion + .accordion { margin-top: var(--space-3); }
+
+.accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-7);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  background: var(--color-surface);
+  transition: background var(--duration-fast);
+  user-select: none;
+}
+.accordion-header:hover { background: var(--color-surface-2); }
+
+.accordion-chevron {
+  color: var(--color-text-tertiary);
+  transition: transform var(--duration-base);
+  flex-shrink: 0;
+}
+.accordion.open .accordion-chevron { transform: rotate(180deg); }
+
+.accordion-body {
+  padding: var(--space-5) var(--space-7);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+  display: none;
+}
+.accordion.open .accordion-body { display: block; }
+
+
+/* ============================================================
+   COMMENT / UPDATE FEED
+   ============================================================ */
+
+.comment-list { display: flex; flex-direction: column; gap: var(--space-7); }
+
+.comment {
+  display: flex;
+  gap: var(--space-5);
+}
+.comment-avatar {
+  width: var(--avatar-sm);
+  height: var(--avatar-sm);
+  border-radius: var(--radius-full);
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
+  font-size: 11px;
+  font-weight: var(--font-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+.comment-body { flex: 1; min-width: 0; }
+.comment-meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+.comment-author {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+}
+.comment-time {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+}
+.comment-text {
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  line-height: var(--leading-relaxed);
+}
+
+
+/* ============================================================
+   PDF ATTACHMENT CARD
+   ============================================================ */
+
+.attachment-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-7);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+.attachment-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius);
+  background: rgba(239, 68, 68, 0.10);
+  color: #DC2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.attachment-icon svg { width: var(--icon-lg); height: var(--icon-lg); }
+.attachment-info { flex: 1; min-width: 0; }
+.attachment-name {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attachment-meta {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  margin-top: 1px;
+}
+
+
+/* ============================================================
+   DEAL INFO ROW (key-value pairs in deal detail)
+   ============================================================ */
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-9);
+}
+.info-row:last-child { border-bottom: none; }
+.info-label {
+  min-width: 140px;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+.info-value {
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+
+/* ============================================================
+   EVENT CARD (upcoming events panel)
+   ============================================================ */
+
+.event-card {
+  display: flex;
+  gap: var(--space-5);
+  padding: var(--space-5) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.event-card:last-child { border-bottom: none; }
+.event-date-block {
+  min-width: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+.event-date-day {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-brand);
+  line-height: 1.1;
+}
+.event-date-month {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.event-info { flex: 1; min-width: 0; }
+.event-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+.event-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+
+/* ============================================================
+   USER AVATAR (top-right pill)
+   ============================================================ */
+
+.user-avatar {
+  width: var(--avatar-md);
+  height: var(--avatar-md);
+  border-radius: var(--radius-full);
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  transition: opacity var(--duration-fast);
+}
+.user-avatar:hover { opacity: 0.85; }
+
+
+/* ============================================================
+   DIVIDER
+   ============================================================ */
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-8) 0;
+}
+.divider-labeled {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  margin: var(--space-8) 0;
+}
+.divider-line { flex: 1; height: 1px; background: var(--color-border); }
+.divider-text {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  opacity: 0;
+  background: var(--color-text-primary);
+  color: #FFFFFF;
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: var(--z-toast);
+  box-shadow: var(--shadow-dialog);
+  transition:
+    transform var(--duration-slide) var(--ease-out),
+    opacity var(--duration-enter) var(--ease-default);
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+.toast.positive { background: #16A34A; }
+.toast.negative { background: #DC2626; }
+
+
+/* ============================================================
+   DATE PICKER ROW (upcoming events header)
+   ============================================================ */
+
+.datepicker-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5) 0 var(--space-5);
+}
+.datepicker-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+.datepicker-input {
+  height: 30px;
+  padding: 0 var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  outline: none;
+  transition: border-color var(--duration-fast);
+}
+.datepicker-input:focus { border-color: var(--color-border-focus); box-shadow: var(--shadow-focus); }
+
+
+/* ============================================================
+   SECTION LABEL (eyebrow pattern)
+   ============================================================ */
+
+.section-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-tertiary);
+}
+
+/* Teal section label */
+.section-label-brand {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-brand);
+}

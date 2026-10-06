@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enigma — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --c-bg:           #EBEBEB;
+      --c-surface:      #FFFFFF;
+      --c-surface-2:    #F5F5F5;
+      --c-primary:      #7AEFEF;
+      --c-primary-dim:  #5ADADA;
+      --c-primary-ghost:#7AEFEF18;
+      --c-black:        #1A1A1A;
+      --c-text:         #1A1F36;
+      --c-text-2:       #6B7280;
+      --c-text-3:       #9CA3AF;
+      --c-border:       #E2E2E2;
+      --c-danger:       #EF4444;
+      --c-disabled:     #D1D5DB;
+      --font-sans: 'DM Sans', -apple-system, sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    button:focus-visible, [tabindex]:focus-visible {
+      outline: 2px solid var(--c-primary);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    /* Inputs handle focus visually via border + box-shadow — no extra outline needed */
+    input:focus-visible { outline: none; }
+    html, body {
+      min-height: 100vh;
+      font-family: var(--font-sans);
+      background: var(--c-bg);
+      color: var(--c-text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Page layout ─── */
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    /* Top nav bar */
+    .top-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--c-border);
+      display: flex; align-items: center;
+      padding: 0 32px;
+      z-index: 100;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-icon {
+      width: 28px; height: 28px;
+      background: var(--c-black);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-icon svg { width: 16px; height: 16px; }
+    .nav-name { font-size: 16px; font-weight: 700; color: var(--c-text); letter-spacing: .04em; }
+    .nav-name span { color: var(--c-primary); }
+
+    /* ─── Card ─── */
+    .card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--c-surface);
+      border-radius: 8px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+      padding: 0 40px 36px;
+    }
+    @media (max-width: 500px) { .card { padding: 0 24px 28px; } }
+
+    /* ─── Card logo header ─── */
+    .card-logo-header {
+      display: flex; justify-content: center;
+      padding: 36px 0 28px;
+    }
+
+    /* ─── Screen switching ─── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ─── Typography ─── */
+    .eyebrow {
+      font-size: 14px; font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--c-text-2); margin-bottom: 8px;
+    }
+    .card-title   { font-size: 24px; font-weight: 700; line-height: 1.2; margin-bottom: 6px; }
+    .card-sub     { font-size: 14px; color: var(--c-text-2); line-height: 1.55; margin-bottom: 28px; }
+    #view-login .eyebrow,
+    #view-login .card-title,
+    #view-login .card-sub { text-align: center; }
+
+    /* ─── Form ─── */
+    .field       { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .field-label { font-size: 12px; font-weight: 600; color: var(--c-text-2); letter-spacing: .04em; }
+    .field-wrap  { position: relative; }
+    .field-input {
+      width: 100%; height: 48px;
+      padding: 0 44px 0 14px;
+      background: var(--c-surface-2);
+      border: 1.5px solid var(--c-border);
+      border-radius: 4px;
+      font-family: var(--font-sans);
+      font-size: 16px; color: var(--c-text);
+      outline: none;
+      transition: border-color .18s, box-shadow .18s;
+      -webkit-appearance: none;
+    }
+    .field-input:focus {
+      border-color: var(--c-primary);
+      background: var(--c-surface);
+      box-shadow: 0 0 0 4px var(--c-primary-ghost);
+    }
+    .field-input::placeholder { color: var(--c-text-3); }
+    .field-input.error { border-color: var(--c-danger); box-shadow: 0 0 0 4px rgba(239,68,68,.08); }
+    .field-toggle {
+      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; padding: 0; cursor: pointer; color: var(--c-text-3);
+      width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+      transition: color .12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .field-toggle:hover { color: var(--c-text-2); }
+    .field-toggle svg { width: 18px; height: 18px; display: block; }
+    .field-error { font-size: 12px; color: var(--c-danger); margin-top: 4px; display: none; }
+    .field-error.show { display: block; }
+
+    /* ─── Row ─── */
+    .row-between { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; }
+    .checkbox-row { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+    .cb-box {
+      width: 16px; height: 16px; border-radius: 2px; flex-shrink: 0;
+      border: 1px solid var(--c-text-3); background: var(--c-surface);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .12s, border-color .12s;
+    }
+    .checkbox-row.checked .cb-box { background: var(--c-primary); border-color: var(--c-primary); }
+    .cb-box svg { width: 10px; height: 10px; opacity: 0; transition: opacity .12s; }
+    .checkbox-row.checked .cb-box svg { opacity: 1; }
+    .cb-label { font-size: 14px; color: var(--c-text); font-weight: 400; }
+    .link-btn {
+      background: none; border: none; font-family: var(--font-sans);
+      font-size: 14px; font-weight: 600; color: var(--c-primary-dim);
+      cursor: pointer; padding: 6px 2px; transition: opacity .12s;
+      text-decoration: underline; text-underline-offset: 4px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .link-btn:hover { opacity: .75; }
+    .link-btn:disabled { opacity: .45; cursor: not-allowed; pointer-events: none; }
+
+    /* ─── Primary button ─── */
+    .btn {
+      width: 100%; height: 50px;
+      border: none; border-radius: 4px;
+      font-family: var(--font-sans); font-size: 16px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .12s, transform .08s, opacity .12s;
+      position: relative; overflow: hidden;
+    }
+    .btn-primary { background: var(--c-primary); color: var(--c-black); }
+    .btn-primary:hover  { background: var(--c-primary-dim); }
+    .btn-primary:active { transform: scale(.98); }
+    /* FIX: white on #D1D5DB fails contrast — use var(--c-text-2) */
+    .btn-primary:disabled { background: var(--c-disabled); color: var(--c-text-2); cursor: not-allowed; }
+    .btn .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(0,0,0,.15); border-top-color: var(--c-black);
+      border-radius: 50%; animation: spin .65s linear infinite; display: none;
+    }
+    .btn.loading .btn-label { visibility: hidden; }
+    .btn.loading .spinner   { display: block; position: absolute; }
+
+    /* ─── Divider ─── */
+    .divider { display: flex; align-items: center; gap: 10px; margin: 20px 0; }
+    .divider-line { flex: 1; height: 2px; background: var(--c-border); }
+    .divider-text { font-size: 12px; color: var(--c-text-3); font-weight: 500; }
+
+    /* ─── Security badge ─── */
+    .secure-row {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      margin-top: 24px;
+    }
+    .secure-row svg { width: 14px; height: 14px; color: var(--c-primary); }
+    .secure-row span { font-size: 12px; color: var(--c-text-3); font-weight: 500; }
+
+    /* ═════════════════════════════════════════════════
+       VIEW 2 — AUTHENTICATOR WAIT
+    ═════════════════════════════════════════════════ */
+
+    /* Phone illustration */
+    .phone-graphic {
+      width: 100%; display: flex; justify-content: center; margin-bottom: 28px;
+    }
+    .phone-pill {
+      background: var(--c-black);
+      border-radius: 8px;
+      padding: 14px 20px 16px;
+      display: flex; align-items: center; gap: 12px;
+      max-width: 300px; width: 100%;
+      position: relative;
+    }
+    .phone-app-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: var(--c-primary-ghost);
+      border: 1px solid rgba(45,218,197,.3);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .phone-app-icon svg { width: 22px; height: 22px; }
+    .phone-notif-text { flex: 1; min-width: 0; }
+    .phone-notif-app { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.5); letter-spacing: .04em; }
+    .phone-notif-msg { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.35; margin-top: 2px; }
+    .phone-notif-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--c-primary);
+      flex-shrink: 0;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .4; transform: scale(1.4); }
+    }
+
+    /* OTP slots */
+    .otp-slots {
+      display: flex; gap: 8px;
+      margin: 28px 0 12px;
+    }
+    .otp-slot {
+      flex: 1; min-width: 0; height: 58px;
+      background: var(--c-surface);
+      border: 1.5px solid var(--c-border);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 24px; font-weight: 600;
+      color: var(--c-text);
+      text-align: center; caret-color: var(--c-primary);
+      outline: none;
+      transition: border-color .15s, box-shadow .15s, background .15s, transform .1s;
+      -webkit-appearance: none;
+    }
+    .otp-slot:focus, .otp-slot:focus-visible {
+      border-color: var(--c-primary);
+      background: var(--c-surface);
+      box-shadow: 0 0 0 4px var(--c-primary-ghost);
+      transform: scale(1.05);
+      outline: none;
+    }
+    .otp-slot.filled    { border-color: var(--c-primary); background: var(--c-surface); }
+    .otp-slot.has-error { border-color: var(--c-danger); background: #fef2f2; animation: shake .35s ease; }
+
+    /* Separator dot between 3+3 */
+    .otp-sep {
+      display: flex; align-items: center; padding: 0 2px;
+      color: var(--c-text-3); font-size: 22px; font-weight: 700; user-select: none;
+    }
+
+    /* OTP inline error message */
+    .otp-error-msg {
+      font-size: 14px; color: var(--c-danger); font-weight: 500;
+      text-align: center; min-height: 20px;
+      margin-bottom: 8px; display: none;
+    }
+    .otp-error-msg.show { display: block; }
+
+    /* Timer row */
+    .timer-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 14px; color: var(--c-text-3);
+      margin-bottom: 16px;
+    }
+    .timer-label { display: flex; align-items: center; gap: 6px; }
+    .timer-label svg { width: 14px; height: 14px; }
+    #web-timer { font-family: var(--font-mono); font-weight: 600; color: var(--c-text-2); }
+    #web-timer.warn { color: var(--c-danger); }
+
+    /* Waiting indicator */
+    .waiting-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--c-primary-ghost);
+      border-radius: 999px; padding: 6px 14px;
+      font-size: 12px; font-weight: 600; color: var(--c-primary);
+      letter-spacing: .04em;
+      margin-bottom: 20px;
+    }
+    .waiting-dots span {
+      display: inline-block; width: 4px; height: 4px; border-radius: 50%;
+      background: var(--c-primary); margin: 0 1.5px;
+      animation: dot-bounce .9s ease-in-out infinite;
+    }
+    .waiting-dots span:nth-child(2) { animation-delay: .15s; }
+    .waiting-dots span:nth-child(3) { animation-delay: .30s; }
+    @keyframes dot-bounce {
+      0%,100% { transform: translateY(0); opacity: .4; }
+      50%      { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* ═════════════════════════════════════════════════
+       VIEW 3 — SUCCESS
+    ═════════════════════════════════════════════════ */
+    .success-center {
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; padding: 0;
+    }
+    .success-ring {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: var(--c-primary-ghost);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px;
+      animation: pop-in .45s cubic-bezier(.34,1.56,.64,1);
+    }
+    .success-ring svg { width: 34px; height: 34px; color: var(--c-primary); }
+    .success-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .success-sub   { font-size: 14px; color: var(--c-text-2); line-height: 1.55; margin-bottom: 0; }
+    .session-chip {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--c-surface-2); border-radius: 999px;
+      padding: 8px 18px; font-size: 14px; font-weight: 600;
+      color: var(--c-text-2); margin-bottom: 28px;
+    }
+    .session-chip .live-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--c-primary);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    .btn-black { background: var(--c-black); color: #fff; }
+    .btn-black:hover { opacity: .88; }
+    .btn-black:active { transform: scale(.98); }
+
+    /* ─── Animations ─── */
+    @keyframes spin    { to { transform: rotate(360deg); } }
+    @keyframes shake   { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    @keyframes pop-in  { 0%{transform:scale(.2);opacity:0} 100%{transform:scale(1);opacity:1} }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <div class="card">
+
+    <!-- ─── Card logo header ─── -->
+    <div class="card-logo-header">
+      <svg width="72" height="72" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13.5997 36.9331V34.5121L15.7256 35.4391V30.2742L19.9785 31.4062V37.1221L39.234 28.7333V24.3074L36.3801 24.9364V26.6263L38.385 26.0364V27.6083L28.9913 31.0282V28.8113L35.1911 26.9993V25.2384L28.9913 26.5983V24.3814L39.985 22.7224V29.8533L19.9935 39.999L13.5997 36.9331ZM0 29.8503V17.0206L8.3418 15.8486V21.9644L6.92683 21.8465V17.9796L4.5019 18.1445V21.6665L1.60796 21.4305V19.8895L3.4509 19.9055V18.2155L0.78297 18.3885V25.8254L1.61596 26.0774V22.9774L2.50494 23.1114V27.9383L0.801982 27.2993V28.7773L5.67585 30.9622V29.1153L3.47593 28.2973V26.5993L8.36179 28.0733V26.0364L3.47992 24.9364V23.2624L13.6007 24.8184V22.3994L9.93875 22.1084V19.9535L15.7386 19.9855V7.09083L19.9915 5.71586V2.85392L11.6647 6.27385V8.54578L13.5966 7.85481V10.2757L8.38178 11.7847V13.8217L6.96684 14.1276V10.2597L9.93374 9.19077V4.88288L19.9935 0L35.2071 7.53881V9.31577L32.4182 8.12879V10.0947L32.3782 10.0628L30.7532 9.48976V7.40681L22.5234 3.9159V6.58184L28.9743 8.85378V11.0707L32.3862 12.0217V13.9876L27.0023 12.8557V10.5127L22.5024 9.25577V11.9207L19.9565 11.3947V14.2556L35.1871 16.3556V21.6465L33.8612 21.7465V18.0465L30.7722 17.8466V22.0135L24.8634 22.4684V19.9615L28.9783 19.9295V17.7126L19.9645 17.1226V19.9845L22.5104 19.9695V27.9873L19.9645 28.5463V22.8294L15.7126 22.5384V27.6993L9.91275 26.3783V28.5333L13.5747 29.6333V32.0542L6.92182 29.5783V31.5122L11.6427 33.6262V35.8991L0 29.8503ZM22.5374 30.6912L24.8924 29.9993V24.9834L27.0343 24.6604V31.7122L22.5394 33.3552L22.5374 30.6912ZM36.3951 19.9065L39.249 19.8905V12.4997L40.001 12.7667V21.3205L36.3961 21.5955L36.3951 19.9065ZM37.4541 18.3065V16.7066L36.3951 16.5576V14.8676H36.4031L38.408 15.2776V18.3595L37.4541 18.3065ZM11.6747 15.4066L9.93676 15.6586V13.4997L9.94476 13.4917L13.6067 12.7127V17.5556L11.6747 17.6886V15.4066ZM0.0100095 9.88975L8.36179 5.66786L8.36979 5.68386V7.71981L5.68586 8.87578V10.7237L4.53889 11.1327V9.37277L0.811991 10.9837V12.4627L2.51794 11.8487V13.4607L5.67085 12.5487V14.3796L1.62896 15.2446V13.7197L0.796977 13.9557V15.4336L0.0130002 15.5996L0.0100095 9.88975ZM33.8892 14.3316V10.6047L36.3961 11.4847V8.12879L39.985 9.89776V11.3207L37.4551 10.2517V11.8637L38.409 12.2017V13.7427L35.2161 12.8427V14.6026L33.8892 14.3316Z" fill="#7AEFEF"/>
+      </svg>
+    </div>
+
+    <!-- ══ VIEW 1: Login ══════════════════════════════════════ -->
+    <div class="view active" id="view-login">
+      <h1 class="card-title">Welcome back to Enigma X</h1>
+      <p class="card-sub">Sign in to access your trading dashboard.</p>
+
+      <div class="field">
+        <label class="field-label" for="email">EMAIL ADDRESS</label>
+        <div class="field-wrap">
+          <input class="field-input" id="email" type="email" placeholder="you@enigma.io"
+            autocomplete="email" autocapitalize="off" spellcheck="false"
+            style="padding-right: 14px;" />
+        </div>
+        <div class="field-error" id="email-err">Please enter a valid email address.</div>
+      </div>
+
+      <div class="field" style="margin-bottom:12px;">
+        <label class="field-label" for="password">PASSWORD</label>
+        <div class="field-wrap">
+          <input class="field-input" id="password" type="password" placeholder="Enter your password"
+            autocomplete="current-password" style="padding-right:44px;" />
+          <button class="field-toggle" id="pw-tog" onclick="togglePw()" aria-label="Show or hide password">
+            <svg id="pw-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="pw-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+        <div class="field-error" id="pw-err">Incorrect credentials. Please try again.</div>
+      </div>
+
+      <div class="row-between">
+        <label class="checkbox-row checked" onclick="this.classList.toggle('checked')">
+          <div class="cb-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="cb-label">Keep me signed in</span>
+        </label>
+        <button class="link-btn">Forgot password?</button>
+      </div>
+
+      <button class="btn btn-primary" id="btn-login" onclick="handleLogin()">
+        <span class="btn-label">Sign In</span>
+        <div class="spinner"></div>
+      </button>
+
+    </div><!-- /view-login -->
+
+    <!-- ══ VIEW 2: Authenticator wait ═════════════════════════ -->
+    <div class="view" id="view-otp">
+      <div class="eyebrow" style="margin-bottom:6px; text-align:center;">Two-factor authentication</div>
+      <h2 class="card-title" style="font-size:20px; margin-bottom:6px; text-align:center;">Enter your 6-digit code</h2>
+      <p style="font-size:14px; color:var(--c-text-2); margin-bottom:0; text-align:center;">Open the Enigma Authenticator on your phone and enter the code below.</p>
+
+      <!-- OTP input slots -->
+      <div class="otp-slots" id="otp-slots" role="group" aria-label="6-digit verification code">
+        <input class="otp-slot" id="s0" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" aria-label="Digit 1"/>
+        <input class="otp-slot" id="s1" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 2"/>
+        <input class="otp-slot" id="s2" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 3"/>
+        <div class="otp-sep" aria-hidden="true">·</div>
+        <input class="otp-slot" id="s3" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 4"/>
+        <input class="otp-slot" id="s4" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 5"/>
+        <input class="otp-slot" id="s5" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 6"/>
+      </div>
+
+      <!-- FIX: inline error message, shown after wrong code attempt -->
+      <p class="otp-error-msg" id="otp-err" role="alert"></p>
+
+      <div class="timer-row">
+        <div class="timer-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Code expires in <span id="web-timer">3:00</span>
+        </div>
+        <button class="link-btn" id="resend-link" onclick="resendCode()">Resend notification</button>
+      </div>
+
+      <button class="btn btn-primary" id="btn-verify" onclick="handleVerify()" disabled style="margin-top:40px;">
+        <span class="btn-label">Verify &amp; Sign In</span>
+        <div class="spinner"></div>
+      </button>
+
+      <button onclick="goToView('view-login')" aria-label="Back to sign in"
+        style="background:none;border:none;cursor:pointer;width:100%;margin-top:16px;padding:10px 0;
+               color:var(--c-text-2);display:flex;align-items:center;justify-content:center;gap:6px;
+               font-family:var(--font-sans);font-size:14px;font-weight:500;
+               -webkit-tap-highlight-color:transparent;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to sign in
+      </button>
+
+    </div><!-- /view-otp -->
+
+    <!-- ══ VIEW 3: Success ════════════════════════════════════ -->
+    <div class="view" id="view-success">
+      <div class="success-center">
+        <div class="success-ring">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 class="success-title">Identity verified</h2>
+        <p class="success-sub">You've successfully signed in.<br/>Redirecting to your dashboard in <span id="redirect-countdown">5</span>s…</p>
+      </div>
+    </div><!-- /view-success -->
+
+  </div><!-- /card -->
+</div><!-- /page -->
+
+<script>
+/* ─── View switching ─────────────────────────────────────── */
+function goToView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const isSuccess = id === 'view-success';
+  // Hide logo on success screen — checkmark is the visual hero there
+  document.querySelector('.card-logo-header').style.display = isSuccess ? 'none' : '';
+  // Remove card bottom padding on success so spacing is symmetric
+  document.querySelector('.card').style.padding = isSuccess ? '32px' : '';
+}
+
+/* ─── Password toggle ────────────────────────────────────── */
+function togglePw() {
+  const i = document.getElementById('password');
+  const show = document.getElementById('pw-show'), hide = document.getElementById('pw-hide');
+  if (i.type === 'password') { i.type = 'text'; show.style.display='none'; hide.style.display=''; }
+  else                        { i.type = 'password'; show.style.display=''; hide.style.display='none'; }
+}
+
+/* ─── Login ──────────────────────────────────────────────── */
+function handleLogin() {
+  const email = document.getElementById('email').value.trim();
+  const pw    = document.getElementById('password').value;
+  const btn   = document.getElementById('btn-login');
+  let ok = true;
+
+  document.getElementById('email-err').classList.remove('show');
+  document.getElementById('pw-err').classList.remove('show');
+  document.getElementById('email').classList.remove('error');
+  document.getElementById('password').classList.remove('error');
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById('email-err').classList.add('show');
+    document.getElementById('email').classList.add('error');
+    ok = false;
+  }
+  if (pw.length < 4) {
+    document.getElementById('pw-err').classList.add('show');
+    document.getElementById('password').classList.add('error');
+    ok = false;
+  }
+  if (!ok) return;
+
+  btn.classList.add('loading'); btn.disabled = true;
+  setTimeout(() => {
+    btn.classList.remove('loading'); btn.disabled = false;
+    goToView('view-otp');
+    // Notify the auth app a sign-in request has been made
+    try { new BroadcastChannel('enigma_auth').postMessage({ type: 'sign_in_request' }); } catch(e) {}
+    // Reset resend button state each time we enter the OTP view
+    clearInterval(resendCooldownTimer);
+    const rb = document.getElementById('resend-link');
+    rb.textContent = 'Resend notification';
+    rb.disabled = false;
+    setTimeout(() => document.getElementById('s0').focus(), 50);
+    startWebTimer();
+    setupOTP();
+  }, 1300);
+}
+
+/* ─── OTP slots ──────────────────────────────────────────── */
+const SLOTS = ['s0','s1','s2','s3','s4','s5'];
+const DEMO_CODE = '482716';
+// FIX: guard against duplicate event listeners on resend
+let otpListenersAttached = false;
+
+function setupOTP() {
+  SLOTS.forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+    el.classList.remove('filled','has-error');
+    el.disabled = false;
+    // Only attach listeners once — prevent duplicates on resend
+    if (!otpListenersAttached) {
+      el.addEventListener('input',   onSlotInput);
+      el.addEventListener('keydown', onSlotKeydown);
+      el.addEventListener('paste',   onSlotPaste);
+    }
+  });
+  otpListenersAttached = true;
+  // Clear any previous error message
+  const errEl = document.getElementById('otp-err');
+  errEl.textContent = '';
+  errEl.classList.remove('show');
+  updateVerifyBtn();
+}
+
+function onSlotInput(e) {
+  const idx = SLOTS.indexOf(e.target.id);
+  e.target.value = e.target.value.replace(/\D/g,'').slice(-1);
+  e.target.classList.toggle('filled', !!e.target.value);
+  e.target.classList.remove('has-error');
+  // FIX: clear error message as soon as user starts re-entering code
+  document.getElementById('otp-err').classList.remove('show');
+  if (e.target.value && idx < SLOTS.length - 1) document.getElementById(SLOTS[idx+1]).focus();
+  updateVerifyBtn();
+}
+
+function onSlotKeydown(e) {
+  const idx = SLOTS.indexOf(e.target.id);
+  if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+    document.getElementById(SLOTS[idx-1]).value = '';
+    document.getElementById(SLOTS[idx-1]).classList.remove('filled');
+    document.getElementById(SLOTS[idx-1]).focus();
+    updateVerifyBtn();
+  }
+  if (e.key === 'ArrowLeft'  && idx > 0) document.getElementById(SLOTS[idx-1]).focus();
+  if (e.key === 'ArrowRight' && idx < SLOTS.length-1) document.getElementById(SLOTS[idx+1]).focus();
+}
+
+function onSlotPaste(e) {
+  e.preventDefault();
+  const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+  pasted.split('').forEach((ch, i) => {
+    if (SLOTS[i]) { const el = document.getElementById(SLOTS[i]); el.value = ch; el.classList.add('filled'); }
+  });
+  const focus = Math.min(pasted.length, SLOTS.length-1);
+  document.getElementById(SLOTS[focus]).focus();
+  document.getElementById('otp-err').classList.remove('show');
+  updateVerifyBtn();
+}
+
+function getCode() { return SLOTS.map(id => document.getElementById(id).value).join(''); }
+
+function updateVerifyBtn() {
+  document.getElementById('btn-verify').disabled = getCode().length < 6;
+}
+
+/* ─── Verify ─────────────────────────────────────────────── */
+function handleVerify() {
+  const code = getCode();
+  const btn  = document.getElementById('btn-verify');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  setTimeout(() => {
+    if (code !== DEMO_CODE) {
+      btn.classList.remove('loading'); btn.disabled = false;
+      // Shake slots and clear them
+      SLOTS.forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.add('has-error');
+        setTimeout(() => { el.classList.remove('has-error'); el.value=''; el.classList.remove('filled'); }, 600);
+      });
+      // FIX: show inline error message so user knows what went wrong
+      const errEl = document.getElementById('otp-err');
+      errEl.textContent = 'Incorrect code — please try again.';
+      errEl.classList.add('show');
+      setTimeout(() => { document.getElementById('s0').focus(); updateVerifyBtn(); }, 650);
+      return;
+    }
+    clearInterval(webTimerInterval);
+    // Notify the auth app that the code was consumed
+    try { new BroadcastChannel('enigma_auth').postMessage({ type: 'code_used' }); } catch(e) {}
+    goToView('view-success');
+    // Auto-redirect to dashboard after 5s with live countdown
+    let secs = 5;
+    const countEl = document.getElementById('redirect-countdown');
+    const countInterval = setInterval(() => {
+      secs--;
+      if (countEl) countEl.textContent = secs;
+      if (secs <= 0) {
+        clearInterval(countInterval);
+        // Redirect to dashboard — update URL as needed
+        window.location.href = 'enigma-dashboard.html';
+      }
+    }, 1000);
+  }, 1100);
+}
+
+/* ─── Web timer ──────────────────────────────────────────── */
+let webTimerInterval, webSecs = 180;
+function startWebTimer() {
+  webSecs = 180;
+  clearInterval(webTimerInterval);
+  const el = document.getElementById('web-timer');
+  el.textContent = '3:00';
+  el.classList.remove('warn');
+  webTimerInterval = setInterval(() => {
+    webSecs--;
+    const m = Math.floor(webSecs/60), s = webSecs%60;
+    el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+    el.classList.toggle('warn', webSecs <= 30);
+    if (webSecs <= 0) {
+      clearInterval(webTimerInterval);
+      el.textContent = 'Expired';
+      SLOTS.forEach(id => document.getElementById(id).disabled = true);
+    }
+  }, 1000);
+}
+
+/* ─── Resend with cooldown ───────────────────────────────── */
+// FIX: resend now has a 30s cooldown to prevent spamming
+let resendCooldownTimer = null;
+
+function resendCode() {
+  const btn = document.getElementById('resend-link');
+  btn.disabled = true;
+  // Restart the expiry timer
+  startWebTimer();
+  // Clear and reset OTP slots
+  SLOTS.forEach(id => {
+    const el = document.getElementById(id);
+    el.value = ''; el.disabled = false;
+    el.classList.remove('filled','has-error');
+  });
+  document.getElementById('otp-err').classList.remove('show');
+  updateVerifyBtn();
+  setTimeout(() => document.getElementById('s0').focus(), 50);
+  // 30-second cooldown countdown
+  let secs = 30;
+  btn.textContent = `Resend in ${secs}s`;
+  clearInterval(resendCooldownTimer);
+  resendCooldownTimer = setInterval(() => {
+    secs--;
+    if (secs <= 0) {
+      clearInterval(resendCooldownTimer);
+      btn.textContent = 'Resend notification';
+      btn.disabled = false;
+    } else {
+      btn.textContent = `Resend in ${secs}s`;
+    }
+  }, 1000);
+}
+
+/* ─── Reset ──────────────────────────────────────────────── */
+function resetAll() {
+  clearInterval(webTimerInterval);
+  clearInterval(resendCooldownTimer);
+  otpListenersAttached = false;
+  document.getElementById('email').value = '';
+  document.getElementById('password').value = '';
+  goToView('view-login');
+}
+
+/* ─── Enter key ──────────────────────────────────────────── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('view-login').classList.contains('active')) handleLogin();
+    if (document.getElementById('view-otp').classList.contains('active') && getCode().length === 6) handleVerify();
+  }
+});
+</script>
+</body>
+</html>

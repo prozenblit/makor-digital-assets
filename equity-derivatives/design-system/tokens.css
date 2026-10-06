@@ -1,0 +1,219 @@
+/* ============================================================
+   Equity Derivatives Auction — Design Tokens
+   Extracted from Figma design file (October 2026)
+
+   Usage: import this file before any component styles.
+   Dark mode only — desktop-only platform.
+   ============================================================ */
+
+:root {
+
+  /* ----------------------------------------------------------
+     BRAND
+  ---------------------------------------------------------- */
+  --color-brand:          #7AEFEF;  /* bright cyan-teal — buttons, links, focus, active states, M logo */
+  --color-brand-hover:    #5ADADA;  /* button hover */
+  --color-brand-ghost:    rgba(122, 239, 239, 0.10); /* focus rings, subtle bg tints */
+  --color-brand-ghost-border: rgba(122, 239, 239, 0.25); /* subtle teal border */
+
+  /* ----------------------------------------------------------
+     SURFACES
+  ---------------------------------------------------------- */
+  --color-bg:             #151729;  /* page background — dark navy */
+  --color-surface:        #1E2035;  /* cards, auction session cards */
+  --color-surface-raised: #252740;  /* modals, dialogs — slightly lighter */
+  --color-input-bg:       #1A1B2E;  /* dark input fields */
+  --color-sidebar-bg:     #0F1123;  /* narrowest left sidebar — darkest */
+  --color-surface-overlay: rgba(0, 0, 0, 0.55); /* modal scrim */
+
+  /* ----------------------------------------------------------
+     TEXT
+  ---------------------------------------------------------- */
+  --color-text-primary:   #F0F0F8;  /* near-white, slightly cool — main body text */
+  --color-text-secondary: #8B8EA8;  /* muted lavender-gray — labels, metadata */
+  --color-text-tertiary:  #5A5C70;  /* dim gray — placeholders, fine print */
+  --color-text-on-brand:  #000000;  /* text ON the teal brand color (button labels) */
+  --color-text-on-coral:  #FFFFFF;  /* text on coral/danger cancel buttons */
+
+  /* ----------------------------------------------------------
+     BORDERS
+  ---------------------------------------------------------- */
+  --color-border:         #2D2F4A;  /* subtle dark border — cards, inputs, dividers */
+  --color-border-focus:   #7AEFEF;  /* input focus border — brand teal */
+
+  /* ----------------------------------------------------------
+     CANCEL / DANGER (coral — the Cancel auction button)
+  ---------------------------------------------------------- */
+  --color-cancel:         #E57373;  /* coral/salmon — Cancel auction dropdown button */
+  --color-cancel-hover:   #EF5350;  /* coral hover */
+  --color-cancel-bg:      rgba(229, 115, 115, 0.12); /* subtle coral bg tint */
+  --color-cancel-border:  rgba(229, 115, 115, 0.40); /* cancel button border */
+
+  /* ----------------------------------------------------------
+     STATUS — Success / "In the mix"
+  ---------------------------------------------------------- */
+  --color-status-success:      #4DCC9B;   /* green — "in the mix" badge text, success */
+  --color-status-success-bg:   rgba(77, 204, 155, 0.15); /* "in the mix" badge background */
+
+  /* ----------------------------------------------------------
+     STATUS — Danger / Error
+  ---------------------------------------------------------- */
+  --color-status-danger:       #EF4444;   /* red — error input border (Bid >= Ask) */
+  --color-status-danger-text:  #EF4444;   /* error text */
+  --color-status-danger-bg:    rgba(239, 68, 68, 0.10); /* error state background */
+  --color-status-reject:       #E57373;   /* Reject button outlined coral — same family as cancel */
+
+  /* ----------------------------------------------------------
+     STATUS — Pending / Timer / Warning (amber)
+  ---------------------------------------------------------- */
+  --color-status-warning:      #F59E0B;   /* amber — timer badge text, warning tooltip */
+  --color-status-warning-bg:   rgba(245, 158, 11, 0.12); /* timer badge background */
+  --color-status-warning-border: rgba(245, 158, 11, 0.25); /* timer badge border */
+
+  /* ----------------------------------------------------------
+     TOGGLE SWITCH
+  ---------------------------------------------------------- */
+  --color-toggle-active:   #7AEFEF;  /* teal — Active user toggle thumb/track */
+  --color-toggle-inactive: #4A4B60;  /* gray — Inactive toggle track */
+
+  /* ----------------------------------------------------------
+     REVIEW BADGE (amber fill)
+  ---------------------------------------------------------- */
+  --color-review-bg:   #F59E0B;      /* "Review (12)" badge background */
+  --color-review-text: #000000;      /* dark text on amber badge */
+
+  /* ----------------------------------------------------------
+     BUTTON — White variant (Cancel/Close in modals)
+  ---------------------------------------------------------- */
+  --color-btn-white-bg:   #FFFFFF;   /* white Cancel/Close button */
+  --color-btn-white-text: #1A1B2E;   /* dark text on white button */
+
+  /* ----------------------------------------------------------
+     EQUILIBRIUM PRICE
+  ---------------------------------------------------------- */
+  --color-eq-price: #7AEFEF;  /* teal — equilibrium price display label */
+
+  /* ----------------------------------------------------------
+     TYPOGRAPHY
+  ---------------------------------------------------------- */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:    'Inter', 'Roboto Mono', 'Courier New', monospace; /* tabular-nums for bid/ask */
+
+  --text-xs:    10px;   /* micro labels, secondary metadata */
+  --text-sm:    12px;   /* column headers, badges, timestamps */
+  --text-base:  13px;   /* table metadata, secondary values */
+  --text-md:    14px;   /* body, inputs, buttons, instrument names */
+  --text-lg:    16px;   /* platform title, session heading */
+  --text-xl:    18px;   /* page headings */
+  --text-2xl:   22px;   /* large section titles */
+  --text-3xl:   24px;   /* modal headings */
+
+  --font-normal:   400;
+  --font-medium:   500;
+  --font-semibold: 600;
+  --font-bold:     700;
+
+  --leading-tight:   1.2;
+  --leading-snug:    1.35;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.55;
+
+  --tracking-tight:   -0.02em;
+  --tracking-none:     0;
+  --tracking-wide:     0.04em;
+  --tracking-wider:    0.06em;
+  --tracking-label:    0.08em;  /* uppercase column headers */
+
+  /* ----------------------------------------------------------
+     CONTROL HEIGHTS
+  ---------------------------------------------------------- */
+  --h-chip:        24px;  /* inline badges */
+  --h-badge:       28px;  /* timer badge, type badge */
+  --h-btn-sm:      32px;  /* compact icon-only or tight action buttons */
+  --h-btn:         36px;  /* standard action buttons (Confirm, Cancel, Save) */
+  --h-input:       36px;  /* auction bid/ask inline inputs */
+  --h-input-modal: 40px;  /* modal form inputs (Username, Email, etc.) */
+  --h-nav:         52px;  /* top header bar */
+  --h-sidebar:     100%;  /* full-height left sidebar */
+
+  /* ----------------------------------------------------------
+     SIDEBAR / ICON NAV WIDTHS
+  ---------------------------------------------------------- */
+  --w-sidebar: 56px;   /* narrow icon-only left nav */
+
+  /* ----------------------------------------------------------
+     AVATAR / ICON SIZES
+  ---------------------------------------------------------- */
+  --avatar-sm:  28px;
+  --avatar-md:  32px;
+  --icon-xs:    12px;
+  --icon-sm:    14px;
+  --icon-md:    16px;
+  --icon-lg:    18px;
+  --icon-xl:    20px;
+
+  /* ----------------------------------------------------------
+     SPACING
+  ---------------------------------------------------------- */
+  --space-1:   4px;
+  --space-2:   6px;
+  --space-3:   8px;
+  --space-4:   10px;
+  --space-5:   12px;
+  --space-6:   14px;
+  --space-7:   16px;
+  --space-8:   18px;
+  --space-9:   20px;
+  --space-10:  24px;
+  --space-12:  28px;
+  --space-14:  32px;
+  --space-16:  40px;
+
+  /* ----------------------------------------------------------
+     BORDER RADIUS
+  ---------------------------------------------------------- */
+  --radius-sm:   4px;    /* tight — inner badges, small chips */
+  --radius:      6px;    /* standard — buttons, inputs, small cards */
+  --radius-md:   8px;    /* cards, auction session cards */
+  --radius-lg:   10px;   /* modals, dialogs */
+  --radius-pill: 999px;  /* pill badges */
+  --radius-full: 50%;    /* avatars, toggle thumbs */
+
+  /* ----------------------------------------------------------
+     SHADOWS
+  ---------------------------------------------------------- */
+  --shadow-card:    0 2px 12px rgba(0, 0, 0, 0.30);
+  --shadow-card-lg: 0 4px 24px rgba(0, 0, 0, 0.40), 0 2px 4px rgba(0, 0, 0, 0.20);
+  --shadow-modal:   0 8px 40px rgba(0, 0, 0, 0.50), 0 2px 8px rgba(0, 0, 0, 0.30);
+  --shadow-dropdown: 0 4px 20px rgba(0, 0, 0, 0.40);
+  --shadow-tooltip: 0 4px 16px rgba(0, 0, 0, 0.50);
+  --shadow-focus:   0 0 0 3px rgba(122, 239, 239, 0.20);
+  --shadow-notification: 0 8px 32px rgba(0, 0, 0, 0.45);
+
+  /* ----------------------------------------------------------
+     TRANSITIONS
+  ---------------------------------------------------------- */
+  --duration-instant: 0.08s;   /* button active state scale */
+  --duration-fast:    0.12s;   /* color/opacity changes */
+  --duration-base:    0.15s;   /* borders, backgrounds */
+  --duration-normal:  0.18s;   /* inputs, focus rings */
+  --duration-enter:   0.20s;   /* element entry */
+  --duration-slide:   0.28s;   /* dropdown slide */
+  --duration-modal:   0.22s;   /* modal fade */
+
+  --ease-default: ease;
+  --ease-out:     cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ----------------------------------------------------------
+     Z-INDEX
+  ---------------------------------------------------------- */
+  --z-base:       0;
+  --z-sidebar:    10;
+  --z-header:     20;
+  --z-dropdown:   100;
+  --z-tooltip:    150;
+  --z-overlay:    200;
+  --z-modal:      210;
+  --z-notification: 300;
+}

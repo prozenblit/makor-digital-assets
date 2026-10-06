@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Enigma X Auth — Design System Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Tokens (inline) ───────────────────────────────────── */
+    :root {
+      --auth-color-brand:          #7AEFEF;
+      --auth-color-brand-dark:     #3DBFBF;
+      --auth-color-brand-dim:      #5ADADA;
+      --auth-color-brand-ghost:    rgba(122,239,239,0.094);
+      --auth-color-bg-web:         #EBEBEB;
+      --auth-color-bg-mobile:      #F7F8F8;
+      --auth-color-bg:             #F7F8F8;
+      --auth-color-surface:        #FFFFFF;
+      --auth-color-surface-2:      #F7F8F8;
+      --auth-color-surface-overlay: rgba(0,0,0,0.45);
+      --auth-color-nav-bg:         rgba(255,255,255,0.85);
+      --auth-color-text-primary:   #1A1F36;
+      --auth-color-text-secondary: #7C9CAC;
+      --auth-color-text-secondary-web: #6B7280;
+      --auth-color-text-tertiary:  #A8BECD;
+      --auth-color-text-tertiary-web: #9CA3AF;
+      --auth-color-text-on-brand:  #000000;
+      --auth-color-black:          #1A1A1A;
+      --auth-color-black-mobile:   #000000;
+      --auth-color-border:         #DEE8ED;
+      --auth-color-border-web:     #E2E2E2;
+      --auth-color-border-focus:   #7AEFEF;
+      --auth-color-danger:         #E5686A;
+      --auth-color-danger-web:     #EF4444;
+      --auth-color-danger-bg:      rgba(229,104,106,0.06);
+      --auth-color-danger-bg-web:  rgba(239,68,68,0.08);
+      --auth-color-success:        #4DCC9B;
+      --auth-color-disabled-bg:    #D1D5DB;
+      --auth-color-disabled-text:  #6B7280;
+      --auth-font-sans:  'DM Sans', -apple-system, sans-serif;
+      --auth-font-mono:  'DM Mono', monospace;
+      --auth-radius:     4px;
+      --auth-radius-sm:  2px;
+      --auth-radius-md:  8px;
+      --auth-radius-lg:  10px;
+      --auth-radius-xl:  12px;
+      --auth-radius-2xl: 14px;
+      --auth-radius-pill: 999px;
+      --auth-radius-full: 50%;
+      --auth-shadow-card: 0 2px 10px rgba(0,0,0,.06);
+      --auth-shadow-card-lg: 0 4px 24px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+      --auth-shadow-focus: 0 0 0 4px rgba(122,239,239,0.094);
+      --auth-shadow-dot-pulse: 0 0 0 4px rgba(122,239,239,0.094);
+    }
+
+    /* ── Showcase shell ──────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: var(--auth-font-sans);
+      background: #F2F3F4;
+      color: var(--auth-color-text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .sc-shell { display: flex; height: 100vh; overflow: hidden; }
+
+    /* Sidebar */
+    .sc-sidebar {
+      width: 220px; flex-shrink: 0;
+      background: var(--auth-color-surface);
+      border-right: 1px solid var(--auth-color-border);
+      overflow-y: auto; scrollbar-width: none;
+      display: flex; flex-direction: column;
+    }
+    .sc-sidebar::-webkit-scrollbar { display: none; }
+    .sc-sidebar-head {
+      padding: 20px 16px 12px;
+      border-bottom: 1px solid var(--auth-color-border);
+      flex-shrink: 0;
+    }
+    .sc-sidebar-title { font-size: 13px; font-weight: 700; color: var(--auth-color-text-primary); letter-spacing: -.01em; }
+    .sc-sidebar-sub   { font-size: 11px; color: var(--auth-color-text-tertiary); margin-top: 2px; }
+    .sc-sidebar-nav   { padding: 8px 8px 24px; flex: 1; }
+    .sc-sidebar-section { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--auth-color-text-tertiary); padding: 14px 8px 6px; }
+    .sc-sidebar-link {
+      display: block; width: 100%; padding: 7px 8px;
+      font-size: 13px; font-weight: 500; color: var(--auth-color-text-secondary);
+      border-radius: var(--auth-radius); cursor: pointer;
+      background: none; border: none; text-align: left;
+      font-family: var(--auth-font-sans);
+      transition: background .1s, color .1s;
+    }
+    .sc-sidebar-link:hover { background: var(--auth-color-bg); color: var(--auth-color-text-primary); }
+    .sc-sidebar-link.active { background: var(--auth-color-brand-ghost); color: var(--auth-color-brand-dark); font-weight: 600; }
+
+    /* Main area */
+    .sc-main { flex: 1; overflow-y: auto; }
+    .sc-content { max-width: 960px; margin: 0 auto; padding: 40px 32px 80px; }
+
+    /* Section headings */
+    .sc-section { margin-bottom: 56px; }
+    .sc-section-title {
+      font-size: 22px; font-weight: 700; color: var(--auth-color-text-primary);
+      margin-bottom: 6px; letter-spacing: -.02em;
+    }
+    .sc-section-desc { font-size: 14px; color: var(--auth-color-text-secondary); margin-bottom: 28px; line-height: 1.55; }
+    .sc-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; margin-bottom: 24px; }
+    .sc-col { display: flex; flex-direction: column; gap: 12px; min-width: 200px; }
+    .sc-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--auth-color-text-tertiary); margin-bottom: 4px; }
+
+    /* Canvas boxes */
+    .sc-canvas {
+      background: var(--auth-color-surface);
+      border: 1px solid var(--auth-color-border);
+      border-radius: var(--auth-radius-md);
+      padding: 24px;
+    }
+    .sc-canvas--bg { background: var(--auth-color-bg-web); }
+    .sc-canvas--dark { background: var(--auth-color-black); }
+    .sc-canvas--teal { background: var(--auth-color-brand-dark); }
+
+    /* Color swatches */
+    .sc-swatch-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+    .sc-swatch {
+      display: flex; flex-direction: column; gap: 6px; min-width: 120px;
+    }
+    .sc-swatch-box {
+      width: 100%; height: 56px; border-radius: var(--auth-radius);
+      border: 1px solid rgba(0,0,0,.06);
+    }
+    .sc-swatch-name { font-size: 11px; font-weight: 600; color: var(--auth-color-text-primary); }
+    .sc-swatch-val  { font-size: 11px; font-family: var(--auth-font-mono); color: var(--auth-color-text-secondary); }
+
+    /* Type specimens */
+    .sc-type-row { padding: 14px 0; border-bottom: 1px solid var(--auth-color-border); }
+    .sc-type-row:last-child { border-bottom: none; }
+    .sc-type-meta { font-size: 11px; color: var(--auth-color-text-tertiary); font-family: var(--auth-font-mono); margin-bottom: 4px; }
+
+    /* Component demos */
+    .sc-demo { padding: 28px; background: var(--auth-color-bg-web); border-radius: var(--auth-radius-md); border: 1px solid var(--auth-color-border); }
+    .sc-demo--white { background: var(--auth-color-surface); }
+    .sc-demo--mobile-bg { background: var(--auth-color-bg-mobile); }
+
+    /* Interactive states tag */
+    .sc-tag {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+      padding: 2px 6px; border-radius: 3px;
+      background: var(--auth-color-brand-ghost); color: var(--auth-color-brand-dark);
+    }
+
+    /* ── Component Styles (inline for self-contained showcase) ── */
+
+    /* Inputs */
+    .auth-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .auth-field-label { font-size: 12px; font-weight: 600; color: var(--auth-color-text-secondary-web); letter-spacing: .04em; text-transform: uppercase; }
+    .auth-field-wrap { position: relative; }
+    .auth-field-input {
+      width: 100%; height: 48px; padding: 0 44px 0 14px;
+      background: var(--auth-color-surface-2); border: 1.5px solid var(--auth-color-border-web);
+      border-radius: var(--auth-radius); font-family: var(--auth-font-sans);
+      font-size: 16px; color: var(--auth-color-text-primary); outline: none;
+      transition: border-color .18s, box-shadow .18s; -webkit-appearance: none;
+    }
+    .auth-field-input:focus { border-color: var(--auth-color-border-focus); background: var(--auth-color-surface); box-shadow: var(--auth-shadow-focus); }
+    .auth-field-input::placeholder { color: var(--auth-color-text-tertiary-web); }
+    .auth-field-input.error { border-color: var(--auth-color-danger-web); box-shadow: 0 0 0 4px var(--auth-color-danger-bg-web); }
+    .auth-field-toggle {
+      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; padding: 0; cursor: pointer; color: var(--auth-color-text-tertiary-web);
+      width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+      transition: color .12s; -webkit-tap-highlight-color: transparent;
+    }
+    .auth-field-toggle:hover { color: var(--auth-color-text-secondary-web); }
+    .auth-field-toggle svg { width: 18px; height: 18px; display: block; }
+
+    /* Buttons */
+    .auth-btn {
+      width: 100%; height: 50px; border: none; border-radius: var(--auth-radius);
+      font-family: var(--auth-font-sans); font-size: 16px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .12s, transform .08s, opacity .12s; position: relative; overflow: hidden;
+    }
+    .auth-btn-primary { background: var(--auth-color-brand); color: var(--auth-color-black); }
+    .auth-btn-primary:hover  { background: var(--auth-color-brand-dim); }
+    .auth-btn-primary:active { transform: scale(.98); }
+    .auth-btn-primary:disabled { background: var(--auth-color-disabled-bg); color: var(--auth-color-text-secondary-web); cursor: not-allowed; }
+    .auth-btn-black { background: var(--auth-color-black); color: #fff; }
+    .auth-btn-black:hover { opacity: .88; }
+    .auth-spinner {
+      width: 18px; height: 18px; border: 2.5px solid rgba(0,0,0,.15); border-top-color: var(--auth-color-black);
+      border-radius: 50%; animation: auth-spin .65s linear infinite; display: none;
+    }
+    .auth-btn.loading .auth-btn-label { visibility: hidden; }
+    .auth-btn.loading .auth-spinner { display: block; position: absolute; }
+
+    /* Mobile primary button */
+    .auth-btn-primary-mobile {
+      width: 100%; height: 52px; background: var(--auth-color-brand); border: none;
+      border-radius: var(--auth-radius); font-family: var(--auth-font-sans); font-size: 16px;
+      font-weight: 600; color: #000; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .12s, transform .08s;
+    }
+    .auth-btn-primary-mobile:hover { background: #5ADADA; }
+    .auth-btn-primary-mobile:active { transform: scale(.98); }
+
+    /* Danger button */
+    .auth-btn-danger {
+      width: 100%; height: 48px; background: transparent; border: 1.5px solid var(--auth-color-danger);
+      border-radius: var(--auth-radius); font-family: var(--auth-font-sans); font-size: 14px;
+      font-weight: 600; color: var(--auth-color-danger); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .12s;
+    }
+    .auth-btn-danger:hover { background: var(--auth-color-danger-bg); }
+
+    /* Link button */
+    .auth-link-btn {
+      background: none; border: none; font-family: var(--auth-font-sans);
+      font-size: 14px; font-weight: 600; color: var(--auth-color-brand-dim);
+      cursor: pointer; padding: 6px 2px; transition: opacity .12s;
+      text-decoration: underline; text-underline-offset: 4px;
+    }
+    .auth-link-btn:hover { opacity: .75; }
+    .auth-link-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* Checkbox */
+    .auth-checkbox-row { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+    .auth-cb-box {
+      width: 16px; height: 16px; border-radius: 2px; flex-shrink: 0;
+      border: 1px solid var(--auth-color-text-tertiary-web); background: var(--auth-color-surface);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .12s, border-color .12s;
+    }
+    .auth-checkbox-row.checked .auth-cb-box { background: var(--auth-color-brand); border-color: var(--auth-color-brand); }
+    .auth-cb-box svg { width: 10px; height: 10px; opacity: 0; transition: opacity .12s; }
+    .auth-checkbox-row.checked .auth-cb-box svg { opacity: 1; }
+    .auth-cb-label { font-size: 14px; color: var(--auth-color-text-primary); }
+
+    /* OTP slots */
+    .auth-otp-slots { display: flex; gap: 8px; }
+    .auth-otp-slot {
+      flex: 1; min-width: 0; height: 58px;
+      background: var(--auth-color-surface); border: 1.5px solid var(--auth-color-border-web);
+      border-radius: var(--auth-radius-md); font-family: var(--auth-font-mono);
+      font-size: 24px; font-weight: 600; color: var(--auth-color-text-primary);
+      text-align: center; caret-color: var(--auth-color-brand); outline: none;
+      transition: border-color .15s, box-shadow .15s, background .15s, transform .1s; -webkit-appearance: none;
+    }
+    .auth-otp-slot:focus { border-color: var(--auth-color-border-focus); background: var(--auth-color-surface); box-shadow: var(--auth-shadow-focus); transform: scale(1.05); outline: none; }
+    .auth-otp-slot.filled { border-color: var(--auth-color-brand); }
+    .auth-otp-slot.has-error { border-color: var(--auth-color-danger-web); background: #fef2f2; animation: auth-shake .35s ease; }
+    .auth-otp-sep { display: flex; align-items: center; padding: 0 2px; color: var(--auth-color-text-tertiary-web); font-size: 22px; font-weight: 700; user-select: none; }
+
+    /* Waiting badge */
+    .auth-waiting-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--auth-color-brand-ghost); border-radius: 999px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: var(--auth-color-brand); letter-spacing: .04em; }
+    .auth-waiting-dots span { display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: var(--auth-color-brand); margin: 0 1.5px; animation: auth-dot-bounce .9s ease-in-out infinite; }
+    .auth-waiting-dots span:nth-child(2) { animation-delay: .15s; }
+    .auth-waiting-dots span:nth-child(3) { animation-delay: .30s; }
+
+    /* Session live dot */
+    .auth-session-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--auth-color-brand); flex-shrink: 0; box-shadow: var(--auth-shadow-dot-pulse); animation: auth-dotpulse 2.4s ease infinite; }
+
+    /* Push banner */
+    .auth-push-banner-demo {
+      background: rgba(0,0,0,.20); backdrop-filter: blur(48px); -webkit-backdrop-filter: blur(48px);
+      border-radius: 22px; padding: 10px 12px 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 6px 32px rgba(0,0,0,.18), inset 0 2px 0 rgba(255,255,255,.22);
+      max-width: 360px;
+    }
+    .auth-push-banner-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .auth-push-banner-appname { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.80); text-transform: uppercase; letter-spacing: .02em; flex: 1; }
+    .auth-push-banner-time { font-size: 12px; color: rgba(255,255,255,.60); }
+    .auth-push-banner-content { display: flex; align-items: center; gap: 10px; }
+    .auth-push-banner-app-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--auth-color-brand-dark); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .auth-push-banner-body { flex: 1; min-width: 0; }
+    .auth-push-banner-title { font-size: 14px; font-weight: 700; color: rgba(255,255,255,1); line-height: 1.3; }
+    .auth-push-banner-sub   { font-size: 12px; color: rgba(255,255,255,.78); margin-top: 2px; }
+
+    /* Toast */
+    .auth-toast-demo { background: #000; color: #fff; border-radius: var(--auth-radius); padding: 14px 16px; font-size: 14px; font-weight: 500; text-align: center; }
+    .auth-toast-demo.danger { background: var(--auth-color-danger); }
+
+    /* Avatar */
+    .auth-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--auth-color-brand); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #000; }
+
+    /* Success ring */
+    .auth-success-ring { width: 72px; height: 72px; border-radius: 50%; background: var(--auth-color-brand-ghost); display: flex; align-items: center; justify-content: center; }
+    .auth-success-ring svg { width: 34px; height: 34px; color: var(--auth-color-brand); }
+
+    /* OTP code display */
+    .auth-sheet-otp { font-family: var(--auth-font-mono); font-size: 38px; font-weight: 600; color: var(--auth-color-text-primary); letter-spacing: .18em; display: flex; justify-content: center; align-items: center; }
+
+    /* Mobile eyebrow */
+    .auth-eyebrow-mobile { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--auth-color-brand-dark); }
+
+    /* Bottom sheet handle */
+    .auth-sheet-handle { width: 36px; height: 4px; border-radius: 4px; background: var(--auth-color-border); margin: 12px auto 4px; }
+
+    /* Session compact */
+    .auth-session-compact { background: var(--auth-color-surface); border-radius: var(--auth-radius-md); padding: 14px; display: flex; align-items: center; gap: 12px; }
+    .auth-session-compact-flag { width: 36px; height: 36px; border-radius: var(--auth-radius); background: var(--auth-color-surface-2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; font-weight: 700; color: var(--auth-color-text-secondary); }
+    .auth-session-compact-body { flex: 1; min-width: 0; }
+    .auth-session-compact-loc  { font-size: 14px; font-weight: 600; color: var(--auth-color-text-primary); }
+    .auth-session-compact-meta { font-size: 12px; color: var(--auth-color-text-tertiary); margin-top: 2px; }
+    .auth-session-compact-signout { background: none; border: 1px solid var(--auth-color-danger); border-radius: var(--auth-radius); font-family: var(--auth-font-sans); font-size: 12px; font-weight: 600; color: var(--auth-color-danger); padding: 8px 14px; cursor: pointer; white-space: nowrap; min-height: 36px; }
+
+    /* Confirm dialog */
+    .auth-confirm-dialog-demo { background: var(--auth-color-surface); border-radius: 14px; max-width: 280px; padding: 20px 20px 12px; box-shadow: 0 8px 40px rgba(0,0,0,.2); text-align: center; }
+    .auth-confirm-title { font-size: 16px; font-weight: 700; color: var(--auth-color-text-primary); margin-bottom: 6px; }
+    .auth-confirm-body  { font-size: 14px; color: var(--auth-color-text-secondary); line-height: 1.45; margin-bottom: 18px; }
+    .auth-confirm-actions { display: flex; gap: 8px; }
+    .auth-confirm-btn { flex: 1; padding: 14px 8px; border-radius: var(--auth-radius); font-family: var(--auth-font-sans); font-size: 14px; font-weight: 600; cursor: pointer; border: none; min-height: 44px; }
+    .auth-confirm-btn-cancel { background: var(--auth-color-surface-2); color: var(--auth-color-text-secondary); }
+    .auth-confirm-btn-danger { background: var(--auth-color-danger); color: #fff; }
+
+    /* Home logo banner demo */
+    .auth-home-logo-banner { display: flex; align-items: center; padding: 14px 20px; gap: 10px; background: var(--auth-color-brand-dark); border-radius: var(--auth-radius-md); }
+    .auth-home-logo-icon { width: 44px; height: 44px; background: rgba(255,255,255,.22); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .auth-home-logo-name { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -.02em; }
+
+    /* Eyebrow */
+    .auth-eyebrow { font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--auth-color-text-secondary-web); }
+
+    /* Sheet code card */
+    .auth-sheet-code-card { background: var(--auth-color-surface-2); border-radius: 8px; padding: 16px; }
+    .auth-sheet-code-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .auth-sheet-code-label { font-size: 12px; font-weight: 700; color: var(--auth-color-text-tertiary); text-transform: uppercase; letter-spacing: .08em; }
+    .auth-sheet-code-expiry { font-size: 14px; font-weight: 600; color: var(--auth-color-text-secondary); font-family: var(--auth-font-mono); }
+    .auth-sheet-copy-btn { width: 100%; height: 52px; background: var(--auth-color-brand); border: none; border-radius: 8px; font-family: var(--auth-font-sans); font-size: 16px; font-weight: 600; color: #000; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 16px; }
+    .auth-sheet-copy-btn:active { opacity: .85; }
+
+    /* Faceid fallback pill */
+    .auth-faceid-fallback-link { font-size: 14px; font-weight: 600; color: var(--auth-color-text-secondary); background: rgba(0,0,0,.06); border: none; border-radius: var(--auth-radius); padding: 12px 28px; cursor: pointer; font-family: var(--auth-font-sans); transition: background .15s; }
+    .auth-faceid-fallback-link:hover { background: rgba(0,0,0,.10); color: var(--auth-color-text-primary); }
+
+    /* Animations */
+    @keyframes auth-spin     { to { transform: rotate(360deg); } }
+    @keyframes auth-shake    { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    @keyframes auth-pop-in   { 0%{transform:scale(.2);opacity:0} 100%{transform:scale(1);opacity:1} }
+    @keyframes auth-pulse-dot{ 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.4)} }
+    @keyframes auth-dotpulse { 0%,100%{box-shadow:0 0 0 4px rgba(122,239,239,.094)} 50%{box-shadow:0 0 0 6px transparent} }
+    @keyframes auth-dot-bounce{ 0%,100%{transform:translateY(0);opacity:.4} 50%{transform:translateY(-4px);opacity:1} }
+  </style>
+</head>
+<body>
+<div class="sc-shell">
+
+  <!-- ─── Sidebar navigation ─── -->
+  <nav class="sc-sidebar">
+    <div class="sc-sidebar-head">
+      <div class="sc-sidebar-title">Auth Design System</div>
+      <div class="sc-sidebar-sub">Enigma X · October 2026</div>
+    </div>
+    <div class="sc-sidebar-nav">
+      <div class="sc-sidebar-section">Foundations</div>
+      <button class="sc-sidebar-link active" onclick="scrollTo('colors')">Colors</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('typography')">Typography</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('spacing')">Spacing &amp; Radius</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('shadows')">Shadows</button>
+
+      <div class="sc-sidebar-section">Web Sign-In</div>
+      <button class="sc-sidebar-link" onclick="scrollTo('inputs')">Inputs</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('buttons')">Buttons</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('checkbox')">Checkbox</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('otp')">OTP Slots</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('waiting')">Waiting Badge</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('timer')">Timer</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('success')">Success Ring</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('eyebrow')">Eyebrow / Step</button>
+
+      <div class="sc-sidebar-section">Mobile Auth</div>
+      <button class="sc-sidebar-link" onclick="scrollTo('push')">Push Notification</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('faceid')">Face ID</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('homebanner')">Home Banner</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('session')">Session Cards</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('otpcode')">OTP Code Display</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('sheet')">Bottom Sheet</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('dialog')">Confirm Dialog</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('toast')">Toast</button>
+      <button class="sc-sidebar-link" onclick="scrollTo('avatar')">Avatar</button>
+    </div>
+  </nav>
+
+  <!-- ─── Main content ─── -->
+  <main class="sc-main">
+    <div class="sc-content">
+
+      <!-- COLORS -->
+      <div class="sc-section" id="colors">
+        <div class="sc-section-title">Colors</div>
+        <div class="sc-section-desc">All colors are defined as <code>--auth-color-*</code> tokens. Light mode only.</div>
+
+        <div class="sc-label">Brand</div>
+        <div class="sc-swatch-grid" style="margin-bottom:20px;">
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#7AEFEF;"></div><div class="sc-swatch-name">brand</div><div class="sc-swatch-val">#7AEFEF</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#3DBFBF;"></div><div class="sc-swatch-name">brand-dark</div><div class="sc-swatch-val">#3DBFBF</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#5ADADA;"></div><div class="sc-swatch-name">brand-dim</div><div class="sc-swatch-val">#5ADADA</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:rgba(122,239,239,0.094); border: 1px solid #DEE8ED;"></div><div class="sc-swatch-name">brand-ghost</div><div class="sc-swatch-val">rgba(122,239,239,0.094)</div></div>
+        </div>
+
+        <div class="sc-label">Surfaces</div>
+        <div class="sc-swatch-grid" style="margin-bottom:20px;">
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#EBEBEB; border:1px solid #DEE8ED;"></div><div class="sc-swatch-name">bg-web</div><div class="sc-swatch-val">#EBEBEB</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#F7F8F8; border:1px solid #DEE8ED;"></div><div class="sc-swatch-name">bg-mobile</div><div class="sc-swatch-val">#F7F8F8</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#FFFFFF; border:1px solid #DEE8ED;"></div><div class="sc-swatch-name">surface</div><div class="sc-swatch-val">#FFFFFF</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#F7F8F8; border:1px solid #DEE8ED;"></div><div class="sc-swatch-name">surface-2</div><div class="sc-swatch-val">#F7F8F8</div></div>
+        </div>
+
+        <div class="sc-label">Text</div>
+        <div class="sc-swatch-grid" style="margin-bottom:20px;">
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#1A1F36;"></div><div class="sc-swatch-name">text-primary</div><div class="sc-swatch-val">#1A1F36</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#7C9CAC;"></div><div class="sc-swatch-name">text-secondary</div><div class="sc-swatch-val">#7C9CAC</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#6B7280;"></div><div class="sc-swatch-name">text-secondary-web</div><div class="sc-swatch-val">#6B7280</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#A8BECD;"></div><div class="sc-swatch-name">text-tertiary</div><div class="sc-swatch-val">#A8BECD</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#9CA3AF;"></div><div class="sc-swatch-name">text-tertiary-web</div><div class="sc-swatch-val">#9CA3AF</div></div>
+        </div>
+
+        <div class="sc-label">Status</div>
+        <div class="sc-swatch-grid">
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#E5686A;"></div><div class="sc-swatch-name">danger (mobile)</div><div class="sc-swatch-val">#E5686A</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#EF4444;"></div><div class="sc-swatch-name">danger-web</div><div class="sc-swatch-val">#EF4444</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#4DCC9B;"></div><div class="sc-swatch-name">success</div><div class="sc-swatch-val">#4DCC9B</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#D1D5DB; border:1px solid #E2E2E2;"></div><div class="sc-swatch-name">disabled-bg</div><div class="sc-swatch-val">#D1D5DB</div></div>
+          <div class="sc-swatch"><div class="sc-swatch-box" style="background:#DEE8ED; border:1px solid #DEE8ED;"></div><div class="sc-swatch-name">border</div><div class="sc-swatch-val">#DEE8ED</div></div>
+        </div>
+      </div>
+
+      <!-- TYPOGRAPHY -->
+      <div class="sc-section" id="typography">
+        <div class="sc-section-title">Typography</div>
+        <div class="sc-section-desc">DM Sans for all UI text. DM Mono exclusively for OTP codes and timer countdowns.</div>
+        <div class="sc-canvas sc-canvas--white">
+          <div class="sc-type-row"><div class="sc-type-meta">38px / 600 / DM Mono / ls 0.18em</div><div style="font-family:'DM Mono',monospace;font-size:38px;font-weight:600;letter-spacing:.18em;color:#1A1F36;">482 716</div></div>
+          <div class="sc-type-row"><div class="sc-type-meta">24px / 700 / DM Sans / ls -0.02em</div><div style="font-size:24px;font-weight:700;color:#1A1F36;">Welcome back to Enigma X</div></div>
+          <div class="sc-type-row"><div class="sc-type-meta">22px / 700 / DM Sans</div><div style="font-size:22px;font-weight:700;color:#1A1F36;">Identity verified</div></div>
+          <div class="sc-type-row"><div class="sc-type-meta">20px / 700 / DM Sans</div><div style="font-size:20px;font-weight:700;color:#1A1F36;">Enter your 6-digit code</div></div>
+          <div class="sc-type-row"><div class="sc-type-meta">18px / 700 / DM Sans / ls -0.02em</div><div style="font-size:18px;font-weight:700;color:#1A1F36;">Enigma Authenticator</div></div>
+          <div class="sc-type-row"><div class="sc-type-meta">16px / 700 / DM Sans / ls 0.04em</div><div style="font-size:16px;font-weight:700;color:#1A1F36;">Enigma <span style="color:#7AEFEF;">X</span></div></div>
+          <div class="sc-type-row"><div class="sc-type-meta">14px / 400 / DM Sans / lh 1.55 — body</div><div style="font-size:14px;color:#6B7280;line-height:1.55;">Sign in to access your trading dashboard.</div></div>
+          <div class="sc-type-row"><div class="sc-type-meta">12px / 600 / DM Sans / uppercase / ls 0.04em — field label</div><div style="font-size:12px;font-weight:600;color:#6B7280;letter-spacing:.04em;text-transform:uppercase;">EMAIL ADDRESS</div></div>
+          <div class="sc-type-row"><div class="sc-type-meta">10px / 700 / DM Sans / uppercase / ls 0.12em — mobile eyebrow</div><div style="font-size:10px;font-weight:700;color:#3DBFBF;letter-spacing:.12em;text-transform:uppercase;">Identity Verification</div></div>
+        </div>
+      </div>
+
+      <!-- SPACING & RADIUS -->
+      <div class="sc-section" id="spacing">
+        <div class="sc-section-title">Spacing &amp; Border Radius</div>
+        <div class="sc-section-desc">Universal radius is 4px. OTP slots use 8px. Sheet uses 8px top corners. Avatars are 50%.</div>
+        <div class="sc-row">
+          <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div style="width:40px;height:40px;background:var(--auth-color-brand);border-radius:2px;"></div>
+              <span style="font-size:11px;color:var(--auth-color-text-tertiary);">2px<br>checkbox</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div style="width:40px;height:40px;background:var(--auth-color-brand);border-radius:4px;"></div>
+              <span style="font-size:11px;color:var(--auth-color-text-tertiary);">4px<br>universal</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div style="width:40px;height:40px;background:var(--auth-color-brand);border-radius:8px;"></div>
+              <span style="font-size:11px;color:var(--auth-color-text-tertiary);">8px<br>OTP / sheet</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div style="width:40px;height:40px;background:var(--auth-color-brand);border-radius:14px;"></div>
+              <span style="font-size:11px;color:var(--auth-color-text-tertiary);">14px<br>dialog</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div style="width:40px;height:40px;background:var(--auth-color-brand);border-radius:22px;"></div>
+              <span style="font-size:11px;color:var(--auth-color-text-tertiary);">22px<br>banner</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div style="width:40px;height:40px;background:var(--auth-color-brand);border-radius:50%;"></div>
+              <span style="font-size:11px;color:var(--auth-color-text-tertiary);">50%<br>avatar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <div style="width:80px;height:40px;background:var(--auth-color-brand);border-radius:999px;"></div>
+              <span style="font-size:11px;color:var(--auth-color-text-tertiary);">999px<br>pill</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SHADOWS -->
+      <div class="sc-section" id="shadows">
+        <div class="sc-section-title">Shadows</div>
+        <div class="sc-row">
+          <div style="background:#fff;padding:20px 24px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.06);width:160px;text-align:center;">
+            <div style="font-size:12px;color:#A8BECD;font-weight:600;">Card</div>
+          </div>
+          <div style="background:#fff;padding:20px 24px;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);width:160px;text-align:center;">
+            <div style="font-size:12px;color:#A8BECD;font-weight:600;">Card LG</div>
+          </div>
+          <div style="background:#fff;padding:20px 24px;border-radius:8px;box-shadow:0 -8px 40px rgba(0,0,0,.18);width:160px;text-align:center;">
+            <div style="font-size:12px;color:#A8BECD;font-weight:600;">Sheet</div>
+          </div>
+          <div style="background:#fff;padding:20px 24px;border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.20);width:160px;text-align:center;">
+            <div style="font-size:12px;color:#A8BECD;font-weight:600;">Dialog</div>
+          </div>
+          <div style="background:#7AEFEF;padding:20px 24px;border-radius:4px;box-shadow:0 0 0 4px rgba(122,239,239,.094);width:160px;text-align:center;">
+            <div style="font-size:12px;color:#000;font-weight:600;">Focus ring</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INPUTS -->
+      <div class="sc-section" id="inputs">
+        <div class="sc-section-title">Inputs <span class="sc-tag">Interactive</span></div>
+        <div class="sc-section-desc">Height 48px, border 1.5px, radius 4px. Click to see focus state.</div>
+        <div class="sc-demo" style="max-width:440px;">
+          <div class="auth-field">
+            <label class="auth-field-label" for="demo-email">Email Address</label>
+            <div class="auth-field-wrap">
+              <input class="auth-field-input" id="demo-email" type="email" placeholder="you@enigma.io" style="padding-right:14px;" />
+            </div>
+          </div>
+          <div class="auth-field">
+            <label class="auth-field-label" for="demo-pw">Password</label>
+            <div class="auth-field-wrap">
+              <input class="auth-field-input" id="demo-pw" type="password" placeholder="Enter your password" style="padding-right:44px;" />
+              <button class="auth-field-toggle" onclick="toggleDemoPw()" aria-label="Toggle password">
+                <svg id="demo-pw-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg id="demo-pw-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="auth-field" style="margin-bottom:0;">
+            <label class="auth-field-label">Error state</label>
+            <div class="auth-field-wrap">
+              <input class="auth-field-input error" type="text" value="invalid@" style="padding-right:14px;" />
+            </div>
+            <div style="font-size:12px;color:#EF4444;margin-top:4px;">Please enter a valid email address.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="sc-section" id="buttons">
+        <div class="sc-section-title">Buttons <span class="sc-tag">Interactive</span></div>
+        <div class="sc-section-desc">Primary: height 50px (web) / 52px (mobile). Teal bg, black text. Hover → #5ADADA. Active → scale(0.98).</div>
+        <div class="sc-demo" style="max-width:440px;display:flex;flex-direction:column;gap:12px;">
+          <button class="auth-btn auth-btn-primary" id="demo-btn-primary">
+            <span class="auth-btn-label">Sign In</span>
+            <div class="auth-spinner"></div>
+          </button>
+          <button class="auth-btn auth-btn-primary loading">
+            <span class="auth-btn-label">Loading…</span>
+            <div class="auth-spinner"></div>
+          </button>
+          <button class="auth-btn auth-btn-primary" disabled>
+            <span class="auth-btn-label">Disabled</span>
+          </button>
+          <button class="auth-btn auth-btn-black">
+            <span class="auth-btn-label">Go to Dashboard</span>
+          </button>
+          <div style="display:flex;gap:12px;align-items:center;">
+            <button class="auth-link-btn">Forgot password?</button>
+            <button class="auth-link-btn" disabled>Resend in 28s</button>
+          </div>
+          <button class="auth-btn-primary-mobile">Confirm Identity (Mobile)</button>
+          <button class="auth-btn-danger">Block sign-in attempt</button>
+        </div>
+      </div>
+
+      <!-- CHECKBOX -->
+      <div class="sc-section" id="checkbox">
+        <div class="sc-section-title">Checkbox <span class="sc-tag">Interactive</span></div>
+        <div class="sc-demo sc-demo--white" style="display:flex;gap:20px;align-items:center;">
+          <label class="auth-checkbox-row checked" onclick="this.classList.toggle('checked')">
+            <div class="auth-cb-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span class="auth-cb-label">Keep me signed in</span>
+          </label>
+          <label class="auth-checkbox-row" onclick="this.classList.toggle('checked')">
+            <div class="auth-cb-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span class="auth-cb-label">Unchecked</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- OTP SLOTS -->
+      <div class="sc-section" id="otp">
+        <div class="sc-section-title">OTP Digit Slots <span class="sc-tag">Interactive</span></div>
+        <div class="sc-section-desc">Height 58px, radius 8px, DM Mono 24px. Auto-advance on input. Click slot 1 to focus.</div>
+        <div class="sc-demo" style="max-width:440px;">
+          <div class="auth-otp-slots" id="demo-otp-slots" role="group" aria-label="6-digit code">
+            <input class="auth-otp-slot" id="ds0" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 1"/>
+            <input class="auth-otp-slot" id="ds1" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 2"/>
+            <input class="auth-otp-slot" id="ds2" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 3"/>
+            <div class="auth-otp-sep" aria-hidden="true">·</div>
+            <input class="auth-otp-slot" id="ds3" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 4"/>
+            <input class="auth-otp-slot" id="ds4" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 5"/>
+            <input class="auth-otp-slot" id="ds5" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 6"/>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button onclick="demoOtpFill()" style="background:var(--auth-color-brand-ghost);border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;color:var(--auth-color-brand-dark);">Fill demo code</button>
+            <button onclick="demoOtpError()" style="background:rgba(239,68,68,.08);border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;color:#EF4444;">Show error</button>
+            <button onclick="demoOtpClear()" style="background:var(--auth-color-surface-2);border:1px solid var(--auth-color-border);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;color:var(--auth-color-text-secondary);">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- WAITING BADGE -->
+      <div class="sc-section" id="waiting">
+        <div class="sc-section-title">Waiting Badge</div>
+        <div class="sc-demo sc-demo--white" style="display:flex;align-items:center;gap:20px;">
+          <div class="auth-waiting-badge">
+            <div class="auth-waiting-dots"><span></span><span></span><span></span></div>
+            Waiting for approval
+          </div>
+          <div class="auth-session-dot"></div>
+          <span style="font-size:12px;color:var(--auth-color-text-tertiary);">Live dot</span>
+        </div>
+      </div>
+
+      <!-- TIMER -->
+      <div class="sc-section" id="timer">
+        <div class="sc-section-title">Timer Row <span class="sc-tag">Interactive</span></div>
+        <div class="sc-demo" style="max-width:440px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:14px;color:#9CA3AF;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              Code expires in <span id="sc-timer" style="font-family:'DM Mono',monospace;font-weight:600;color:#6B7280;margin-left:4px;">3:00</span>
+            </div>
+            <button class="auth-link-btn">Resend notification</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button onclick="startScTimer()" style="background:var(--auth-color-brand-ghost);border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;color:var(--auth-color-brand-dark);">Start timer</button>
+            <button onclick="stopScTimer()" style="background:var(--auth-color-surface-2);border:1px solid var(--auth-color-border);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;color:var(--auth-color-text-secondary);">Stop</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUCCESS RING -->
+      <div class="sc-section" id="success">
+        <div class="sc-section-title">Success Ring <span class="sc-tag">Interactive</span></div>
+        <div class="sc-demo sc-demo--white" style="display:flex;align-items:center;gap:32px;flex-wrap:wrap;">
+          <div style="text-align:center;">
+            <div class="auth-success-ring" id="sc-success-ring" style="margin:0 auto 16px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div style="font-size:22px;font-weight:700;color:#1A1F36;margin-bottom:4px;">Identity verified</div>
+            <div style="font-size:14px;color:#6B7280;line-height:1.55;">You've successfully signed in.</div>
+            <button onclick="replaySuccessRing()" style="margin-top:12px;background:var(--auth-color-brand-ghost);border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;color:var(--auth-color-brand-dark);">Replay animation</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EYEBROW -->
+      <div class="sc-section" id="eyebrow">
+        <div class="sc-section-title">Eyebrow / Step Indicator</div>
+        <div class="sc-demo sc-demo--white" style="display:flex;flex-direction:column;gap:16px;">
+          <div>
+            <div class="sc-label" style="margin-bottom:6px;">Web eyebrow — 14px / 600 / ls 0.08em</div>
+            <div class="auth-eyebrow">Two-factor authentication</div>
+          </div>
+          <div>
+            <div class="sc-label" style="margin-bottom:6px;">Mobile eyebrow — 10px / 700 / ls 0.12em / teal-dark</div>
+            <div class="auth-eyebrow-mobile">Identity Verification</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PUSH NOTIFICATION -->
+      <div class="sc-section" id="push">
+        <div class="sc-section-title">Push Notification Banner</div>
+        <div class="sc-section-desc">iOS glass morphism. Slides from top. Auto-dismisses after 9s. blur(48px) + dark translucent bg.</div>
+        <div class="sc-demo sc-canvas--dark" style="padding:16px;min-height:120px;display:flex;align-items:flex-start;">
+          <div class="auth-push-banner-demo">
+            <div class="auth-push-banner-top">
+              <span class="auth-push-banner-appname">Enigma Authenticator</span>
+              <span class="auth-push-banner-time">now</span>
+            </div>
+            <div class="auth-push-banner-content">
+              <div class="auth-push-banner-app-icon">
+                <svg viewBox="0 0 40 40" fill="none" width="22" height="22"><path d="M13.5997 36.9331V34.5121L15.7256 35.4391V30.2742L19.9785 31.4062V37.1221L39.234 28.7333V24.3074L36.3801 24.9364V26.6263L38.385 26.0364V27.6083L28.9913 31.0282V28.8113L35.1911 26.9993V25.2384L28.9913 26.5983V24.3814L39.985 22.7224V29.8533L19.9935 39.999L13.5997 36.9331Z" fill="white"/></svg>
+              </div>
+              <div class="auth-push-banner-body">
+                <div class="auth-push-banner-title">Sign-in requested</div>
+                <div class="auth-push-banner-sub">London · Chrome · 82.43.201.15</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FACE ID -->
+      <div class="sc-section" id="faceid">
+        <div class="sc-section-title">Face ID Overlay</div>
+        <div class="sc-section-desc">Frosted blur (6px) over app content. Lottie animation. "Use Passcode" fallback pill below.</div>
+        <div class="sc-demo sc-demo--mobile-bg" style="display:flex;flex-direction:column;align-items:center;padding:40px 24px;gap:20px;">
+          <div style="width:180px;height:180px;background:var(--auth-color-brand-ghost);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--auth-color-brand);">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--auth-color-brand-dark)" stroke-width="1.5" stroke-linecap="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h6m-6 0v2M15 3h4a2 2 0 0 1 2 2v4M3 9v6m18-6v6M3 15v4a2 2 0 0 0 2 2h4m6 0h4a2 2 0 0 0 2-2v-4M9 21H9m6 0h-6m6-9h.01M9 12h.01M12 9v.01M12 15v.01"/></svg>
+          </div>
+          <p style="font-size:16px;font-weight:600;color:#1A1F36;letter-spacing:-.01em;">Enigma Authenticator locked</p>
+          <button class="auth-faceid-fallback-link">Use Passcode</button>
+        </div>
+      </div>
+
+      <!-- HOME BANNER -->
+      <div class="sc-section" id="homebanner">
+        <div class="sc-section-title">Home Logo Banner</div>
+        <div class="sc-section-desc">Teal #3DBFBF header. White logo + app name. Status bar turns teal with 90% white text.</div>
+        <div style="border-radius:var(--auth-radius-md);overflow:hidden;max-width:390px;">
+          <div class="auth-home-logo-banner">
+            <div class="auth-home-logo-icon">
+              <svg width="30" height="30" viewBox="0 0 40 40" fill="none"><path d="M13.5997 36.9331V34.5121L15.7256 35.4391V30.2742L19.9785 31.4062V37.1221L39.234 28.7333V24.3074L36.3801 24.9364V26.6263L38.385 26.0364V27.6083L28.9913 31.0282V28.8113L35.1911 26.9993V25.2384L28.9913 26.5983V24.3814L39.985 22.7224V29.8533L19.9935 39.999L13.5997 36.9331Z" fill="white"/></svg>
+            </div>
+            <p class="auth-home-logo-name">Enigma Authenticator</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESSION CARDS -->
+      <div class="sc-section" id="session">
+        <div class="sc-section-title">Session Compact Cards</div>
+        <div class="sc-demo sc-demo--mobile-bg" style="display:flex;flex-direction:column;gap:8px;max-width:390px;">
+          <div class="auth-session-compact">
+            <div style="display:flex;align-items:center;gap:8px;flex:0 0 auto;">
+              <div class="auth-session-dot"></div>
+            </div>
+            <div class="auth-session-compact-body">
+              <div class="auth-session-compact-loc">London, UK — active now</div>
+              <div class="auth-session-compact-meta">Chrome · macOS · just now</div>
+            </div>
+          </div>
+          <div class="auth-session-compact">
+            <div class="auth-session-compact-flag">US</div>
+            <div class="auth-session-compact-body">
+              <div class="auth-session-compact-loc">New York, US</div>
+              <div class="auth-session-compact-meta">Firefox · Windows · 2h ago</div>
+            </div>
+            <button class="auth-session-compact-signout">Sign out</button>
+          </div>
+          <div class="auth-session-compact">
+            <div class="auth-session-compact-flag">SG</div>
+            <div class="auth-session-compact-body">
+              <div class="auth-session-compact-loc">Singapore</div>
+              <div class="auth-session-compact-meta">Safari · iPhone · 5h ago</div>
+            </div>
+            <button class="auth-session-compact-signout">Sign out</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OTP CODE DISPLAY -->
+      <div class="sc-section" id="otpcode">
+        <div class="sc-section-title">OTP Code Display (Bottom Sheet)</div>
+        <div class="sc-section-desc">DM Mono, 38px, letter-spacing 0.18em. Expiry timer turns red at ≤30s. Used state strikes through.</div>
+        <div class="sc-demo sc-demo--white" style="max-width:390px;">
+          <div class="auth-sheet-code-card">
+            <div class="auth-sheet-code-header">
+              <span class="auth-sheet-code-label">One-time code</span>
+              <span class="auth-sheet-code-expiry" id="sc-expiry">2:47</span>
+            </div>
+            <div class="auth-sheet-otp">482 716</div>
+            <button class="auth-sheet-copy-btn" onclick="demoCopyCode(this)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+              Copy code
+            </button>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button onclick="document.getElementById('sc-expiry').classList.toggle('urgent')" style="background:rgba(239,68,68,.08);border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;color:#E5686A;">Toggle urgent</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM SHEET -->
+      <div class="sc-section" id="sheet">
+        <div class="sc-section-title">Bottom Sheet <span class="sc-tag">Interactive</span></div>
+        <div class="sc-section-desc">Slides up from bottom. Handle bar at top. Max-height 88%. Overlay behind at rgba(0,0,0,0.45).</div>
+        <button onclick="showDemoSheet()" style="background:var(--auth-color-brand);border:none;height:44px;padding:0 20px;border-radius:4px;font-family:var(--auth-font-sans);font-size:14px;font-weight:600;color:#000;cursor:pointer;">Open demo sheet</button>
+
+        <!-- Demo sheet -->
+        <div id="demo-sheet-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;opacity:0;pointer-events:none;transition:opacity .35s ease;" onclick="hideDemoSheet()"></div>
+        <div id="demo-sheet" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:min(390px,100vw);background:var(--auth-color-surface);border-radius:8px 8px 0 0;z-index:501;transition:transform .42s cubic-bezier(.32,0,.04,1);box-shadow:0 -8px 40px rgba(0,0,0,.18);max-height:88vh;overflow:hidden;">
+          <div class="auth-sheet-handle"></div>
+          <div style="padding:16px 20px 40px;">
+            <p style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--auth-color-text-tertiary);margin-bottom:10px;">Sign-in details</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
+              <div><div style="font-size:10px;font-weight:700;color:var(--auth-color-text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Browser</div><div style="font-size:14px;font-weight:600;color:var(--auth-color-text-primary);">Chrome 126</div></div>
+              <div><div style="font-size:10px;font-weight:700;color:var(--auth-color-text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">OS</div><div style="font-size:14px;font-weight:600;color:var(--auth-color-text-primary);">macOS 14</div></div>
+              <div><div style="font-size:10px;font-weight:700;color:var(--auth-color-text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">IP Address</div><div style="font-size:14px;font-weight:600;color:var(--auth-color-text-primary);">82.43.201.15</div></div>
+              <div><div style="font-size:10px;font-weight:700;color:var(--auth-color-text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;">Time</div><div style="font-size:14px;font-weight:600;color:var(--auth-color-text-primary);">9:41 AM</div></div>
+            </div>
+            <div class="auth-sheet-code-card">
+              <div class="auth-sheet-code-header">
+                <span class="auth-sheet-code-label">One-time code</span>
+                <span class="auth-sheet-code-expiry">2:47</span>
+              </div>
+              <div class="auth-sheet-otp">482 716</div>
+              <button class="auth-sheet-copy-btn" onclick="hideDemoSheet()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                Copy code
+              </button>
+            </div>
+            <button style="display:block;width:100%;text-align:center;font-size:14px;color:var(--auth-color-danger);font-weight:500;cursor:pointer;background:none;border:none;font-family:var(--auth-font-sans);padding:16px 0 4px;text-decoration:underline;text-underline-offset:4px;" onclick="hideDemoSheet()">This wasn't me — Block sign-in</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIRM DIALOG -->
+      <div class="sc-section" id="dialog">
+        <div class="sc-section-title">Sign-Out Confirm Dialog <span class="sc-tag">Interactive</span></div>
+        <button onclick="showDemoDialog()" style="background:var(--auth-color-danger);border:none;height:44px;padding:0 20px;border-radius:4px;font-family:var(--auth-font-sans);font-size:14px;font-weight:600;color:#fff;cursor:pointer;">Show dialog</button>
+        <div id="demo-dialog-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s ease;">
+          <div class="auth-confirm-dialog-demo" style="transform:scale(.95);transition:transform .2s ease;" id="demo-dialog-inner">
+            <p class="auth-confirm-title">Sign out New York session?</p>
+            <p class="auth-confirm-body">This will immediately end the New York session and require re-authentication on that device.</p>
+            <div class="auth-confirm-actions">
+              <button class="auth-confirm-btn auth-confirm-btn-cancel" onclick="hideDemoDialog()">Cancel</button>
+              <button class="auth-confirm-btn auth-confirm-btn-danger" onclick="hideDemoDialog()">Sign out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOAST -->
+      <div class="sc-section" id="toast">
+        <div class="sc-section-title">Toast <span class="sc-tag">Interactive</span></div>
+        <div class="sc-section-desc">Slides up from bottom. Black bg default, red for danger. Auto-dismisses after 3s.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="showDemoToast('Code copied to clipboard.','')" style="background:var(--auth-color-surface);border:1.5px solid var(--auth-color-border);height:40px;padding:0 16px;border-radius:4px;font-family:var(--auth-font-sans);font-size:13px;font-weight:600;color:var(--auth-color-text-primary);cursor:pointer;">Default toast</button>
+          <button onclick="showDemoToast('Sign-in blocked. Attempt logged.','danger')" style="background:rgba(229,104,106,.08);border:1.5px solid var(--auth-color-danger);height:40px;padding:0 16px;border-radius:4px;font-family:var(--auth-font-sans);font-size:13px;font-weight:600;color:var(--auth-color-danger);cursor:pointer;">Danger toast</button>
+        </div>
+        <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
+          <div class="auth-toast-demo">Code copied to clipboard.</div>
+          <div class="auth-toast-demo danger">Sign-in blocked. Attempt has been logged.</div>
+        </div>
+        <!-- Toast (fixed, for demo) -->
+        <div id="sc-toast" style="position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:#000;color:#fff;border-radius:4px;padding:14px 16px;font-family:var(--auth-font-sans);font-size:14px;font-weight:500;opacity:0;transition:transform .28s cubic-bezier(.4,0,.2,1),opacity .28s ease;z-index:9999;text-align:center;white-space:nowrap;pointer-events:none;"></div>
+      </div>
+
+      <!-- AVATAR -->
+      <div class="sc-section" id="avatar">
+        <div class="sc-section-title">Avatar / Initials</div>
+        <div class="sc-demo sc-demo--white" style="display:flex;gap:16px;align-items:center;">
+          <div class="auth-avatar">PR</div>
+          <div class="auth-avatar">JD</div>
+          <div class="auth-avatar">MK</div>
+        </div>
+      </div>
+
+    </div><!-- /sc-content -->
+  </main><!-- /sc-main -->
+</div><!-- /sc-shell -->
+
+<script>
+  /* Sidebar scroll navigation */
+  function scrollTo(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelectorAll('.sc-sidebar-link').forEach(l => l.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+  }
+
+  /* Password toggle */
+  function toggleDemoPw() {
+    const i = document.getElementById('demo-pw');
+    const show = document.getElementById('demo-pw-show'), hide = document.getElementById('demo-pw-hide');
+    if (i.type === 'password') { i.type = 'text'; show.style.display = 'none'; hide.style.display = ''; }
+    else { i.type = 'password'; show.style.display = ''; hide.style.display = 'none'; }
+  }
+
+  /* OTP demo */
+  const DS = ['ds0','ds1','ds2','ds3','ds4','ds5'];
+  function demoOtpFill() {
+    '482716'.split('').forEach((ch,i) => { if(DS[i]){const el=document.getElementById(DS[i]);el.value=ch;el.classList.add('filled');el.classList.remove('has-error');} });
+  }
+  function demoOtpError() {
+    DS.forEach(id => { const el=document.getElementById(id);el.classList.add('has-error');setTimeout(()=>{el.classList.remove('has-error');el.value='';el.classList.remove('filled');},600); });
+  }
+  function demoOtpClear() {
+    DS.forEach(id => { const el=document.getElementById(id);el.value='';el.classList.remove('filled','has-error'); });
+  }
+  DS.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', e => {
+      const idx = DS.indexOf(e.target.id);
+      e.target.value = e.target.value.replace(/\D/g,'').slice(-1);
+      e.target.classList.toggle('filled', !!e.target.value);
+      if (e.target.value && idx < DS.length - 1) document.getElementById(DS[idx+1]).focus();
+    });
+    el.addEventListener('keydown', e => {
+      const idx = DS.indexOf(e.target.id);
+      if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+        document.getElementById(DS[idx-1]).value = '';
+        document.getElementById(DS[idx-1]).classList.remove('filled');
+        document.getElementById(DS[idx-1]).focus();
+      }
+    });
+  });
+
+  /* Timer demo */
+  let scTimerInterval, scSecs = 180;
+  function startScTimer() {
+    clearInterval(scTimerInterval);
+    scSecs = 180;
+    const el = document.getElementById('sc-timer');
+    el.classList.remove('warn'); el.style.color = '#6B7280';
+    scTimerInterval = setInterval(() => {
+      scSecs--;
+      const m = Math.floor(scSecs/60), s = scSecs%60;
+      el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+      if (scSecs <= 30) { el.style.color = '#EF4444'; }
+      if (scSecs <= 0) { clearInterval(scTimerInterval); el.textContent = 'Expired'; }
+    }, 1000);
+  }
+  function stopScTimer() { clearInterval(scTimerInterval); }
+
+  /* Success ring */
+  function replaySuccessRing() {
+    const ring = document.getElementById('sc-success-ring');
+    ring.style.animation = 'none'; void ring.offsetWidth;
+    ring.style.animation = 'auth-pop-in .45s cubic-bezier(.34,1.56,.64,1)';
+  }
+
+  /* Copy code demo */
+  function demoCopyCode(btn) {
+    btn.innerHTML = '✓ Copied!'; btn.disabled = true;
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy code';
+      btn.disabled = false;
+    }, 2000);
+  }
+
+  /* Bottom sheet demo */
+  function showDemoSheet() {
+    const overlay = document.getElementById('demo-sheet-overlay');
+    const sheet   = document.getElementById('demo-sheet');
+    overlay.style.opacity = '1'; overlay.style.pointerEvents = 'auto';
+    sheet.style.transform = 'translateX(-50%) translateY(0)';
+  }
+  function hideDemoSheet() {
+    const overlay = document.getElementById('demo-sheet-overlay');
+    const sheet   = document.getElementById('demo-sheet');
+    overlay.style.opacity = '0'; overlay.style.pointerEvents = 'none';
+    sheet.style.transform = 'translateX(-50%) translateY(100%)';
+  }
+
+  /* Confirm dialog demo */
+  function showDemoDialog() {
+    const overlay = document.getElementById('demo-dialog-overlay');
+    const inner   = document.getElementById('demo-dialog-inner');
+    overlay.style.opacity = '1'; overlay.style.pointerEvents = 'auto';
+    inner.style.transform = 'scale(1)';
+  }
+  function hideDemoDialog() {
+    const overlay = document.getElementById('demo-dialog-overlay');
+    const inner   = document.getElementById('demo-dialog-inner');
+    overlay.style.opacity = '0'; overlay.style.pointerEvents = 'none';
+    inner.style.transform = 'scale(.95)';
+  }
+
+  /* Toast demo */
+  let scToastTimer;
+  function showDemoToast(msg, type) {
+    const el = document.getElementById('sc-toast');
+    el.textContent = msg;
+    el.style.background = type === 'danger' ? '#E5686A' : '#000';
+    el.style.opacity = '1'; el.style.transform = 'translateX(-50%) translateY(0)';
+    clearTimeout(scToastTimer);
+    scToastTimer = setTimeout(() => {
+      el.style.opacity = '0'; el.style.transform = 'translateX(-50%) translateY(80px)';
+    }, 3000);
+  }
+</script>
+</body>
+</html>

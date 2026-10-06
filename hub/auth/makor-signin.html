@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Makor-X.AI — Sign In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --c-bg:           #C8D8DF;
+      --c-surface:      #EDF3F6;
+      --c-surface-2:    #FFFFFF;
+      --c-primary:      #005268;
+      --c-primary-hover:#003D4F;
+      --c-primary-ghost:rgba(0,82,104,0.07);
+      --c-text:         #0B2530;
+      --c-text-2:       #537380;
+      --c-text-3:       #90AEBC;
+      --c-border:       #CCDDE4;
+      --c-danger:       #B53A3A;
+      --c-disabled:     #7FA0AB;
+      --font-serif: 'EB Garamond', Georgia, serif;
+      --font-sans:  'Geist', -apple-system, sans-serif;
+      --font-mono:  var(--font-sans);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    button:focus-visible, [tabindex]:focus-visible {
+      outline: 2px solid var(--c-primary);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    input:focus-visible { outline: none; }
+
+    html, body {
+      min-height: 100vh;
+      font-family: var(--font-sans);
+      background: var(--c-bg);
+      color: var(--c-text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Constellation canvas ─── */
+    #constellation-canvas {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ─── Background watermark (bottom-right) ─── */
+    .bg-watermark {
+      position: fixed; bottom: -40px; right: -40px;
+      width: 360px; height: 288px;
+      opacity: 0.045;
+      pointer-events: none; z-index: 0;
+    }
+    .bg-watermark svg { width: 100%; height: 100%; }
+
+    /* ─── Page footer ─── */
+    .page-footer {
+      position: fixed; bottom: 22px; left: 0; right: 0;
+      display: flex; justify-content: space-between;
+      padding: 0 36px;
+      pointer-events: none; z-index: 2;
+    }
+    .footer-text {
+      font-size: 10px; font-weight: 600;
+      color: var(--c-text-2); letter-spacing: .1em;
+      text-transform: uppercase; opacity: .7;
+    }
+
+    /* ─── Page layout ─── */
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 80px 16px 80px;
+    }
+
+    /* ─── Card ─── */
+    .card {
+      width: 100%; max-width: 460px;
+      background: var(--c-surface);
+      border-radius: 16px;
+      box-shadow: 0 2px 40px rgba(0,30,50,.10), 0 1px 4px rgba(0,30,50,.05);
+      padding: 0 48px 48px;
+    }
+    @media (max-width: 560px) { .card { padding: 0 32px 40px; } }
+
+    /* ─── Card logo header ─── */
+    .card-logo-header {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 36px 0 24px; gap: 10px;
+    }
+    .brand-name {
+      font-family: var(--font-serif);
+      font-size: 15px; font-weight: 600;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: var(--c-primary);
+    }
+
+    /* ─── View switching ─── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ─── Eyebrow ─── */
+    .eyebrow {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--c-text-2); margin-bottom: 10px; text-align: center;
+    }
+    .eyebrow.accent { color: var(--c-primary); }
+
+    /* ─── Headings ─── */
+    .card-title {
+      font-family: var(--font-serif);
+      font-size: 38px; font-weight: 500; line-height: 1.1;
+      color: var(--c-text); margin-bottom: 8px;
+      font-variant-caps: small-caps; letter-spacing: .01em;
+    }
+    .card-sub {
+      font-size: 14px; color: var(--c-text-2);
+      line-height: 1.6; margin-bottom: 28px;
+    }
+    #view-login .eyebrow,
+    #view-login .card-title,
+    #view-login .card-sub { text-align: center; }
+
+    /* ─── Form fields ─── */
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .field-wrap { position: relative; }
+    .field-input {
+      width: 100%; height: 48px;
+      padding: 0 44px 0 16px;
+      background: var(--c-surface-2);
+      border: 1.5px solid transparent;
+      border-radius: 8px;
+      font-family: var(--font-sans); font-size: 14px; color: var(--c-text);
+      outline: none;
+      transition: border-color .18s, box-shadow .18s;
+      -webkit-appearance: none;
+    }
+    .field-input:focus {
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 3px var(--c-primary-ghost);
+    }
+    .field-input::placeholder { color: var(--c-text-3); }
+    .field-input.error { border-color: var(--c-danger); box-shadow: 0 0 0 3px rgba(181,58,58,.07); }
+
+    .field-toggle {
+      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; padding: 0; cursor: pointer; color: var(--c-text-3);
+      width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+      transition: color .12s; -webkit-tap-highlight-color: transparent;
+    }
+    .field-toggle:hover { color: var(--c-text-2); }
+    .field-toggle svg { width: 18px; height: 18px; display: block; }
+    .field-error { font-size: 12px; color: var(--c-danger); margin-top: 4px; display: none; }
+    .field-error.show { display: block; }
+
+    /* ─── Row ─── */
+    .row-between {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .checkbox-row {
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+    }
+    .cb-box {
+      width: 16px; height: 16px; border-radius: 3px; flex-shrink: 0;
+      border: 1.5px solid var(--c-border); background: var(--c-surface);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .12s, border-color .12s;
+    }
+    .checkbox-row.checked .cb-box { background: var(--c-primary); border-color: var(--c-primary); }
+    .cb-box svg { width: 10px; height: 10px; opacity: 0; transition: opacity .12s; }
+    .checkbox-row.checked .cb-box svg { opacity: 1; }
+    .cb-label { font-size: 13px; color: var(--c-text-2); font-weight: 400; }
+
+    .link-btn {
+      background: none; border: none; font-family: var(--font-sans);
+      font-size: 13px; font-weight: 600; color: var(--c-primary);
+      cursor: pointer; padding: 4px 0; transition: opacity .12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .link-btn:hover { opacity: .7; }
+    .link-btn:disabled { opacity: .4; cursor: not-allowed; pointer-events: none; }
+
+    /* ─── Primary button ─── */
+    .btn {
+      width: 100%; height: 50px;
+      border: none; border-radius: 8px;
+      font-family: var(--font-sans); font-size: 15px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .15s, transform .08s, opacity .12s;
+      position: relative; overflow: hidden; letter-spacing: .01em;
+    }
+    .btn-primary { background: var(--c-primary); color: #fff; }
+    .btn-primary:hover  { background: var(--c-primary-hover); }
+    .btn-primary:active { transform: scale(.99); }
+    .btn-primary:disabled { background: var(--c-disabled); color: rgba(255,255,255,.65); cursor: not-allowed; }
+    .btn .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,.3); border-top-color: #fff;
+      border-radius: 50%; animation: spin .65s linear infinite; display: none;
+    }
+    .btn.loading .btn-label { visibility: hidden; }
+    .btn.loading .spinner   { display: block; position: absolute; }
+
+    /* ─── Terms ─── */
+    .terms-row {
+      margin-top: 18px; text-align: center;
+      font-size: 12px; color: var(--c-text-3); line-height: 1.5;
+    }
+    .terms-row a { color: var(--c-primary); font-weight: 500; text-decoration: none; }
+    .terms-row a:hover { text-decoration: underline; }
+
+    /* ─── Back link ─── */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--c-text-2);
+      background: none; border: none; cursor: pointer;
+      font-family: var(--font-sans); font-weight: 500;
+      padding: 0; margin-bottom: 28px;
+      transition: color .12s; -webkit-tap-highlight-color: transparent;
+    }
+    .back-link:hover { color: var(--c-text); }
+
+    /* ─── OTP slots ─── */
+    .otp-slots {
+      display: flex; gap: 8px;
+      margin: 24px 0 8px;
+    }
+    .otp-slot {
+      flex: 1; min-width: 0; height: 68px;
+      background: var(--c-surface-2);
+      border: 1.5px solid var(--c-border);
+      border-radius: 12px;
+      font-family: var(--font-serif);
+      font-size: 30px; font-weight: 500;
+      color: var(--c-text); text-align: center;
+      caret-color: var(--c-primary); outline: none;
+      transition: border-color .15s, box-shadow .15s, transform .1s;
+      -webkit-appearance: none;
+    }
+    .otp-slot:focus, .otp-slot:focus-visible {
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 3px var(--c-primary-ghost);
+      transform: scale(1.03);
+      outline: none;
+    }
+    .otp-slot.filled    { border-color: var(--c-primary); }
+    .otp-slot.has-error { border-color: var(--c-danger); background: rgba(181,58,58,.04); animation: shake .35s ease; }
+
+    /* Hidden separator (kept for JS compatibility) */
+    .otp-sep { display: none; }
+
+    /* OTP error */
+    .otp-error-msg {
+      font-size: 13px; color: var(--c-danger); font-weight: 500;
+      text-align: center; min-height: 20px;
+      margin-bottom: 4px; display: none;
+    }
+    .otp-error-msg.show { display: block; }
+
+    /* Timer row */
+    .timer-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; color: var(--c-text-3); margin-bottom: 24px;
+    }
+    .timer-label { display: flex; align-items: center; gap: 6px; }
+    .timer-label svg { width: 14px; height: 14px; }
+    #web-timer { font-family: var(--font-serif); font-weight: 500; color: var(--c-text-2); }
+    #web-timer.warn { color: var(--c-danger); }
+
+    /* Resend note */
+    .resend-note {
+      text-align: center; margin-top: 16px;
+      font-size: 13px; color: var(--c-text-3);
+    }
+    .resend-note strong { color: var(--c-text); font-weight: 600; }
+
+    /* ─── Success ─── */
+    .success-center {
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; padding: 8px 0 0;
+    }
+    .success-ring {
+      width: 68px; height: 68px; border-radius: 50%;
+      background: var(--c-primary-ghost);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px;
+      animation: pop-in .45s cubic-bezier(.34,1.56,.64,1);
+    }
+    .success-ring svg { width: 32px; height: 32px; color: var(--c-primary); }
+    .success-title {
+      font-family: var(--font-serif);
+      font-size: 30px; font-weight: 500;
+      font-variant-caps: small-caps;
+      margin-bottom: 8px; color: var(--c-text);
+    }
+    .success-sub { font-size: 14px; color: var(--c-text-2); line-height: 1.6; }
+
+    /* ─── Animations ─── */
+    @keyframes spin   { to { transform: rotate(360deg); } }
+    @keyframes shake  { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    @keyframes pop-in { 0%{transform:scale(.2);opacity:0} 100%{transform:scale(1);opacity:1} }
+  </style>
+</head>
+<body>
+
+<!-- Constellation background -->
+<canvas id="constellation-canvas"></canvas>
+
+<!-- Watermark -->
+<div class="bg-watermark">
+  <svg viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M67.6259 0.448242C68.296 -0.544707 69.8282 0.266374 69.3837 1.37891L44.4969 63.6465C44.4114 63.8604 44.2039 64.0009 43.9735 64.001C43.759 64.001 43.5626 63.8788 43.4677 63.6865L35.9071 48.3721C35.7482 48.0502 35.7747 47.6677 35.9755 47.3701L67.6259 0.448242ZM70.454 11.9521C70.8449 11.0137 72.225 11.1857 72.369 12.1924C73.8917 22.839 78.3705 53.8814 79.9803 62.0361C80.1417 62.8537 79.2542 63.9969 78.4208 63.9971H70.6864C69.9107 63.9971 69.0048 63.036 68.9579 62.2617C68.5325 55.2413 64.8382 29.5715 64.4325 26.7646C64.4067 26.5861 64.4326 26.4273 64.5018 26.2607L70.454 11.9521ZM11.9266 39.3418C12.2469 38.4743 13.4678 38.4726 13.7889 39.3398C14.6306 41.6132 15.7767 44.7461 16.0458 45.6631C16.1838 46.133 16.4626 46.5621 16.8534 46.9053C17.2441 47.2484 17.7325 47.493 18.2675 47.6143C19.2502 47.8366 22.4681 48.7419 25.0018 49.4639C25.9651 49.7388 25.9652 51.0943 25.0018 51.3691C22.4681 52.0911 19.2502 52.9954 18.2675 53.2178C17.7324 53.339 17.2441 53.5846 16.8534 53.9277C16.4628 54.2708 16.1839 54.6992 16.0458 55.1689C15.8155 55.9532 14.6405 59.1665 13.7831 61.4902C13.4629 62.3579 12.2429 62.3595 11.9218 61.4922C11.0801 59.2189 9.93401 56.0859 9.66492 55.1689C9.52686 54.6993 9.24781 54.2708 8.8573 53.9277C8.46647 53.5845 7.97745 53.339 7.44226 53.2178C6.60153 53.0274 3.31353 52.1037 0.724487 51.3682C-0.240351 51.0941 -0.242022 49.7351 0.722534 49.46C3.25303 48.7383 6.46074 47.8357 7.44226 47.6133C7.9772 47.4922 8.46553 47.2472 8.85632 46.9043C9.24713 46.5613 9.52661 46.1328 9.66492 45.6631C9.89523 44.8788 11.0692 41.6655 11.9266 39.3418ZM49.1327 2.29199C49.8058 1.29435 51.3432 2.11701 50.8866 3.23047L34.3046 43.626C34.2424 43.7774 34.0952 43.876 33.9315 43.876C33.7819 43.8759 33.6449 43.7934 33.5751 43.6611L28.4393 33.9248C28.2675 33.5989 28.289 33.2049 28.495 32.8994L49.1327 2.29199ZM32.7079 5.94043C33.3818 4.94234 34.9202 5.76746 34.4618 6.88086L26.1835 26.9678C26.1453 27.0604 26.0551 27.121 25.955 27.1211C25.865 27.1211 25.7817 27.0719 25.7382 26.9932L22.7733 21.6328C22.5914 21.3039 22.6089 20.9004 22.8192 20.5889L32.7079 5.94043ZM11.9315 8.78711C12.2484 7.91866 13.4671 7.91769 13.7841 8.78613C14.084 9.60905 14.3625 10.3907 14.451 10.6924C14.5201 10.9274 14.6599 11.1419 14.8553 11.3135C15.0507 11.485 15.2949 11.6073 15.5624 11.668C15.8479 11.7326 16.5108 11.912 17.2645 12.1221C18.23 12.3912 18.23 13.7465 17.2645 14.0156C16.5108 14.2257 15.8479 14.4051 15.5624 14.4697C15.2949 14.5303 15.0507 14.6527 14.8553 14.8242C14.6599 14.9958 14.5201 15.2103 14.451 15.4453C14.3745 15.706 14.0897 16.5039 13.7811 17.3506C13.4643 18.2192 12.2444 18.2203 11.9276 17.3516C11.6277 16.5286 11.3491 15.747 11.2606 15.4453C11.1916 15.2104 11.0526 14.9958 10.8573 14.8242C10.662 14.6527 10.4177 14.5304 10.1503 14.4697C9.90325 14.4138 9.23234 14.2305 8.45886 14.0146C7.49319 13.7447 7.49288 12.3886 8.45886 12.1191C9.20794 11.9102 9.8661 11.7314 10.1503 11.667C10.4176 11.6064 10.662 11.4839 10.8573 11.3125C11.0524 11.1411 11.1915 10.927 11.2606 10.6924C11.3372 10.4317 11.623 9.63379 11.9315 8.78711Z" fill="#005268"/>
+  </svg>
+</div>
+
+<!-- Footer -->
+<div class="page-footer">
+  <span class="footer-text">Trading Intelligence · SOC 2 · ISO 27001</span>
+  <span class="footer-text">Secure Portal · V.1.0</span>
+</div>
+
+<div class="page">
+  <div class="card">
+
+    <!-- Logo header -->
+    <div class="card-logo-header" id="card-logo-header">
+      <svg width="90" height="72" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M67.6259 0.448242C68.296 -0.544707 69.8282 0.266374 69.3837 1.37891L44.4969 63.6465C44.4114 63.8604 44.2039 64.0009 43.9735 64.001C43.759 64.001 43.5626 63.8788 43.4677 63.6865L35.9071 48.3721C35.7482 48.0502 35.7747 47.6677 35.9755 47.3701L67.6259 0.448242ZM70.454 11.9521C70.8449 11.0137 72.225 11.1857 72.369 12.1924C73.8917 22.839 78.3705 53.8814 79.9803 62.0361C80.1417 62.8537 79.2542 63.9969 78.4208 63.9971H70.6864C69.9107 63.9971 69.0048 63.036 68.9579 62.2617C68.5325 55.2413 64.8382 29.5715 64.4325 26.7646C64.4067 26.5861 64.4326 26.4273 64.5018 26.2607L70.454 11.9521ZM11.9266 39.3418C12.2469 38.4743 13.4678 38.4726 13.7889 39.3398C14.6306 41.6132 15.7767 44.7461 16.0458 45.6631C16.1838 46.133 16.4626 46.5621 16.8534 46.9053C17.2441 47.2484 17.7325 47.493 18.2675 47.6143C19.2502 47.8366 22.4681 48.7419 25.0018 49.4639C25.9651 49.7388 25.9652 51.0943 25.0018 51.3691C22.4681 52.0911 19.2502 52.9954 18.2675 53.2178C17.7324 53.339 17.2441 53.5846 16.8534 53.9277C16.4628 54.2708 16.1839 54.6992 16.0458 55.1689C15.8155 55.9532 14.6405 59.1665 13.7831 61.4902C13.4629 62.3579 12.2429 62.3595 11.9218 61.4922C11.0801 59.2189 9.93401 56.0859 9.66492 55.1689C9.52686 54.6993 9.24781 54.2708 8.8573 53.9277C8.46647 53.5845 7.97745 53.339 7.44226 53.2178C6.60153 53.0274 3.31353 52.1037 0.724487 51.3682C-0.240351 51.0941 -0.242022 49.7351 0.722534 49.46C3.25303 48.7383 6.46074 47.8357 7.44226 47.6133C7.9772 47.4922 8.46553 47.2472 8.85632 46.9043C9.24713 46.5613 9.52661 46.1328 9.66492 45.6631C9.89523 44.8788 11.0692 41.6655 11.9266 39.3418ZM49.1327 2.29199C49.8058 1.29435 51.3432 2.11701 50.8866 3.23047L34.3046 43.626C34.2424 43.7774 34.0952 43.876 33.9315 43.876C33.7819 43.8759 33.6449 43.7934 33.5751 43.6611L28.4393 33.9248C28.2675 33.5989 28.289 33.2049 28.495 32.8994L49.1327 2.29199ZM32.7079 5.94043C33.3818 4.94234 34.9202 5.76746 34.4618 6.88086L26.1835 26.9678C26.1453 27.0604 26.0551 27.121 25.955 27.1211C25.865 27.1211 25.7817 27.0719 25.7382 26.9932L22.7733 21.6328C22.5914 21.3039 22.6089 20.9004 22.8192 20.5889L32.7079 5.94043ZM11.9315 8.78711C12.2484 7.91866 13.4671 7.91769 13.7841 8.78613C14.084 9.60905 14.3625 10.3907 14.451 10.6924C14.5201 10.9274 14.6599 11.1419 14.8553 11.3135C15.0507 11.485 15.2949 11.6073 15.5624 11.668C15.8479 11.7326 16.5108 11.912 17.2645 12.1221C18.23 12.3912 18.23 13.7465 17.2645 14.0156C16.5108 14.2257 15.8479 14.4051 15.5624 14.4697C15.2949 14.5303 15.0507 14.6527 14.8553 14.8242C14.6599 14.9958 14.5201 15.2103 14.451 15.4453C14.3745 15.706 14.0897 16.5039 13.7811 17.3506C13.4643 18.2192 12.2444 18.2203 11.9276 17.3516C11.6277 16.5286 11.3491 15.747 11.2606 15.4453C11.1916 15.2104 11.0526 14.9958 10.8573 14.8242C10.662 14.6527 10.4177 14.5304 10.1503 14.4697C9.90325 14.4138 9.23234 14.2305 8.45886 14.0146C7.49319 13.7447 7.49288 12.3886 8.45886 12.1191C9.20794 11.9102 9.8661 11.7314 10.1503 11.667C10.4176 11.6064 10.662 11.4839 10.8573 11.3125C11.0524 11.1411 11.1915 10.927 11.2606 10.6924C11.3372 10.4317 11.623 9.63379 11.9315 8.78711Z" fill="#005268"/>
+      </svg>
+    </div>
+
+    <!-- ══ VIEW 1: Login ══ -->
+    <div class="view active" id="view-login">
+      <h1 class="card-title">Welcome back</h1>
+      <p class="card-sub">Continue to your Makor X.AI workspace.</p>
+
+      <div class="field">
+        <div class="field-wrap">
+          <input class="field-input" id="email" type="text" placeholder="Username"
+            autocomplete="username" autocapitalize="off" spellcheck="false"
+            style="padding-right:16px;" />
+        </div>
+        <div class="field-error" id="email-err">Please enter your username.</div>
+      </div>
+
+      <div class="field" style="margin-bottom:10px;">
+        <div class="field-wrap">
+          <input class="field-input" id="password" type="password" placeholder="Password"
+            autocomplete="current-password" style="padding-right:44px;" />
+          <button class="field-toggle" id="pw-tog" onclick="togglePw()" aria-label="Show or hide password">
+            <svg id="pw-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="pw-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+        <div class="field-error" id="pw-err">Incorrect credentials. Please try again.</div>
+      </div>
+
+      <div class="row-between">
+        <label class="checkbox-row checked" onclick="this.classList.toggle('checked')">
+          <div class="cb-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="cb-label">Remember me</span>
+        </label>
+        <button class="link-btn">Forgot password?</button>
+      </div>
+
+      <button class="btn btn-primary" id="btn-login" onclick="handleLogin()">
+        <span class="btn-label">Sign in</span>
+        <div class="spinner"></div>
+      </button>
+
+      <p class="terms-row">By continuing you accept our <a href="#">Terms</a> and <a href="#">Privacy</a>.</p>
+    </div>
+
+    <!-- ══ VIEW 2: OTP ══ -->
+    <div class="view" id="view-otp">
+      <button class="back-link" onclick="goToView('view-login')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back
+      </button>
+
+      <p class="eyebrow accent">Step 2 of 2</p>
+      <h2 class="card-title" style="text-align:center; font-size:30px;">Verify it's you</h2>
+      <p class="card-sub" style="text-align:center;">We sent a 6-digit code to your device. Enter it below to continue.</p>
+
+      <div class="otp-slots" id="otp-slots" role="group" aria-label="6-digit verification code">
+        <input class="otp-slot" id="s0" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" aria-label="Digit 1"/>
+        <input class="otp-slot" id="s1" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 2"/>
+        <input class="otp-slot" id="s2" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 3"/>
+        <div class="otp-sep" aria-hidden="true">·</div>
+        <input class="otp-slot" id="s3" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 4"/>
+        <input class="otp-slot" id="s4" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 5"/>
+        <input class="otp-slot" id="s5" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 6"/>
+      </div>
+
+      <p class="otp-error-msg" id="otp-err" role="alert"></p>
+
+      <div class="timer-row">
+        <div class="timer-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Code expires in&nbsp;<span id="web-timer">3:00</span>
+        </div>
+        <button class="link-btn" id="resend-link" onclick="resendCode()">Resend notification</button>
+      </div>
+
+      <button class="btn btn-primary" id="btn-verify" onclick="handleVerify()" disabled>
+        <span class="btn-label">Verify and continue</span>
+        <div class="spinner"></div>
+      </button>
+
+      <p class="resend-note">
+        Didn't get a code? <button class="link-btn" id="resend-link-2" onclick="resendCode()" style="font-size:13px; font-weight:700;">Resend</button>
+      </p>
+    </div>
+
+    <!-- ══ VIEW 3: Success ══ -->
+    <div class="view" id="view-success">
+      <div class="success-center">
+        <div class="success-ring">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2 class="success-title">Identity verified</h2>
+        <p class="success-sub">You've successfully signed in.<br/>Redirecting to your dashboard in <span id="redirect-countdown">5</span>s…</p>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /page -->
+
+<script>
+/* ─── Constellation background ─── */
+(function() {
+  const canvas = document.getElementById('constellation-canvas');
+  const ctx    = canvas.getContext('2d');
+  let w, h, dots;
+  const COUNT = 55, DIST = 155, RGB = '0,45,70';
+
+  function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+
+  function makeDot() {
+    return { x: Math.random()*w, y: Math.random()*h,
+             vx:(Math.random()-.5)*.22, vy:(Math.random()-.5)*.22,
+             r: Math.random()*1.2+.8 };
+  }
+
+  function init() { resize(); dots = Array.from({length:COUNT}, makeDot); }
+
+  function draw() {
+    ctx.clearRect(0,0,w,h);
+    dots.forEach(d => {
+      d.x += d.vx; d.y += d.vy;
+      if (d.x < 0) d.x = w; if (d.x > w) d.x = 0;
+      if (d.y < 0) d.y = h; if (d.y > h) d.y = 0;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${RGB},.3)`;
+      ctx.fill();
+    });
+    for (let i=0; i<dots.length; i++) {
+      for (let j=i+1; j<dots.length; j++) {
+        const dx=dots[i].x-dots[j].x, dy=dots[i].y-dots[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if (dist < DIST) {
+          ctx.beginPath();
+          ctx.moveTo(dots[i].x, dots[i].y);
+          ctx.lineTo(dots[j].x, dots[j].y);
+          ctx.strokeStyle = `rgba(${RGB},${.1*(1-dist/DIST)})`;
+          ctx.lineWidth = .7;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  init(); draw();
+})();
+
+/* ─── View switching ─── */
+function goToView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const isSuccess = id === 'view-success';
+  document.getElementById('card-logo-header').style.display = isSuccess ? 'none' : '';
+  document.querySelector('.card').style.padding = isSuccess ? '40px' : '';
+}
+
+/* ─── Password toggle ─── */
+function togglePw() {
+  const i = document.getElementById('password');
+  const show = document.getElementById('pw-show'), hide = document.getElementById('pw-hide');
+  if (i.type === 'password') { i.type='text'; show.style.display='none'; hide.style.display=''; }
+  else                        { i.type='password'; show.style.display=''; hide.style.display='none'; }
+}
+
+/* ─── Login ─── */
+function handleLogin() {
+  const email = document.getElementById('email').value.trim();
+  const pw    = document.getElementById('password').value;
+  const btn   = document.getElementById('btn-login');
+  let ok = true;
+
+  document.getElementById('email-err').classList.remove('show');
+  document.getElementById('pw-err').classList.remove('show');
+  document.getElementById('email').classList.remove('error');
+  document.getElementById('password').classList.remove('error');
+
+  if (!email) {
+    document.getElementById('email-err').classList.add('show');
+    document.getElementById('email').classList.add('error');
+    ok = false;
+  }
+  if (pw.length < 4) {
+    document.getElementById('pw-err').classList.add('show');
+    document.getElementById('password').classList.add('error');
+    ok = false;
+  }
+  if (!ok) return;
+
+  btn.classList.add('loading'); btn.disabled = true;
+  setTimeout(() => {
+    btn.classList.remove('loading'); btn.disabled = false;
+    goToView('view-otp');
+    try { new BroadcastChannel('enigma_auth').postMessage({ type: 'sign_in_request' }); } catch(e) {}
+    clearInterval(resendCooldownTimer);
+    const rb = document.getElementById('resend-link');
+    rb.textContent = 'Resend notification'; rb.disabled = false;
+    const rb2 = document.getElementById('resend-link-2');
+    if (rb2) { rb2.textContent = 'Resend'; rb2.disabled = false; }
+    setTimeout(() => document.getElementById('s0').focus(), 50);
+    startWebTimer(); setupOTP();
+  }, 1300);
+}
+
+/* ─── OTP slots ─── */
+const SLOTS = ['s0','s1','s2','s3','s4','s5'];
+const DEMO_CODE = '482716';
+let otpListenersAttached = false;
+
+function setupOTP() {
+  SLOTS.forEach(id => {
+    const el = document.getElementById(id);
+    el.value = ''; el.classList.remove('filled','has-error'); el.disabled = false;
+    if (!otpListenersAttached) {
+      el.addEventListener('input',   onSlotInput);
+      el.addEventListener('keydown', onSlotKeydown);
+      el.addEventListener('paste',   onSlotPaste);
+    }
+  });
+  otpListenersAttached = true;
+  const errEl = document.getElementById('otp-err');
+  errEl.textContent = ''; errEl.classList.remove('show');
+  updateVerifyBtn();
+}
+
+function onSlotInput(e) {
+  const idx = SLOTS.indexOf(e.target.id);
+  e.target.value = e.target.value.replace(/\D/g,'').slice(-1);
+  e.target.classList.toggle('filled', !!e.target.value);
+  e.target.classList.remove('has-error');
+  document.getElementById('otp-err').classList.remove('show');
+  if (e.target.value && idx < SLOTS.length-1) document.getElementById(SLOTS[idx+1]).focus();
+  updateVerifyBtn();
+}
+
+function onSlotKeydown(e) {
+  const idx = SLOTS.indexOf(e.target.id);
+  if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+    document.getElementById(SLOTS[idx-1]).value = '';
+    document.getElementById(SLOTS[idx-1]).classList.remove('filled');
+    document.getElementById(SLOTS[idx-1]).focus();
+    updateVerifyBtn();
+  }
+  if (e.key === 'ArrowLeft'  && idx > 0) document.getElementById(SLOTS[idx-1]).focus();
+  if (e.key === 'ArrowRight' && idx < SLOTS.length-1) document.getElementById(SLOTS[idx+1]).focus();
+}
+
+function onSlotPaste(e) {
+  e.preventDefault();
+  const pasted = (e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+  pasted.split('').forEach((ch,i) => {
+    if (SLOTS[i]) { const el=document.getElementById(SLOTS[i]); el.value=ch; el.classList.add('filled'); }
+  });
+  const focus = Math.min(pasted.length, SLOTS.length-1);
+  document.getElementById(SLOTS[focus]).focus();
+  document.getElementById('otp-err').classList.remove('show');
+  updateVerifyBtn();
+}
+
+function getCode() { return SLOTS.map(id => document.getElementById(id).value).join(''); }
+function updateVerifyBtn() { document.getElementById('btn-verify').disabled = getCode().length < 6; }
+
+/* ─── Verify ─── */
+function handleVerify() {
+  const code = getCode();
+  const btn  = document.getElementById('btn-verify');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  setTimeout(() => {
+    if (code !== DEMO_CODE) {
+      btn.classList.remove('loading'); btn.disabled = false;
+      SLOTS.forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.add('has-error');
+        setTimeout(() => { el.classList.remove('has-error'); el.value=''; el.classList.remove('filled'); }, 600);
+      });
+      const errEl = document.getElementById('otp-err');
+      errEl.textContent = 'Incorrect code — please try again.';
+      errEl.classList.add('show');
+      setTimeout(() => { document.getElementById('s0').focus(); updateVerifyBtn(); }, 650);
+      return;
+    }
+    clearInterval(webTimerInterval);
+    try { new BroadcastChannel('enigma_auth').postMessage({ type: 'code_used' }); } catch(e) {}
+    goToView('view-success');
+    let secs = 5;
+    const countEl = document.getElementById('redirect-countdown');
+    const countInterval = setInterval(() => {
+      secs--;
+      if (countEl) countEl.textContent = secs;
+      if (secs <= 0) {
+        clearInterval(countInterval);
+        window.location.href = 'makor-dashboard.html';
+      }
+    }, 1000);
+  }, 1100);
+}
+
+/* ─── Web timer ─── */
+let webTimerInterval, webSecs = 180;
+function startWebTimer() {
+  webSecs = 180;
+  clearInterval(webTimerInterval);
+  const el = document.getElementById('web-timer');
+  el.textContent = '3:00'; el.classList.remove('warn');
+  webTimerInterval = setInterval(() => {
+    webSecs--;
+    const m = Math.floor(webSecs/60), s = webSecs%60;
+    el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+    el.classList.toggle('warn', webSecs <= 30);
+    if (webSecs <= 0) {
+      clearInterval(webTimerInterval);
+      el.textContent = 'Expired';
+      SLOTS.forEach(id => document.getElementById(id).disabled = true);
+    }
+  }, 1000);
+}
+
+/* ─── Resend ─── */
+let resendCooldownTimer = null;
+function resendCode() {
+  const btn  = document.getElementById('resend-link');
+  const btn2 = document.getElementById('resend-link-2');
+  btn.disabled = true;
+  startWebTimer();
+  SLOTS.forEach(id => {
+    const el = document.getElementById(id);
+    el.value=''; el.disabled=false; el.classList.remove('filled','has-error');
+  });
+  document.getElementById('otp-err').classList.remove('show');
+  updateVerifyBtn();
+  setTimeout(() => document.getElementById('s0').focus(), 50);
+  let secs = 30;
+  btn.textContent  = `Resend in ${secs}s`;
+  if (btn2) { btn2.textContent = `Resend in ${secs}s`; btn2.disabled = true; }
+  clearInterval(resendCooldownTimer);
+  resendCooldownTimer = setInterval(() => {
+    secs--;
+    if (secs <= 0) {
+      clearInterval(resendCooldownTimer);
+      btn.textContent = 'Resend notification'; btn.disabled = false;
+      if (btn2) { btn2.textContent = 'Resend'; btn2.disabled = false; }
+    } else {
+      btn.textContent = `Resend in ${secs}s`;
+      if (btn2) btn2.textContent = `Resend in ${secs}s`;
+    }
+  }, 1000);
+}
+
+/* ─── Enter key ─── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('view-login').classList.contains('active')) handleLogin();
+    if (document.getElementById('view-otp').classList.contains('active') && getCode().length === 6) handleVerify();
+  }
+});
+</script>
+</body>
+</html>

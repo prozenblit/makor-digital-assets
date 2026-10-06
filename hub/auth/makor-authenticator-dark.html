@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Makor-X.AI Authenticator — Dark</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script type="module" src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs"></script>
+  <style>
+    :root {
+      --c-bg:           #0C1219;
+      --c-surface:      #121C26;
+      --c-surface-2:    #192533;
+      --c-primary:      #17C3AF;
+      --c-primary-dark: #0A7A8E;
+      --c-primary-dim:  #17C3AF;
+      --c-primary-ghost: rgba(23,195,175,0.13);
+      --c-black:        #0C1219;
+      --c-text:         #E6EFF4;
+      --c-text-2:       #87A8B5;
+      --c-text-3:       #4E6A78;
+      --c-border:       #1E2F3C;
+      --c-danger:       #FF6B6B;
+      --c-success:      #2DD4BF;
+      --font-serif: 'EB Garamond', Georgia, serif;
+      --font-sans: 'Geist', -apple-system, sans-serif;
+      --font-mono: var(--font-sans);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
+      outline: 2px solid var(--c-primary);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: #080F15;
+      min-height: 100dvh;
+      display: flex; align-items: center; justify-content: center;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Shell ─── */
+    .shell {
+      width: min(390px, 100vw);
+      height: min(844px, 100dvh);
+      background:
+        radial-gradient(ellipse at 50% -5%, rgba(10,115,132,0.48) 0%, transparent 55%),
+        var(--c-bg);
+      border-radius: min(44px, 4vw);
+      box-shadow: 0 24px 64px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      position: relative;
+    }
+
+    /* ─── Status bar ─── */
+    .status-bar {
+      height: 44px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 28px 0;
+      color: var(--c-text);
+    }
+    .status-bar .time { font-family: var(--font-mono); font-size: 16px; font-weight: 600; }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
+    .status-icons svg { width: 16px; height: 16px; fill: var(--c-text); }
+
+    /* ─── Screen stack ─── */
+    .screens {
+      flex: 1; min-height: 0;
+      position: relative; overflow: hidden;
+    }
+    .screen {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      display: flex; flex-direction: column;
+      overflow-y: auto; overflow-x: hidden;
+      scrollbar-width: none;
+      transition: transform .38s cubic-bezier(.4,0,.2,1), opacity .3s ease;
+      will-change: transform;
+    }
+    .screen::-webkit-scrollbar { display: none; }
+
+    #s-home       { transform: translateX(0);    opacity: 1; }
+    #s-pwfallback { transform: translateX(100%); opacity: 0; }
+
+    /* ─── Push notification banner ─── */
+    .push-banner {
+      position: absolute; top: 0; left: 0; right: 0;
+      z-index: 300; padding: 10px 10px 0;
+      transform: translateY(-130%);
+      transition: transform .42s cubic-bezier(.32,0,.04,1);
+      pointer-events: none;
+    }
+    .push-banner.show { transform: translateY(0); pointer-events: auto; }
+    .push-banner-inner {
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(48px);
+      -webkit-backdrop-filter: blur(48px);
+      border-radius: 22px;
+      padding: 10px 12px 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 6px 32px rgba(0,0,0,.40), inset 0 2px 0 rgba(255,255,255,.08);
+      cursor: pointer;
+    }
+    .push-banner-top {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+    }
+    .push-banner-appname {
+      font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.80);
+      text-transform: uppercase; letter-spacing: .02em; flex: 1;
+    }
+    .push-banner-time { font-size: 12px; color: rgba(255,255,255,0.55); }
+    .push-banner-content { display: flex; align-items: center; gap: 10px; }
+    .push-banner-app-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .push-banner-app-icon svg { width: 24px; height: 19px; }
+    .push-banner-body { flex: 1; min-width: 0; }
+    .push-banner-title { font-size: 14px; font-weight: 700; color: rgba(255,255,255,1.0); line-height: 1.3; }
+    .push-banner-sub   { font-size: 12px; color: rgba(255,255,255,0.65); margin-top: 2px; line-height: 1.4; }
+
+    /* ─── Logo gradient (mirrors logo color.svg) ─── */
+    .logo-gradient {
+      background:
+        radial-gradient(ellipse at 82% 10%, rgba(0,89,159,0.9) 0%, transparent 55%),
+        radial-gradient(ellipse at 73% 68%, rgba(0,99,91,0.85) 0%, transparent 55%),
+        radial-gradient(ellipse at 25% 83%, rgba(0,184,184,0.75) 0%, transparent 50%),
+        #005268;
+    }
+
+    /* ─── Common ─── */
+    .eyebrow {
+      font-size: 10px; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--c-primary);
+    }
+    .screen-title {
+      font-family: var(--font-sans); font-size: 32px; font-weight: 500;
+      line-height: 1.2; color: var(--c-text); margin-top: 6px;
+    }
+    .screen-sub   { font-size: 14px; color: var(--c-text-2); line-height: 1.55; margin-top: 6px; }
+
+    .btn-primary {
+      width: 100%; height: 52px;
+      background: var(--c-primary); border: none;
+      border-radius: 4px; font-family: var(--font-sans);
+      font-size: 16px; font-weight: 600; color: #fff;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .12s, transform .08s;
+    }
+    .btn-primary:hover  { background: #10A898; }
+    .btn-primary:active { transform: scale(.98); }
+    .btn-primary:disabled { background: var(--c-text-3); color: var(--c-text-2); cursor: not-allowed; }
+
+    .btn-danger {
+      width: 100%; height: 48px;
+      background: transparent; border: 1.5px solid var(--c-danger);
+      border-radius: 4px; font-family: var(--font-sans);
+      font-size: 14px; font-weight: 600; color: var(--c-danger);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .12s;
+    }
+    .btn-danger:hover { background: rgba(255,107,107,.10); }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: absolute; bottom: 32px; left: 16px; right: 16px;
+      background: #192533; color: var(--c-text);
+      border: 1px solid #1E2F3C;
+      border-radius: 4px; padding: 14px 16px;
+      font-size: 14px; font-weight: 500;
+      transform: translateY(80px); opacity: 0;
+      transition: transform .28s cubic-bezier(.4,0,.2,1), opacity .28s ease;
+      z-index: 999; text-align: center;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.danger { background: var(--c-danger); border-color: var(--c-danger); color: #fff; }
+
+    /* ─── Launch screen ─── */
+    #s-launch {
+      position: absolute; inset: 0;
+      z-index: 40;
+      background:
+        radial-gradient(ellipse at 50% 22%, rgba(10,115,132,0.72) 0%, rgba(8,90,108,0.30) 38%, transparent 60%),
+        radial-gradient(ellipse at 80% 85%, rgba(5,75,92,0.38) 0%, transparent 40%),
+        #071018;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 20px;
+      padding-bottom: 18%;
+      transition: opacity .3s ease;
+      pointer-events: auto;
+    }
+    #s-launch.hidden { opacity: 0; pointer-events: none; }
+    #launch-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    .launch-logo-icon {
+      width: 96px; height: 96px;
+      border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 32px rgba(0,82,104,0.55), 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .launch-app-name {
+      font-family: var(--font-sans); font-size: 20px; font-weight: 400;
+      color: var(--c-primary); letter-spacing: .01em;
+      text-align: center; line-height: 1.4;
+    }
+
+    /* ─── Face ID overlay ─── */
+    #s-faceid {
+      position: absolute; inset: 0;
+      z-index: 50;
+      opacity: 1; pointer-events: auto;
+      transition: opacity .25s ease;
+      display: flex; flex-direction: column;
+    }
+    #s-faceid.hidden { opacity: 0; pointer-events: none; }
+
+    .faceid-blur-bg {
+      position: absolute; inset: 0;
+      background: rgba(7,12,18,0.42);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+
+    .faceid-wrap {
+      position: relative; z-index: 1;
+      flex: 1; min-height: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 0 24px 80px;
+      text-align: center;
+      gap: 0;
+    }
+    #s-faceid:not(.hidden) .faceid-blur-bg {
+      animation: blurFadeIn .65s ease both;
+    }
+    @keyframes blurFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    #s-faceid:not(.hidden) .faceid-wrap {
+      animation: faceIDContentIn .2s ease .25s both;
+    }
+    @keyframes faceIDContentIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .faceid-bottom { display: flex; flex-direction: column; align-items: center; margin-top: 32px; }
+
+    .faceid-card {
+      background: rgba(18,28,38,0.70);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 28px;
+      padding: 24px 24px 20px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0;
+      margin-bottom: 20px;
+      cursor: pointer;
+      box-shadow: 0 8px 32px rgba(0,0,0,.28);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .fid-wrapper {
+      width: 180px; height: 180px;
+      position: relative; cursor: pointer;
+      flex-shrink: 0; display: block;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+    .fid-wrapper dotlottie-player {
+      position: absolute;
+      inset: -14px;
+      width: calc(100% + 28px) !important;
+      height: calc(100% + 28px) !important;
+    }
+    .fid-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 35, 55, 0.72);
+      mix-blend-mode: color;
+      z-index: 2;
+      pointer-events: none;
+      border-radius: 12px;
+    }
+
+    .faceid-locked-label {
+      font-family: var(--font-sans); font-size: 20px; font-weight: 400;
+      color: var(--c-text);
+      letter-spacing: .01em;
+    }
+    .faceid-sub { display: none; }
+
+    .faceid-fallback-link {
+      font-size: 14px; font-weight: 600;
+      color: var(--c-text-2);
+      background: rgba(255,255,255,.07);
+      border: none; border-radius: 4px;
+      padding: 12px 28px; cursor: pointer;
+      font-family: var(--font-sans);
+      letter-spacing: -.01em;
+      margin-top: 12px;
+      transition: background .15s, color .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .faceid-fallback-link:hover  { background: rgba(255,255,255,.12); color: var(--c-text); }
+    .faceid-fallback-link:active { background: rgba(255,255,255,.17); }
+
+    /* ─── Home logo banner ─── */
+    .home-logo-banner {
+      display: flex; flex-direction: row; align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px 16px; gap: 10px;
+      background: transparent;
+      flex-shrink: 0;
+    }
+    .home-logo-banner-left {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .home-logo-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.22);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+    .home-logo-name {
+      font-family: var(--font-sans); font-size: 20px; font-weight: 400;
+      color: #fff; letter-spacing: .01em;
+    }
+    .home-content-card {
+      background: var(--c-bg);
+      border-radius: 20px 20px 0 0;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ─── Home / Session management screen ─── */
+    #s-home {
+      background: linear-gradient(180deg, #0D8090 0px, #0A5888 50px, #1E3578 110px, var(--c-bg) 170px);
+      padding: 0;
+      overflow: hidden;
+    }
+    .status-bar--dark {
+      background: #0D8090 !important;
+      color: rgba(255,255,255,0.9) !important;
+    }
+    .status-bar--dark .status-icons svg { fill: rgba(255,255,255,0.9) !important; }
+    .home-header {
+      padding: 24px 24px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .home-header-left { display: flex; flex-direction: column; gap: 2px; }
+    .home-header-left .eyebrow { margin-bottom: 2px; }
+    .home-header-left .screen-title { font-size: 18px; color: var(--c-text-2); font-weight: 500; }
+    .home-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--c-primary); display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff;
+    }
+    .home-scroll { flex: 1; overflow-y: auto; padding: 0 24px 32px; scrollbar-width: none; }
+    .home-scroll::-webkit-scrollbar { display: none; }
+
+    /* Current session card */
+    .session-current {
+      background: var(--c-surface);
+      border-radius: 4px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.18);
+      margin-bottom: 20px;
+    }
+    .session-current-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    }
+    .session-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--c-primary); flex-shrink: 0;
+      box-shadow: 0 0 0 4px var(--c-primary-ghost);
+      animation: dotpulse 2.4s ease infinite;
+    }
+    @keyframes dotpulse {
+      0%, 100% { box-shadow: 0 0 0 4px var(--c-primary-ghost); }
+      50%       { box-shadow: 0 0 0 6px transparent; }
+    }
+    .session-current-label { font-size: 12px; font-weight: 700; color: var(--c-primary); text-transform: uppercase; letter-spacing: .08em; }
+    .session-current-time  { font-size: 12px; color: var(--c-text-3); margin-left: auto; }
+    .session-rows { display: flex; flex-direction: column; gap: 10px; }
+    .session-row { display: flex; align-items: flex-start; gap: 10px; }
+    .session-row-icon {
+      width: 30px; height: 30px; border-radius: 4px;
+      background: var(--c-surface-2);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .session-row-icon svg { width: 16px; height: 16px; fill: var(--c-text-2); }
+    .session-row-body { flex: 1; min-width: 0; }
+    .session-row-label { font-size: 12px; color: var(--c-text-3); font-weight: 600; text-transform: uppercase; letter-spacing: .07em; }
+    .session-row-val   { font-size: 14px; color: var(--c-text); font-weight: 600; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Other sessions */
+    .other-sessions-label {
+      font-size: 12px; font-weight: 700; color: var(--c-text-3); text-transform: uppercase;
+      letter-spacing: .1em; margin-bottom: 10px; padding: 0;
+    }
+    .session-compact {
+      background: var(--c-surface);
+      border-radius: 8px; padding: 14px 14px;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 8px;
+      transition: opacity .23s, transform .23s;
+    }
+    .session-compact-flag {
+      width: 36px; height: 36px; border-radius: 4px;
+      background: var(--c-surface-2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 12px; font-weight: 700; color: var(--c-text-2);
+      letter-spacing: .04em; text-align: center;
+      font-family: var(--font-sans);
+    }
+    .session-compact-body { flex: 1; min-width: 0; }
+    .session-compact-loc  { font-size: 14px; font-weight: 600; color: var(--c-text); }
+    .session-compact-meta { font-size: 12px; color: var(--c-text-3); margin-top: 2px; }
+    .session-compact-signout {
+      background: none; border: 1px solid var(--c-danger);
+      border-radius: 4px; font-family: var(--font-sans);
+      font-size: 12px; font-weight: 600; color: var(--c-danger);
+      padding: 8px 14px; cursor: pointer; white-space: nowrap;
+      min-height: 36px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sessions-empty { font-size: 14px; color: var(--c-text-3); text-align: center; padding: 20px 0; display: none; }
+
+    /* ─── Password fallback screen ─── */
+    #s-pwfallback {
+      background: var(--c-surface);
+      display: flex; flex-direction: column;
+    }
+    .fb-top {
+      padding: 32px 24px 28px;
+      border-bottom: 1px solid var(--c-border);
+    }
+    .fb-back {
+      background: none; border: none; cursor: pointer;
+      font-family: var(--font-sans); font-size: 14px; font-weight: 500;
+      color: var(--c-text-3); padding: 10px 8px 10px 0; display: flex; align-items: center; gap: 6px;
+      margin-bottom: 16px; min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .fb-form { padding: 28px 24px 32px; flex: 1; display: flex; flex-direction: column; }
+    .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .input-group label {
+      font-size: 12px; font-weight: 600; color: var(--c-text-2);
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+    .input-wrap { position: relative; }
+    .input-field {
+      width: 100%; height: 48px;
+      padding: 0 44px 0 14px;
+      background: var(--c-surface-2); border: 1.5px solid var(--c-border);
+      border-radius: 4px;
+      font-family: var(--font-sans); font-size: 16px; color: var(--c-text);
+      outline: none; transition: border-color .18s, box-shadow .18s;
+      -webkit-appearance: none;
+    }
+    .input-field:focus {
+      border-color: var(--c-primary);
+      background: var(--c-surface);
+      box-shadow: 0 0 0 4px var(--c-primary-ghost);
+    }
+    .input-field::placeholder { color: var(--c-text-3); }
+    .input-toggle {
+      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; padding: 0; cursor: pointer; color: var(--c-text-3);
+      width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .input-toggle svg { width: 18px; height: 18px; display: block; }
+    .fb-submit { margin-top: auto; padding-top: 16px; }
+
+    /* ─── Sign-out confirmation dialog ─── */
+    .confirm-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,.6);
+      z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .confirm-overlay.show { opacity: 1; pointer-events: auto; }
+    .confirm-dialog {
+      background: var(--c-surface);
+      border-radius: 14px;
+      border: 1px solid var(--c-border);
+      width: calc(100% - 48px);
+      max-width: 320px;
+      padding: 20px 20px 12px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.45);
+      transform: scale(.95);
+      transition: transform .2s ease;
+      text-align: center;
+    }
+    .confirm-overlay.show .confirm-dialog { transform: scale(1); }
+    .confirm-title {
+      font-size: 16px; font-weight: 700;
+      color: var(--c-text); letter-spacing: -.01em;
+      margin-bottom: 6px;
+    }
+    .confirm-body {
+      font-size: 14px; color: var(--c-text-2);
+      line-height: 1.45; margin-bottom: 18px;
+    }
+    .confirm-actions { display: flex; gap: 8px; }
+    .confirm-btn {
+      flex: 1; padding: 14px 8px; border-radius: 4px;
+      font-family: var(--font-sans); font-size: 14px; font-weight: 600;
+      cursor: pointer; border: none; transition: opacity .15s;
+      min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .confirm-btn:active { opacity: .7; }
+    .confirm-btn-cancel { background: var(--c-surface-2); color: var(--c-text-2); }
+    .confirm-btn-danger { background: var(--c-danger); color: #fff; }
+
+    /* ─── Bottom sheet ─── */
+    .sheet-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,.60);
+      opacity: 0; pointer-events: none;
+      transition: opacity .35s ease;
+      z-index: 100;
+    }
+    .sheet-overlay.show { opacity: 1; pointer-events: auto; }
+
+    .bottom-sheet {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: var(--c-surface);
+      border-radius: 8px 8px 0 0;
+      transform: translateY(100%);
+      transition: transform .42s cubic-bezier(.32,0,.04,1);
+      z-index: 101;
+      max-height: 88%;
+      overflow: hidden;
+      box-shadow: 0 -8px 40px rgba(0,0,0,.40);
+      border-top: 1px solid var(--c-border);
+    }
+    .bottom-sheet.open { transform: translateY(0); }
+
+    .sheet-handle {
+      width: 36px; height: 4px; border-radius: 4px;
+      background: var(--c-border);
+      margin: 12px auto 4px; flex-shrink: 0;
+    }
+
+    /* Map area */
+    .sheet-map {
+      flex-shrink: 0; height: 160px; position: relative;
+      overflow: hidden; margin: 0 16px; border-radius: 4px;
+      background: #152030;
+    }
+    .sheet-map svg { width: 100%; height: 100%; }
+    .map-location-pill {
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      background: rgba(18,28,38,.94); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 4px; padding: 6px 12px 6px 8px;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 600; color: var(--c-text);
+      box-shadow: 0 2px 8px rgba(0,0,0,.35); white-space: nowrap;
+    }
+    .map-location-pill .loc-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--c-primary); flex-shrink: 0;
+    }
+
+    /* Sheet body */
+    .sheet-body {
+      overflow-y: auto; padding: 16px 20px 32px;
+      scrollbar-width: none;
+    }
+    .sheet-body::-webkit-scrollbar { display: none; }
+
+    .sheet-section-title {
+      font-size: 10px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--c-text-3);
+      margin-bottom: 10px;
+    }
+    .sheet-info-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      margin-bottom: 18px;
+    }
+    .sheet-info-item { display: flex; flex-direction: column; gap: 4px; }
+    .sheet-info-label { font-size: 10px; color: var(--c-text-3); font-weight: 600; text-transform: uppercase; letter-spacing: .07em; }
+    .sheet-info-val   { font-size: 14px; color: var(--c-text); font-weight: 600; }
+
+    /* OTP code in sheet */
+    .sheet-code-card {
+      background: var(--c-surface-2); border-radius: 8px;
+      border: 1px solid var(--c-border);
+      padding: 16px; margin-bottom: 10px;
+    }
+    .sheet-code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .sheet-code-label { font-size: 12px; font-weight: 700; color: var(--c-text-3); text-transform: uppercase; letter-spacing: .08em; }
+    .sheet-code-expiry.urgent { color: var(--c-danger); }
+    .sheet-otp {
+      font-family: var(--font-sans); font-size: 44px; font-weight: 500;
+      color: var(--c-text); letter-spacing: .22em;
+      display: flex; justify-content: center; align-items: center;
+      margin-bottom: 12px;
+    }
+    .sheet-otp.used { color: var(--c-text-3); text-decoration: line-through; letter-spacing: .1em; font-size: 26px; }
+    .sheet-code-expiry { font-size: 16px; font-weight: 500; color: var(--c-text-2); font-family: var(--font-sans); }
+    .sheet-copy-btn {
+      width: 100%; height: 52px;
+      background: var(--c-primary); border: none; border-radius: 8px;
+      font-family: var(--font-sans); font-size: 16px; font-weight: 600; color: #fff;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-top: 16px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .sheet-copy-btn:active { opacity: .85; }
+    .sheet-copy-btn:disabled { background: var(--c-text-3); color: var(--c-text-2); cursor: not-allowed; }
+    .sheet-block-link {
+      display: block; width: 100%; text-align: center;
+      font-size: 14px; color: var(--c-danger); font-weight: 500;
+      cursor: pointer; background: none; border: none;
+      font-family: var(--font-sans);
+      padding: 16px 0 4px;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ─── Confirmed state ─── */
+    .sheet-confirmed {
+      text-align: center; padding: 12px 0;
+    }
+    .sheet-confirmed-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--c-primary-ghost);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 12px;
+    }
+    .sheet-confirmed-icon svg { width: 28px; height: 28px; fill: var(--c-primary); }
+    .sheet-confirmed h3 { font-size: 18px; font-weight: 700; color: var(--c-text); margin-bottom: 4px; }
+    .sheet-confirmed p  { font-size: 14px; color: var(--c-text-2); }
+  </style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ─── Launch screen ─── -->
+  <div id="s-launch">
+    <canvas id="launch-canvas"></canvas>
+    <div class="launch-logo-icon logo-gradient">
+      <svg width="56" height="45" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M67.6259 0.448242C68.296 -0.544707 69.8282 0.266374 69.3837 1.37891L44.4969 63.6465C44.4114 63.8604 44.2039 64.0009 43.9735 64.001C43.759 64.001 43.5626 63.8788 43.4677 63.6865L35.9071 48.3721C35.7482 48.0502 35.7747 47.6677 35.9755 47.3701L67.6259 0.448242ZM70.454 11.9521C70.8449 11.0137 72.225 11.1857 72.369 12.1924C73.8917 22.839 78.3705 53.8814 79.9803 62.0361C80.1417 62.8537 79.2542 63.9969 78.4208 63.9971H70.6864C69.9107 63.9971 69.0048 63.036 68.9579 62.2617C68.5325 55.2413 64.8382 29.5715 64.4325 26.7646C64.4067 26.5861 64.4326 26.4273 64.5018 26.2607L70.454 11.9521ZM11.9266 39.3418C12.2469 38.4743 13.4678 38.4726 13.7889 39.3398C14.6306 41.6132 15.7767 44.7461 16.0458 45.6631C16.1838 46.133 16.4626 46.5621 16.8534 46.9053C17.2441 47.2484 17.7325 47.493 18.2675 47.6143C19.2502 47.8366 22.4681 48.7419 25.0018 49.4639C25.9651 49.7388 25.9652 51.0943 25.0018 51.3691C22.4681 52.0911 19.2502 52.9954 18.2675 53.2178C17.7324 53.339 17.2441 53.5846 16.8534 53.9277C16.4628 54.2708 16.1839 54.6992 16.0458 55.1689C15.8155 55.9532 14.6405 59.1665 13.7831 61.4902C13.4629 62.3579 12.2429 62.3595 11.9218 61.4922C11.0801 59.2189 9.93401 56.0859 9.66492 55.1689C9.52686 54.6993 9.24781 54.2708 8.8573 53.9277C8.46647 53.5845 7.97745 53.339 7.44226 53.2178C6.60153 53.0274 3.31353 52.1037 0.724487 51.3682C-0.240351 51.0941 -0.242022 49.7351 0.722534 49.46C3.25303 48.7383 6.46074 47.8357 7.44226 47.6133C7.9772 47.4922 8.46553 47.2472 8.85632 46.9043C9.24713 46.5613 9.52661 46.1328 9.66492 45.6631C9.89523 44.8788 11.0692 41.6655 11.9266 39.3418ZM49.1327 2.29199C49.8058 1.29435 51.3432 2.11701 50.8866 3.23047L34.3046 43.626C34.2424 43.7774 34.0952 43.876 33.9315 43.876C33.7819 43.8759 33.6449 43.7934 33.5751 43.6611L28.4393 33.9248C28.2675 33.5989 28.289 33.2049 28.495 32.8994L49.1327 2.29199ZM32.7079 5.94043C33.3818 4.94234 34.9202 5.76746 34.4618 6.88086L26.1835 26.9678C26.1453 27.0604 26.0551 27.121 25.955 27.1211C25.865 27.1211 25.7817 27.0719 25.7382 26.9932L22.7733 21.6328C22.5914 21.3039 22.6089 20.9004 22.8192 20.5889L32.7079 5.94043ZM11.9315 8.78711C12.2484 7.91866 13.4671 7.91769 13.7841 8.78613C14.084 9.60905 14.3625 10.3907 14.451 10.6924C14.5201 10.9274 14.6599 11.1419 14.8553 11.3135C15.0507 11.485 15.2949 11.6073 15.5624 11.668C15.8479 11.7326 16.5108 11.912 17.2645 12.1221C18.23 12.3912 18.23 13.7465 17.2645 14.0156C16.5108 14.2257 15.8479 14.4051 15.5624 14.4697C15.2949 14.5303 15.0507 14.6527 14.8553 14.8242C14.6599 14.9958 14.5201 15.2103 14.451 15.4453C14.3745 15.706 14.0897 16.5039 13.7811 17.3506C13.4643 18.2192 12.2444 18.2203 11.9276 17.3516C11.6277 16.5286 11.3491 15.747 11.2606 15.4453C11.1916 15.2104 11.0526 14.9958 10.8573 14.8242C10.662 14.6527 10.4177 14.5304 10.1503 14.4697C9.90325 14.4138 9.23234 14.2305 8.45886 14.0146C7.49319 13.7447 7.49288 12.3886 8.45886 12.1191C9.20794 11.9102 9.8661 11.7314 10.1503 11.667C10.4176 11.6064 10.662 11.4839 10.8573 11.3125C11.0524 11.1411 11.1915 10.927 11.2606 10.6924C11.3372 10.4317 11.623 9.63379 11.9315 8.78711Z" fill="white"/>
+      </svg>
+    </div>
+    <p class="launch-app-name">Makor-X.AI<br>Authenticator</p>
+  </div>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span class="time" id="sb-time">9:41</span>
+    <div class="status-icons">
+      <svg viewBox="0 0 24 24"><path d="M1.5 8.5C4 5.5 7.8 3.5 12 3.5s8 2 10.5 5l-2 2C18.5 8 15.5 6.5 12 6.5S5.5 8 3.5 10.5l-2-2zm3.5 3.5C6.5 9.5 9 8 12 8s5.5 1.5 7 4l-2 2c-1-1.5-2.8-3-5-3s-4 1.5-5 3l-2-2zm3.5 3.5c1-1 2.2-1.5 3.5-1.5s2.5.5 3.5 1.5l-3.5 4-3.5-4z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+
+  <!-- Push notification banner -->
+  <div class="push-banner" id="push-banner" onclick="openFromBanner()">
+    <div class="push-banner-inner">
+      <div class="push-banner-top">
+        <span class="push-banner-appname">Makor-X.AI</span>
+        <span class="push-banner-time">now</span>
+      </div>
+      <div class="push-banner-content">
+        <div class="push-banner-app-icon logo-gradient">
+          <svg viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="22">
+            <path d="M67.6259 0.448242C68.296 -0.544707 69.8282 0.266374 69.3837 1.37891L44.4969 63.6465C44.4114 63.8604 44.2039 64.0009 43.9735 64.001C43.759 64.001 43.5626 63.8788 43.4677 63.6865L35.9071 48.3721C35.7482 48.0502 35.7747 47.6677 35.9755 47.3701L67.6259 0.448242ZM70.454 11.9521C70.8449 11.0137 72.225 11.1857 72.369 12.1924C73.8917 22.839 78.3705 53.8814 79.9803 62.0361C80.1417 62.8537 79.2542 63.9969 78.4208 63.9971H70.6864C69.9107 63.9971 69.0048 63.036 68.9579 62.2617C68.5325 55.2413 64.8382 29.5715 64.4325 26.7646C64.4067 26.5861 64.4326 26.4273 64.5018 26.2607L70.454 11.9521ZM11.9266 39.3418C12.2469 38.4743 13.4678 38.4726 13.7889 39.3398C14.6306 41.6132 15.7767 44.7461 16.0458 45.6631C16.1838 46.133 16.4626 46.5621 16.8534 46.9053C17.2441 47.2484 17.7325 47.493 18.2675 47.6143C19.2502 47.8366 22.4681 48.7419 25.0018 49.4639C25.9651 49.7388 25.9652 51.0943 25.0018 51.3691C22.4681 52.0911 19.2502 52.9954 18.2675 53.2178C17.7324 53.339 17.2441 53.5846 16.8534 53.9277C16.4628 54.2708 16.1839 54.6992 16.0458 55.1689C15.8155 55.9532 14.6405 59.1665 13.7831 61.4902C13.4629 62.3579 12.2429 62.3595 11.9218 61.4922C11.0801 59.2189 9.93401 56.0859 9.66492 55.1689C9.52686 54.6993 9.24781 54.2708 8.8573 53.9277C8.46647 53.5845 7.97745 53.339 7.44226 53.2178C6.60153 53.0274 3.31353 52.1037 0.724487 51.3682C-0.240351 51.0941 -0.242022 49.7351 0.722534 49.46C3.25303 48.7383 6.46074 47.8357 7.44226 47.6133C7.9772 47.4922 8.46553 47.2472 8.85632 46.9043C9.24713 46.5613 9.52661 46.1328 9.66492 45.6631C9.89523 44.8788 11.0692 41.6655 11.9266 39.3418ZM49.1327 2.29199C49.8058 1.29435 51.3432 2.11701 50.8866 3.23047L34.3046 43.626C34.2424 43.7774 34.0952 43.876 33.9315 43.876C33.7819 43.8759 33.6449 43.7934 33.5751 43.6611L28.4393 33.9248C28.2675 33.5989 28.289 33.2049 28.495 32.8994L49.1327 2.29199ZM32.7079 5.94043C33.3818 4.94234 34.9202 5.76746 34.4618 6.88086L26.1835 26.9678C26.1453 27.0604 26.0551 27.121 25.955 27.1211C25.865 27.1211 25.7817 27.0719 25.7382 26.9932L22.7733 21.6328C22.5914 21.3039 22.6089 20.9004 22.8192 20.5889L32.7079 5.94043ZM11.9315 8.78711C12.2484 7.91866 13.4671 7.91769 13.7841 8.78613C14.084 9.60905 14.3625 10.3907 14.451 10.6924C14.5201 10.9274 14.6599 11.1419 14.8553 11.3135C15.0507 11.485 15.2949 11.6073 15.5624 11.668C15.8479 11.7326 16.5108 11.912 17.2645 12.1221C18.23 12.3912 18.23 13.7465 17.2645 14.0156C16.5108 14.2257 15.8479 14.4051 15.5624 14.4697C15.2949 14.5303 15.0507 14.6527 14.8553 14.8242C14.6599 14.9958 14.5201 15.2103 14.451 15.4453C14.3745 15.706 14.0897 16.5039 13.7811 17.3506C13.4643 18.2192 12.2444 18.2203 11.9276 17.3516C11.6277 16.5286 11.3491 15.747 11.2606 15.4453C11.1916 15.2104 11.0526 14.9958 10.8573 14.8242C10.662 14.6527 10.4177 14.5304 10.1503 14.4697C9.90325 14.4138 9.23234 14.2305 8.45886 14.0146C7.49319 13.7447 7.49288 12.3886 8.45886 12.1191C9.20794 11.9102 9.8661 11.7314 10.1503 11.667C10.4176 11.6064 10.662 11.4839 10.8573 11.3125C11.0524 11.1411 11.1915 10.927 11.2606 10.6924C11.3372 10.4317 11.623 9.63379 11.9315 8.78711Z" fill="white"/>
+          </svg>
+        </div>
+        <div class="push-banner-body">
+          <div class="push-banner-title">Sign-in requested</div>
+          <div class="push-banner-sub">London · Chrome · 82.43.201.15</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Face ID overlay ─── -->
+  <div id="s-faceid" class="hidden">
+    <div class="faceid-blur-bg"></div>
+    <div class="faceid-wrap">
+      <div class="faceid-card" id="fid-frame-wrap">
+        <div class="fid-wrapper" id="fid-wrapper">
+          <dotlottie-player
+            id="fid-lottie"
+            src="https://lottie.host/2c89c12e-4c0d-41a6-ae13-30b2ce7a964a/kjwDIWFPeM.lottie"
+            loop
+            style="display:block;width:180px;height:180px;"
+          ></dotlottie-player>
+        </div>
+      </div>
+      <p class="faceid-locked-label">Locked</p>
+      <p class="faceid-sub" id="faceid-sub"></p>
+      <div class="faceid-bottom">
+        <button class="faceid-fallback-link" onclick="goToPwFallback()">Use Passcode</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="screens">
+
+    <!-- SCREEN: Home / Sessions -->
+    <div class="screen" id="s-home">
+
+      <div class="home-logo-banner">
+        <div class="home-logo-banner-left">
+          <div class="home-logo-icon">
+            <svg width="28" height="22" viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M67.6259 0.448242C68.296 -0.544707 69.8282 0.266374 69.3837 1.37891L44.4969 63.6465C44.4114 63.8604 44.2039 64.0009 43.9735 64.001C43.759 64.001 43.5626 63.8788 43.4677 63.6865L35.9071 48.3721C35.7482 48.0502 35.7747 47.6677 35.9755 47.3701L67.6259 0.448242ZM70.454 11.9521C70.8449 11.0137 72.225 11.1857 72.369 12.1924C73.8917 22.839 78.3705 53.8814 79.9803 62.0361C80.1417 62.8537 79.2542 63.9969 78.4208 63.9971H70.6864C69.9107 63.9971 69.0048 63.036 68.9579 62.2617C68.5325 55.2413 64.8382 29.5715 64.4325 26.7646C64.4067 26.5861 64.4326 26.4273 64.5018 26.2607L70.454 11.9521ZM11.9266 39.3418C12.2469 38.4743 13.4678 38.4726 13.7889 39.3398C14.6306 41.6132 15.7767 44.7461 16.0458 45.6631C16.1838 46.133 16.4626 46.5621 16.8534 46.9053C17.2441 47.2484 17.7325 47.493 18.2675 47.6143C19.2502 47.8366 22.4681 48.7419 25.0018 49.4639C25.9651 49.7388 25.9652 51.0943 25.0018 51.3691C22.4681 52.0911 19.2502 52.9954 18.2675 53.2178C17.7324 53.339 17.2441 53.5846 16.8534 53.9277C16.4628 54.2708 16.1839 54.6992 16.0458 55.1689C15.8155 55.9532 14.6405 59.1665 13.7831 61.4902C13.4629 62.3579 12.2429 62.3595 11.9218 61.4922C11.0801 59.2189 9.93401 56.0859 9.66492 55.1689C9.52686 54.6993 9.24781 54.2708 8.8573 53.9277C8.46647 53.5845 7.97745 53.339 7.44226 53.2178C6.60153 53.0274 3.31353 52.1037 0.724487 51.3682C-0.240351 51.0941 -0.242022 49.7351 0.722534 49.46C3.25303 48.7383 6.46074 47.8357 7.44226 47.6133C7.9772 47.4922 8.46553 47.2472 8.85632 46.9043C9.24713 46.5613 9.52661 46.1328 9.66492 45.6631C9.89523 44.8788 11.0692 41.6655 11.9266 39.3418ZM49.1327 2.29199C49.8058 1.29435 51.3432 2.11701 50.8866 3.23047L34.3046 43.626C34.2424 43.7774 34.0952 43.876 33.9315 43.876C33.7819 43.8759 33.6449 43.7934 33.5751 43.6611L28.4393 33.9248C28.2675 33.5989 28.289 33.2049 28.495 32.8994L49.1327 2.29199ZM32.7079 5.94043C33.3818 4.94234 34.9202 5.76746 34.4618 6.88086L26.1835 26.9678C26.1453 27.0604 26.0551 27.121 25.955 27.1211C25.865 27.1211 25.7817 27.0719 25.7382 26.9932L22.7733 21.6328C22.5914 21.3039 22.6089 20.9004 22.8192 20.5889L32.7079 5.94043ZM11.9315 8.78711C12.2484 7.91866 13.4671 7.91769 13.7841 8.78613C14.084 9.60905 14.3625 10.3907 14.451 10.6924C14.5201 10.9274 14.6599 11.1419 14.8553 11.3135C15.0507 11.485 15.2949 11.6073 15.5624 11.668C15.8479 11.7326 16.5108 11.912 17.2645 12.1221C18.23 12.3912 18.23 13.7465 17.2645 14.0156C16.5108 14.2257 15.8479 14.4051 15.5624 14.4697C15.2949 14.5303 15.0507 14.6527 14.8553 14.8242C14.6599 14.9958 14.5201 15.2103 14.451 15.4453C14.3745 15.706 14.0897 16.5039 13.7811 17.3506C13.4643 18.2192 12.2444 18.2203 11.9276 17.3516C11.6277 16.5286 11.3491 15.747 11.2606 15.4453C11.1916 15.2104 11.0526 14.9958 10.8573 14.8242C10.662 14.6527 10.4177 14.5304 10.1503 14.4697C9.90325 14.4138 9.23234 14.2305 8.45886 14.0146C7.49319 13.7447 7.49288 12.3886 8.45886 12.1191C9.20794 11.9102 9.8661 11.7314 10.1503 11.667C10.4176 11.6064 10.662 11.4839 10.8573 11.3125C11.0524 11.1411 11.1915 10.927 11.2606 10.6924C11.3372 10.4317 11.623 9.63379 11.9315 8.78711Z" fill="white"/>
+            </svg>
+          </div>
+          <p class="home-logo-name">Makor-X.AI Authenticator</p>
+        </div>
+      </div>
+
+      <div class="home-content-card">
+      <div class="home-header">
+        <div class="home-header-left">
+          <h1 class="screen-title">Your devices</h1>
+        </div>
+      </div>
+
+      <div class="home-scroll">
+        <div id="all-sessions">
+          <p class="other-sessions-label" id="label-active" style="display:none; color: var(--c-success);">Active now</p>
+          <div class="session-compact" id="sess-london" style="display:none; border: 1.5px solid var(--c-border); flex-direction: column; align-items: stretch; gap: 0; padding: 16px;">
+            <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:14px;">
+              <div class="session-dot" style="flex-shrink:0; margin-top:6px;"></div>
+              <div style="flex:1; min-width:0;">
+                <span class="session-compact-loc">London, UK</span>
+                <div class="session-compact-meta" style="margin-top:2px;"><span id="sess-london-time">just now</span></div>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; background:var(--c-surface-2); border-radius: 8px; padding:12px 14px;">
+              <div>
+                <div style="font-size:10px;font-weight:700;color:var(--c-text-3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px;">Browser</div>
+                <div style="font-size:12px;font-weight:600;color:var(--c-text);">Chrome 126</div>
+              </div>
+              <div>
+                <div style="font-size:10px;font-weight:700;color:var(--c-text-3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px;">Device</div>
+                <div style="font-size:12px;font-weight:600;color:var(--c-text);">MacBook Pro</div>
+              </div>
+              <div>
+                <div style="font-size:10px;font-weight:700;color:var(--c-text-3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px;">OS</div>
+                <div style="font-size:12px;font-weight:600;color:var(--c-text);">macOS 14</div>
+              </div>
+              <div>
+                <div style="font-size:10px;font-weight:700;color:var(--c-text-3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px;">IP Address</div>
+                <div style="font-size:12px;font-weight:600;color:var(--c-text);font-family:var(--font-mono);">82.43.201.15</div>
+              </div>
+            </div>
+          </div>
+
+          <p class="other-sessions-label" style="margin-top:16px; margin-bottom:10px;">Recent sign-ins</p>
+          <div class="session-compact" id="sess-ny">
+            <div class="session-compact-flag">US</div>
+            <div class="session-compact-body">
+              <div class="session-compact-loc">New York, US</div>
+              <div class="session-compact-meta">Firefox · Windows · 2h ago</div>
+            </div>
+            <button class="session-compact-signout" onclick="signOutSession('sess-ny','New York')">Sign out</button>
+          </div>
+          <div class="session-compact" id="sess-sg">
+            <div class="session-compact-flag">SG</div>
+            <div class="session-compact-body">
+              <div class="session-compact-loc">Singapore</div>
+              <div class="session-compact-meta">Safari · iPhone · 5h ago</div>
+            </div>
+            <button class="session-compact-signout" onclick="signOutSession('sess-sg','Singapore')">Sign out</button>
+          </div>
+          <div class="session-compact" id="sess-am">
+            <div class="session-compact-flag">NL</div>
+            <div class="session-compact-body">
+              <div class="session-compact-loc">Amsterdam, NL</div>
+              <div class="session-compact-meta">Chrome · Windows · 1d ago</div>
+            </div>
+            <button class="session-compact-signout" onclick="signOutSession('sess-am','Amsterdam')">Sign out</button>
+          </div>
+          <p class="sessions-empty" id="sessions-empty" style="display:none;">No other active sessions.</p>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- SCREEN: Password fallback -->
+    <div class="screen" id="s-pwfallback">
+      <div class="fb-top">
+        <button class="fb-back" onclick="backToFaceID()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to Face ID
+        </button>
+        <p class="eyebrow" style="margin-bottom:6px;">Identity Verification</p>
+        <h2 class="screen-title" style="margin-top:0; margin-bottom:6px;">Sign in with password</h2>
+        <p class="screen-sub" style="margin:0; font-size:14px;">Face ID wasn't available. Enter your credentials to continue.</p>
+      </div>
+      <div class="fb-form">
+        <div class="input-group">
+          <label for="fb-email">Email Address</label>
+          <div class="input-wrap">
+            <input type="email" class="input-field" id="fb-email" placeholder="you@makor-x.ai" autocomplete="email" />
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="fb-pw">Password</label>
+          <div class="input-wrap">
+            <input type="password" class="input-field" id="fb-pw" placeholder="Enter your password" autocomplete="current-password" />
+            <button class="input-toggle" type="button" onclick="this.previousElementSibling.type=this.previousElementSibling.type==='password'?'text':'password'" aria-label="Toggle password visibility">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="fb-submit">
+          <button class="btn-primary" id="fb-btn" onclick="doFbLogin()">Confirm Identity</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screens -->
+
+  <!-- Sign-out confirmation dialog -->
+  <div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-dialog">
+      <p class="confirm-title" id="confirm-title">Sign out session?</p>
+      <p class="confirm-body" id="confirm-body">This will immediately end the session and require re-authentication on that device.</p>
+      <div class="confirm-actions">
+        <button class="confirm-btn confirm-btn-cancel" onclick="cancelSignOut()">Cancel</button>
+        <button class="confirm-btn confirm-btn-danger" onclick="confirmSignOut()">Sign out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Sheet overlay -->
+  <div class="sheet-overlay" id="sheet-overlay"></div>
+
+  <!-- Bottom Sheet -->
+  <div class="bottom-sheet" id="sign-in-sheet">
+    <div class="sheet-handle"></div>
+
+    <!-- Map — dark night-mode palette -->
+    <div class="sheet-map">
+      <svg viewBox="0 0 358 160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <rect width="358" height="160" fill="#0F1A24"/>
+        <rect x="10" y="8" width="60" height="28" rx="3" fill="#172230"/>
+        <rect x="78" y="8" width="44" height="28" rx="3" fill="#172230"/>
+        <rect x="130" y="8" width="52" height="22" rx="3" fill="#172230"/>
+        <rect x="190" y="8" width="38" height="28" rx="3" fill="#172230"/>
+        <rect x="236" y="8" width="62" height="22" rx="3" fill="#172230"/>
+        <rect x="306" y="8" width="44" height="28" rx="3" fill="#172230"/>
+        <rect x="10" y="44" width="38" height="36" rx="3" fill="#172230"/>
+        <rect x="56" y="44" width="56" height="36" rx="3" fill="#172230"/>
+        <rect x="120" y="44" width="28" height="18" rx="3" fill="#172230"/>
+        <rect x="156" y="44" width="44" height="36" rx="3" fill="#172230"/>
+        <rect x="208" y="44" width="32" height="20" rx="3" fill="#172230"/>
+        <rect x="248" y="44" width="50" height="36" rx="3" fill="#172230"/>
+        <rect x="306" y="44" width="44" height="36" rx="3" fill="#172230"/>
+        <path d="M0 100 Q60 90 120 105 Q180 120 240 105 Q300 90 358 100 L358 125 Q300 115 240 130 Q180 145 120 130 Q60 115 0 125 Z" fill="#0A1520" opacity=".9"/>
+        <path d="M0 105 Q60 95 120 110 Q180 125 240 110 Q300 95 358 105" fill="none" stroke="#081320" stroke-width="1.5"/>
+        <rect x="158" y="98" width="42" height="6" rx="3" fill="#0A1520"/>
+        <rect x="10" y="134" width="52" height="22" rx="3" fill="#172230"/>
+        <rect x="70" y="134" width="40" height="22" rx="3" fill="#172230"/>
+        <rect x="118" y="134" width="62" height="22" rx="3" fill="#172230"/>
+        <rect x="188" y="134" width="44" height="22" rx="3" fill="#172230"/>
+        <rect x="240" y="134" width="56" height="22" rx="3" fill="#172230"/>
+        <rect x="304" y="134" width="46" height="22" rx="3" fill="#172230"/>
+        <line x1="0" y1="88" x2="358" y2="88" stroke="#0C1219" stroke-width="5"/>
+        <line x1="179" y1="0" x2="179" y2="88" stroke="#0C1219" stroke-width="5"/>
+        <line x1="179" y1="128" x2="179" y2="160" stroke="#0C1219" stroke-width="4"/>
+        <line x1="0" y1="40" x2="358" y2="40" stroke="#0C1219" stroke-width="3.5"/>
+        <rect x="20" y="50" width="28" height="22" rx="4" fill="#17C3AF" opacity=".22"/>
+        <!-- Drop pin -->
+        <circle cx="179" cy="68" r="14" fill="#17C3AF" opacity=".18"/>
+        <circle cx="179" cy="68" r="8" fill="#17C3AF"/>
+        <circle cx="179" cy="68" r="3.5" fill="white"/>
+        <path d="M179 76 L179 84" stroke="#17C3AF" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <div class="map-location-pill">
+        <div class="loc-dot"></div>
+        London, United Kingdom
+      </div>
+    </div>
+
+    <!-- Sheet body -->
+    <div class="sheet-body">
+      <p class="sheet-section-title">Sign-in details</p>
+      <div class="sheet-info-grid">
+        <div class="sheet-info-item">
+          <span class="sheet-info-label">Browser</span>
+          <span class="sheet-info-val">Chrome 126</span>
+        </div>
+        <div class="sheet-info-item">
+          <span class="sheet-info-label">OS</span>
+          <span class="sheet-info-val">macOS 14</span>
+        </div>
+        <div class="sheet-info-item">
+          <span class="sheet-info-label">IP Address</span>
+          <span class="sheet-info-val">82.43.201.15</span>
+        </div>
+        <div class="sheet-info-item">
+          <span class="sheet-info-label">Time</span>
+          <span class="sheet-info-val" id="sheet-time">9:41 AM</span>
+        </div>
+      </div>
+
+      <div class="sheet-code-card" id="sheet-code-section">
+        <div class="sheet-code-header">
+          <span class="sheet-code-label">One-time code</span>
+          <span class="sheet-code-expiry" id="sheet-expiry">3:00</span>
+        </div>
+        <div class="sheet-otp" id="sheet-otp">482 716</div>
+        <button class="sheet-copy-btn" id="sheet-copy-btn" onclick="copyCode()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Copy code
+        </button>
+      </div>
+
+      <button class="sheet-block-link" onclick="blockRequest()">This wasn't me — Block sign-in</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+</div><!-- /shell -->
+
+<script>
+  /* ─── Screen navigation ─── */
+  const SCREEN_ORDER = ['s-home','s-pwfallback'];
+  let currentScreen = 's-home';
+  let faceIDContext = 'unlock';
+
+  function goToScreen(id) {
+    const targetIdx = SCREEN_ORDER.indexOf(id);
+    SCREEN_ORDER.forEach((sid, i) => {
+      const el = document.getElementById(sid);
+      const diff = i - targetIdx;
+      el.style.transform = diff === 0 ? 'translateX(0)' : `translateX(${diff < 0 ? -100 : 100}%)`;
+      el.style.opacity   = diff === 0 ? '1' : '0';
+    });
+    currentScreen = id;
+    document.querySelector('.status-bar').classList.toggle('status-bar--dark', id === 's-home');
+  }
+
+  function showFaceIDOverlay() { document.getElementById('s-faceid').classList.remove('hidden'); }
+  function hideFaceIDOverlay()  { document.getElementById('s-faceid').classList.add('hidden'); }
+
+  function showLaunch(callback) {
+    const launch = document.getElementById('s-launch');
+    launch.classList.remove('hidden');
+    setTimeout(callback, 1800);
+  }
+  function hideLaunchScreen() { document.getElementById('s-launch').classList.add('hidden'); }
+
+  function updateClock() {
+    const now = new Date();
+    let h = now.getHours(), m = now.getMinutes();
+    h = h % 12 || 12;
+    document.getElementById('sb-time').textContent = `${h}:${String(m).padStart(2,'0')}`;
+  }
+  updateClock(); setInterval(updateClock, 10000);
+  document.querySelector('.status-bar').classList.add('status-bar--dark');
+
+  showLaunch(() => { showFaceIDOverlay(); resetFrame(); startFaceID(); });
+
+  (function(){
+    const d = new Date();
+    let h = d.getHours(), m = d.getMinutes(), ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    document.getElementById('sheet-time').textContent = `${h}:${String(m).padStart(2,'0')} ${ampm}`;
+  })();
+
+  /* ─── Toast ─── */
+  let toastTimer;
+  function showToast(msg, type='') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast' + (type ? ' '+type : '') + ' show';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+  }
+
+  /* ─── Push notification banner ─── */
+  let bannerDismissTimer;
+  let appUnlocked = false;
+
+  function showPushBanner() {
+    const banner = document.getElementById('push-banner');
+    banner.classList.add('show');
+    clearTimeout(bannerDismissTimer);
+    bannerDismissTimer = setTimeout(() => hidePushBanner(), 9000);
+  }
+  function hidePushBanner() {
+    clearTimeout(bannerDismissTimer);
+    document.getElementById('push-banner').classList.remove('show');
+  }
+  function openFromBanner() {
+    hidePushBanner();
+    faceIDContext = 'signin';
+    hideFaceIDOverlay();
+    if (appUnlocked) {
+      showFaceIDOverlay(); resetFrame(); startFaceID();
+    } else {
+      showLaunch(() => { showFaceIDOverlay(); resetFrame(); startFaceID(); });
+    }
+  }
+
+  /* ─── Face ID ─── */
+  let faceIDTimer;
+
+  function afterAuthSuccess() {
+    hideFaceIDOverlay();
+    hideLaunchScreen();
+    goToScreen('s-home');
+    appUnlocked = true;
+    if (faceIDContext === 'signin') setTimeout(() => showSignInSheet(), 400);
+    faceIDContext = 'unlock';
+  }
+
+  function resetFrame() {
+    const w = document.getElementById('fid-wrapper');
+    const lottie = document.getElementById('fid-lottie');
+    if (w) w.className = 'fid-wrapper';
+    if (lottie) lottie.stop();
+  }
+
+  function startFaceID() {
+    const w      = document.getElementById('fid-wrapper');
+    const lottie = document.getElementById('fid-lottie');
+    w.className = 'fid-wrapper';
+    if (lottie) lottie.stop();
+    void w.offsetWidth;
+    setTimeout(() => { w.classList.add('active'); if (lottie) lottie.play(); }, 60);
+    clearTimeout(faceIDTimer);
+    faceIDTimer = setTimeout(() => {
+      w.classList.add('completed');
+      if (lottie) lottie.stop();
+      afterAuthSuccess();
+    }, 2200);
+  }
+
+  document.getElementById('fid-frame-wrap').addEventListener('click', () => {
+    const w = document.getElementById('fid-wrapper');
+    if (w && !w.classList.contains('active')) startFaceID();
+  });
+
+  setTimeout(startFaceID, 600);
+
+  function goToPwFallback() {
+    clearTimeout(faceIDTimer);
+    resetFrame();
+    hideFaceIDOverlay();
+    hideLaunchScreen();
+    const btn = document.getElementById('fb-btn');
+    btn.textContent = 'Confirm Identity'; btn.disabled = false;
+    document.getElementById('fb-email').value = '';
+    document.getElementById('fb-pw').value = '';
+    clearTimeout(fbLoginTimer);
+    goToScreen('s-pwfallback');
+  }
+
+  function backToFaceID() {
+    clearTimeout(fbLoginTimer);
+    document.getElementById('fb-btn').textContent = 'Confirm Identity';
+    document.getElementById('fb-btn').disabled = false;
+    goToScreen('s-home');
+    showFaceIDOverlay();
+    setTimeout(startFaceID, 200);
+  }
+
+  /* ─── Password fallback ─── */
+  let fbLoginTimer;
+  function doFbLogin() {
+    const email = document.getElementById('fb-email').value.trim();
+    const pw    = document.getElementById('fb-pw').value;
+    if (!email || pw.length < 4) { showToast('Enter your email and password.'); return; }
+    const btn = document.getElementById('fb-btn');
+    btn.textContent = 'Verifying…'; btn.disabled = true;
+    clearTimeout(fbLoginTimer);
+    fbLoginTimer = setTimeout(() => {
+      btn.textContent = 'Confirm Identity'; btn.disabled = false;
+      afterAuthSuccess();
+    }, 1400);
+  }
+
+  /* ─── Reveal current session after sign-in ─── */
+  function revealCurrentSession() {
+    const d = new Date();
+    let h = d.getHours(), m = d.getMinutes(), ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    document.getElementById('sess-london-time').textContent = `${h}:${String(m).padStart(2,'0')} ${ampm}`;
+    const label = document.getElementById('label-active');
+    if (label) label.style.display = 'block';
+    const el = document.getElementById('sess-london');
+    el.style.display = 'flex';
+    el.style.opacity = '0'; el.style.transform = 'scale(.97)';
+    requestAnimationFrame(() => {
+      el.style.transition = 'opacity .3s ease, transform .3s ease';
+      el.style.opacity = '1'; el.style.transform = '';
+    });
+  }
+
+  /* ─── Sign-out ─── */
+  let _pendingSignOutId = null, _pendingSignOutLoc = null;
+
+  function signOutSession(id, location) {
+    _pendingSignOutId  = id;
+    _pendingSignOutLoc = location;
+    document.getElementById('confirm-title').textContent = `Sign out ${location} session?`;
+    document.getElementById('confirm-body').textContent  =
+      `This will immediately end the ${location} session and require re-authentication on that device.`;
+    document.getElementById('confirm-overlay').classList.add('show');
+  }
+  function confirmSignOut() {
+    document.getElementById('confirm-overlay').classList.remove('show');
+    const el = document.getElementById(_pendingSignOutId);
+    if (!el) return;
+    el.style.transition = 'opacity .23s ease, transform .23s ease';
+    el.style.opacity = '0'; el.style.transform = 'scale(.97)';
+    setTimeout(() => { el.remove(); }, 230);
+    showToast(`Signed out of ${_pendingSignOutLoc} session.`);
+    _pendingSignOutId = _pendingSignOutLoc = null;
+  }
+  function cancelSignOut() {
+    document.getElementById('confirm-overlay').classList.remove('show');
+    _pendingSignOutId = _pendingSignOutLoc = null;
+  }
+
+  /* ─── Bottom sheet ─── */
+  let expiryInterval;
+  const EXPIRY_SECS = 180;
+  let expirySecsLeft = EXPIRY_SECS;
+
+  function formatCountdown(secs) {
+    return `${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}`;
+  }
+
+  function showSignInSheet() {
+    resetCodeCard();
+    document.getElementById('sheet-overlay').classList.add('show');
+    document.getElementById('sign-in-sheet').classList.add('open');
+    startExpiryTimer();
+  }
+  function dismissSignInSheet() {
+    clearInterval(expiryInterval);
+    document.getElementById('sign-in-sheet').classList.remove('open');
+    document.getElementById('sheet-overlay').classList.remove('show');
+    setTimeout(resetCodeCard, 450);
+  }
+  function resetCodeCard() {
+    expirySecsLeft = EXPIRY_SECS;
+    document.getElementById('sheet-expiry').textContent = formatCountdown(EXPIRY_SECS);
+    document.getElementById('sheet-expiry').className = 'sheet-code-expiry';
+    document.getElementById('sheet-otp').textContent = '482 716';
+    document.getElementById('sheet-otp').className = 'sheet-otp';
+    const copyBtn = document.getElementById('sheet-copy-btn');
+    copyBtn.disabled = false;
+    copyBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy code';
+    const confirmed = document.querySelector('.sheet-confirmed');
+    if (confirmed) confirmed.remove();
+    const codeSection = document.getElementById('sheet-code-section');
+    codeSection.style.display = '';
+    codeSection.style.opacity = '';
+    codeSection.style.transition = '';
+    document.querySelector('.sheet-block-link').style.display = '';
+  }
+  function startExpiryTimer() {
+    clearInterval(expiryInterval);
+    expirySecsLeft = EXPIRY_SECS;
+    const exLabel = document.getElementById('sheet-expiry');
+    exLabel.textContent = formatCountdown(EXPIRY_SECS);
+    expiryInterval = setInterval(() => {
+      expirySecsLeft--;
+      exLabel.textContent = formatCountdown(expirySecsLeft);
+      if (expirySecsLeft <= 30) exLabel.classList.add('urgent');
+      if (expirySecsLeft <= 0) {
+        clearInterval(expiryInterval);
+        dismissSignInSheet();
+        showToast('Code expired. Please request a new sign-in.');
+      }
+    }, 1000);
+  }
+  function copyCode() {
+    try { navigator.clipboard.writeText('482716'); } catch(e) {}
+    const btn = document.getElementById('sheet-copy-btn');
+    btn.innerHTML = '✓ Copied!'; btn.disabled = true;
+    showToast('Code copied to clipboard.');
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy code';
+      btn.disabled = false;
+    }, 2000);
+  }
+  function blockRequest() {
+    clearInterval(expiryInterval);
+    dismissSignInSheet();
+    setTimeout(() => {
+      goToScreen('s-home');
+      showToast('Sign-in blocked. Attempt has been logged.', 'danger');
+    }, 150);
+  }
+
+  /* ─── BroadcastChannel ─── */
+  function handleCodeUsed() {
+    clearInterval(expiryInterval);
+    const codeSection = document.getElementById('sheet-code-section');
+    const blockLink   = document.querySelector('.sheet-block-link');
+    codeSection.style.transition = 'opacity .2s';
+    codeSection.style.opacity = '0';
+    if (blockLink) blockLink.style.display = 'none';
+    setTimeout(() => {
+      codeSection.style.display = 'none';
+      const confirmed = document.createElement('div');
+      confirmed.className = 'sheet-confirmed';
+      confirmed.innerHTML = `
+        <div class="sheet-confirmed-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <h3>Sign-in confirmed</h3>
+        <p>You're now signed in on Chrome · London</p>
+      `;
+      codeSection.parentNode.insertBefore(confirmed, codeSection.nextSibling);
+      setTimeout(() => {
+        dismissSignInSheet();
+        setTimeout(() => revealCurrentSession(), 500);
+      }, 2800);
+    }, 220);
+  }
+
+  /* ─── Launch screen constellation ─── */
+  (function() {
+    const canvas = document.getElementById('launch-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const TEAL       = 'rgba(23,195,175,';
+    const LINE_COLOR = 'rgba(23,195,175,';
+    const NODE_COUNT = 52;
+    const CONNECT_DIST = 90;
+    const SPEED = 0.28;
+
+    let W, H, nodes;
+
+    function resize() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      W = canvas.width  = rect.width  || 390;
+      H = canvas.height = rect.height || 844;
+    }
+
+    function mkNode() {
+      return {
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * SPEED,
+        vy: (Math.random() - 0.5) * SPEED,
+        r: Math.random() * 1.4 + 0.8
+      };
+    }
+
+    function init() {
+      resize();
+      nodes = Array.from({ length: NODE_COUNT }, mkNode);
+    }
+
+    function step() {
+      ctx.clearRect(0, 0, W, H);
+
+      // move nodes
+      for (const n of nodes) {
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > W) n.vx *= -1;
+        if (n.y < 0 || n.y > H) n.vy *= -1;
+      }
+
+      // draw edges
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const d  = Math.sqrt(dx * dx + dy * dy);
+          if (d < CONNECT_DIST) {
+            const alpha = (1 - d / CONNECT_DIST) * 0.22;
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.strokeStyle = LINE_COLOR + alpha + ')';
+            ctx.lineWidth = 0.7;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // draw nodes
+      for (const n of nodes) {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        ctx.fillStyle = TEAL + '0.55)';
+        ctx.fill();
+        // soft glow
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r * 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = TEAL + '0.08)';
+        ctx.fill();
+      }
+
+      raf = requestAnimationFrame(step);
+    }
+
+    let raf;
+    init();
+    raf = requestAnimationFrame(step);
+
+    // Pause when launch screen hides to save CPU
+    const launchEl = document.getElementById('s-launch');
+    const obs = new MutationObserver(() => {
+      if (launchEl.classList.contains('hidden')) {
+        cancelAnimationFrame(raf);
+      }
+    });
+    obs.observe(launchEl, { attributes: true, attributeFilter: ['class'] });
+  })();
+
+  try {
+    const authChannel = new BroadcastChannel('enigma_auth');
+    authChannel.onmessage = (e) => {
+      if (e.data?.type === 'sign_in_request') showPushBanner();
+      if (e.data?.type === 'code_used') handleCodeUsed();
+    };
+  } catch(e) {}
+</script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+/* ============================================================
+   Enigma X — Design Tokens
+   Extracted from enigma-signin.html + enigma-authenticator.html
+   October 2026
+
+   Usage: import this file before any component styles.
+   Light mode only — no dark mode variant currently.
+   ============================================================ */
+
+:root {
+
+  /* ----------------------------------------------------------
+     BRAND
+  ---------------------------------------------------------- */
+  --color-brand:          #7AEFEF;  /* bright cyan-teal — buttons, links, focus, active states */
+  --color-brand-dark:     #3DBFBF;  /* deeper teal — hover states, header bg, eyebrow text */
+  --color-brand-dim:      #5ADADA;  /* mid teal — button hover */
+  --color-brand-ghost:    rgba(122, 239, 239, 0.094); /* focus rings, subtle bg tints */
+  --color-brand-ghost-border: rgba(61, 191, 191, 0.30); /* subtle teal border */
+
+  /* ----------------------------------------------------------
+     SURFACES
+  ---------------------------------------------------------- */
+  --color-bg:             #F7F8F8;  /* page background — very light blue-gray */
+  --color-surface:        #FFFFFF;  /* cards, modals, popovers */
+  --color-surface-2:      #F7F8F8;  /* inputs, raised areas, subtle sections */
+  --color-surface-overlay: rgba(0, 0, 0, 0.40); /* modal + sheet overlay */
+
+  /* ----------------------------------------------------------
+     TEXT
+  ---------------------------------------------------------- */
+  --color-text-primary:   #1A1F36;  /* body text, headings — blue-tinted near-black */
+  --color-text-secondary: #7C9CAC;  /* subtitles, labels, muted text */
+  --color-text-tertiary:  #A8BECD;  /* placeholders, timestamps, fine print */
+  --color-text-on-brand:  #000000;  /* text ON the brand color (button labels) */
+  --color-text-on-dark:   #FFFFFF;  /* text on dark surfaces */
+
+  /* ----------------------------------------------------------
+     BORDERS
+  ---------------------------------------------------------- */
+  --color-border:         #DEE8ED;  /* all cards, inputs, dividers */
+  --color-border-focus:   #7AEFEF;  /* input focus border */
+
+  /* ----------------------------------------------------------
+     STATUS — Success / Gain
+  ---------------------------------------------------------- */
+  --color-status-success:        #4DCC9B;   /* success text + icon */
+  --color-status-success-bg:     rgba(77, 204, 155, 0.12);
+  --color-status-gain-text:      #4DCC9B;   /* positive P&L */
+  --color-status-gain-bg:        rgba(77, 204, 155, 0.12);
+
+  /* ----------------------------------------------------------
+     STATUS — Error / Loss / Danger
+  ---------------------------------------------------------- */
+  --color-status-danger:         #E5686A;   /* error borders, destructive */
+  --color-status-danger-bg:      rgba(229, 104, 106, 0.08);
+  --color-status-loss-text:      #E5686A;   /* negative P&L */
+  --color-status-loss-bg:        rgba(229, 104, 106, 0.08);
+
+  /* ----------------------------------------------------------
+     STATUS — Pending / Neutral
+  ---------------------------------------------------------- */
+  --color-status-pending:        #F59E0B;
+  --color-status-pending-bg:     rgba(245, 158, 11, 0.12);
+
+  /* ----------------------------------------------------------
+     STATUS — Active / Live session
+  ---------------------------------------------------------- */
+  --color-status-active:         #7AEFEF;
+  --color-status-active-bg:      rgba(122, 239, 239, 0.094);
+
+  /* ----------------------------------------------------------
+     STATUS — Disabled
+  ---------------------------------------------------------- */
+  --color-disabled-bg:           #D1D5DB;
+  --color-disabled-text:         #7C9CAC;
+
+  /* ----------------------------------------------------------
+     TYPOGRAPHY
+  ---------------------------------------------------------- */
+  --font-primary:  'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:     'DM Mono', 'Courier New', monospace;
+
+  --text-xs:    10px;   /* section labels, micro metadata */
+  --text-sm:    12px;   /* badges, form labels, table headers */
+  --text-base:  14px;   /* body, buttons, form elements */
+  --text-md:    16px;   /* primary inputs, prominent buttons */
+  --text-lg:    18px;   /* section titles */
+  --text-xl:    20px;   /* screen titles */
+  --text-2xl:   22px;   /* page headings */
+  --text-3xl:   24px;   /* card titles, hero numbers */
+  --text-4xl:   38px;   /* OTP code display */
+
+  --font-normal:   400;
+  --font-medium:   500;
+  --font-semibold: 600;
+  --font-bold:     700;
+
+  --leading-tight:   1.2;
+  --leading-snug:    1.35;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.55;
+
+  --tracking-tight:   -0.02em;
+  --tracking-none:     0;
+  --tracking-wide:     0.04em;
+  --tracking-wider:    0.07em;
+  --tracking-widest:   0.10em;
+  --tracking-label:    0.08em;  /* eyebrow + uppercase section labels */
+  --tracking-mono:     0.18em;  /* OTP / code display */
+
+  /* ----------------------------------------------------------
+     CONTROL HEIGHTS
+  ---------------------------------------------------------- */
+  --h-input:       48px;  /* all text inputs */
+  --h-btn:         50px;  /* primary action button */
+  --h-btn-mobile:  52px;  /* mobile primary button (authenticator) */
+  --h-btn-sm:      36px;  /* compact / session-level buttons */
+  --h-btn-danger:  48px;  /* danger outline button */
+  --h-chip:        32px;  /* pill badges and chips */
+  --h-nav:         56px;  /* top navigation bar */
+
+  /* ----------------------------------------------------------
+     AVATAR / ICON SIZES
+  ---------------------------------------------------------- */
+  --avatar-sm:  28px;   /* nav icon logo */
+  --avatar-md:  36px;   /* user avatar (home screen) */
+  --avatar-lg:  40px;   /* notification icon */
+  --avatar-xl:  44px;   /* push banner icon, header icon */
+  --icon-sm:    14px;
+  --icon-md:    16px;
+  --icon-lg:    18px;
+  --icon-xl:    22px;
+  --icon-2xl:   30px;   /* large brand logo in header */
+
+  /* ----------------------------------------------------------
+     SPACING
+  ---------------------------------------------------------- */
+  --space-1:   4px;
+  --space-2:   6px;
+  --space-3:   8px;
+  --space-4:   10px;
+  --space-5:   12px;
+  --space-6:   14px;
+  --space-7:   16px;
+  --space-8:   18px;
+  --space-9:   20px;
+  --space-10:  24px;
+  --space-12:  28px;
+  --space-14:  32px;
+  --space-16:  40px;
+
+  /* ----------------------------------------------------------
+     BORDER RADIUS
+  ---------------------------------------------------------- */
+  --radius:       4px;    /* universal — buttons, inputs, badges, cards, toasts */
+  --radius-sm:    4px;    /* same — kept explicit for clarity */
+  --radius-md:    8px;    /* bottom sheets, OTP slots, code card sections */
+  --radius-lg:    14px;   /* sign-out confirmation dialog */
+  --radius-pill:  999px;  /* waiting badges, session chips */
+  --radius-full:  50%;    /* avatars, live dots */
+
+  /* ----------------------------------------------------------
+     SHADOWS
+  ---------------------------------------------------------- */
+  --shadow-card:      0 2px 10px rgba(0, 0, 0, 0.06);
+  --shadow-card-lg:   0 4px 24px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-sheet:     0 -8px 40px rgba(0, 0, 0, 0.18);
+  --shadow-dialog:    0 8px 40px rgba(0, 0, 0, 0.20);
+  --shadow-mobile:    0 24px 64px rgba(0, 0, 0, 0.18), 0 0 0 2px rgba(0, 0, 0, 0.07);
+  --shadow-focus:     0 0 0 4px rgba(122, 239, 239, 0.094);
+  --shadow-dot-pulse: 0 0 0 4px rgba(122, 239, 239, 0.094);
+  --shadow-banner:    0 6px 32px rgba(0, 0, 0, 0.18), inset 0 2px 0 rgba(255, 255, 255, 0.22);
+
+  /* ----------------------------------------------------------
+     TRANSITIONS
+  ---------------------------------------------------------- */
+  --duration-instant: 0.08s;   /* button active state scale */
+  --duration-fast:    0.12s;   /* color/opacity changes */
+  --duration-base:    0.15s;   /* borders, backgrounds */
+  --duration-normal:  0.18s;   /* inputs, focus rings */
+  --duration-enter:   0.20s;   /* toast entry */
+  --duration-slide:   0.28s;   /* toast slide */
+  --duration-screen:  0.38s;   /* screen push transitions */
+  --duration-sheet:   0.42s;   /* bottom sheet slide */
+
+  --ease-default: ease;
+  --ease-screen:  cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-sheet:   cubic-bezier(0.32, 0, 0.04, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ----------------------------------------------------------
+     Z-INDEX
+  ---------------------------------------------------------- */
+  --z-base:       0;
+  --z-nav:        100;
+  --z-banner:     300;
+  --z-sheet:      101;
+  --z-sheet-overlay: 100;
+  --z-dialog:     200;
+  --z-faceid:     50;
+  --z-launch:     40;
+}

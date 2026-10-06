@@ -1,0 +1,1004 @@
+/* ============================================================
+   Equity Derivatives Auction — Component Styles
+   Requires: tokens.css loaded first
+   Dark mode only · Desktop only
+   ============================================================ */
+
+/* ─── RESET ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-primary);
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+input:focus-visible { outline: none; } /* inputs use border + box-shadow */
+
+
+/* ============================================================
+   LAYOUT — App Shell
+   ============================================================ */
+
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Left icon sidebar */
+.sidebar {
+  width: var(--w-sidebar);
+  flex-shrink: 0;
+  background: var(--color-sidebar-bg);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  gap: 4px;
+  z-index: var(--z-sidebar);
+}
+
+.sidebar-logo {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  color: var(--color-brand);
+  font-size: 20px;
+  font-weight: var(--font-bold);
+  letter-spacing: -0.02em;
+}
+
+.sidebar-nav-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast),
+    color var(--duration-fast);
+}
+.sidebar-nav-btn:hover {
+  background: var(--color-brand-ghost);
+  color: var(--color-brand);
+}
+.sidebar-nav-btn.active {
+  background: var(--color-brand-ghost);
+  color: var(--color-brand);
+}
+.sidebar-nav-btn svg { width: var(--icon-lg); height: var(--icon-lg); }
+
+/* Main content area */
+.app-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+
+/* ============================================================
+   TOP HEADER BAR
+   ============================================================ */
+
+.top-header {
+  height: var(--h-nav);
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-10);
+  gap: var(--space-7);
+}
+
+.header-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  letter-spacing: 0.01em;
+}
+
+.header-spacer { flex: 1; }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+.breadcrumb-sep {
+  color: var(--color-text-tertiary);
+  margin: 0 2px;
+}
+.breadcrumb-item { cursor: pointer; transition: color var(--duration-fast); }
+.breadcrumb-item:hover { color: var(--color-text-primary); }
+.breadcrumb-item.current {
+  color: var(--color-text-primary);
+  font-weight: var(--font-medium);
+  cursor: default;
+}
+
+/* User avatar */
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--color-brand-ghost);
+  border: 1.5px solid var(--color-brand-ghost-border);
+  color: var(--color-brand);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--h-btn);
+  padding: 0 var(--space-7);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-primary);
+  font-size: var(--text-md);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default),
+    opacity    var(--duration-fast) var(--ease-default),
+    transform  var(--duration-instant) var(--ease-default);
+  position: relative;
+}
+.btn:active { transform: scale(0.98); }
+
+/* Primary — teal fill (Confirm, Save Changes, Add New) */
+.btn-primary {
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
+}
+.btn-primary:hover { background: var(--color-brand-hover); }
+.btn-primary:disabled {
+  opacity: 0.40;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Cancel auction — coral fill */
+.btn-cancel-auction {
+  background: var(--color-cancel);
+  color: var(--color-text-on-coral);
+}
+.btn-cancel-auction:hover { background: var(--color-cancel-hover); }
+
+/* Reject — outlined coral */
+.btn-reject {
+  background: transparent;
+  color: var(--color-cancel);
+  border: 1.5px solid var(--color-cancel);
+}
+.btn-reject:hover { background: var(--color-cancel-bg); }
+
+/* White — modal Cancel / Close */
+.btn-white {
+  background: var(--color-btn-white-bg);
+  color: var(--color-btn-white-text);
+}
+.btn-white:hover { opacity: 0.88; }
+
+/* Ghost / outlined dark */
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+.btn-ghost:hover {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-primary);
+}
+
+/* Small */
+.btn-sm {
+  height: var(--h-btn-sm);
+  padding: 0 var(--space-5);
+  font-size: 13px;
+}
+
+/* Icon button — square, no label */
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+.btn-icon:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-primary);
+}
+.btn-icon.danger:hover {
+  background: var(--color-cancel-bg);
+  color: var(--color-cancel);
+}
+.btn-icon svg { width: var(--icon-md); height: var(--icon-md); }
+
+
+/* ============================================================
+   INPUTS — Inline (Auction Bid/Ask table)
+   ============================================================ */
+
+.input-inline {
+  width: 100%;
+  height: var(--h-input);
+  padding: 0 var(--space-5);
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: var(--font-primary);
+  font-size: var(--text-md);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+  text-align: right;
+  outline: none;
+  transition:
+    border-color var(--duration-normal),
+    box-shadow var(--duration-normal);
+  -webkit-appearance: none;
+}
+.input-inline:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: var(--shadow-focus);
+}
+.input-inline::placeholder { color: var(--color-text-tertiary); }
+.input-inline.error {
+  border-color: var(--color-status-danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+.input-inline:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   INPUTS — Modal form fields
+   ============================================================ */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.field-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  letter-spacing: 0.04em;
+}
+.field-wrap { position: relative; }
+
+.field-input {
+  width: 100%;
+  height: var(--h-input-modal);
+  padding: 0 var(--space-7);
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: var(--font-primary);
+  font-size: var(--text-md);
+  color: var(--color-text-primary);
+  outline: none;
+  transition:
+    border-color var(--duration-normal),
+    box-shadow var(--duration-normal);
+  -webkit-appearance: none;
+}
+.field-input:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: var(--shadow-focus);
+}
+.field-input::placeholder { color: var(--color-text-tertiary); }
+.field-input.error {
+  border-color: var(--color-status-danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.field-error {
+  font-size: var(--text-sm);
+  color: var(--color-status-danger-text);
+  display: none;
+}
+.field-error.show { display: block; }
+
+/* Search input with icon prefix */
+.field-input.with-prefix { padding-left: 34px; }
+.field-prefix-icon {
+  position: absolute;
+  left: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+  display: flex; align-items: center;
+  pointer-events: none;
+}
+.field-prefix-icon svg { width: 14px; height: 14px; }
+
+
+/* ============================================================
+   AUCTION SESSION CARD
+   ============================================================ */
+
+.session-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  margin-bottom: var(--space-7);
+}
+
+/* Session header row */
+.session-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-7);
+  border-bottom: 1px solid var(--color-border);
+}
+.session-name {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+}
+.session-header-spacer { flex: 1; }
+.session-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Session type badge (EFP / Cash Close) */
+.badge-session-type {
+  display: inline-flex;
+  align-items: center;
+  height: var(--h-badge);
+  padding: 0 var(--space-4);
+  background: var(--color-brand-ghost);
+  border: 1px solid var(--color-brand-ghost-border);
+  border-radius: var(--radius);
+  color: var(--color-brand);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  white-space: nowrap;
+}
+
+/* Timer badge (Time Left / Starting In) */
+.badge-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--h-badge);
+  padding: 0 var(--space-4);
+  background: var(--color-status-warning-bg);
+  border: 1px solid var(--color-status-warning-border);
+  border-radius: var(--radius);
+  color: var(--color-status-warning);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  white-space: nowrap;
+}
+.badge-timer svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+/* Cancel dropdown button (coral) with chevron */
+.btn-cancel-dropdown {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--h-btn);
+  padding: 0 var(--space-5);
+  background: var(--color-cancel);
+  color: var(--color-text-on-coral);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  position: relative;
+  transition: background var(--duration-fast);
+}
+.btn-cancel-dropdown:hover { background: var(--color-cancel-hover); }
+.btn-cancel-dropdown svg { width: 12px; height: 12px; }
+
+
+/* ============================================================
+   INSTRUMENT ROW (inside session card)
+   ============================================================ */
+
+.instrument-row {
+  padding: var(--space-5) var(--space-7);
+  border-bottom: 1px solid var(--color-border);
+}
+.instrument-row:last-child { border-bottom: none; }
+
+.instrument-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  margin-bottom: var(--space-4);
+}
+.instrument-name {
+  font-size: var(--text-md);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+}
+.instrument-meta {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+}
+.instrument-eq {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-base);
+}
+.instrument-eq-label {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+.instrument-eq-value {
+  color: var(--color-eq-price);
+  font-weight: var(--font-semibold);
+  font-variant-numeric: tabular-nums;
+}
+.instrument-header-spacer { flex: 1; }
+
+
+/* ============================================================
+   AUCTION TABLE (Size / Bid / Ask / Spread)
+   ============================================================ */
+
+.auction-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.auction-table th {
+  padding: var(--space-2) var(--space-4);
+  text-align: left;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+.auction-table th:not(:first-child) { text-align: right; }
+
+.auction-table td {
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid rgba(45, 47, 74, 0.5);
+  vertical-align: middle;
+}
+.auction-table td.col-size {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.auction-table td.col-bid,
+.auction-table td.col-ask,
+.auction-table td.col-spread {
+  text-align: right;
+}
+.auction-table tbody tr:last-child td { border-bottom: none; }
+
+/* Delete row button (red circle ×) */
+.row-delete-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--color-cancel-bg);
+  color: var(--color-cancel);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+.row-delete-btn:hover { background: var(--color-cancel); color: #fff; }
+.row-delete-btn svg { width: 10px; height: 10px; }
+
+
+/* ============================================================
+   INLINE STATUS BADGES (below bid row)
+   ============================================================ */
+
+/* "In the mix" success badge */
+.badge-in-the-mix {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--h-chip);
+  padding: 0 var(--space-3);
+  background: var(--color-status-success-bg);
+  border-radius: var(--radius-sm);
+  color: var(--color-status-success);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+}
+.badge-in-the-mix svg { width: 12px; height: 12px; }
+
+/* Warning tooltip (Bid >= Ask) */
+.warning-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: auto;
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-status-warning-bg);
+  border: 1px solid var(--color-status-warning-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-status-warning);
+  font-size: var(--text-sm);
+}
+.warning-inline svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+
+/* ============================================================
+   CANCEL DROPDOWN MENU
+   ============================================================ */
+
+.cancel-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 120px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-dropdown);
+  z-index: var(--z-dropdown);
+  overflow: hidden;
+}
+.cancel-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: var(--space-4) var(--space-7);
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: var(--font-primary);
+  font-size: var(--text-md);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background var(--duration-fast);
+}
+.cancel-dropdown-item:hover { background: rgba(255, 255, 255, 0.05); }
+.cancel-dropdown-item.danger { color: var(--color-cancel); }
+.cancel-dropdown-item.danger:hover { background: var(--color-cancel-bg); }
+
+
+/* ============================================================
+   ORDER CONFIRMATION NOTIFICATION
+   ============================================================ */
+
+.order-notification {
+  position: fixed;
+  top: calc(var(--h-nav) + var(--space-5));
+  right: var(--space-10);
+  max-width: 360px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-notification);
+  padding: var(--space-7);
+  z-index: var(--z-notification);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.order-notification-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+.order-notification-text {
+  font-size: var(--text-md);
+  color: var(--color-text-primary);
+  line-height: var(--leading-snug);
+}
+.order-notification-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+
+/* ============================================================
+   TOGGLE SWITCH (Active/Inactive)
+   ============================================================ */
+
+.toggle-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  user-select: none;
+}
+.toggle-track {
+  width: 40px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  background: var(--color-toggle-inactive);
+  position: relative;
+  transition: background var(--duration-base);
+  flex-shrink: 0;
+}
+.toggle-track.on { background: var(--color-toggle-active); }
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  background: #FFFFFF;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.30);
+  transition: left var(--duration-base) var(--ease-out);
+}
+.toggle-track.on .toggle-thumb { left: 21px; }
+.toggle-label {
+  font-size: var(--text-md);
+  color: var(--color-text-secondary);
+}
+.toggle-track.on ~ .toggle-label { color: var(--color-text-primary); }
+
+
+/* ============================================================
+   CHECKBOX
+   ============================================================ */
+
+.checkbox-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.cb-box {
+  width: 16px; height: 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-toggle-inactive);
+  background: var(--color-input-bg);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--duration-fast), border-color var(--duration-fast);
+}
+.checkbox-row.checked .cb-box {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+}
+.cb-check {
+  width: 10px; height: 10px;
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+.checkbox-row.checked .cb-check { opacity: 1; }
+.cb-label {
+  font-size: var(--text-md);
+  color: var(--color-text-primary);
+}
+.checkbox-row.indeterminate .cb-box {
+  background: var(--color-brand-ghost);
+  border-color: var(--color-brand);
+}
+
+
+/* ============================================================
+   BADGES — General
+   ============================================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--h-chip);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  white-space: nowrap;
+}
+.badge-success {
+  background: var(--color-status-success-bg);
+  color: var(--color-status-success);
+}
+.badge-warning {
+  background: var(--color-status-warning-bg);
+  color: var(--color-status-warning);
+  border: 1px solid var(--color-status-warning-border);
+}
+.badge-danger {
+  background: var(--color-status-danger-bg);
+  color: var(--color-status-danger-text);
+}
+.badge-brand {
+  background: var(--color-brand-ghost);
+  color: var(--color-brand);
+  border: 1px solid var(--color-brand-ghost-border);
+}
+
+/* Review badge (amber fill) */
+.badge-review {
+  height: var(--h-badge);
+  padding: 0 var(--space-4);
+  background: var(--color-review-bg);
+  color: var(--color-review-text);
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+}
+
+
+/* ============================================================
+   ADMIN TABLE (user list, client list)
+   ============================================================ */
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-md);
+  color: var(--color-text-primary);
+}
+.admin-table th {
+  padding: var(--space-3) var(--space-7);
+  text-align: left;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+  background: var(--color-surface);
+}
+.admin-table td {
+  padding: var(--space-4) var(--space-7);
+  border-bottom: 1px solid var(--color-border);
+}
+.admin-table tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+.admin-table tbody tr:last-child td { border-bottom: none; }
+
+/* Checkbox column */
+.admin-table .col-check {
+  width: 40px;
+  padding-left: var(--space-7);
+}
+
+
+/* ============================================================
+   SECTION LABEL
+   ============================================================ */
+
+.section-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+  color: var(--color-text-secondary);
+}
+
+
+/* ============================================================
+   CARD / PANEL
+   ============================================================ */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.card-header {
+  padding: var(--space-5) var(--space-7);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+.card-title {
+  font-size: var(--text-md);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  flex: 1;
+}
+.card-body { padding: var(--space-7); }
+
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-surface-overlay);
+  z-index: var(--z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-modal);
+  padding: var(--space-10);
+  min-width: 440px;
+  max-width: 560px;
+  width: 100%;
+  z-index: var(--z-modal);
+}
+.modal-header {
+  margin-bottom: var(--space-9);
+}
+.modal-title {
+  font-size: 20px;
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+}
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-4);
+  margin-top: var(--space-10);
+  padding-top: var(--space-7);
+  border-top: 1px solid var(--color-border);
+}
+
+
+/* ============================================================
+   DIVIDER
+   ============================================================ */
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-7) 0;
+}
+
+
+/* ============================================================
+   PAGINATION
+   ============================================================ */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.page-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
+}
+.page-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+  border-color: var(--color-text-secondary);
+}
+.page-btn.active {
+  background: var(--color-brand-ghost);
+  border-color: var(--color-brand-ghost-border);
+  color: var(--color-brand);
+  font-weight: var(--font-semibold);
+}
+.page-btn:disabled {
+  opacity: 0.30;
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  opacity: 0;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  font-size: var(--text-md);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: var(--z-notification);
+  box-shadow: var(--shadow-notification);
+  transition:
+    transform var(--duration-slide) var(--ease-out),
+    opacity var(--duration-enter) var(--ease-default);
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+.toast.success { border-color: var(--color-status-success); color: var(--color-status-success); }
+.toast.danger  { border-color: var(--color-cancel); color: var(--color-cancel); }

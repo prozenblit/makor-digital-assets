@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Makor Digital Assets</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <base href="/hub/">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+  <svg class="nav-icon" viewBox="0 0 20 20" fill="none">
+    <rect width="20" height="20" rx="5" fill="#005268"/>
+    <path d="M6 7h8M6 10h6M6 13h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  <span class="nav-logo">Makor Digital Assets</span>
+</nav>
+
+<div class="search-bar" id="search-bar">
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+      <circle cx="6.5" cy="6.5" r="4.5"/><path d="M10.5 10.5l3 3"/>
+    </svg>
+    <input class="search-input" id="search-input" type="search" placeholder="Search platforms and apps… (press / to focus)" autocomplete="off" spellcheck="false" />
+    <button class="search-clear" id="search-clear" aria-label="Clear search">×</button>
+  </div>
+</div>
+
+<div class="page">
+  <div id="app"></div>
+</div>
+
+<script src="projects.js"></script>
+<script>
+  const ICONS = {
+    figma: `<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 2C4.67 2 4 2.67 4 3.5v1C4 5.33 4.67 6 5.5 6H7V2H5.5zM7 6H8.5C9.33 6 10 5.33 10 4.5v-1C10 2.67 9.33 2 8.5 2H7v4zM7 7H5.5C4.67 7 4 7.67 4 8.5S4.67 10 5.5 10H7V7zM7 11h1.5C9.33 11 10 10.33 10 9.5S9.33 8 8.5 8H7v3zM5.5 11C4.67 11 4 11.67 4 12.5S4.67 14 5.5 14 7 13.33 7 12.5V11H5.5z"/></svg>`,
+    github: `<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1C4.13 1 1 4.13 1 8c0 3.09 2.01 5.72 4.79 6.65.35.06.48-.15.48-.34v-1.19c-1.95.42-2.36-.94-2.36-.94-.32-.81-.78-1.03-.78-1.03-.64-.43.05-.43.05-.43.7.05 1.07.72 1.07.72.62 1.07 1.63.76 2.03.58.06-.45.24-.76.44-.94-1.55-.18-3.19-.78-3.19-3.46 0-.76.27-1.39.72-1.88-.07-.18-.31-.89.07-1.85 0 0 .59-.19 1.93.72A6.68 6.68 0 018 4.93c.6 0 1.2.08 1.76.23 1.34-.9 1.93-.72 1.93-.72.38.96.14 1.67.07 1.85.45.49.72 1.12.72 1.88 0 2.69-1.64 3.28-3.2 3.46.25.22.48.65.48 1.31v1.94c0 .19.13.4.48.34C12.99 13.72 15 11.09 15 8c0-3.87-3.13-7-7-7z"/></svg>`,
+    chevron: `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,6 8,10 12,6"/></svg>`,
+  };
+
+  function statusBadge(status) {
+    const m = { live: ['Live','live'], wip: ['In progress','wip'], placeholder: ['Soon','placeholder'] };
+    const [label, cls] = m[status] || ['',''];
+    return label ? `<span class="status-badge status-${cls}">${label}</span>` : '';
+  }
+
+  function initials(name) {
+    return name.split(/[\s.&]+/).filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  }
+
+  function renderPlatformChips(links) {
+    if (!links || !links.length) return '';
+    return links.map(l =>
+      `<a href="${l.url}" target="_blank" class="platform-chip" onclick="event.stopPropagation()">
+        ${ICONS[l.type] || ''}${l.label}
+      </a>`
+    ).join('');
+  }
+
+  function typeColor(type) {
+    const map = {
+      figma:'#7c3aed', github:'#24292f', tokens:'#0ea5e9', claude:'#005268',
+      css:'#16a34a', 'html-ref':'#f97316', showcase:'#6366f1', prototype:'#0891b2',
+      deck:'#6366f1', excel:'#16a34a', doc:'#7c8dac'
+    };
+    return map[type] || '#aaa';
+  }
+
+  function renderAppCard(app, platformId) {
+    const clickable = app.status === 'live' && app.assets && app.assets.length > 0;
+    const n = app.assets ? app.assets.length : 0;
+    const uniqueTypes = app.assets ? [...new Set(app.assets.map(a => a.type))] : [];
+    const typePills = uniqueTypes.map(t =>
+      `<span class="asset-type-pill" style="background:${typeColor(t)}" title="${t}"></span>`
+    ).join('');
+    const pillsHtml = uniqueTypes.length ? `<div class="asset-type-pills">${typePills}</div>` : '';
+    return `
+      <div class="app-card${app.status !== 'live' ? ' dimmed' : ''}${clickable ? ' clickable' : ''}"
+           ${clickable ? `onclick="goTo('platforms/${platformId}/${app.id}')"` : ''}>
+        <div class="app-card-top">
+          <span class="app-name">${app.name}</span>
+          ${statusBadge(app.status)}
+        </div>
+        ${app.description ? `<p class="app-desc">${app.description}</p>` : ''}
+        ${pillsHtml}
+        ${clickable ? `<div class="app-foot">${n} asset${n !== 1 ? 's' : ''} →</div>` : ''}
+      </div>
+    `;
+  }
+
+  function renderFolder(platform, idx) {
+    const fid = `f-${platform.id}`;
+    const liveApps = platform.apps.filter(a => a.status === 'live');
+    const wipApps  = platform.apps.filter(a => a.status !== 'live');
+    const totalN   = platform.apps.length;
+    const liveN    = liveApps.length;
+    const metaStr  = `${liveN} live · ${totalN} app${totalN !== 1 ? 's' : ''}`;
+    const chipsHtml = renderPlatformChips(platform.platformLinks);
+    const appsHtml  = platform.apps.map(app => renderAppCard(app, platform.id)).join('');
+
+    // Papers: live apps first (teal), then wip (gray), capped at 9
+    const papers = [
+      ...liveApps.map(() => 'live'),
+      ...wipApps.map(() => 'wip'),
+    ].slice(0, 9);
+    const papersHtml = papers.map(t => `<div class="paper paper-${t}"></div>`).join('');
+
+    return `
+      <div class="platform-folder" id="${fid}" style="animation-delay:${idx * 55}ms">
+        <div class="folder-papers" aria-hidden="true">${papersHtml}</div>
+        <div class="folder-card">
+          <div class="folder-ear" onclick="toggleFolder('${fid}')">
+            <div class="platform-avatar">${initials(platform.name)}</div>
+            <div class="folder-ear-info">
+              <span class="folder-name">${platform.name}</span>
+              <span class="folder-meta">${metaStr}</span>
+            </div>
+            ${chipsHtml ? `<div class="folder-chips">${chipsHtml}</div>` : ''}
+            <div class="folder-chevron">${ICONS.chevron}</div>
+          </div>
+          <div class="folder-case">
+            <div class="folder-case-inner">
+              <div class="apps-grid">${appsHtml}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function toggleFolder(fid) {
+    document.getElementById(fid).classList.toggle('open');
+  }
+
+  function goTo(hash) {
+    window.location.href = 'project.html#' + hash;
+  }
+
+  function render() {
+    let html = '';
+    SECTIONS.forEach(section => {
+      const entries = PROJECTS[section];
+      if (!entries || !entries.length) return;
+
+      html += `<div class="section-block" data-section="${section}">`;
+      html += `<div class="section-label">${SECTION_LABELS[section]}</div>`;
+
+      if (section === 'platforms') {
+        entries.forEach((platform, i) => { html += renderFolder(platform, i); });
+      } else {
+        html += `<div class="flat-grid">`;
+        entries.forEach(p => {
+          const clickable = p.status !== 'wip' && p.status !== 'placeholder';
+          html += `
+            <div class="flat-card${!clickable ? ' dimmed' : ''}"
+                 ${clickable ? `onclick="goTo('${section}/${p.id}')"` : ''}>
+              <div class="flat-top">
+                <span class="flat-name">${p.name}</span>
+                ${statusBadge(p.status)}
+              </div>
+              <p class="flat-desc">${p.description}</p>
+              ${clickable ? `<div class="flat-foot">Open →</div>` : ''}
+            </div>
+          `;
+        });
+        html += `</div>`;
+      }
+
+      html += `</div>`;
+    });
+    document.getElementById('app').innerHTML = html;
+
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.platform-folder').forEach(el => el.classList.add('animate-in'));
+    });
+  }
+
+  function initSearch() {
+    const input = document.getElementById('search-input');
+    const clearBtn = document.getElementById('search-clear');
+    if (!input) return;
+
+    document.addEventListener('keydown', e => {
+      if (e.key === '/' && document.activeElement !== input) {
+        e.preventDefault(); input.focus(); input.select();
+      }
+      if (e.key === 'Escape' && document.activeElement === input) {
+        input.value = ''; input.blur(); filterPlatforms('');
+        clearBtn.classList.remove('visible');
+      }
+    });
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim();
+      clearBtn.classList.toggle('visible', q.length > 0);
+      filterPlatforms(q);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      input.value = ''; clearBtn.classList.remove('visible');
+      filterPlatforms(''); input.focus();
+    });
+  }
+
+  function filterPlatforms(query) {
+    const q = query.toLowerCase();
+    let anyVisible = false;
+
+    // --- Platform folders ---
+    let platformsHasMatch = false;
+    document.querySelectorAll('.platform-folder').forEach(folder => {
+      const platformId = folder.id.replace('f-', '');
+      const platform = (PROJECTS.platforms || []).find(p => p.id === platformId);
+      if (!platform) return;
+
+      if (!q) {
+        folder.style.display = '';
+        folder.style.opacity = '';
+        folder.style.transform = '';
+        folder.querySelectorAll('.app-card').forEach(c => c.style.display = '');
+        platformsHasMatch = true;
+        return;
+      }
+
+      const platformMatch = platform.name.toLowerCase().includes(q);
+      const matchingApps = (platform.apps || []).filter(app =>
+        app.name.toLowerCase().includes(q) || (app.description || '').toLowerCase().includes(q)
+      );
+
+      if (platformMatch || matchingApps.length > 0) {
+        folder.style.display = '';
+        folder.style.opacity = '1';
+        folder.style.transform = 'translateY(0)';
+        platformsHasMatch = true;
+
+        if (!platformMatch && matchingApps.length > 0) {
+          folder.classList.add('open');
+          folder.querySelectorAll('.app-card').forEach(card => {
+            const name = card.querySelector('.app-name')?.textContent || '';
+            const desc = card.querySelector('.app-desc')?.textContent || '';
+            const matches = name.toLowerCase().includes(q) || desc.toLowerCase().includes(q);
+            card.style.display = matches ? '' : 'none';
+          });
+        }
+      } else {
+        folder.style.display = 'none';
+      }
+    });
+
+    // Show/hide the Platforms section-block header
+    const platformsBlock = document.querySelector('.section-block[data-section="platforms"]');
+    if (platformsBlock) {
+      platformsBlock.style.display = (!q || platformsHasMatch) ? '' : 'none';
+      if (platformsHasMatch) anyVisible = true;
+    }
+
+    // --- Flat sections (Decks, Marketing, etc.) ---
+    document.querySelectorAll('.section-block:not([data-section="platforms"])').forEach(block => {
+      const flatCards = block.querySelectorAll('.flat-card');
+      if (!flatCards.length) return;
+
+      if (!q) {
+        block.style.display = '';
+        flatCards.forEach(c => c.style.display = '');
+        return;
+      }
+
+      let blockHasMatch = false;
+      flatCards.forEach(card => {
+        const name = card.querySelector('.flat-name')?.textContent || '';
+        const desc = card.querySelector('.flat-desc')?.textContent || '';
+        const matches = name.toLowerCase().includes(q) || desc.toLowerCase().includes(q);
+        card.style.display = matches ? '' : 'none';
+        if (matches) blockHasMatch = true;
+      });
+
+      block.style.display = blockHasMatch ? '' : 'none';
+      if (blockHasMatch) anyVisible = true;
+    });
+
+    let emptyEl = document.getElementById('search-empty');
+    if (!anyVisible && q) {
+      if (!emptyEl) {
+        emptyEl = document.createElement('div');
+        emptyEl.id = 'search-empty';
+        emptyEl.className = 'search-empty';
+        document.getElementById('app').appendChild(emptyEl);
+      }
+      emptyEl.innerHTML = `<strong>No results for "${query}"</strong>Try a platform name or app name`;
+      emptyEl.style.display = '';
+    } else if (emptyEl) {
+      emptyEl.style.display = 'none';
+    }
+  }
+
+  render();
+  initSearch();
+</script>
+</body>
+</html>

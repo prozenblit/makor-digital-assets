@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equity Derivatives Auction — Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-primary);
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ── */
+    .sc-wrap { display: flex; min-height: 100vh; }
+
+    .sc-sidenav {
+      width: 220px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      scrollbar-width: none;
+    }
+    .sc-sidenav::-webkit-scrollbar { display: none; }
+
+    .sc-logo {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+    .sc-logo-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      letter-spacing: 0.02em;
+    }
+    .sc-logo-name span { color: var(--color-brand); }
+    .sc-logo-sub {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-top: 3px;
+      letter-spacing: 0.03em;
+    }
+
+    .sc-nav { padding: 10px 0; flex: 1; }
+    .sc-nav a {
+      display: block;
+      padding: 7px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: color 0.1s, background 0.1s;
+      border-radius: 0;
+    }
+    .sc-nav a:hover { color: var(--color-brand); background: var(--color-brand-ghost); }
+    .sc-nav a.active { color: var(--color-brand); font-weight: 600; }
+
+    .sc-nav-group {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-tertiary);
+      padding: 14px 18px 4px;
+    }
+
+    /* ── Main ── */
+    .sc-main {
+      flex: 1;
+      min-width: 0;
+      padding: 48px 56px;
+    }
+
+    /* ── Section ── */
+    .sc-section {
+      max-width: 920px;
+      margin-bottom: 64px;
+      scroll-margin-top: 32px;
+    }
+    .sc-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      color: var(--color-brand);
+      margin-bottom: 6px;
+    }
+    .sc-section-heading {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    /* ── Row / group ── */
+    .sc-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .sc-row.column { flex-direction: column; align-items: flex-start; }
+    .sc-row.center { align-items: center; }
+
+    /* ── Label ── */
+    .sc-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--color-text-tertiary);
+      margin-bottom: 8px;
+    }
+    .sc-group + .sc-group { margin-top: 20px; }
+
+    /* ── Color swatches ── */
+    .sc-swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .sc-swatch {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+    .sc-swatch-color { height: 56px; }
+    .sc-swatch-info {
+      padding: 8px 10px;
+      background: var(--color-surface);
+    }
+    .sc-swatch-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .sc-swatch-val {
+      font-family: monospace;
+      font-size: 10px;
+      color: var(--color-text-tertiary);
+      margin-top: 2px;
+    }
+
+    /* ── Type specimen ── */
+    .sc-type-row {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .sc-type-meta {
+      min-width: 80px;
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      flex-shrink: 0;
+    }
+
+    /* ── Demo surface ── */
+    .sc-demo {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .sc-demo-raised {
+      background: var(--color-surface-raised);
+    }
+
+    /* ── Separator ── */
+    .sc-sep {
+      height: 1px;
+      background: var(--color-border);
+      margin: 28px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="sc-wrap">
+
+  <!-- ── SIDENAV ── -->
+  <nav class="sc-sidenav">
+    <div class="sc-logo">
+      <div class="sc-logo-name">EQUITY DERIVATIVES <span>AUCTION</span></div>
+      <div class="sc-logo-sub">Design System</div>
+    </div>
+    <div class="sc-nav">
+      <div class="sc-nav-group">Foundation</div>
+      <a href="#colors">Colors</a>
+      <a href="#typography">Typography</a>
+      <a href="#spacing">Spacing & Sizing</a>
+
+      <div class="sc-nav-group">Controls</div>
+      <a href="#buttons">Buttons</a>
+      <a href="#inputs">Inputs</a>
+      <a href="#toggle">Toggle Switch</a>
+      <a href="#checkbox">Checkbox</a>
+
+      <div class="sc-nav-group">Display</div>
+      <a href="#badges">Badges</a>
+      <a href="#tables">Tables</a>
+      <a href="#nav">Navigation & Header</a>
+
+      <div class="sc-nav-group">Auction UI</div>
+      <a href="#session-card">Session Card</a>
+      <a href="#notification">Order Notification</a>
+      <a href="#cancel-dropdown">Cancel Dropdown</a>
+
+      <div class="sc-nav-group">Admin UI</div>
+      <a href="#modals">Modals</a>
+      <a href="#admin-table">Admin Table</a>
+
+      <div class="sc-nav-group">Feedback</div>
+      <a href="#cards">Cards</a>
+      <a href="#toast">Toast</a>
+      <a href="#pagination">Pagination</a>
+    </div>
+  </nav>
+
+  <!-- ── MAIN ── -->
+  <main class="sc-main">
+
+    <!-- HEADER -->
+    <div style="margin-bottom:56px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:var(--color-brand);margin-bottom:6px;">Component Library</div>
+      <h1 style="font-size:32px;font-weight:700;letter-spacing:-.02em;color:var(--color-text-primary);">Equity Derivatives Auction</h1>
+      <p style="font-size:15px;color:var(--color-text-secondary);margin-top:8px;line-height:1.6;">Design system for the equity derivatives auction platform.<br>Inter · 6–8–10px radius · Dark mode only · Desktop only.</p>
+    </div>
+
+
+    <!-- ════ COLORS ════ -->
+    <section class="sc-section" id="colors">
+      <div class="sc-section-title">Foundation</div>
+      <h2 class="sc-section-heading">Colors</h2>
+
+      <div class="sc-label">Brand (Teal)</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#7AEFEF;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Brand</div><div class="sc-swatch-val">#7AEFEF</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#5ADADA;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Brand Hover</div><div class="sc-swatch-val">#5ADADA</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:rgba(122,239,239,0.10);border:1px solid var(--color-border);"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Brand Ghost</div><div class="sc-swatch-val">rgba(122,239,239,.10)</div></div>
+        </div>
+      </div>
+
+      <div class="sc-label">Surfaces (Dark)</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#0F1123;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Sidebar BG</div><div class="sc-swatch-val">#0F1123</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#151729;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Page BG</div><div class="sc-swatch-val">#151729</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#1A1B2E;border:1px solid var(--color-border);"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Input BG</div><div class="sc-swatch-val">#1A1B2E</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#1E2035;border:1px solid var(--color-border);"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Surface / Cards</div><div class="sc-swatch-val">#1E2035</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#252740;border:1px solid var(--color-border);"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Surface Raised</div><div class="sc-swatch-val">#252740</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#2D2F4A;border:1px solid var(--color-border);"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Border</div><div class="sc-swatch-val">#2D2F4A</div></div>
+        </div>
+      </div>
+
+      <div class="sc-label">Text</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#F0F0F8;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Primary</div><div class="sc-swatch-val">#F0F0F8</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#8B8EA8;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Secondary</div><div class="sc-swatch-val">#8B8EA8</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#5A5C70;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Tertiary</div><div class="sc-swatch-val">#5A5C70</div></div>
+        </div>
+      </div>
+
+      <div class="sc-label">Status & Action Colors</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#4DCC9B;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Success / In the Mix</div><div class="sc-swatch-val">#4DCC9B</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#E57373;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Cancel / Reject</div><div class="sc-swatch-val">#E57373</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#EF4444;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Error (Bid &gt;= Ask)</div><div class="sc-swatch-val">#EF4444</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#F59E0B;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Timer / Warning</div><div class="sc-swatch-val">#F59E0B</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#4A4B60;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Toggle Inactive</div><div class="sc-swatch-val">#4A4B60</div></div>
+        </div>
+      </div>
+
+      <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;padding:16px 20px;">
+        <div style="font-size:12px;font-weight:700;color:var(--color-text-primary);margin-bottom:10px;">Color rules — never swap</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:50%;background:#7AEFEF;flex-shrink:0;"></div>
+            <span style="font-size:13px;color:var(--color-text-secondary);">#7AEFEF — Confirm/Save/Add buttons, M logo, equilibrium price label, focus rings, active toggles</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:50%;background:#E57373;flex-shrink:0;"></div>
+            <span style="font-size:13px;color:var(--color-text-secondary);">#E57373 — Cancel auction button (coral), Reject button — never for validation errors</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:50%;background:#EF4444;flex-shrink:0;"></div>
+            <span style="font-size:13px;color:var(--color-text-secondary);">#EF4444 — Input validation error ONLY (Bid &gt;= Ask) — never for cancel buttons</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:50%;background:#F59E0B;flex-shrink:0;"></div>
+            <span style="font-size:13px;color:var(--color-text-secondary);">#F59E0B — Timer badges (Time Left / Starting In), warning tooltips</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:12px;height:12px;border-radius:50%;background:#4DCC9B;flex-shrink:0;"></div>
+            <span style="font-size:13px;color:var(--color-text-secondary);">#4DCC9B — "In the mix" badge only</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ TYPOGRAPHY ════ -->
+    <section class="sc-section" id="typography">
+      <div class="sc-section-title">Foundation</div>
+      <h2 class="sc-section-heading">Typography</h2>
+
+      <div class="sc-label">Inter — UI text</div>
+      <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;overflow:hidden;margin-bottom:20px;">
+        <div class="sc-type-row">
+          <div class="sc-type-meta">24px / 700</div>
+          <div style="font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.2;">New Internal User</div>
+        </div>
+        <div class="sc-type-row">
+          <div class="sc-type-meta">20px / 700</div>
+          <div style="font-size:20px;font-weight:700;">Edit Client</div>
+        </div>
+        <div class="sc-type-row">
+          <div class="sc-type-meta">16px / 700</div>
+          <div style="font-size:16px;font-weight:700;">Europe Equities — Cash Close</div>
+        </div>
+        <div class="sc-type-row">
+          <div class="sc-type-meta">14px / 700</div>
+          <div style="font-size:14px;font-weight:700;">FTSE 100 IDX FUT Sep25</div>
+        </div>
+        <div class="sc-type-row">
+          <div class="sc-type-meta">14px / 400</div>
+          <div style="font-size:14px;font-weight:400;color:var(--color-text-secondary);">Your Buy EURO STOXX 50 Sep25 CC: 400 @ 41</div>
+        </div>
+        <div class="sc-type-row">
+          <div class="sc-type-meta">13px / 400</div>
+          <div style="font-size:13px;color:var(--color-text-secondary);">min size: 350 &nbsp;·&nbsp; Eq: 7,643.00</div>
+        </div>
+        <div class="sc-type-row" style="border-bottom:none;">
+          <div class="sc-type-meta">12px / 600</div>
+          <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-secondary);">Size &nbsp;&nbsp; Bid &nbsp;&nbsp; Ask &nbsp;&nbsp; Spread</div>
+        </div>
+      </div>
+
+      <div class="sc-label">Tabular figures — bid/ask columns</div>
+      <div class="sc-demo">
+        <div style="display:grid;grid-template-columns:repeat(4,auto);gap:4px 24px;justify-content:start;">
+          <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-secondary);">Size</span>
+          <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-secondary);">Bid</span>
+          <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-secondary);">Ask</span>
+          <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-secondary);">Spread</span>
+          <span style="font-size:14px;color:var(--color-text-secondary);font-variant-numeric:tabular-nums;">500</span>
+          <span style="font-size:14px;font-variant-numeric:tabular-nums;">7,641</span>
+          <span style="font-size:14px;font-variant-numeric:tabular-nums;">7,645</span>
+          <span style="font-size:14px;color:var(--color-text-secondary);font-variant-numeric:tabular-nums;">4</span>
+          <span style="font-size:14px;color:var(--color-text-secondary);font-variant-numeric:tabular-nums;">1,000</span>
+          <span style="font-size:14px;font-variant-numeric:tabular-nums;">7,638</span>
+          <span style="font-size:14px;font-variant-numeric:tabular-nums;">7,646</span>
+          <span style="font-size:14px;color:var(--color-text-secondary);font-variant-numeric:tabular-nums;">8</span>
+        </div>
+        <p style="font-size:12px;color:var(--color-text-tertiary);margin-top:12px;">font-variant-numeric: tabular-nums ensures columns stay perfectly aligned as prices update.</p>
+      </div>
+    </section>
+
+
+    <!-- ════ SPACING ════ -->
+    <section class="sc-section" id="spacing">
+      <div class="sc-section-title">Foundation</div>
+      <h2 class="sc-section-heading">Spacing & Sizing</h2>
+
+      <div class="sc-label">Control heights</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:monospace;font-size:11px;color:var(--color-text-tertiary);width:60px;">24px</div>
+          <div style="height:24px;background:var(--color-brand-ghost);border:1px solid var(--color-brand-ghost-border);border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:11px;color:var(--color-brand);">Badge / Chip</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:monospace;font-size:11px;color:var(--color-text-tertiary);width:60px;">28px</div>
+          <div style="height:28px;background:var(--color-status-warning-bg);border:1px solid var(--color-status-warning-border);border-radius:6px;display:flex;align-items:center;padding:0 10px;font-size:12px;color:var(--color-status-warning);">Timer Badge</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:monospace;font-size:11px;color:var(--color-text-tertiary);width:60px;">32px</div>
+          <div style="height:32px;background:var(--color-surface-raised);border:1px solid var(--color-border);border-radius:6px;display:flex;align-items:center;padding:0 12px;font-size:13px;color:var(--color-text-secondary);">Small button</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:monospace;font-size:11px;color:var(--color-text-tertiary);width:60px;">36px</div>
+          <div style="height:36px;background:var(--color-brand);border-radius:6px;display:flex;align-items:center;padding:0 16px;font-size:14px;font-weight:600;color:#000;">Confirm button / Input</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:monospace;font-size:11px;color:var(--color-text-tertiary);width:60px;">40px</div>
+          <div style="height:40px;background:var(--color-input-bg);border:1px solid var(--color-border);border-radius:6px;display:flex;align-items:center;padding:0 14px;font-size:14px;color:var(--color-text-tertiary);">Modal form input</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-family:monospace;font-size:11px;color:var(--color-text-tertiary);width:60px;">52px</div>
+          <div style="height:52px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:6px;display:flex;align-items:center;padding:0 16px;font-size:14px;color:var(--color-text-secondary);">Top header bar</div>
+        </div>
+      </div>
+
+      <div class="sc-label">Border radius</div>
+      <div class="sc-demo" style="display:flex;gap:20px;align-items:flex-end;flex-wrap:wrap;">
+        <div style="text-align:center;">
+          <div style="width:48px;height:48px;border:2px solid var(--color-border);border-radius:4px;margin:0 auto 8px;"></div>
+          <div style="font-size:11px;color:var(--color-text-tertiary);">4px<br>badges</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:48px;height:48px;border:2px solid var(--color-border);border-radius:6px;margin:0 auto 8px;"></div>
+          <div style="font-size:11px;color:var(--color-text-tertiary);">6px<br>buttons, inputs</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:48px;height:48px;border:2px solid var(--color-border);border-radius:8px;margin:0 auto 8px;"></div>
+          <div style="font-size:11px;color:var(--color-text-tertiary);">8px<br>session cards</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:48px;height:48px;border:2px solid var(--color-border);border-radius:10px;margin:0 auto 8px;"></div>
+          <div style="font-size:11px;color:var(--color-text-tertiary);">10px<br>modals</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:32px;height:32px;border:2px solid var(--color-border);border-radius:50%;margin:0 auto 8px;"></div>
+          <div style="font-size:11px;color:var(--color-text-tertiary);">50%<br>avatars</div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ BUTTONS ════ -->
+    <section class="sc-section" id="buttons">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Buttons</h2>
+
+      <div class="sc-label">Primary actions</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <button class="btn btn-primary">Confirm</button>
+          <button class="btn btn-primary">Save Changes</button>
+          <button class="btn btn-primary">Add New</button>
+          <button class="btn btn-primary" disabled>Disabled</button>
+        </div>
+      </div>
+
+      <div class="sc-label">Cancel & reject (coral)</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <button class="btn btn-cancel-dropdown">
+            Cancel
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4l3 3 3-3"/></svg>
+          </button>
+          <button class="btn btn-reject">Reject</button>
+        </div>
+      </div>
+
+      <div class="sc-label">Modal Cancel (white)</div>
+      <div class="sc-demo sc-demo-raised">
+        <div class="sc-row center">
+          <button class="btn btn-white">Cancel</button>
+          <button class="btn btn-ghost">Add Row</button>
+        </div>
+      </div>
+
+      <div class="sc-label">Small buttons</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <button class="btn btn-primary btn-sm">Save</button>
+          <button class="btn btn-white btn-sm">Cancel</button>
+          <button class="btn btn-cancel-dropdown btn-sm">
+            Cancel
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4l3 3 3-3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="sc-label">Icon buttons & delete</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <button class="btn-icon" title="Settings">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <circle cx="8" cy="8" r="2.5"/>
+              <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.1 3.1l1.4 1.4M11.5 11.5l1.4 1.4M3.1 12.9l1.4-1.4M11.5 4.5l1.4-1.4"/>
+            </svg>
+          </button>
+          <button class="btn-icon" title="Refresh">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M1.5 8a6.5 6.5 0 1 0 1.1-3.6M1.5 1v3.5H5"/>
+            </svg>
+          </button>
+          <span style="width:1px;height:24px;background:var(--color-border);"></span>
+          <button class="row-delete-btn" title="Remove row">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M2 2l6 6M8 2l-6 6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ INPUTS ════ -->
+    <section class="sc-section" id="inputs">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Inputs</h2>
+
+      <div class="sc-label">Inline bid/ask inputs (auction table)</div>
+      <div class="sc-demo">
+        <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <span style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-tertiary);">Default</span>
+            <input type="number" class="input-inline" style="width:120px;" value="7641" placeholder="0">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <span style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-tertiary);">Focus</span>
+            <input type="number" class="input-inline" style="width:120px;border-color:var(--color-border-focus);box-shadow:var(--shadow-focus);" value="7645">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <span style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-tertiary);">Error (Bid &gt;= Ask)</span>
+            <input type="number" class="input-inline error" style="width:120px;" value="7700">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <span style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--color-text-tertiary);">Empty</span>
+            <input type="number" class="input-inline" style="width:120px;" placeholder="0">
+          </div>
+        </div>
+        <div style="margin-top:12px;">
+          <span class="warning-inline">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M6 1L11 10H1L6 1z"/><path d="M6 5v2M6 8.5v.5"/>
+            </svg>
+            Bid should be lower than Ask
+          </span>
+        </div>
+      </div>
+
+      <div class="sc-label">Modal form inputs</div>
+      <div class="sc-demo sc-demo-raised">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:480px;">
+          <div class="field">
+            <label class="field-label">Username</label>
+            <div class="field-wrap">
+              <input type="text" class="field-input" placeholder="Enter username">
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Email</label>
+            <div class="field-wrap">
+              <input type="email" class="field-input" placeholder="user@company.com">
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">First Name</label>
+            <div class="field-wrap">
+              <input type="text" class="field-input" value="John">
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Last Name (error)</label>
+            <div class="field-wrap">
+              <input type="text" class="field-input error" value="">
+            </div>
+            <span class="field-error show">Last name is required.</span>
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <div class="field-wrap" style="max-width:240px;">
+            <span class="field-prefix-icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <circle cx="6" cy="6" r="4"/><path d="M10 10l2.5 2.5"/>
+              </svg>
+            </span>
+            <input type="search" class="field-input with-prefix" placeholder="Search users...">
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ TOGGLE SWITCH ════ -->
+    <section class="sc-section" id="toggle">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Toggle Switch</h2>
+
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <div class="toggle-wrap" onclick="this.querySelector('.toggle-track').classList.toggle('on');this.querySelector('.toggle-label').textContent=this.querySelector('.toggle-track').classList.contains('on')?'Active':'Inactive'">
+            <div class="toggle-track on">
+              <div class="toggle-thumb"></div>
+            </div>
+            <span class="toggle-label">Active</span>
+          </div>
+          <div class="toggle-wrap" onclick="this.querySelector('.toggle-track').classList.toggle('on');this.querySelector('.toggle-label').textContent=this.querySelector('.toggle-track').classList.contains('on')?'Active':'Inactive'">
+            <div class="toggle-track">
+              <div class="toggle-thumb"></div>
+            </div>
+            <span class="toggle-label">Inactive</span>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--color-text-tertiary);margin-top:16px;">Click to toggle. Used in user modals for Active/Inactive status.</p>
+      </div>
+    </section>
+
+
+    <!-- ════ CHECKBOX ════ -->
+    <section class="sc-section" id="checkbox">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Checkbox</h2>
+
+      <div class="sc-demo">
+        <div class="sc-row column">
+          <label class="checkbox-row checked" onclick="this.classList.toggle('checked')">
+            <span class="cb-box">
+              <svg class="cb-check" viewBox="0 0 10 10" fill="none">
+                <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="cb-label">Admin</span>
+          </label>
+          <label class="checkbox-row" onclick="this.classList.toggle('checked')">
+            <span class="cb-box">
+              <svg class="cb-check" viewBox="0 0 10 10" fill="none">
+                <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="cb-label">Unchecked</span>
+          </label>
+          <label class="checkbox-row indeterminate">
+            <span class="cb-box">
+              <svg class="cb-check" viewBox="0 0 10 10" fill="none" style="opacity:1;">
+                <path d="M2 5h6" stroke="var(--color-brand)" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span class="cb-label">Indeterminate (All)</span>
+          </label>
+          <label class="checkbox-row" style="pointer-events:none;opacity:0.4;">
+            <span class="cb-box"></span>
+            <span class="cb-label">Disabled</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ BADGES ════ -->
+    <section class="sc-section" id="badges">
+      <div class="sc-section-title">Display</div>
+      <h2 class="sc-section-heading">Badges</h2>
+
+      <div class="sc-label">Session type</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <span class="badge-session-type">Cash Close</span>
+          <span class="badge-session-type">EFP</span>
+        </div>
+      </div>
+
+      <div class="sc-label">Timer badges</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <span class="badge-timer">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="6" cy="6" r="5"/><path d="M6 3v3l2 1"/>
+            </svg>
+            Time Left: 04:32
+          </span>
+          <span class="badge-timer">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="6" cy="6" r="5"/><path d="M6 3v3l2 1"/>
+            </svg>
+            Starting In: 12:00
+          </span>
+        </div>
+      </div>
+
+      <div class="sc-label">Status inline</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <span class="badge-in-the-mix">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6l3 3 5-5"/></svg>
+            In the mix
+          </span>
+          <span class="warning-inline">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1L11 10H1L6 1z"/><path d="M6 5v2M6 8.5v.5"/></svg>
+            Bid should be lower than Ask
+          </span>
+        </div>
+      </div>
+
+      <div class="sc-label">General status badges</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <span class="badge badge-success">Active</span>
+          <span class="badge badge-warning">Pending</span>
+          <span class="badge badge-danger">Error</span>
+          <span class="badge badge-brand">Live</span>
+          <span class="badge-review">Review (12)</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ TABLES ════ -->
+    <section class="sc-section" id="tables">
+      <div class="sc-section-title">Display</div>
+      <h2 class="sc-section-heading">Tables</h2>
+
+      <div class="sc-label">Auction bid/ask table</div>
+      <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;overflow:hidden;margin-bottom:20px;">
+        <table class="auction-table" style="padding:0 16px;">
+          <thead>
+            <tr>
+              <th>Size</th>
+              <th>Bid</th>
+              <th>Ask</th>
+              <th>Spread</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-size">500</td>
+              <td class="col-bid"><input type="number" class="input-inline" value="7641" placeholder="0" style="width:100px;"></td>
+              <td class="col-ask"><input type="number" class="input-inline" value="7645" placeholder="0" style="width:100px;"></td>
+              <td class="col-spread"><span style="font-size:13px;color:var(--color-text-secondary);font-variant-numeric:tabular-nums;">4</span></td>
+              <td style="text-align:right;">
+                <button class="row-delete-btn" title="Remove">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="5" style="padding-top:2px;padding-bottom:8px;">
+                <span class="badge-in-the-mix">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6l3 3 5-5"/></svg>
+                  In the mix
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td class="col-size">1,000</td>
+              <td class="col-bid"><input type="number" class="input-inline error" value="7710" placeholder="0" style="width:100px;"></td>
+              <td class="col-ask"><input type="number" class="input-inline" value="7700" placeholder="0" style="width:100px;"></td>
+              <td class="col-spread"></td>
+              <td style="text-align:right;">
+                <button class="row-delete-btn" title="Remove">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="5" style="padding-top:2px;padding-bottom:8px;">
+                <span class="warning-inline">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1L11 10H1L6 1z"/><path d="M6 5v2M6 8.5v.5"/></svg>
+                  Bid should be lower than Ask
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <!-- ════ NAVIGATION ════ -->
+    <section class="sc-section" id="nav">
+      <div class="sc-section-title">Display</div>
+      <h2 class="sc-section-heading">Navigation & Header</h2>
+
+      <div style="border:1px solid var(--color-border);border-radius:8px;overflow:hidden;">
+        <!-- App shell preview -->
+        <div style="display:flex;height:200px;">
+          <!-- Sidebar -->
+          <div style="width:56px;background:var(--color-sidebar-bg);border-right:1px solid var(--color-border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;">
+            <div style="color:var(--color-brand);font-size:18px;font-weight:700;margin-bottom:8px;">M</div>
+            <div style="width:40px;height:40px;border-radius:8px;background:var(--color-brand-ghost);display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="var(--color-brand)" stroke-width="1.5" stroke-linecap="round">
+                <rect x="2" y="3" width="14" height="11" rx="2"/><path d="M6 3V2M12 3V2M2 7h14"/>
+              </svg>
+            </div>
+            <div style="width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" stroke-linecap="round">
+                <path d="M4 6h10M4 9h7M4 12h5"/>
+              </svg>
+            </div>
+            <div style="width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" stroke-linecap="round">
+                <circle cx="9" cy="7" r="3"/><path d="M2 16c0-3.3 3.1-6 7-6s7 2.7 7 6"/>
+              </svg>
+            </div>
+          </div>
+          <!-- Content area -->
+          <div style="flex:1;display:flex;flex-direction:column;">
+            <!-- Header -->
+            <div style="height:52px;background:var(--color-surface);border-bottom:1px solid var(--color-border);display:flex;align-items:center;padding:0 24px;gap:16px;">
+              <span style="font-size:16px;font-weight:600;color:var(--color-text-primary);">Equity Derivatives Auction</span>
+              <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--color-text-secondary);">
+                <span>Equities</span>
+                <span style="color:var(--color-text-tertiary);">›</span>
+                <span>Cash Auctions</span>
+                <span style="color:var(--color-text-tertiary);">›</span>
+                <span style="color:var(--color-text-primary);font-weight:500;">Europe Equities</span>
+              </div>
+              <div style="flex:1;"></div>
+              <div class="user-avatar">PR</div>
+            </div>
+            <!-- Body placeholder -->
+            <div style="flex:1;padding:16px 24px;display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:13px;color:var(--color-text-tertiary);">Auction session cards appear here</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ SESSION CARD ════ -->
+    <section class="sc-section" id="session-card">
+      <div class="sc-section-title">Auction UI</div>
+      <h2 class="sc-section-heading">Session Card</h2>
+
+      <div class="session-card">
+        <!-- Session header -->
+        <div class="session-header">
+          <span class="session-name">Europe Equities — Cash Close</span>
+          <span class="badge-session-type">Cash Close</span>
+          <span class="badge-timer">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="6" cy="6" r="5"/><path d="M6 3v3l2 1"/>
+            </svg>
+            Time Left: 04:32
+          </span>
+          <div class="session-header-spacer"></div>
+          <div class="session-header-actions">
+            <div style="position:relative;display:inline-block;">
+              <button class="btn btn-cancel-dropdown" onclick="toggleDropdown('dd1')">
+                Cancel
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4l3 3 3-3"/></svg>
+              </button>
+              <div class="cancel-dropdown" id="dd1" style="display:none;">
+                <button class="cancel-dropdown-item">All Bid</button>
+                <button class="cancel-dropdown-item">All Ask</button>
+                <button class="cancel-dropdown-item danger">All</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instrument 1 — FTSE 100 -->
+        <div class="instrument-row">
+          <div class="instrument-header">
+            <span class="instrument-name">FTSE 100 IDX FUT Sep25</span>
+            <span class="instrument-meta">min size: 350</span>
+            <div class="instrument-eq">
+              <span class="instrument-eq-label">Eq:</span>
+              <span class="instrument-eq-value">7,643.00</span>
+            </div>
+            <div class="instrument-header-spacer"></div>
+            <div style="position:relative;display:inline-block;">
+              <button class="btn btn-cancel-dropdown btn-sm" onclick="toggleDropdown('dd2')">
+                Cancel
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4l3 3 3-3"/></svg>
+              </button>
+              <div class="cancel-dropdown" id="dd2" style="display:none;">
+                <button class="cancel-dropdown-item">All Bid</button>
+                <button class="cancel-dropdown-item">All Ask</button>
+                <button class="cancel-dropdown-item danger">All</button>
+              </div>
+            </div>
+          </div>
+          <table class="auction-table">
+            <thead>
+              <tr>
+                <th>Size</th>
+                <th>Bid</th>
+                <th>Ask</th>
+                <th>Spread</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="col-size">500</td>
+                <td class="col-bid"><input type="number" class="input-inline" value="7641" style="width:110px;"></td>
+                <td class="col-ask"><input type="number" class="input-inline" value="7645" style="width:110px;"></td>
+                <td class="col-spread"><span style="font-size:13px;color:var(--color-text-secondary);font-variant-numeric:tabular-nums;">4</span></td>
+                <td style="text-align:right;">
+                  <button class="row-delete-btn" title="Remove">
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="5" style="padding-top:0;padding-bottom:8px;">
+                  <span class="badge-in-the-mix">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6l3 3 5-5"/></svg>
+                    In the mix
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Instrument 2 — CAC40 with error -->
+        <div class="instrument-row">
+          <div class="instrument-header">
+            <span class="instrument-name">CAC40 IDX FUT Sep25</span>
+            <span class="instrument-meta">min size: 200</span>
+            <div class="instrument-header-spacer"></div>
+          </div>
+          <table class="auction-table">
+            <thead>
+              <tr><th>Size</th><th>Bid</th><th>Ask</th><th>Spread</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="col-size">200</td>
+                <td class="col-bid"><input type="number" class="input-inline" value="7710" style="width:110px;"></td>
+                <td class="col-ask"><input type="number" class="input-inline error" value="7700" style="width:110px;"></td>
+                <td class="col-spread"></td>
+                <td style="text-align:right;">
+                  <button class="row-delete-btn" title="Remove">
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 2l6 6M8 2l-6 6"/></svg>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="5" style="padding-top:0;padding-bottom:8px;">
+                  <span class="warning-inline">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1L11 10H1L6 1z"/><path d="M6 5v2M6 8.5v.5"/></svg>
+                    Bid should be lower than Ask
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Upcoming session card -->
+      <div class="session-card" style="margin-top:16px;">
+        <div class="session-header">
+          <span class="session-name">Asia Pacific — EFP</span>
+          <span class="badge-session-type">EFP</span>
+          <span class="badge-timer">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="6" cy="6" r="5"/><path d="M6 3v3l2 1"/>
+            </svg>
+            Starting In: 12:00
+          </span>
+          <div class="session-header-spacer"></div>
+          <div class="session-header-actions">
+            <button class="btn btn-cancel-dropdown">
+              Cancel
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4l3 3 3-3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="instrument-row">
+          <div class="instrument-header">
+            <span class="instrument-name">EURO STOXX 50 Sep25</span>
+            <span class="instrument-meta">min size: 500</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ ORDER NOTIFICATION ════ -->
+    <section class="sc-section" id="notification">
+      <div class="sc-section-title">Auction UI</div>
+      <h2 class="sc-section-heading">Order Confirmation Notification</h2>
+
+      <div class="sc-label">Static preview (normally fixed top-right)</div>
+      <div style="max-width:380px;">
+        <div style="background:var(--color-surface-raised);border:1px solid var(--color-border);border-radius:10px;box-shadow:var(--shadow-notification);padding:20px;display:flex;flex-direction:column;gap:16px;">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Orders placed</div>
+            <div style="font-size:14px;color:var(--color-text-primary);line-height:1.4;">Your Buy EURO STOXX 50 Sep25 CC: 400 @ 41</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-reject">Reject</button>
+            <button class="btn btn-primary">Confirm</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <button class="btn btn-ghost btn-sm" onclick="showOrderNotification()">Show live notification (top-right)</button>
+      </div>
+
+      <!-- Live notification element -->
+      <div class="order-notification" id="order-notif" style="display:none;">
+        <div>
+          <div class="order-notification-label">Orders placed</div>
+          <div class="order-notification-text">Your Buy EURO STOXX 50 Sep25 CC: 400 @ 41</div>
+        </div>
+        <div class="order-notification-actions">
+          <button class="btn btn-reject" onclick="dismissNotification()">Reject</button>
+          <button class="btn btn-primary" onclick="dismissNotification()">Confirm</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ CANCEL DROPDOWN ════ -->
+    <section class="sc-section" id="cancel-dropdown">
+      <div class="sc-section-title">Auction UI</div>
+      <h2 class="sc-section-heading">Cancel Dropdown Menu</h2>
+
+      <div class="sc-demo" style="display:flex;gap:24px;align-items:flex-start;">
+        <div style="position:relative;">
+          <button class="btn btn-cancel-dropdown" onclick="toggleDropdown('dd-demo')">
+            Cancel
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4l3 3 3-3"/></svg>
+          </button>
+          <div class="cancel-dropdown" id="dd-demo">
+            <button class="cancel-dropdown-item" onclick="toggleDropdown('dd-demo')">All Bid</button>
+            <button class="cancel-dropdown-item" onclick="toggleDropdown('dd-demo')">All Ask</button>
+            <button class="cancel-dropdown-item danger" onclick="toggleDropdown('dd-demo')">All</button>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.6;">The Cancel dropdown appears on each session card and on each instrument row. Options: All Bid / All Ask / All (in danger red). Click the button to toggle.</p>
+      </div>
+    </section>
+
+
+    <!-- ════ MODALS ════ -->
+    <section class="sc-section" id="modals">
+      <div class="sc-section-title">Admin UI</div>
+      <h2 class="sc-section-heading">Modals</h2>
+
+      <div class="sc-label">Trigger modals</div>
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <button class="btn btn-primary" onclick="openModal('modal-new-user')">New Internal User</button>
+          <button class="btn btn-primary" onclick="openModal('modal-edit-user')">Edit Internal User</button>
+          <button class="btn btn-ghost" onclick="openModal('modal-edit-client')">Edit Client</button>
+        </div>
+      </div>
+
+      <!-- New Internal User Modal -->
+      <div class="modal-overlay" id="modal-new-user" style="display:none;" onclick="if(event.target===this)closeModal('modal-new-user')">
+        <div class="modal">
+          <div class="modal-header">
+            <h2 class="modal-title">New Internal User</h2>
+          </div>
+          <div class="modal-body">
+            <div class="field">
+              <label class="field-label">Username</label>
+              <div class="field-wrap"><input type="text" class="field-input" placeholder="Enter username"></div>
+            </div>
+            <label class="checkbox-row" onclick="this.classList.toggle('checked')">
+              <span class="cb-box">
+                <svg class="cb-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="cb-label">Admin</span>
+            </label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="field">
+                <label class="field-label">First Name</label>
+                <div class="field-wrap"><input type="text" class="field-input" placeholder="First name"></div>
+              </div>
+              <div class="field">
+                <label class="field-label">Last Name</label>
+                <div class="field-wrap"><input type="text" class="field-input" placeholder="Last name"></div>
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Email</label>
+              <div class="field-wrap"><input type="email" class="field-input" placeholder="user@company.com"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:14px;color:var(--color-text-secondary);">Status</span>
+              <div class="toggle-wrap" onclick="toggleStatus(this)">
+                <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                <span class="toggle-label">Inactive</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-white" onclick="closeModal('modal-new-user')">Cancel</button>
+            <button class="btn btn-primary">Add New</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Internal User Modal -->
+      <div class="modal-overlay" id="modal-edit-user" style="display:none;" onclick="if(event.target===this)closeModal('modal-edit-user')">
+        <div class="modal">
+          <div class="modal-header">
+            <h2 class="modal-title">Edit Internal User</h2>
+          </div>
+          <div class="modal-body">
+            <div class="field">
+              <label class="field-label">Username</label>
+              <div class="field-wrap"><input type="text" class="field-input" value="jsmith"></div>
+            </div>
+            <label class="checkbox-row checked" onclick="this.classList.toggle('checked')">
+              <span class="cb-box">
+                <svg class="cb-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              <span class="cb-label">Admin</span>
+            </label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="field">
+                <label class="field-label">First Name</label>
+                <div class="field-wrap"><input type="text" class="field-input" value="John"></div>
+              </div>
+              <div class="field">
+                <label class="field-label">Last Name</label>
+                <div class="field-wrap"><input type="text" class="field-input" value="Smith"></div>
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Email</label>
+              <div class="field-wrap"><input type="email" class="field-input" value="j.smith@company.com"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:14px;color:var(--color-text-secondary);">Status</span>
+              <div class="toggle-wrap" onclick="toggleStatus(this)">
+                <div class="toggle-track on"><div class="toggle-thumb"></div></div>
+                <span class="toggle-label">Active</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-white" onclick="closeModal('modal-edit-user')">Cancel</button>
+            <button class="btn btn-primary">Save Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Client Modal -->
+      <div class="modal-overlay" id="modal-edit-client" style="display:none;" onclick="if(event.target===this)closeModal('modal-edit-client')">
+        <div class="modal" style="max-width:620px;">
+          <div class="modal-header">
+            <h2 class="modal-title">Edit Client</h2>
+          </div>
+          <div class="modal-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div class="field">
+                <label class="field-label">Client Name</label>
+                <div class="field-wrap"><input type="text" class="field-input" value="Acme Capital"></div>
+              </div>
+              <div class="field">
+                <label class="field-label">Makor X ID</label>
+                <div class="field-wrap"><input type="text" class="field-input" value="MX-00412"></div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Client User List</div>
+              <div class="field-wrap" style="margin-bottom:10px;">
+                <span class="field-prefix-icon">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="4"/><path d="M10 10l2.5 2.5"/></svg>
+                </span>
+                <input type="search" class="field-input with-prefix" placeholder="Search users...">
+              </div>
+              <table class="admin-table" style="border:1px solid var(--color-border);border-radius:8px;overflow:hidden;">
+                <thead>
+                  <tr>
+                    <th class="col-check"></th>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="col-check">
+                      <label class="checkbox-row checked" onclick="this.classList.toggle('checked')">
+                        <span class="cb-box"><svg class="cb-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                      </label>
+                    </td>
+                    <td>jsmith</td><td>John</td><td>Smith</td>
+                    <td style="color:var(--color-text-secondary);">j.smith@acme.com</td>
+                  </tr>
+                  <tr>
+                    <td class="col-check">
+                      <label class="checkbox-row" onclick="this.classList.toggle('checked')">
+                        <span class="cb-box"><svg class="cb-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                      </label>
+                    </td>
+                    <td>amiller</td><td>Alice</td><td>Miller</td>
+                    <td style="color:var(--color-text-secondary);">a.miller@acme.com</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:14px;color:var(--color-text-secondary);">Status</span>
+              <div class="toggle-wrap" onclick="toggleStatus(this)">
+                <div class="toggle-track on"><div class="toggle-thumb"></div></div>
+                <span class="toggle-label">Active</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-white" onclick="closeModal('modal-edit-client')">Cancel</button>
+            <button class="btn btn-primary">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ ADMIN TABLE ════ -->
+    <section class="sc-section" id="admin-table">
+      <div class="sc-section-title">Admin UI</div>
+      <h2 class="sc-section-heading">Admin Table</h2>
+
+      <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:8px;overflow:hidden;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th class="col-check">
+                <label class="checkbox-row indeterminate">
+                  <span class="cb-box">
+                    <svg class="cb-check" viewBox="0 0 10 10" fill="none" style="opacity:1;"><path d="M2 5h6" stroke="var(--color-brand)" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  </span>
+                </label>
+              </th>
+              <th>Username</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Email Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-check">
+                <label class="checkbox-row checked" onclick="this.classList.toggle('checked')">
+                  <span class="cb-box"><svg class="cb-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </label>
+              </td>
+              <td>jsmith</td><td>John</td><td>Smith</td>
+              <td style="color:var(--color-text-secondary);">j.smith@company.com</td>
+            </tr>
+            <tr>
+              <td class="col-check">
+                <label class="checkbox-row checked" onclick="this.classList.toggle('checked')">
+                  <span class="cb-box"><svg class="cb-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </label>
+              </td>
+              <td>amiller</td><td>Alice</td><td>Miller</td>
+              <td style="color:var(--color-text-secondary);">a.miller@company.com</td>
+            </tr>
+            <tr>
+              <td class="col-check">
+                <label class="checkbox-row" onclick="this.classList.toggle('checked')">
+                  <span class="cb-box"><svg class="cb-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </label>
+              </td>
+              <td>bwilson</td><td>Bob</td><td>Wilson</td>
+              <td style="color:var(--color-text-secondary);">b.wilson@company.com</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <!-- ════ CARDS ════ -->
+    <section class="sc-section" id="cards">
+      <div class="sc-section-title">Feedback</div>
+      <h2 class="sc-section-heading">Cards / Panels</h2>
+
+      <div class="sc-demo" style="padding:0;overflow:hidden;">
+        <div class="card-header">
+          <span class="card-title">User Management</span>
+          <button class="btn btn-primary btn-sm">Add New User</button>
+        </div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--color-text-secondary);">Card body — tables, forms, or other content go here.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ TOAST ════ -->
+    <section class="sc-section" id="toast">
+      <div class="sc-section-title">Feedback</div>
+      <h2 class="sc-section-heading">Toast</h2>
+
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Orders placed successfully.', 'success')">Success toast</button>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Failed to cancel auction. Please try again.', 'danger')">Error toast</button>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Changes saved.')">Default toast</button>
+        </div>
+        <p style="font-size:12px;color:var(--color-text-tertiary);margin-top:16px;">Appears bottom-center, dismisses after 3 seconds.</p>
+      </div>
+
+      <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+    </section>
+
+
+    <!-- ════ PAGINATION ════ -->
+    <section class="sc-section" id="pagination">
+      <div class="sc-section-title">Feedback</div>
+      <h2 class="sc-section-heading">Pagination</h2>
+
+      <div class="sc-demo">
+        <div class="pagination">
+          <button class="page-btn" disabled>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 3L5 7l4 4"/></svg>
+          </button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">4</button>
+          <button class="page-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+
+<script>
+  /* ── Dropdown toggle ── */
+  function toggleDropdown(id) {
+    const dd = document.getElementById(id);
+    if (!dd) return;
+    const isOpen = dd.style.display !== 'none';
+    // Close all dropdowns first
+    document.querySelectorAll('.cancel-dropdown').forEach(el => el.style.display = 'none');
+    if (!isOpen) dd.style.display = 'block';
+  }
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.btn-cancel-dropdown') && !e.target.closest('.cancel-dropdown')) {
+      document.querySelectorAll('.cancel-dropdown').forEach(el => el.style.display = 'none');
+    }
+  });
+
+  /* ── Modal open/close ── */
+  function openModal(id) {
+    document.getElementById(id).style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  /* ── Toggle status (Active/Inactive) ── */
+  function toggleStatus(wrap) {
+    const track = wrap.querySelector('.toggle-track');
+    const label = wrap.querySelector('.toggle-label');
+    track.classList.toggle('on');
+    label.textContent = track.classList.contains('on') ? 'Active' : 'Inactive';
+  }
+
+  /* ── Toggle switch (general) ── */
+  document.querySelectorAll('.toggle-wrap').forEach(wrap => {
+    if (!wrap.getAttribute('onclick')) {
+      wrap.addEventListener('click', function() {
+        const track = this.querySelector('.toggle-track');
+        const label = this.querySelector('.toggle-label');
+        track.classList.toggle('on');
+        if (label) label.textContent = track.classList.contains('on') ? 'Active' : 'Inactive';
+      });
+    }
+  });
+
+  /* ── Pagination ── */
+  document.querySelectorAll('.pagination .page-btn:not([disabled])').forEach(btn => {
+    btn.addEventListener('click', function() {
+      this.closest('.pagination').querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  /* ── Toast ── */
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (type ? ' ' + type : '');
+    void t.offsetWidth;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  /* ── Order notification ── */
+  function showOrderNotification() {
+    const el = document.getElementById('order-notif');
+    el.style.display = 'flex';
+    setTimeout(() => el.style.display = 'none', 5000);
+  }
+  function dismissNotification() {
+    document.getElementById('order-notif').style.display = 'none';
+  }
+
+  /* ── Active nav on scroll ── */
+  const sections = document.querySelectorAll('.sc-section');
+  const navLinks = document.querySelectorAll('.sc-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const link = document.querySelector(`.sc-nav a[href="#${entry.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,886 @@
+/* ============================================================
+   Enigma X — Component Styles
+   Requires: tokens.css loaded first
+   ============================================================ */
+
+/* ─── RESET ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+input:focus-visible { outline: none; } /* inputs use border + box-shadow instead */
+
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: var(--h-btn);
+  padding: 0 20px;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-primary);
+  font-size: var(--text-md);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--duration-fast) var(--ease-default),
+    opacity    var(--duration-fast) var(--ease-default),
+    transform  var(--duration-instant) var(--ease-default);
+  position: relative;
+  overflow: hidden;
+}
+.btn:active { transform: scale(0.98); }
+
+/* Primary — cyan fill */
+.btn-primary {
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
+}
+.btn-primary:hover   { background: var(--color-brand-dim); }
+.btn-primary:disabled {
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Outlined — white bg, dark border */
+.btn-outline {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1.5px solid var(--color-border);
+}
+.btn-outline:hover {
+  border-color: var(--color-brand-dark);
+  color: var(--color-brand-dark);
+}
+.btn-outline:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Dark — near-black fill */
+.btn-dark {
+  background: var(--color-text-primary);
+  color: var(--color-text-on-dark);
+}
+.btn-dark:hover { opacity: 0.85; }
+
+/* Danger — outlined red */
+.btn-danger {
+  height: var(--h-btn-danger);
+  background: transparent;
+  color: var(--color-status-danger);
+  border: 1.5px solid var(--color-status-danger);
+  font-size: var(--text-base);
+}
+.btn-danger:hover { background: rgba(229, 104, 106, 0.06); }
+
+/* Small */
+.btn-sm {
+  height: var(--h-btn-sm);
+  padding: 0 12px;
+  font-size: var(--text-base);
+}
+
+/* Icon button — square, no label */
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+.btn-icon:hover {
+  background: var(--color-brand-ghost);
+  color: var(--color-brand-dark);
+}
+.btn-icon svg { width: var(--icon-md); height: var(--icon-md); }
+
+/* Link button */
+.btn-link {
+  background: none;
+  border: none;
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-brand-dark);
+  cursor: pointer;
+  padding: 4px 2px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: opacity var(--duration-fast);
+}
+.btn-link:hover   { opacity: 0.75; }
+.btn-link:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+
+/* Loading state — works on any .btn variant */
+.btn .btn-label     { }
+.btn .btn-spinner   {
+  width: 18px; height: 18px;
+  border: 2.5px solid rgba(0,0,0,0.15);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+  display: none;
+  position: absolute;
+}
+.btn.loading .btn-label  { visibility: hidden; }
+.btn.loading .btn-spinner { display: block; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+
+/* ============================================================
+   OPTION TOGGLE (pill-style radio / button group)
+   ============================================================ */
+
+.option-group {
+  display: inline-flex;
+  gap: 0;
+}
+.option-group .option {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition:
+    background var(--duration-fast),
+    border-color var(--duration-fast),
+    color var(--duration-fast);
+}
+/* First/last rounded corners */
+.option-group .option:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.option-group .option:last-child  { border-radius: 0 var(--radius) var(--radius) 0; }
+.option-group .option:not(:first-child) { margin-left: -1px; }
+
+/* Active / selected option */
+.option-group .option.active,
+.option-group .option[aria-selected="true"],
+.option-group .option[aria-pressed="true"] {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: var(--color-text-on-brand);
+  font-weight: var(--font-semibold);
+  z-index: 1;
+}
+.option-group .option:hover:not(.active) { border-color: var(--color-brand-ghost-border); }
+
+/* Standalone option chip (not in a group) */
+.option-chip {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: background var(--duration-fast), border-color var(--duration-fast), color var(--duration-fast);
+}
+.option-chip.active {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: var(--color-text-on-brand);
+  font-weight: var(--font-semibold);
+}
+
+
+/* ============================================================
+   INPUTS
+   ============================================================ */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.field-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-secondary);
+  letter-spacing: 0.04em;
+}
+.field-wrap { position: relative; }
+
+.field-input {
+  width: 100%;
+  height: var(--h-input);
+  padding: 0 var(--space-7);
+  background: var(--color-surface-2);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: var(--font-primary);
+  font-size: var(--text-md);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--duration-normal), box-shadow var(--duration-normal), background var(--duration-normal);
+  -webkit-appearance: none;
+}
+.field-input:focus {
+  border-color: var(--color-border-focus);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-focus);
+}
+.field-input::placeholder { color: var(--color-text-tertiary); }
+.field-input.error {
+  border-color: var(--color-status-danger);
+  box-shadow: 0 0 0 4px rgba(229, 104, 106, 0.08);
+}
+
+.field-error {
+  font-size: var(--text-sm);
+  color: var(--color-status-danger);
+  margin-top: var(--space-1);
+  display: none;
+}
+.field-error.show { display: block; }
+
+/* Password toggle */
+.field-toggle {
+  position: absolute;
+  right: 6px; top: 50%; transform: translateY(-50%);
+  width: 40px; height: 40px;
+  background: none; border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-tertiary);
+  transition: color var(--duration-fast);
+}
+.field-toggle:hover { color: var(--color-text-secondary); }
+.field-toggle svg { width: 18px; height: 18px; }
+
+/* Input with icon prefix */
+.field-input.with-prefix { padding-left: 36px; }
+.field-prefix-icon {
+  position: absolute;
+  left: 10px; top: 50%; transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+  display: flex; align-items: center;
+}
+.field-prefix-icon svg { width: 16px; height: 16px; }
+
+/* Number / quantity input */
+.field-input.input-qty {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+}
+
+
+/* ============================================================
+   SELECT / DROPDOWN
+   ============================================================ */
+
+.select-wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+.select-wrap::after {
+  content: '';
+  position: absolute;
+  right: 14px; top: 50%; transform: translateY(-50%);
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid var(--color-text-tertiary);
+  pointer-events: none;
+  transition: transform var(--duration-fast);
+}
+.select-native {
+  width: 100%;
+  height: var(--h-input);
+  padding: 0 36px 0 var(--space-7);
+  background: var(--color-surface-2);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color var(--duration-normal);
+}
+.select-native:focus { border-color: var(--color-border-focus); box-shadow: var(--shadow-focus); }
+.select-native.placeholder-shown { color: var(--color-text-tertiary); }
+
+
+/* ============================================================
+   CHECKBOX
+   ============================================================ */
+
+.checkbox-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.cb-box {
+  width: 16px; height: 16px;
+  border-radius: 2px;
+  border: 1px solid var(--color-text-tertiary);
+  background: var(--color-surface);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--duration-fast), border-color var(--duration-fast);
+}
+.checkbox-row.checked .cb-box {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+}
+.cb-check {
+  width: 10px; height: 10px;
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+.checkbox-row.checked .cb-check { opacity: 1; }
+
+/* Indeterminate / "All" state */
+.checkbox-row.indeterminate .cb-box {
+  background: var(--color-brand-ghost);
+  border-color: var(--color-brand);
+}
+.cb-label {
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  font-weight: var(--font-normal);
+}
+
+
+/* ============================================================
+   BADGES / PILLS
+   ============================================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  white-space: nowrap;
+}
+
+/* Order type */
+.badge-market {
+  background: rgba(122, 239, 239, 0.15);
+  color: var(--color-brand-dark);
+}
+.badge-limit {
+  background: rgba(150, 130, 220, 0.15);
+  color: #7B5EA7;
+}
+
+/* Trade side */
+.badge-buy  { color: var(--color-status-success); font-weight: var(--font-semibold); }
+.badge-sell { color: var(--color-status-danger);  font-weight: var(--font-semibold); }
+
+/* Status */
+.badge-active  { background: var(--color-status-active-bg);  color: var(--color-brand-dark); }
+.badge-success { background: var(--color-status-success-bg); color: var(--color-status-success); }
+.badge-danger  { background: var(--color-status-danger-bg);  color: var(--color-status-danger); }
+.badge-pending { background: var(--color-status-pending-bg); color: var(--color-status-pending); }
+
+/* Environment badge (UAT / PROD) */
+.badge-env {
+  height: var(--h-chip);
+  padding: 0 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.04em;
+}
+
+/* Currency chip (e.g. BTC tag) */
+.currency-chip {
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--radius);
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-status-pending);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+}
+
+
+/* ============================================================
+   SECTION LABEL (eyebrow pattern)
+   ============================================================ */
+
+.section-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-tertiary);
+}
+
+/* Teal eyebrow (on dark or as heading prefix) */
+.eyebrow {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-brand-dark);
+}
+
+
+/* ============================================================
+   TABS
+   ============================================================ */
+
+.tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.tab {
+  padding: 10px 16px;
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--color-text-tertiary);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: color var(--duration-fast), border-color var(--duration-fast);
+  white-space: nowrap;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: var(--font-primary);
+}
+.tab:hover { color: var(--color-text-secondary); }
+.tab.active {
+  color: var(--color-text-primary);
+  border-bottom-color: var(--color-brand);
+  font-weight: var(--font-semibold);
+}
+
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+.data-table th {
+  padding: 8px 12px;
+  text-align: left;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-tertiary);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+.data-table tbody tr:hover { background: var(--color-surface-2); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+
+/* Price columns — mono font */
+.data-table .col-price,
+.data-table .col-qty,
+.data-table .col-id {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+/* Bid/Ask book colors */
+.data-table .col-bid   { color: var(--color-status-danger); }
+.data-table .col-ask   { color: var(--color-brand); }
+
+/* Right-align numeric columns */
+.data-table .col-price,
+.data-table .col-qty  { text-align: right; }
+
+
+/* ============================================================
+   BID / ASK PRICE DISPLAY (Spot Trader large cards)
+   ============================================================ */
+
+.price-panel {
+  display: flex;
+  gap: 0;
+}
+.price-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  user-select: none;
+  transition: opacity var(--duration-fast);
+}
+.price-side:active { opacity: 0.85; }
+
+.price-side-bid {
+  background: rgba(229, 104, 106, 0.12);
+  border: 1px solid rgba(229, 104, 106, 0.25);
+  margin-right: 2px;
+}
+.price-side-ask {
+  background: rgba(122, 239, 239, 0.12);
+  border: 1px solid rgba(122, 239, 239, 0.25);
+  margin-left: 2px;
+}
+
+.price-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.price-side-bid .price-label { color: var(--color-status-danger); }
+.price-side-ask .price-label { color: var(--color-brand-dark); }
+
+.price-value {
+  font-family: var(--font-mono);
+  font-weight: var(--font-semibold);
+  line-height: 1.1;
+}
+.price-side-bid .price-value { color: var(--color-status-danger); font-size: 32px; }
+.price-side-ask .price-value { color: var(--color-brand); font-size: 32px; }
+
+.price-sub {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+
+/* ============================================================
+   TICKER BAR
+   ============================================================ */
+
+.ticker-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 0 8px;
+}
+.ticker-bar::-webkit-scrollbar { display: none; }
+
+.ticker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 6px 12px;
+  border-right: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: background var(--duration-fast);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+.ticker-item:first-child { align-items: flex-start; }
+.ticker-item:hover { background: var(--color-surface-2); }
+
+.ticker-pair {
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+.ticker-price {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin-top: 1px;
+}
+.ticker-delta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  margin-top: 1px;
+}
+.ticker-delta.up   { color: var(--color-status-success); }
+.ticker-delta.down { color: var(--color-status-danger); }
+
+
+/* ============================================================
+   NAVIGATION BAR (trading web)
+   ============================================================ */
+
+.top-nav {
+  height: var(--h-nav);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-9);
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.nav-logo-text {
+  font-size: var(--text-md);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  letter-spacing: 0.04em;
+}
+.nav-spacer { flex: 1; }
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+/* Exposure indicator */
+.nav-exposure {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 32px;
+  background: var(--color-brand);
+  border-radius: var(--radius);
+}
+.nav-exposure-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: rgba(0,0,0,0.6);
+}
+.nav-exposure-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-text-on-brand);
+}
+
+/* User avatar pill */
+.nav-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--color-text-primary);
+  color: var(--color-text-on-dark);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+
+
+/* ============================================================
+   CARD / PANEL
+   ============================================================ */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.card-header {
+  padding: var(--space-5) var(--space-7);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+.card-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  flex: 1;
+}
+.card-body { padding: var(--space-7); }
+
+
+/* ============================================================
+   DIVIDER
+   ============================================================ */
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+.divider-text {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-medium);
+}
+
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  opacity: 0;
+  background: var(--color-text-on-brand);
+  color: var(--color-text-on-dark);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: var(--z-dialog);
+  transition:
+    transform var(--duration-slide) var(--ease-screen),
+    opacity   var(--duration-enter) var(--ease-default);
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+.toast.danger { background: var(--color-status-danger); }
+
+
+/* ============================================================
+   OTP INPUT (authenticator)
+   ============================================================ */
+
+.otp-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.otp-slot {
+  width: 44px; height: 56px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-3xl);
+  font-weight: var(--font-semibold);
+  text-align: center;
+  color: var(--color-text-primary);
+  outline: none;
+  caret-color: var(--color-brand);
+  transition: border-color var(--duration-normal), box-shadow var(--duration-normal);
+}
+.otp-slot:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: var(--shadow-focus);
+}
+.otp-slot.filled { border-color: var(--color-brand-dark); }
+.otp-slot.error  { border-color: var(--color-status-danger); }
+
+
+/* ============================================================
+   INSTRUMENT SELECTOR (pair dropdown in spot trader)
+   ============================================================ */
+
+.instrument-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+  transition: border-color var(--duration-fast);
+}
+.instrument-select:hover { border-color: var(--color-brand-ghost-border); }
+.instrument-select .instrument-icon { color: var(--color-text-tertiary); }
+.instrument-select svg { width: 12px; height: 12px; color: var(--color-text-tertiary); }
+
+
+/* ============================================================
+   BALANCE ROW
+   ============================================================ */
+
+.balance-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.balance-row:last-child { border-bottom: none; }
+.balance-asset {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+}
+.balance-qty {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+}
+.balance-qty.positive { color: var(--color-status-success); }
+.balance-qty.negative { color: var(--color-status-danger); }

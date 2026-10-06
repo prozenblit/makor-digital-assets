@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FX Engine Room — Design System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-primary);
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ── */
+    .sc-wrap { display: flex; min-height: 100vh; }
+
+    .sc-sidenav {
+      width: 220px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-divider);
+      display: flex;
+      flex-direction: column;
+      scrollbar-width: none;
+    }
+    .sc-sidenav::-webkit-scrollbar { display: none; }
+
+    .sc-logo {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid var(--color-divider);
+      flex-shrink: 0;
+    }
+    .sc-logo-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-brand);
+      letter-spacing: 0.04em;
+    }
+    .sc-logo-sub {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-top: 2px;
+      letter-spacing: 0.03em;
+    }
+
+    .sc-nav { padding: 10px 0; flex: 1; }
+    .sc-nav a {
+      display: block;
+      padding: 7px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: color 0.1s, background 0.1s;
+    }
+    .sc-nav a:hover { color: var(--color-brand); background: var(--color-brand-ghost); }
+    .sc-nav a.active { color: var(--color-brand); font-weight: 600; }
+
+    .sc-nav-group {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-tertiary);
+      padding: 14px 18px 4px;
+    }
+
+    /* ── Main ── */
+    .sc-main {
+      flex: 1;
+      min-width: 0;
+      padding: 48px 56px;
+      background: var(--color-bg);
+    }
+
+    /* ── Section ── */
+    .sc-section {
+      max-width: 920px;
+      margin-bottom: 72px;
+      scroll-margin-top: 32px;
+    }
+    .sc-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      color: var(--color-brand);
+      margin-bottom: 6px;
+    }
+    .sc-section-heading {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--color-divider);
+    }
+
+    /* ── Row / group ── */
+    .sc-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .sc-row.center { align-items: center; }
+    .sc-row.column { flex-direction: column; align-items: flex-start; }
+
+    /* ── Label ── */
+    .sc-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--color-text-tertiary);
+      margin-bottom: 8px;
+    }
+    .sc-group + .sc-group { margin-top: 24px; }
+
+    /* ── Color swatches ── */
+    .sc-swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .sc-swatch {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+    .sc-swatch-color { height: 60px; }
+    .sc-swatch-info {
+      padding: 8px 10px;
+      background: var(--color-surface);
+    }
+    .sc-swatch-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+    .sc-swatch-val {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--color-text-tertiary);
+      margin-top: 2px;
+    }
+
+    /* ── Type specimen ── */
+    .sc-type-row {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--color-divider);
+    }
+    .sc-type-meta {
+      min-width: 90px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      flex-shrink: 0;
+    }
+
+    /* ── Demo surface (dark bg for components) ── */
+    .sc-demo {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .sc-demo-raised {
+      background: var(--color-surface-raised);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    /* ── Separator within section ── */
+    .sc-sep {
+      height: 1px;
+      background: var(--color-divider);
+      margin: 28px 0;
+    }
+
+    /* ── Spacing sample ── */
+    .sc-space-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--color-divider);
+    }
+    .sc-space-box {
+      background: var(--color-brand-dim);
+      border: 1px solid var(--color-brand-border);
+      height: 20px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .sc-space-meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      min-width: 100px;
+    }
+    .sc-space-val {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="sc-wrap">
+
+  <!-- ── SIDENAV ── -->
+  <nav class="sc-sidenav">
+    <div class="sc-logo">
+      <div class="sc-logo-name">FX Engine Room</div>
+      <div class="sc-logo-sub">Design System</div>
+    </div>
+    <div class="sc-nav">
+      <div class="sc-nav-group">Foundation</div>
+      <a href="#colors">Colors</a>
+      <a href="#typography">Typography</a>
+      <a href="#spacing">Spacing &amp; Sizing</a>
+
+      <div class="sc-nav-group">Controls</div>
+      <a href="#buttons">Buttons</a>
+      <a href="#inputs">Inputs &amp; Select</a>
+      <a href="#toggles">Toggles &amp; Radios</a>
+      <a href="#checkbox">Checkboxes</a>
+      <a href="#tags">Tag Input</a>
+
+      <div class="sc-nav-group">Display</div>
+      <a href="#badges">Badges</a>
+      <a href="#labels">Section Labels</a>
+      <a href="#breadcrumb">Breadcrumb</a>
+
+      <div class="sc-nav-group">Platform UI</div>
+      <a href="#list-panel">List Panel</a>
+      <a href="#detail-panel">Detail Panel</a>
+      <a href="#sidebar">Sidebar</a>
+      <a href="#footer">Footer Bar</a>
+      <a href="#permissions">Permissions Grid</a>
+
+      <div class="sc-nav-group">Patterns</div>
+      <a href="#login">Login Card</a>
+      <a href="#cards">Cards</a>
+      <a href="#toast">Toast</a>
+    </div>
+  </nav>
+
+  <!-- ── MAIN ── -->
+  <main class="sc-main">
+
+    <!-- HEADER -->
+    <div style="margin-bottom:56px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.10em;color:var(--color-brand);margin-bottom:6px;">Component Library</div>
+      <h1 style="font-size:32px;font-weight:700;letter-spacing:-.02em;color:var(--color-text-primary);">FX Engine Room Design System</h1>
+      <p style="font-size:15px;color:var(--color-text-secondary);margin-top:8px;line-height:1.6;">Tokens, components, and patterns for the FX Engine Room operations platform.<br>Inter · Dark mode only · Desktop only · Operated by Makor Group.</p>
+    </div>
+
+
+    <!-- ════ COLORS ════ -->
+    <section class="sc-section" id="colors">
+      <div class="sc-section-title">Foundation</div>
+      <h2 class="sc-section-heading">Colors</h2>
+
+      <div class="sc-label">Brand — Lavender / Periwinkle</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#8080CC;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Brand</div><div class="sc-swatch-val">#8080CC</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#6B6BB8;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Brand Hover</div><div class="sc-swatch-val">#6B6BB8</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:rgba(128,128,204,0.12);"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Brand Ghost</div><div class="sc-swatch-val">rgba(128,128,204,.12)</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:rgba(128,128,204,0.08);"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Brand Dim</div><div class="sc-swatch-val">rgba(128,128,204,.08)</div></div>
+        </div>
+      </div>
+
+      <div class="sc-label">Secondary — Teal</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#7AEFEF;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Teal</div><div class="sc-swatch-val">#7AEFEF</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:rgba(122,239,239,0.10);"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Teal Ghost</div><div class="sc-swatch-val">rgba(122,239,239,.10)</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:rgba(122,239,239,0.30);"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Teal Border</div><div class="sc-swatch-val">rgba(122,239,239,.30)</div></div>
+        </div>
+      </div>
+
+      <div class="sc-label">Accent — Amber</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#F59E0B;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Amber</div><div class="sc-swatch-val">#F59E0B</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:rgba(245,158,11,0.12);"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Amber Ghost</div><div class="sc-swatch-val">rgba(245,158,11,.12)</div></div>
+        </div>
+      </div>
+
+      <div class="sc-label">Surfaces</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#0F0F1E; border-bottom:1px solid #2A2A42;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">BG</div><div class="sc-swatch-val">#0F0F1E</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#101020; border-bottom:1px solid #2A2A42;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Sidebar BG</div><div class="sc-swatch-val">#101020</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#1A1B2E; border-bottom:1px solid #2A2A42;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Surface</div><div class="sc-swatch-val">#1A1B2E</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#1E2035; border-bottom:1px solid #2A2A42;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Surface Raised</div><div class="sc-swatch-val">#1E2035</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#252740; border-bottom:1px solid #2A2A42;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Surface Active</div><div class="sc-swatch-val">#252740</div></div>
+        </div>
+      </div>
+
+      <div class="sc-label">Text</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#EEEEF8;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Primary</div><div class="sc-swatch-val">#EEEEF8</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#8A8AAA;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Secondary</div><div class="sc-swatch-val">#8A8AAA</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#5A5A78;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Tertiary</div><div class="sc-swatch-val">#5A5A78</div></div>
+        </div>
+      </div>
+
+      <div class="sc-label">Borders &amp; Dividers</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#2A2A42;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Border</div><div class="sc-swatch-val">#2A2A42</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#8080CC;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Border Focus</div><div class="sc-swatch-val">#8080CC</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#1E1E32; border-bottom:1px solid #2A2A42;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Divider</div><div class="sc-swatch-val">#1E1E32</div></div>
+        </div>
+      </div>
+
+      <div class="sc-label">Status</div>
+      <div class="sc-swatches">
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#4DCC9B;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Success / Live</div><div class="sc-swatch-val">#4DCC9B</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#EF4444;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Danger / Error</div><div class="sc-swatch-val">#EF4444</div></div>
+        </div>
+        <div class="sc-swatch">
+          <div class="sc-swatch-color" style="background:#F59E0B;"></div>
+          <div class="sc-swatch-info"><div class="sc-swatch-name">Pending</div><div class="sc-swatch-val">#F59E0B</div></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ TYPOGRAPHY ════ -->
+    <section class="sc-section" id="typography">
+      <div class="sc-section-title">Foundation</div>
+      <h2 class="sc-section-heading">Typography</h2>
+
+      <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:20px;">Primary: <strong style="color:var(--color-text-primary);">Inter</strong>. Monospace: <strong style="color:var(--color-text-primary);">JetBrains Mono</strong> (account IDs, currency codes, financial data only).</p>
+
+      <div class="sc-type-row">
+        <span class="sc-type-meta">40px / bold</span>
+        <span style="font-size:40px;font-weight:700;color:var(--color-brand);">FX</span>
+      </div>
+      <div class="sc-type-row">
+        <span class="sc-type-meta">28px / bold</span>
+        <span style="font-size:28px;font-weight:700;color:var(--color-brand);">Engine Room</span>
+      </div>
+      <div class="sc-type-row">
+        <span class="sc-type-meta">22px / 700</span>
+        <span style="font-size:22px;font-weight:700;color:var(--color-text-primary);">Bank of America</span>
+      </div>
+      <div class="sc-type-row">
+        <span class="sc-type-meta">18px / 700</span>
+        <span style="font-size:18px;font-weight:700;color:var(--color-text-primary);">Entity Details</span>
+      </div>
+      <div class="sc-type-row">
+        <span class="sc-type-meta">16px / 600</span>
+        <span style="font-size:16px;font-weight:600;color:var(--color-text-primary);">RBS EDGE BOA</span>
+      </div>
+      <div class="sc-type-row">
+        <span class="sc-type-meta">14px / 500</span>
+        <span style="font-size:14px;font-weight:500;color:var(--color-brand);">Vanilla Options</span>
+      </div>
+      <div class="sc-type-row">
+        <span class="sc-type-meta">14px / 400</span>
+        <span style="font-size:14px;font-weight:400;color:var(--color-text-primary);">Standard body text — entity names, form values, list content</span>
+      </div>
+      <div class="sc-type-row">
+        <span class="sc-type-meta">12px / 600 UC</span>
+        <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-brand);">Trading Accounts</span>
+      </div>
+      <div class="sc-type-row">
+        <span class="sc-type-meta">12px / 400</span>
+        <span style="font-size:12px;font-weight:400;color:var(--color-text-secondary);">Client · Bank of America</span>
+      </div>
+      <div class="sc-type-row">
+        <span class="sc-type-meta">13px mono</span>
+        <span style="font-family:var(--font-mono);font-size:13px;color:var(--color-text-secondary);letter-spacing:0.04em;">B4TYDEB6GKMZO031MB27</span>
+      </div>
+      <div class="sc-type-row">
+        <span class="sc-type-meta">12px mono</span>
+        <span style="font-family:var(--font-mono);font-size:12px;color:var(--color-text-tertiary);">USD / 1Y</span>
+      </div>
+    </section>
+
+
+    <!-- ════ SPACING ════ -->
+    <section class="sc-section" id="spacing">
+      <div class="sc-section-title">Foundation</div>
+      <h2 class="sc-section-heading">Spacing &amp; Sizing</h2>
+
+      <div class="sc-label">Spacing Scale</div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:4px;"></span><span class="sc-space-meta">--space-1</span><span class="sc-space-val">4px — tight icon gaps</span></div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:6px;"></span><span class="sc-space-meta">--space-2</span><span class="sc-space-val">6px — compact internal</span></div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:8px;"></span><span class="sc-space-meta">--space-3</span><span class="sc-space-val">8px — checkbox gap, small row</span></div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:12px;"></span><span class="sc-space-meta">--space-5</span><span class="sc-space-val">12px — tight cell padding</span></div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:16px;"></span><span class="sc-space-meta">--space-7</span><span class="sc-space-val">16px — standard panel padding</span></div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:20px;"></span><span class="sc-space-meta">--space-9</span><span class="sc-space-val">20px — section gap</span></div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:24px;"></span><span class="sc-space-meta">--space-10</span><span class="sc-space-val">24px — card section gap</span></div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:40px;"></span><span class="sc-space-meta">--space-16</span><span class="sc-space-val">40px — large gaps</span></div>
+
+      <div class="sc-sep"></div>
+
+      <div class="sc-label">Control Heights</div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:24px; height:24px;"></span><span class="sc-space-meta">--h-chip</span><span class="sc-space-val">24px — badges and chips</span></div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:28px; height:28px;"></span><span class="sc-space-meta">--h-btn-sm</span><span class="sc-space-val">28px — compact buttons</span></div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:36px; height:36px;"></span><span class="sc-space-meta">--h-input / --h-btn</span><span class="sc-space-val">36px — inputs and standard buttons</span></div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:42px; height:42px;"></span><span class="sc-space-meta">--h-btn-lg</span><span class="sc-space-val">42px — login button</span></div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:44px; height:44px;"></span><span class="sc-space-meta">--h-list-item</span><span class="sc-space-val">44px — entity/account list row</span></div>
+      <div class="sc-space-row"><span class="sc-space-box" style="width:48px; height:48px;"></span><span class="sc-space-meta">--w-sidebar</span><span class="sc-space-val">48px — icon sidebar width</span></div>
+
+      <div class="sc-sep"></div>
+
+      <div class="sc-label">Border Radius</div>
+      <div class="sc-row center" style="flex-wrap:wrap;">
+        <div style="text-align:center;"><div style="width:48px;height:48px;background:var(--color-brand-ghost);border:1px solid var(--color-brand-border);border-radius:4px;margin:0 auto 6px;"></div><span class="sc-space-val">4px<br><span style="color:var(--color-text-tertiary);font-size:10px;">badges</span></span></div>
+        <div style="text-align:center;"><div style="width:48px;height:48px;background:var(--color-brand-ghost);border:1px solid var(--color-brand-border);border-radius:6px;margin:0 auto 6px;"></div><span class="sc-space-val">6px<br><span style="color:var(--color-text-tertiary);font-size:10px;">buttons/inputs</span></span></div>
+        <div style="text-align:center;"><div style="width:48px;height:48px;background:var(--color-brand-ghost);border:1px solid var(--color-brand-border);border-radius:8px;margin:0 auto 6px;"></div><span class="sc-space-val">8px<br><span style="color:var(--color-text-tertiary);font-size:10px;">cards</span></span></div>
+        <div style="text-align:center;"><div style="width:48px;height:48px;background:var(--color-brand-ghost);border:1px solid var(--color-brand-border);border-radius:12px;margin:0 auto 6px;"></div><span class="sc-space-val">12px<br><span style="color:var(--color-text-tertiary);font-size:10px;">modal/login</span></span></div>
+        <div style="text-align:center;"><div style="width:48px;height:48px;background:var(--color-brand-ghost);border:1px solid var(--color-brand-border);border-radius:999px;margin:0 auto 6px;"></div><span class="sc-space-val">pill<br><span style="color:var(--color-text-tertiary);font-size:10px;">tags</span></span></div>
+      </div>
+    </section>
+
+
+    <!-- ════ BUTTONS ════ -->
+    <section class="sc-section" id="buttons">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Buttons</h2>
+
+      <div class="sc-demo">
+        <div class="sc-label">Brand / Lavender (primary)</div>
+        <div class="sc-row center">
+          <button class="btn btn-brand">Log In</button>
+          <button class="btn btn-brand loading">
+            <span class="btn-label">Log In</span>
+            <span class="btn-spinner"></span>
+          </button>
+          <button class="btn btn-brand" disabled>Disabled</button>
+        </div>
+
+        <div class="sc-sep"></div>
+
+        <div class="sc-label">Teal (primary actions)</div>
+        <div class="sc-row center">
+          <button class="btn btn-teal">New Trade</button>
+          <button class="btn btn-teal btn-sm">Add</button>
+          <button class="btn btn-teal" disabled>Disabled</button>
+        </div>
+
+        <div class="sc-sep"></div>
+
+        <div class="sc-label">Teal Outlined (Give-Up, Add Permissions)</div>
+        <div class="sc-row center">
+          <button class="btn btn-teal-outline">Give-Up</button>
+          <button class="btn btn-teal-outline">Add Permissions</button>
+          <button class="btn btn-teal-outline btn-sm">Add</button>
+        </div>
+
+        <div class="sc-sep"></div>
+
+        <div class="sc-label">White / Cancel &amp; Save Changes</div>
+        <div class="sc-row center">
+          <button class="btn btn-cancel">Close</button>
+          <button class="btn btn-cancel">Cancel</button>
+          <button class="btn btn-save">Save Changes</button>
+        </div>
+
+        <div class="sc-sep"></div>
+
+        <div class="sc-label">Dark / Tertiary</div>
+        <div class="sc-row center">
+          <button class="btn btn-dark">Secondary</button>
+          <button class="btn btn-dark btn-sm">Edit</button>
+        </div>
+
+        <div class="sc-sep"></div>
+
+        <div class="sc-label">Danger</div>
+        <div class="sc-row center">
+          <button class="btn btn-danger">Remove Entity</button>
+        </div>
+
+        <div class="sc-sep"></div>
+
+        <div class="sc-label">Amber "+" Add &amp; Icon Buttons</div>
+        <div class="sc-row center">
+          <button class="btn-add" title="Add item">+</button>
+          <button class="btn-icon" title="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+          <button class="btn-link">Entities</button>
+        </div>
+
+        <div class="sc-sep"></div>
+
+        <div class="sc-label">Login Button (full-width large)</div>
+        <div style="max-width:320px;">
+          <button class="btn btn-brand btn-lg" style="width:100%;">Log In</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ INPUTS & SELECT ════ -->
+    <section class="sc-section" id="inputs">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Inputs &amp; Select</h2>
+
+      <div class="sc-demo" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="field">
+          <label class="field-label">Text Input</label>
+          <div class="field-wrap">
+            <input type="text" class="field-input" placeholder="Enter value..." />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Focused State</label>
+          <div class="field-wrap">
+            <input type="text" class="field-input" value="RBS EDGE BOA" style="border-color:var(--color-border-focus);box-shadow:var(--shadow-focus);" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Error State</label>
+          <div class="field-wrap">
+            <input type="password" class="field-input error" value="wrongpw" />
+          </div>
+          <span class="field-error show">Incorrect Password</span>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Password + Toggle</label>
+          <div class="field-wrap">
+            <input type="password" class="field-input" id="pw-demo" placeholder="••••••••" />
+            <button class="field-toggle" onclick="togglePwDemo()" type="button" aria-label="Show password">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Search Input</label>
+          <div class="field-wrap">
+            <span class="field-prefix-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+            </span>
+            <input type="search" class="field-input with-prefix" placeholder="Search entities..." />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Mono / Account ID</label>
+          <div class="field-wrap">
+            <input type="text" class="field-input input-mono" placeholder="B4TYDEB6GKMZO031MB27" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Select / Dropdown</label>
+          <div class="select-wrap">
+            <select class="select-native">
+              <option value="" disabled selected>Select entity...</option>
+              <option>Makor UK</option>
+              <option>Makor US</option>
+              <option>Makor Israel</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ TOGGLES & RADIOS ════ -->
+    <section class="sc-section" id="toggles">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Toggles &amp; Radio Buttons</h2>
+
+      <div class="sc-demo">
+        <div class="sc-label">Toggle — Active / Inactive</div>
+        <div class="sc-row center">
+          <label class="toggle-wrap" onclick="this.classList.toggle('active')">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            <span class="toggle-label">Inactive</span>
+          </label>
+          <label class="toggle-wrap active" onclick="this.classList.toggle('active')">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            <span class="toggle-label">Active</span>
+          </label>
+        </div>
+
+        <div class="sc-sep"></div>
+
+        <div class="sc-label">Radio Buttons (Client / Market Maker)</div>
+        <div class="sc-row center" id="radio-demo">
+          <label class="radio-row selected" onclick="selectRadio(this)">
+            <span class="radio-circle"><span class="radio-dot"></span></span>
+            <span class="radio-label">Client</span>
+          </label>
+          <label class="radio-row" onclick="selectRadio(this)">
+            <span class="radio-circle"><span class="radio-dot"></span></span>
+            <span class="radio-label">Market Maker</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ CHECKBOXES ════ -->
+    <section class="sc-section" id="checkbox">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Checkboxes</h2>
+
+      <div class="sc-demo">
+        <div class="sc-row column">
+          <label class="checkbox-row" onclick="this.classList.toggle('checked')">
+            <span class="cb-box">
+              <svg class="cb-check" viewBox="0 0 10 10" fill="none">
+                <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="cb-label">Unchecked — click to toggle</span>
+          </label>
+          <label class="checkbox-row checked" onclick="this.classList.toggle('checked')">
+            <span class="cb-box">
+              <svg class="cb-check" viewBox="0 0 10 10" fill="none">
+                <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="cb-label">RBS EDGE BOA — checked (teal)</span>
+          </label>
+          <label class="checkbox-row checked" onclick="this.classList.toggle('checked')">
+            <span class="cb-box">
+              <svg class="cb-check" viewBox="0 0 10 10" fill="none">
+                <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <span class="cb-label">HSBC Primary</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ TAG INPUT ════ -->
+    <section class="sc-section" id="tags">
+      <div class="sc-section-title">Controls</div>
+      <h2 class="sc-section-heading">Tag Input</h2>
+
+      <div class="sc-demo">
+        <div class="field">
+          <label class="field-label">Counterparties</label>
+          <div class="tag-input-wrap">
+            <span class="tag-chip">
+              RBS EDGE BOA
+              <button class="tag-chip-remove" onclick="this.closest('.tag-chip').remove()" type="button">×</button>
+            </span>
+            <span class="tag-chip">
+              HSBC PRIMARY
+              <button class="tag-chip-remove" onclick="this.closest('.tag-chip').remove()" type="button">×</button>
+            </span>
+            <span class="tag-chip">
+              BOA DIRECT
+              <button class="tag-chip-remove" onclick="this.closest('.tag-chip').remove()" type="button">×</button>
+            </span>
+            <input class="tag-input" type="text" placeholder="Add counterparty..." />
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ BADGES ════ -->
+    <section class="sc-section" id="badges">
+      <div class="sc-section-title">Display</div>
+      <h2 class="sc-section-heading">Badges</h2>
+
+      <div class="sc-demo">
+        <div class="sc-label">Group &amp; Amber</div>
+        <div class="sc-row center">
+          <span class="badge badge-group">Group</span>
+        </div>
+
+        <div class="sc-sep"></div>
+
+        <div class="sc-label">Review Badge — 4 States</div>
+        <div class="sc-row center">
+          <span class="badge badge-review-filled">Review</span>
+          <span class="badge badge-review-teal">Review</span>
+          <span class="badge badge-review-dark">Review</span>
+          <span class="badge badge-review-outlined">Review</span>
+        </div>
+
+        <div class="sc-sep"></div>
+
+        <div class="sc-label">Status Badges</div>
+        <div class="sc-row center">
+          <span class="badge badge-active">Active</span>
+          <span class="badge badge-success">Success</span>
+          <span class="badge badge-danger">Error</span>
+          <span class="badge badge-pending">Pending</span>
+        </div>
+
+        <div class="sc-sep"></div>
+
+        <div class="sc-label">Account Type</div>
+        <div class="sc-row center">
+          <span class="badge badge-type">RBS</span>
+          <span class="badge badge-type">Client</span>
+          <span class="badge badge-type">Market Maker</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ SECTION LABELS ════ -->
+    <section class="sc-section" id="labels">
+      <div class="sc-section-title">Display</div>
+      <h2 class="sc-section-heading">Section Labels</h2>
+
+      <div class="sc-demo">
+        <div class="sc-row column" style="gap:14px;">
+          <span class="section-label">Trading Accounts</span>
+          <span class="section-label">Traders</span>
+          <span class="section-label">Product Permissions</span>
+          <span class="section-label">Default Booking Recipients</span>
+        </div>
+        <p style="font-size:12px;color:var(--color-text-tertiary);margin-top:16px;">Color: <code style="color:var(--color-brand);">--color-brand</code> (lavender). 12px / 600 / uppercase / tracking 0.06em.</p>
+      </div>
+    </section>
+
+
+    <!-- ════ BREADCRUMB ════ -->
+    <section class="sc-section" id="breadcrumb">
+      <div class="sc-section-title">Display</div>
+      <h2 class="sc-section-heading">Breadcrumb</h2>
+
+      <div class="sc-demo">
+        <nav class="breadcrumb">
+          <button class="breadcrumb-link">Entities</button>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-current">Bank of America</span>
+        </nav>
+        <div style="margin-top:16px;">
+          <nav class="breadcrumb">
+            <button class="breadcrumb-link">Entities</button>
+            <span class="breadcrumb-sep">›</span>
+            <button class="breadcrumb-link">Bank of America</button>
+            <span class="breadcrumb-sep">›</span>
+            <span class="breadcrumb-current">RBS EDGE BOA</span>
+          </nav>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ LIST PANEL ════ -->
+    <section class="sc-section" id="list-panel">
+      <div class="sc-section-title">Platform UI</div>
+      <h2 class="sc-section-heading">List Panel</h2>
+
+      <div class="sc-demo" style="padding:0;overflow:hidden;max-width:280px;">
+        <div class="list-group-header">
+          <span>RBS Group</span>
+          <button class="btn-add" title="Add">+</button>
+        </div>
+        <div class="list-section-label">
+          <span class="section-label">Trading Accounts</span>
+        </div>
+        <div class="list-item" onclick="this.parentElement.querySelectorAll('.list-item').forEach(el=>el.classList.remove('active'));this.classList.add('active')">
+          <div class="list-item-name">RBS EDGE BOA</div>
+          <div class="list-item-sub">Client · Bank of America</div>
+        </div>
+        <div class="list-item active" onclick="this.parentElement.querySelectorAll('.list-item').forEach(el=>el.classList.remove('active'));this.classList.add('active')">
+          <div class="list-item-name">RBS PRIME GBP</div>
+          <div class="list-item-sub">Market Maker · RBS Group</div>
+        </div>
+        <div class="list-group-header" style="margin-top:0;">
+          <span>HSBC Group</span>
+          <button class="btn-add" title="Add">+</button>
+        </div>
+        <div class="list-section-label">
+          <span class="section-label">Trading Accounts</span>
+        </div>
+        <div class="list-item" onclick="this.parentElement.querySelectorAll('.list-item').forEach(el=>el.classList.remove('active'));this.classList.add('active')">
+          <div class="list-item-name">HSBC PRIMARY</div>
+          <div class="list-item-sub">Client · HSBC Holdings</div>
+        </div>
+        <div class="list-section-label">
+          <span class="section-label">Traders</span>
+        </div>
+        <div class="list-item" onclick="this.parentElement.querySelectorAll('.list-item').forEach(el=>el.classList.remove('active'));this.classList.add('active')">
+          <div class="list-item-name">John Smith</div>
+          <div class="list-item-sub">Trader</div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ DETAIL PANEL ════ -->
+    <section class="sc-section" id="detail-panel">
+      <div class="sc-section-title">Platform UI</div>
+      <h2 class="sc-section-heading">Detail Panel</h2>
+
+      <div class="sc-demo">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" style="margin-bottom:16px;">
+          <button class="breadcrumb-link">Entities</button>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-current">Bank of America</span>
+        </nav>
+
+        <!-- Header -->
+        <div class="detail-header">
+          <div>
+            <div class="detail-title">RBS EDGE BOA</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+              <span class="badge badge-type">RBS</span>
+              <span style="font-size:13px;color:var(--color-text-secondary);">Bank of America</span>
+            </div>
+          </div>
+          <label class="toggle-wrap active" onclick="this.classList.toggle('active')">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            <span class="toggle-label">Active</span>
+          </label>
+        </div>
+
+        <div class="sc-sep"></div>
+
+        <!-- Radio -->
+        <div style="display:flex;gap:24px;margin-bottom:20px;" id="type-radio">
+          <label class="radio-row selected" onclick="document.getElementById('type-radio').querySelectorAll('.radio-row').forEach(r=>r.classList.remove('selected'));this.classList.add('selected')">
+            <span class="radio-circle"><span class="radio-dot"></span></span>
+            <span class="radio-label">Client</span>
+          </label>
+          <label class="radio-row" onclick="document.getElementById('type-radio').querySelectorAll('.radio-row').forEach(r=>r.classList.remove('selected'));this.classList.add('selected')">
+            <span class="radio-circle"><span class="radio-dot"></span></span>
+            <span class="radio-label">Market Maker</span>
+          </label>
+        </div>
+
+        <!-- Field pairs -->
+        <div class="field-pair">
+          <span class="field-pair-label">Prime Broker / Mapping Value</span>
+          <input class="field-input" type="text" value="RBS" style="max-width:200px;" />
+        </div>
+        <div class="field-pair">
+          <span class="field-pair-label">Makor Entity</span>
+          <div class="select-wrap" style="max-width:200px;">
+            <select class="select-native">
+              <option>Makor UK</option>
+              <option>Makor US</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-pair">
+          <span class="field-pair-label">Give-Up</span>
+          <button class="btn btn-teal-outline btn-sm">Give-Up</button>
+        </div>
+
+        <div class="sc-sep"></div>
+
+        <!-- Default Booking Recipients -->
+        <div class="detail-section-head">
+          <span class="section-label">Default Booking Recipients</span>
+          <button class="btn-add" title="Add">+</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;margin-bottom:20px;">
+          <label class="checkbox-row checked" onclick="this.classList.toggle('checked')">
+            <span class="cb-box"><svg class="cb-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="cb-label">RBS EDGE BOA</span>
+          </label>
+          <label class="checkbox-row" onclick="this.classList.toggle('checked')">
+            <span class="cb-box"><svg class="cb-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="cb-label">HSBC Primary</span>
+          </label>
+        </div>
+
+        <!-- Product Permissions -->
+        <div class="detail-section-head" style="margin-bottom:10px;">
+          <span class="section-label">Product Permissions</span>
+          <button class="btn btn-teal-outline btn-sm">Add Permissions</button>
+        </div>
+        <table class="permissions-grid">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Limit</th>
+              <th>Currency / Tenor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="perm-product">Spot</span></td>
+              <td><input class="field-input" type="number" value="10000000" style="width:120px;height:28px;padding:0 8px;" /></td>
+              <td><span class="perm-code">USD / —</span></td>
+            </tr>
+            <tr>
+              <td><span class="perm-product">Forwards</span></td>
+              <td><input class="field-input" type="number" value="5000000" style="width:120px;height:28px;padding:0 8px;" /></td>
+              <td><span class="perm-code">USD / 1Y</span></td>
+            </tr>
+            <tr>
+              <td><span class="perm-product">Vanilla Options</span></td>
+              <td><input class="field-input" type="number" value="2000000" style="width:120px;height:28px;padding:0 8px;" /></td>
+              <td><span class="perm-code">USD / 6M</span></td>
+            </tr>
+            <tr>
+              <td><span class="perm-product">Exotic Options</span></td>
+              <td><input class="field-input" type="number" placeholder="—" style="width:120px;height:28px;padding:0 8px;" /></td>
+              <td><span class="perm-code">USD / 3M</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:24px;padding-top:16px;border-top:1px solid var(--color-divider);">
+          <button class="btn btn-cancel">Close</button>
+          <button class="btn btn-save">Save Changes</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ SIDEBAR ════ -->
+    <section class="sc-section" id="sidebar">
+      <div class="sc-section-title">Platform UI</div>
+      <h2 class="sc-section-heading">Sidebar Navigation</h2>
+
+      <div class="sc-demo" style="padding:12px;">
+        <div style="display:flex;gap:0;">
+          <!-- Sidebar snippet -->
+          <aside style="width:48px;background:var(--color-sidebar-bg);border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;">
+            <div class="sidebar-icon active" title="Entities">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+              </svg>
+            </div>
+            <div class="sidebar-icon" title="Documents">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/>
+              </svg>
+            </div>
+            <div class="sidebar-icon" title="Trades">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <polyline points="17,1 21,5 17,9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7,23 3,19 7,15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+              </svg>
+            </div>
+            <div class="sidebar-icon" title="Archive">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <polyline points="21,8 21,21 3,21 3,8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
+              </svg>
+            </div>
+            <div style="flex:1;"></div>
+            <div class="sidebar-icon" title="Settings">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </div>
+          </aside>
+          <div style="flex:1;background:var(--color-surface);border-radius:0 8px 8px 0;padding:20px;color:var(--color-text-tertiary);font-size:13px;">Content area</div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ FOOTER ════ -->
+    <section class="sc-section" id="footer">
+      <div class="sc-section-title">Platform UI</div>
+      <h2 class="sc-section-heading">Footer Bar</h2>
+
+      <div style="border-radius:8px;overflow:hidden;border:1px solid var(--color-border);">
+        <footer class="app-footer">
+          <div class="footer-logo">M</div>
+          <span class="footer-text">FX Engine Room | Operated by Makor Group</span>
+          <div class="footer-spacer"></div>
+          <div class="footer-live">
+            <span class="footer-dot"></span>
+            <span>Live</span>
+          </div>
+        </footer>
+      </div>
+    </section>
+
+
+    <!-- ════ PERMISSIONS ════ -->
+    <section class="sc-section" id="permissions">
+      <div class="sc-section-title">Platform UI</div>
+      <h2 class="sc-section-heading">Product Permissions Grid</h2>
+
+      <div class="sc-demo">
+        <div class="detail-section-head" style="margin-bottom:12px;">
+          <span class="section-label">Product Permissions</span>
+          <button class="btn btn-teal-outline btn-sm">Add Permissions</button>
+        </div>
+        <table class="permissions-grid">
+          <thead>
+            <tr><th>Product</th><th>Limit</th><th>Currency / Tenor</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="perm-product">Spot</span></td>
+              <td><span style="font-size:14px;color:var(--color-text-primary);">10,000,000</span></td>
+              <td><span class="perm-code">USD / —</span></td>
+            </tr>
+            <tr>
+              <td><span class="perm-product">Forwards</span></td>
+              <td><span style="font-size:14px;color:var(--color-text-primary);">5,000,000</span></td>
+              <td><span class="perm-code">USD / 1Y</span></td>
+            </tr>
+            <tr>
+              <td><span class="perm-product">Vanilla Options</span></td>
+              <td><span style="font-size:14px;color:var(--color-text-primary);">2,000,000</span></td>
+              <td><span class="perm-code">USD / 6M</span></td>
+            </tr>
+            <tr>
+              <td><span class="perm-product">Exotic Options</span></td>
+              <td><span style="color:var(--color-text-tertiary);">—</span></td>
+              <td><span class="perm-code">USD / 3M</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <!-- ════ LOGIN ════ -->
+    <section class="sc-section" id="login">
+      <div class="sc-section-title">Patterns</div>
+      <h2 class="sc-section-heading">Login Card</h2>
+
+      <div class="sc-demo" style="display:flex;justify-content:center;padding:40px;">
+        <div class="login-card" style="position:relative;">
+          <div class="login-brand">
+            <span class="login-brand-fx">FX</span>
+            <span class="login-brand-sub">Engine Room</span>
+          </div>
+          <div class="login-form">
+            <div class="field">
+              <label class="field-label">Username</label>
+              <div class="field-wrap">
+                <input type="text" class="field-input" placeholder="Enter username" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label">Password</label>
+              <div class="field-wrap">
+                <input type="password" class="field-input error" placeholder="••••••••" value="wrongpassword" />
+                <button class="field-toggle" type="button" aria-label="Show password">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+              <span class="field-error show">Incorrect Password</span>
+            </div>
+            <button class="login-forgot" type="button">Forgot Password?</button>
+            <button class="btn btn-brand btn-lg">
+              <span class="btn-label">Log In</span>
+              <span class="btn-spinner"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ CARDS ════ -->
+    <section class="sc-section" id="cards">
+      <div class="sc-section-title">Patterns</div>
+      <h2 class="sc-section-heading">Cards &amp; Panels</h2>
+
+      <div class="card" style="max-width:400px;">
+        <div class="card-header">
+          <span class="card-title">Entity Details</span>
+          <button class="btn-icon" title="Refresh">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <polyline points="23,4 23,10 17,10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+          </button>
+        </div>
+        <div class="card-body">
+          <p style="color:var(--color-text-secondary);font-size:14px;">Card body content goes here.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ════ TOAST ════ -->
+    <section class="sc-section" id="toast">
+      <div class="sc-section-title">Patterns</div>
+      <h2 class="sc-section-heading">Toast Notifications</h2>
+
+      <div class="sc-demo">
+        <div class="sc-row center">
+          <button class="btn btn-dark" onclick="showToast('Changes saved successfully', 'success')">Show Success Toast</button>
+          <button class="btn btn-dark" onclick="showToast('Failed to save changes', 'danger')">Show Error Toast</button>
+          <button class="btn btn-dark" onclick="showToast('Entity updated')">Show Default Toast</button>
+        </div>
+        <p style="font-size:12px;color:var(--color-text-tertiary);margin-top:12px;">Toast appears at the bottom of the viewport. Click a button above to preview.</p>
+      </div>
+    </section>
+
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+<script>
+  // Active nav link on scroll
+  const sections = document.querySelectorAll('.sc-section');
+  const navLinks = document.querySelectorAll('.sc-nav a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Toast
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (type ? ' ' + type : '');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // Password toggle
+  function togglePwDemo() {
+    const input = document.getElementById('pw-demo');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  // Radio button groups
+  function selectRadio(el) {
+    const group = el.closest('#radio-demo');
+    if (group) {
+      group.querySelectorAll('.radio-row').forEach(r => r.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+  }
+</script>
+
+</body>
+</html>
