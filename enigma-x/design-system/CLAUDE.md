@@ -1,276 +1,158 @@
-# Enigma X — Design System
-**For Claude agents building or modifying this platform**
+# Enigma X (trading app): design system brief
 
-Load this file at the start of any session working on enigma-x. All design decisions must follow these rules. Do not invent, substitute, or "improve" values.
+For agents that build or modify the Enigma X **main trading app** UI. Load this first, then `components.md` (copy-paste HTML for every component), `tokens.css` / `tokens.json`, `components.css`, and open `showcase.html` (the live reference, with node ids on every card). Every value here comes from the Figma harvest (`../figma-spec/{foundations,components,dashboard}.md`) or is marked EXTENDED. Do not invent, round or "improve" values.
 
-## Companion files — load these too
-- `components.css` — full CSS for all components, all states
-- `components.md` — copy-paste HTML for every component with JS behavior notes
-- `tokens.css` — all design tokens as CSS custom properties
-- `tokens.json` — same tokens in JSON for programmatic access
+This system is separate from the Enigma X **auth** system (`../auth-design-system/`, `--eauth-*`, DM Sans / DM Mono, OTP, mobile shell). Never mix them.
 
-**When implementing any UI:** check `components.md` first. If the component exists there, use that exact HTML + the corresponding CSS class. Do not write new CSS for something already in the component library.
+## What the platform is
 
----
+Real-time spot trading platform for institutional / crypto traders. Desktop only: one Dashboard (1920 x 1080) with a floating header bar, a ticker strip, and five panels (Spot Trader, RFQ, Spot balances, Chart, Trades blotter). The Figma UI is **light**. No mobile or responsive layout exists in the source.
 
-## What this platform is
+## Source of truth and owner decisions
 
-Enigma X is a real-time spot trading platform for institutional/professional crypto traders (BTC-USD, ETH-USD, etc.). The UI is data-dense: live bid/ask order books, trades blotter, balance panels, RFQ flow. The aesthetic is professional fintech — clean, precise, high-contrast. Reference: Bloomberg Terminal light, Refinitiv Eikon, but minimal and modern.
+- Figma file `3PpdEgLKQZaybhyIILCfUF`, canonical page **final** `16:1909` = Dashboard `16:1910` + 12 component sets (Select 56:123, Input with 2 text 56:135, Input 56:145, Search 56:153, Checkbox 56:165, Button Outline 56:188, Button 56:193, Button black 56:198, tabs 56:203, input with tabs 56:214, refresh 56:225, filter 56:230, hands 56:235) + mark `58:84`. Page `drafts` (0:1) holds duplicates (Dashboard 19:692 identical) and the live-app capture `1:1949` / frame `1:3` (a **dark** web import in fallback fonts): supporting evidence only.
+- Figma defines **no** variables, text styles or effect styles; only 15 paint styles. Everything below is read from nodes.
+- Owner decisions (2026-10-15): the **dark theme** (sampled from the capture raster, every value "sampled / derived") and the **chart panel** (toolbar + plot slot) are included as EXTENDED. NOT built: the capture's "Status" column header and the stale-ticker "!" badge.
+- Rule: values in the source are reproduced exactly; where the source is silent the system is EXTENDED from existing tokens only (no new hues, fonts or radii) and marked `EXTENDED` (CSS comment, showcase badge, `components.md` table).
 
-It has two runtime contexts:
-- **Trading web app** — desktop-only, `DM Sans` + `DM Mono`, light mode only
-- **Mobile authenticator** — iOS-style shell, same design tokens, touch-optimized controls
+## Non-negotiables (each proven by the spec)
 
----
+1. **Fonts: Geist (labels, titles, buttons, inputs, all blotter cells) and Geist Mono (ticker price/change, BID/ASK tile digits, spread chip, order-book prices + quantities, balance quantities).** Only weights 400 / 500 / 600. No DM Sans in this system. Line-height is AUTO everywhere (pinned as 16 / 18 / 21 / 26 / 42px for 12 / 14 / 16 / 20 / 32px text).
+2. **Controls are 32px high, radius 4, no stroke** (Select, Input, Input with 2 text, Search, Button, icon buttons, small tabs). Larger: Dashboard SELL/BUY tabs and the primary button 40px; header pills and avatar 40px.
+3. **Radius is not one value:** 2 checkbox, 4 controls / tabs / pills, 8 panels / tiles / tables / header, 16 order-type chips and coin discs, 24 avatar, spread tab 8 8 0 0.
+4. **Main color is `#7AEFEF`** (Figma "Main color"): primary button, selected checkbox / tab. Hover `#B0F9F6`, tint `#7AEFEF` at 0.20, darker `#3DBFBF` (logo, search / chevron glyphs). Primary text is **Black `#000000`**; Grey 3 `#7C9CAC` is secondary; Grey 2 `#A8BECD` is tertiary (labels, headers).
+5. **No shadows, no effects, no gradients (except SOL coin art), no opacity.** Elevation = White card on the Grey 0 page. Strokes are INSIDE (inset `box-shadow`); table containers and Button black Variant2 are OUTSIDE (outer `box-shadow`).
+6. **Tiles:** BID / SELL `#FB9697` ("Red"), ASK / BUY `#8BEEC8` ("green"), black Geist Mono Regular 32 digits + 14 decimals, no BID / ASK word on them. Text and dots use the saturated pair: `#E5686A` ("Red for text") / `#4DCC9B` ("green for text"). Never swap the pairs.
+7. **Zebra tables:** container Grey 0 with a 1px OUTSIDE Grey 0 stroke, radius 8; odd rows White, even rows Grey 0. Order-type chips Limit `#E4CAFF` / `#9236F2`, Market `#CADCFF` / `#3A77F2` (raw, unbound).
+8. **Panel titles are Geist Regular 20 uppercase via `text-transform: uppercase`** on mixed-case text ("Spot Trader", "Spot balances", "Chart", "RFQ", "trades blotter"). SELL / BUY / REQUEST FOR QUOTE are typed uppercase (no transform).
+9. **Dimmed decimals:** integer part keeps the value colour, trailing zeros / time part = Grey 2 (`<span class="dim">.00</span>`).
+10. **Margins as drawn:** left 24, gutter 16, panels padding 16/24/24/24 gap 16 (blotter 8). The 8px right-edge mismatch (panels end 1888, header 1896) is kept; use the alternate class if alignment is wanted.
+11. Components use only semantic tokens (`var(--color-text-*` …) so the dark theme flips them; no raw hex in component CSS.
 
-## Non-negotiables
+## Tokens
 
-- **Border radius is always 4px.** Buttons, inputs, badges, cards, dropdowns, toasts — everything. The only exceptions are the mobile shell (variable, `min(44px, 4vw)`) and OTP slots (`8px`).
-- **Primary font is DM Sans.** DM Mono is for prices, numbers, codes, and mono-spaced data only — never for labels or UI copy.
-- **Brand color is `#7AEFEF`.** The deeper teal `#3DBFBF` is for hover states, eyebrows, and header elements. Never swap them.
-- **No gradients.** No decorative effects. Flat surfaces only.
-- **Light mode only.** No dark mode — do not add media-query dark mode overrides.
-- **BID is always red. ASK is always teal.** This is a financial convention — never reverse it.
-- **Prices and quantities always use DM Mono.** This ensures consistent character width in live-updating tables.
-- **No Tailwind or CSS frameworks.** All styles are custom.
+Light = Figma. Names mirror 1:1 in `tokens.css` (`--color-<kebab>`) and `tokens.json` (hub-viewer schema; group `color.figma` keeps the exact Figma names).
 
----
+### The 15 Figma paint styles
+| Figma name | Token | Hex | Role |
+|---|---|---|---|
+| White | `--color-white` | `#FFFFFF` | panels, header bar, ticker, odd rows, spread tab |
+| Grey 0 | `--color-grey-0` | `#F7F8F8` | page, fields, table container, tabs track |
+| Grey 1 | `--color-grey-1` | `#DEE8ED` | icon-button hover, avatar, clock divider |
+| Grey 2 | `--color-grey-2` | `#A8BECD` | tertiary text, checkbox border, dimmed decimals |
+| Grey 3 | `--color-grey-3` | `#7C9CAC` | secondary text, inactive tabs, refresh/filter/hands glyphs, disabled |
+| Main color | `--color-main-color` | `#7AEFEF` | CTA fill, selected checkbox / tab |
+| Main color hover | `--color-main-color-hover` | `#B0F9F6` | Button hover fill |
+| Main color transp | `--color-main-color-transp` | `rgba(122,239,239,0.2)` | UAT pill, Button Outline hover |
+| Main color darker | `--color-main-color-darker` | `#3DBFBF` | logo, search / chevron glyphs |
+| Red | `--color-red` | `#FB9697` | BID tile |
+| Red for text | `--color-red-for-text` | `#E5686A` | negative / bid / sell text, danger dot |
+| green | `--color-green` | `#8BEEC8` | ASK tile, BUY segment |
+| green for text | `--color-green-for-text` | `#4DCC9B` | positive / ask / buy text, success dot, Exposure border |
+| Black | `--color-black` | `#000000` | primary text, outline stroke, Button black fill |
+| Orange | `--color-orange` | `#FFB051` | selected BTC currency tab only |
 
-## Figma Color Styles → Token Mapping
+Raw (unbound): `--color-limit-text/-bg`, `--color-market-text/-bg`, `--color-exposure-tint` (`#4DCC9B` at 0.2), `--color-coin-*` (ETH `#3D5092`, BTC `#F7931A`, USDT `#009393`, SOL / XLM `#000000`, SHIB `#FC1E1F`, ADA `#246DD3`, AVAX `#E84142`) and art tints.
 
-| Figma Name | Token | Value |
-|---|---|---|
-| White | `--color-surface` | `#FFFFFF` |
-| Grey 0 | `--color-bg` | `#F7F8F8` |
-| Grey 1 | `--color-border` | `#DEE8ED` |
-| Grey 2 | `--color-text-secondary` | `#7C9CAC` |
-| Grey 3 | `--color-text-primary` | `#1A1F36` |
-| Main color | `--color-brand` | `#7AEFEF` |
-| Main color hover | `--color-brand-dim` | `#5ADADA` |
-| Main color transp | `--color-brand-ghost` | `rgba(122,239,239,0.094)` |
-| Main color darker | `--color-brand-dark` | `#3DBFBF` |
-| Red | `--color-status-danger` | `#E5686A` |
-| Red for text | `--color-status-danger` | `#E5686A` (same — use for text and borders) |
-| green | `--color-status-success` | `#4DCC9B` |
-| green for text | `--color-status-success` | `#4DCC9B` (same) |
-| Black | `--color-text-on-dark` | `#000000` |
-| Orange | `--color-status-pending` | `#F59E0B` |
+### Semantic roles (use these in code; light value / dark value)
+| Group | Tokens |
+|---|---|
+| text | `primary` Black / `#E4E7EB` · `secondary` Grey 3 / `#7A9091` · `tertiary` Grey 2 / `#7A9091` · `dim` Grey 2 / `#808080` · `on-brand` Black / `#2B2B2B` · `on-tile` Black / `#2B2B2B` · `on-warning` Black / `#000000` · `positive` `#4DCC9B` / `#0FC286` · `negative` `#E5686A` / `#DE5D67` · `title` Black / `#7A9091` · `tab-active` Black / `#39E2C9` · `tab-inactive` Grey 3 / `#7A9091` · `disabled`, `on-disabled`, `on-black` (Main color / `#39E2C9`), `limit`, `market` |
+| surface | `page` `#F7F8F8` / `#181818` · `panel` White / `#2B2B2B` · `nav` White / `#181818` · `ticker` White / `#2B2B2B` · `field` Grey 0 / `#3F3F3F` · `table` Grey 0 / `#383838` · `row-odd` White / `#2B2B2B` · `row-even` Grey 0 / `#383838` · `spread` · `tabs-track` Grey 0 / `#3F3F3F` · `hover` Grey 1 / `#3D3D3D` · `avatar` · `env` · `exposure` · `tile-bid` `#FB9697` / `#DE5D67` · `tile-ask` `#8BEEC8` / `#0FC286` · `tab-buy` · `warning` Orange / `#FF8D1C` · `button-black` Black / `#181818` · `chip-limit` · `chip-market` · `disabled` Grey 3 |
+| border | `nav` (light transparent) · `table` · `ticker` · `divider` Grey 1 · `checkbox` Grey 2 · `outline` Black · `brand` Main color · `exposure` · `tab-active` Black |
+| icon | `default` Grey 3 · `field` Main color darker · `logo` Main color darker |
+| brand | `--color-brand` Main color / `#39E2C9` · `-hover` · `-transp` · `-darker` |
+| status | `success` `#4DCC9B` · `danger` `#E5686A` · `warning` Orange |
 
----
+EXTENDED semantic tokens (not in Figma): `surface-tab-sell` (Red), `surface-chart-toolbar(-active)`, `surface-scrim` (Black 0.2), `border-focus` (Main color), `border-error` (Red for text), `brand-pressed` (Main color darker).
 
-## Colors
-
-### Brand
-| Token | Value | Use |
-|---|---|---|
-| `--color-brand` | `#7AEFEF` | Buttons, active states, ASK prices, focus borders, checkmarks |
-| `--color-brand-dark` | `#3DBFBF` | Hover states, eyebrow labels, header brand elements |
-| `--color-brand-dim` | `#5ADADA` | Button hover background |
-| `--color-brand-ghost` | `rgba(122,239,239,0.094)` | Focus rings, subtle bg tints, active chip bg |
-| `--color-brand-ghost-border` | `rgba(61,191,191,0.30)` | Subtle teal borders |
-
-### Surfaces
-| Token | Value | Use |
-|---|---|---|
-| `--color-bg` | `#F7F8F8` | Page background |
-| `--color-surface` | `#FFFFFF` | Cards, modals, input backgrounds |
-| `--color-surface-2` | `#F7F8F8` | Inputs default bg, secondary panels |
-
-### Text
-| Token | Value | Use |
-|---|---|---|
-| `--color-text-primary` | `#1A1F36` | All body text, prices (dark) |
-| `--color-text-secondary` | `#7C9CAC` | Labels, subtitles, column headers |
-| `--color-text-tertiary` | `#A8BECD` | Placeholders, metadata, section labels |
-| `--color-text-on-brand` | `#000000` | Text ON the cyan brand color (button labels) |
-
-### Borders
-| Token | Value | Use |
-|---|---|---|
-| `--color-border` | `#DEE8ED` | All inputs, cards, table cells |
-| `--color-border-focus` | `#7AEFEF` | Input focus border |
-
-### Status / Trading
-| Token | Value | Use |
-|---|---|---|
-| `--color-status-success` | `#4DCC9B` | Gain, profit, positive P&L, success |
-| `--color-status-danger` | `#E5686A` | Loss, error, negative P&L, BID prices |
-| `--color-status-pending` | `#F59E0B` | Pending orders, warnings |
-| `--color-status-active` | `#7AEFEF` | Active session, ASK prices, BUY side |
-
-### Trading conventions — do not deviate
-- **BID price** → `--color-status-danger` (`#E5686A`)
-- **ASK price** → `--color-status-active` (`#7AEFEF`) / `--color-brand`
-- **SELL side** → `--color-status-danger`
-- **BUY side** → `--color-status-success` or `--color-brand`
-- **Positive P&L** → `--color-status-success`
-- **Negative P&L** → `--color-status-danger`
-
----
+### Dark theme (EXTENDED; every dark value is "sampled / derived")
+Apply `<body class="dark">` or `.theme-dark` on any ancestor (re-points every semantic token, `color-scheme: dark`); `.theme-light` re-asserts light inside a dark scope. Dark values are read from the live-app capture raster (Figma `get_screenshot` of frame `1:3`, 1920x905) at stated coordinates (visual estimate, thin text can read slightly dim) or derived by rule (hover = mix(brand, #FFF, 49%), transp = brand at 0.2, pressed = mix(brand, #000, 20%), Black fill -> darkest surface, role maps). All coordinates are in the comments of `tokens.json` `color.dark` and in the showcase Colours section. Known conflicts between the capture and the light roles are modifiers, never defaults: `.dashboard--alt-title-primary`, `.nav--alt-fullbleed`, `.data-table--alt-hairlines`.
 
 ## Typography
 
-- **Body base:** 14px / 1.5 / DM Sans / weight 400
-- **Price display:** DM Mono — always for prices, quantities, IDs, codes, timestamps
-- **Eyebrow labels:** 10–12px, weight 700, uppercase, `letter-spacing: 0.08–0.12em`, `--color-brand-dark`
-- **Section titles:** 14–16px, weight 600–700
-- **Table headers:** 12px, weight 600, uppercase, `letter-spacing: 0.06em`, `--color-text-tertiary`
+Font tokens: `--font-primary` Geist, `--font-mono` Geist Mono (fallback stacks after the family names are EXTENDED). Load `family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600` from Google Fonts. Use `font: var(--type-<family-weight-size>)` or the classes.
 
-### Size scale
-```
-10px  eyebrows (mobile), section micro-labels
-12px  badges, form labels, table headers, timestamps
-13px  table cell data, secondary values
-14px  body, buttons, inputs                ← standard UI text
-16px  primary inputs (auth), prominent buttons, screen titles
-18px  screen titles (mobile)
-20px  section headings
-24px  screen titles, OTP display (heading)
-38px  OTP code display (mono)
-```
+13 shorthands: `regular-12`, `medium-12`, `regular-14`, `medium-14`, `semibold-14`, `medium-16`, `regular-20`, `mono-regular-12`, `mono-regular-14`, `mono-medium-14`, `mono-semibold-14`, `mono-regular-16`, `mono-regular-32`. Classes `.t-<same>`.
 
----
+31 observed role tuples (`.t-<role>`, tokens `--type-<role>`; all letter-spacing 0 except avatar initials 2px):
+- Geist Medium 12: `blotter-cell` Black (n=73, also button labels), `blotter-dim` Grey 2, `badge-limit`, `badge-market`, `side-sell`, `side-buy`, `button-black-label` (Main color).
+- Geist Regular 12: `field-label` Grey 2, `field-value` Black, `field-unit` Grey 3, `blotter-header` Grey 2 (ls 0px), `clock` (ls 0px).
+- Geist Mono 12: `ticker-change-negative` / `-positive`. Geist Mono SemiBold 14: `ticker-price`, `ticker-price-negative`. Geist Mono Medium 14: `book-ask`, `book-bid`, `book-ask-dim`. Geist Mono Regular 14: `book-qty`, `tile-decimals` (UPPER). Geist Mono Regular 16: `spread-value`. Geist Mono Regular 32 UPPER: `tile-big`.
+- Geist Medium 14: `balance-asset` (also RFQ button, selected tab). Geist Regular 14: `book-header` Grey 2 (ls 0px), `tab-inactive` Grey 3, `avatar-initials` (ls 2px). Geist SemiBold 14: `exposure-value`. Geist Medium 16: `env-pill`.
+- Geist Regular 20 UPPER: `panel-title` (Black), `tab-title-inactive` (Grey 3).
 
-## Spacing
+## Spacing and control geometry
 
-```
-4px   --space-1   tight icon gaps
-6px   --space-2
-8px   --space-3   checkbox gap, small row gap
-10px  --space-4
-12px  --space-5   table cell padding (tight), card padding SM
-14px  --space-6
-16px  --space-7   standard card padding, table cell padding
-18px  --space-8
-20px  --space-9   section gap
-24px  --space-10  card section gap
-28px  --space-12
-32px  --space-14  card padding LG
-40px  --space-16  page padding top
-```
+Figma defines no spacing tokens. Observed values: `--space-0/4/7/8/10/11/12/16/24/30/32/36/48` (the real scale is 4, 8, 10, 12, 16, 24; plus 7 control padding, 11/36 spread tab, 30 chip wrapper, 32 two-item gap, 48 RFQ form gap).
 
----
+| Control | Size | Padding / gap | Source |
+|---|---|---|---|
+| Select / Input / Input 2 text / Search | 148 x 32 (Dashboard 188; label adds 16 + gap 4 = 52) | Select 7/8/7/12 gap 32; Input 7/12 gap 0; Input 2 text 7/12 gap 32; Search 7/8 gap 8 | 56:123-56:160 |
+| Button / Outline / black | 86 x 32 hug, Dashboard primary 392 x 40 (label 14) | 7/24 gap 8 | 56:188-56:198, 16:2132 |
+| tabs | 184 x 40; each tab padding 7/24; small tabs (input with tabs) 32 high, padding 7/8 | | 56:203, 56:214 |
+| Icon buttons | 32 x 32, padding 7, glyph 18 x 18 (hands 20 x 18) | | 56:225-56:235 |
+| Checkbox | row 120 x 16, box 16 x 16 r2, gap 8 | | 56:165 |
+| Chips | 24 high, padding 0/24, r16 (Limit 76, Market 88) | | 16:2010, 16:2025 |
+| Tiles | 188 x 100, padding 12, gap 4, r8 | | 16:1920, 16:1923 |
+| Spread tab | 120 x 32, padding 11/36, r 8 8 0 0 | | 16:1927 |
+| Tables | book / balances 392 wide: header 34 (padding 8/24), rows 42 (padding 12/24); blotter 1360: header 32 (8/12), rows 40 (12) | | 16:1932, 16:1958, 16:1990 |
 
-## Control heights
+## Components (Figma-defined unless marked EXTENDED)
 
-```
-32px  --h-chip       pill badges, chips
-36px  --h-btn-sm     compact buttons, session-level actions
-48px  --h-input      all text inputs
-48px  --h-btn-danger danger outline button
-50px  --h-btn        primary action button (desktop/web)
-52px  --h-btn-mobile mobile primary button (authenticator)
-56px  --h-nav        top navigation bar
-```
+Class scheme (details and copy-paste markup in `components.md`):
+- Fields: `.field` (+ `__label`; `--dashboard` 188, `--fill`, `--rfq-instrument` 132, `--input-tabs` 244) around `.select` (`__value`, `.is-filled`), `.input` (`__field`, `.is-dim`, `__unit`), `.input-2text`, `.search`, `.input-tabs` (+ `.tabs--sm`). States `.is-focus .is-error .is-disabled` are EXTENDED.
+- Buttons: `.btn`, `.btn-outline`, `.btn-black`, `.btn--lg`, `.btn--block`; hover Figma, pressed / disabled / focus EXTENDED. `.icon-btn` + `.icon-refresh/-filter/-hands`.
+- `.checkbox` (`__input __box __label`; six Figma states; hover / focus EXTENDED).
+- `.tabs` + `.tab` (`.is-selected`), `.tabs--track` (SELL/BUY on Grey 0, `.tab--buy` green; `.tab--sell` selected = EXTENDED), `.tabs--sm`, `.tab--warning` (Orange).
+- `.chip--limit/--market`, `.status-dot--success/--danger`, `<img class="coin coin--btc">` (8 coins), `.price-tile--bid/--ask`, `.spread-tab`, `.pill-env`, `.pill-exposure`, `.clock`, `.avatar`.
+- Shell/patterns: `.dashboard` (1920 x 1080, absolute placement of `.nav .ticker .panel--trader .panel--rfq .panel--balances .chart-panel .panel--blotter`), `.panel` (+ `__head`, `__title`, `__actions`), `.form-row`, `.form-stack`, `.nav` (+ `__logo __right __user`), `.ticker` (+ `__track __cell __id __symbol __quote __price __change`), `.tile-group > .tile-stack`, `.data-table` (`--book`, `--blotter`; `__head __th __body __row __td`; `.col`, `.col--140/--dot/--chip`), `.blotter-tabs > .blotter-tab`.
+- EXTENDED (marked in CSS and showcase): focus ring (1.5px Main color, offset 2), field / checkbox / button / tab / icon-button hover-pressed-disabled-focus-error states, `.menu` (open Select list), `.toast`, `.modal` + `.modal-backdrop`, `.summary` (order confirmation), `.tooltip`, `.skeleton`, empty table (`.data-table--empty`), row hover / selected / sort indicators, ticker marquee, `.chart-toolbar`, `.chart-plot`, dark theme, `--z-*`.
+- Alternates (never default): `.dashboard--alt-aligned` (panels end 1896, RFQ 302 high), `.dashboard--alt-title-primary`, `.nav--alt-fullbleed`, `.data-table--alt-hairlines`.
 
----
+Key behaviours drawn in Figma: hover exists only for Button (fill `#B0F9F6` + 1px Main color stroke inside), Button Outline (fill Main color transp), Button black "Variant2" (1px Main color stroke outside; treated as hover), icon buttons (Grey 1 fill). Tabs: selected = Main color fill + Geist Medium, unselected = Geist Regular Grey 3. Selected BUY = `#8BEEC8`; selected BTC currency tab = Orange `#FFB051`. Checkbox: selected / all = Main color box + Black 1.5 glyph; not selected = Grey 2 1px inset stroke; disabled = Grey 3 box and label with a Grey 0 glyph.
 
-## Shadows
+## Layout / shell geometry (Dashboard 16:1910, 1920 x 1080, Grey 0)
 
-```
-Card:     0 2px 10px rgba(0,0,0,0.06)
-Card LG:  0 4px 24px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)
-Dialog:   0 8px 40px rgba(0,0,0,0.20)
-Sheet:    0 -8px 40px rgba(0,0,0,0.18)
-Mobile:   0 24px 64px rgba(0,0,0,0.18), 0 0 0 2px rgba(0,0,0,0.07)
-Focus:    0 0 0 4px rgba(122,239,239,0.094)
-```
+| Item | x, y | w x h | Id |
+|---|---|---|---|
+| Header bar (White r8) | 24, 16 | 1872 x 72 | 16:2386 |
+| Ticker strip (White, full bleed) | 0, 104 | 1920 x 80 | 16:2133 |
+| Spot Trader | 24, 200 | 440 x 528 | 16:1911 |
+| RFQ | 24, 744 | 440 x 278 | 16:2124 |
+| Spot balances | 480, 200 | 440 x 392 | 16:1954 |
+| Chart | 936, 200 | 952 x 392 | 16:1978 |
+| Trades blotter | 480, 608 | 1408 x 438 | 16:1981 |
 
----
+Header: padding 16/24, logo frame 528 x 40, UAT pill 220 x 40 at nav x 826, right cluster at x 1320 (Exposure 255 x 40, clock 216 x 40, avatar 40 x 40). Spot Trader stack: title 26, instrument row 52, tile group 160 (tiles 188 + 188 gap 16; spread tab centred at y 68 of the 100 stack via margin-top -36), Slippage / Type row 52, order book 202. RFQ: title, tabs 392 x 40, form (row 52 + gap 48 + button 392 x 40). Balances: header 32 with refresh, table 244 (header 34 + 5 x 42). Blotter: top row 38 (tabs 214 + 255, icon cluster 96 x 32), table 352 (header 32 + 8 x 40), columns dot 6.67 | Id 140 | Order Id 140 | Instrument | Order Type (117 x 16 wrapper) | Time In Force | Side | Quantity | Executed Price | User | Channel | Executed At 140. Ticker cells: padding 12/16, hug width 138 / 159 / 130, 15 cells at track x -60.
 
-## Transitions
+## Icons
 
-```
-0.08s  --duration-instant   button :active scale
-0.12s  --duration-fast      color/opacity changes, hover
-0.15s  --duration-base      borders, backgrounds
-0.18s  --duration-normal    inputs, focus rings
-0.20s  --duration-enter     toast entry
-0.28s  --duration-slide     screen slide (screen-to-screen push)
-0.38s  --duration-screen    screen transitions
-0.42s  --duration-sheet     bottom sheet slide
-```
+27 SVGs in `assets/` (19 Figma exports + 8 `.currentColor` twins); see `assets/MANIFEST.md`. Monochrome: `<i class="icon icon-search">` (mask + `currentColor`): search, chevron-down (16 x 16), refresh, filter (18 x 18), hands (20 x 18), check (10 x 8), minus (10 x 2). Coloured art as `<img>`: logo (163 x 40), mark (40 x 40), 8 coins (18 x 18), status dots (use `.status-dot`). Never redraw or hand-write icon paths. Stroke weights differ by design: search 1, chevron 1.2, others 1.5. Not in Figma: MATIC / XRP / USDC / BNB / DOGE coins, close / plus / arrow / calendar / user glyphs, spinner, favicon.
 
-Easing: `ease` for most. `cubic-bezier(0.4,0,0.2,1)` for screen push. `cubic-bezier(0.32,0,0.04,1)` for sheets.
+## Known Figma inconsistencies (kept as drawn; full table in `showcase.html` Reference)
 
----
+- Panels end x 1888 vs header 1896; RFQ bottom 1022 vs Trades 1046.
+- Blotter numerics are proportional Geist; order book / balances are Geist Mono.
+- Orange only on the selected BTC tab; stroke weights 1 / 1.2 / 1.5; table header 14px (book) vs 12px (blotter); letter-spacing stored 0px vs 0% (equivalent).
+- Dashboard instances point at drafts components (identical to final); Checkbox drafts use an old dark-green style (final = Main color).
+- "Variant2" (Button black, filter, hands) is unnamed, treated as hover. Header itemSpacing 271 is stale (real 274). Blotter header cell drifts about 0.5px against the 117 wrapper.
+- Rendering tolerances: chips 75.72 / 87.81 wide, status dot 6.65625, ticker ETH cell 136.8 (Geist hug vs Figma rounding).
+- Sample data only partly harvested (ticker numbers, first blotter row; Id / Order Id are literally "UAT-TRD-000...").
 
-## Components — Key Rules
+## Open decisions for the owner
 
-### Buttons
-- **Primary:** `background #7AEFEF`, `color #000`, `height 50px (desktop) / 52px (mobile)`, `px 20px`, hover → `#5ADADA`
-- **Outlined:** `border 1.5px solid --color-border`, `color --color-text-primary`, hover → border + text darken
-- **Dark:** `background --color-text-primary (#1A1F36)`, `color #fff`
-- **Danger outline:** `border 1.5px solid --color-status-danger`, `color --color-status-danger`, height 48px
-- All buttons: `border-radius 4px`, `font-size 14–16px`, `font-weight 600`, `:active scale(0.98)`
-
-### Inputs
-- Height: `48px`, border: `1.5px solid #DEE8ED`, background: `#F7F8F8`, radius: `4px`
-- Focus: `border-color #7AEFEF`, `box-shadow: 0 0 0 4px rgba(122,239,239,0.094)`
-- Placeholder: `color #A8BECD`
-- Error: `border-color #E5686A`, `box-shadow: 0 0 0 4px rgba(229,104,106,0.08)`
-
-### Option toggles (pill-style radio)
-- Outlined by default: `border 1px solid #DEE8ED`, `color #1A1F36`, `border-radius 4px`
-- Active/selected: `background #7AEFEF`, `border-color #7AEFEF`, `color #000`, `font-weight 600`
-
-### Checkboxes
-- Size: `16×16px`, `border-radius 2px`, `border 1px solid #A8BECD`
-- Checked: `background #7AEFEF`, `border-color #7AEFEF`, white checkmark inside
-- Indeterminate (All): dash icon
-
-### Select / Dropdown
-- Same height/border as inputs (48px, 1.5px border)
-- Custom chevron: `#A8BECD`, rotates on open
-- Options list: `background #fff`, `border 1px solid #DEE8ED`, `box-shadow: 0 8px 32px rgba(0,0,0,0.10)`, `radius 4px`
-- Option hover: `background #F7F8F8`
-- Selected option: `color #7AEFEF`, `font-weight 600`
-
-### Tables (trading data)
-- Header: `12px`, weight `600`, uppercase, `letter-spacing 0.06em`, `color #A8BECD`
-- Cell: `13px`, `color #1A1F36`, DM Mono for price/quantity columns
-- Row hover: `background #F7F8F8`
-- Bid column: `color #E5686A` — always
-- Ask column: `color #7AEFEF` — always
-
-### Order type badges (Trades Blotter)
-- Badge base: `font-size 12px`, `font-weight 600`, `border-radius 4px`, `padding 2px 8px`
-- Market: `background rgba(122,239,239,0.15)`, `color #3DBFBF`
-- Limit: light lavender — exact value TBD from Figma (not in color styles panel; may be a component-level hardcoded value)
-
-### Trade side (Buy/Sell) labels
-- BUY: `color #4DCC9B`, `font-weight 600`
-- SELL: `color #E5686A`, `font-weight 600`
-
-### Tabs (e.g. Trades Blotter | Balance Movement)
-- Active: `color #1A1F36`, `border-bottom 2px solid #7AEFEF`, `font-weight 600`
-- Inactive: `color #A8BECD`, `border-bottom 2px solid transparent`, `font-weight 500`
-- Hover inactive: `color #7C9CAC`
-
-### Section labels (eyebrow pattern)
-```css
-font-size: 12px;
-font-weight: 700;
-text-transform: uppercase;
-letter-spacing: 0.06em;
-color: #A8BECD;
-```
-
-### Toast
-- `background #000000`, `color #fff`, `border-radius 4px`, `padding 14px 16px`
-- Entry: `translateY(80px) → 0` + `opacity 0 → 1` over `0.28s`
-- Danger variant: `background #E5686A`
-
----
+1. Is "Variant2" a hover or a focus state? 2. Slippage "2" Grey 2: placeholder or disabled? 3. SELL-selected RFQ colour (Red derived) and the missing RFQ quote / confirmation / filter / hands popovers. 4. Dark theme: supply a dark Figma page or confirm the sampled values and the three dark alternates. 5. Align panels to 1896 / 1046? 6. Blotter numerics proportional vs Mono? 7. Orange tab: brand exception, and what is selected USD? 8. Meaning of the blotter status-dot colours. 9. Final chart design. 10. Real ticker / blotter sample values. 11. Relink Dashboard instances to final components. 12. Real motion values. 13. Confirm the Status column and "!" badge stay out.
 
 ## What NOT to do
 
-- Do not use Tailwind or any CSS framework — all styles are custom
-- Do not use border-radius above 4px on any UI element (except mobile shell and OTP slots)
-- Do not use colors outside this system without designer approval
-- Do not use DM Mono for labels, buttons, or UI copy — only for numbers and codes
-- Do not reverse BID/ASK colors — BID is always red, ASK is always teal
-- Do not add dark mode — light mode only
-- Do not add hover animations longer than 0.20s on inputs/buttons
-- Do not hardcode hex values in component CSS — always reference `var(--color-*)` tokens
-- Do not use gradients or decorative shadows beyond what is defined above
+- Do not use DM Sans / DM Mono for the trading app (that is the auth system). Do not use Inter / Trebuchet MS (capture fallbacks).
+- Do not use `#1A1F36` as text (primary text is Black `#000000`), `#5ADADA` as hover (Figma hover is `#B0F9F6`), `#F59E0B` for pending (Orange is `#FFB051`, BTC tab only), `status-pending`, `brand-ghost-border`, `--color-bg / surface-2` style names.
+- Do not make controls 48 / 50 / 52 / 36 / 56px (controls are 32; Dashboard tabs / primary button / pills 40; header 72).
+- Do not say "border radius is always 4" (see radii above). Do not add shadows, blur, transitions or press-scale animations (Figma has none; only the EXTENDED marquee and skeleton pulse animate).
+- Do not colour BID prices red and ASK prices teal `#7AEFEF`: bid text `#E5686A`, ask text `#4DCC9B`, tiles `#FB9697` / `#8BEEC8`.
+- Do not claim "light mode only": the dark theme exists as EXTENDED; never present dark values as Figma-defined.
+- Do not add a mobile shell, OTP input, authenticator, Dark / Danger / Small / Link buttons, option-toggle pills, password inputs, status / environment badges, eyebrow section labels, divider-with-label, balance rows or instrument selectors: they are not in the trading Figma (auth belongs to `--eauth-*`).
+- Do not use a Status column header, the "!" stale badge, a 20-row blotter, a " *" price suffix, the "Position ... CLOSE" row, or TradingView assets (not built; owner decision / obsolete).
+- Do not hardcode hex in component CSS; do not create new radii, hues or fonts; do not merge near-equal values; do not draw icons by hand; do not synthesise font weights beyond 400 / 500 / 600.
+- Do not edit the old auth files, the shared showcase kit or the hub.

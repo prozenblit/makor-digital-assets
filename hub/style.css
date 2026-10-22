@@ -200,6 +200,8 @@ a { color: inherit; text-decoration: none; }
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 .platform-chip:hover { background: #fff; border-color: var(--brand); color: var(--brand); }
+.platform-chip-ds { color: var(--brand); border-color: rgba(0,82,104,.25); background: rgba(0,82,104,.06); }
+.platform-chip-ds:hover { border-color: var(--brand); background: rgba(0,82,104,.12); color: var(--brand); }
 
 /* Chevron */
 .folder-chevron {

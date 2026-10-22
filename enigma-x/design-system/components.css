@@ -1,886 +1,764 @@
-/* ============================================================
-   Enigma X — Component Styles
-   Requires: tokens.css loaded first
-   ============================================================ */
+/* ===== PART 1: TOKEN-LEVEL & CONTROLS ===== */
+/* =====================================================================
+   ENIGMA X (trading app) — components.css  (stage 1: base, type, icons, controls)
+   Requires tokens.css loaded first. Fonts: Geist + Geist Mono (Google Fonts:
+   family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600). NO DM Sans (that is the separate
+   Enigma X AUTH system, --eauth-*, which this file never touches).
+   Source: Figma file 3PpdEgLKQZaybhyIILCfUF, page "final" 16:1909 (12 component sets + Dashboard 16:1910).
 
-/* ─── RESET ──────────────────────────────────────────────── */
+   CONVENTIONS
+   - Every rule block is preceded by "figma: <node ids>" naming where the numbers came from.
+   - Values the Figma file does not draw are marked "EXTENDED — not in Figma: <derivation>" and derive only from existing tokens.
+   - Forced state classes mirror pseudo-classes so a showcase can display them:
+       .is-hover .is-focus .is-active .is-disabled .is-error .is-open .is-selected .is-checked .is-indeterminate .is-filled .is-dim
+   - STROKES: Figma strokes are INSIDE-aligned -> box-shadow: inset 0 0 0 <w> <colour> (no layout impact).
+     OUTSIDE strokes (Button black Variant2, table containers) -> outer box-shadow: 0 0 0 <w> <colour>.
+   - Rules use ONLY semantic var(--color-<group>-<role>) tokens, so body.dark / .theme-dark (EXTENDED) flips every component.
+   - Line-height: Figma is "auto" everywhere; tokens.css pins the measured auto boxes inside the --type-* shorthands.
+   - No shadows: Figma defines none; elevation = white panel on the Grey 0 page.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   BASE / RESET
+   figma: foundations 3 (Geist Regular 12, black text), 2.1 (Dashboard fill Grey 0 16:1910)
+   --------------------------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font: var(--type-regular-12);
+  letter-spacing: var(--ls-0);
+  color: var(--color-text-primary);
+  background: var(--color-surface-page);
+}
+h1, h2, h3, h4, h5, h6, p, figure { margin: 0; font: inherit; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font: inherit; color: inherit; letter-spacing: inherit; margin: 0; }
+button { background: none; border: 0; padding: 0; cursor: pointer; }
+img, svg { display: block; }
+[hidden] { display: none !important; }
+.is-nowrap { white-space: nowrap; }
 
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-[tabindex]:focus-visible {
-  outline: 2px solid var(--color-brand);
+/* EXTENDED — not in Figma: keyboard focus ring = the Main color stroke language (1px strokes) at 1.5px (the icon stroke weight), offset 2px; colour = --color-border-focus (Main color). Zero specificity so component rules can replace it. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--stroke-icon) solid var(--color-border-focus);
   outline-offset: 2px;
-  border-radius: var(--radius);
-}
-input:focus-visible { outline: none; } /* inputs use border + box-shadow instead */
-
-
-/* ============================================================
-   BUTTONS
-   ============================================================ */
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: var(--h-btn);
-  padding: 0 20px;
-  border: none;
-  border-radius: var(--radius);
-  font-family: var(--font-primary);
-  font-size: var(--text-md);
-  font-weight: var(--font-semibold);
-  cursor: pointer;
-  white-space: nowrap;
-  transition:
-    background var(--duration-fast) var(--ease-default),
-    opacity    var(--duration-fast) var(--ease-default),
-    transform  var(--duration-instant) var(--ease-default);
-  position: relative;
-  overflow: hidden;
-}
-.btn:active { transform: scale(0.98); }
-
-/* Primary — cyan fill */
-.btn-primary {
-  background: var(--color-brand);
-  color: var(--color-text-on-brand);
-}
-.btn-primary:hover   { background: var(--color-brand-dim); }
-.btn-primary:disabled {
-  background: var(--color-disabled-bg);
-  color: var(--color-disabled-text);
-  cursor: not-allowed;
-  pointer-events: none;
 }
 
-/* Outlined — white bg, dark border */
-.btn-outline {
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  border: 1.5px solid var(--color-border);
-}
-.btn-outline:hover {
-  border-color: var(--color-brand-dark);
-  color: var(--color-brand-dark);
-}
-.btn-outline:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
-}
+/* ---------------------------------------------------------------------
+   TYPOGRAPHY — base shorthands (family + weight + size). usage: <span class="t-medium-12">
+   figma: foundations 3 (13 distinct family/weight/size combinations over the 31 tuples)
+   --------------------------------------------------------------------- */
+.t-regular-12 { font: var(--type-regular-12); }
+.t-medium-12 { font: var(--type-medium-12); }
+.t-regular-14 { font: var(--type-regular-14); }
+.t-medium-14 { font: var(--type-medium-14); }
+.t-semibold-14 { font: var(--type-semibold-14); }
+.t-medium-16 { font: var(--type-medium-16); }
+.t-regular-20 { font: var(--type-regular-20); }
+.t-mono-regular-12 { font: var(--type-mono-regular-12); }
+.t-mono-regular-14 { font: var(--type-mono-regular-14); }
+.t-mono-medium-14 { font: var(--type-mono-medium-14); }
+.t-mono-semibold-14 { font: var(--type-mono-semibold-14); }
+.t-mono-regular-16 { font: var(--type-mono-regular-16); }
+.t-mono-regular-32 { font: var(--type-mono-regular-32); }
 
-/* Dark — near-black fill */
-.btn-dark {
-  background: var(--color-text-primary);
-  color: var(--color-text-on-dark);
-}
-.btn-dark:hover { opacity: 0.85; }
+/* TYPOGRAPHY — the 31 observed tuples by role (font + colour + case + letter-spacing).
+   figma: foundations 3 table rows #1-#31 (colour = semantic token, light value = the Figma paint style named in the row) */
+.t-blotter-cell { font: var(--type-blotter-cell); color: var(--color-text-primary); }                         /* #1  Geist Medium 12 Black. figma: 16:2006, 16:2008, 16:2012, 16:2015 */
+.t-field-label { font: var(--type-field-label); color: var(--color-text-tertiary); }                          /* #2  Geist Regular 12 Grey 2. figma: I16:1915;10:35, 16:2398, 16:2401 */
+.t-ticker-change-negative { font: var(--type-ticker-change-negative); color: var(--color-text-negative); }    /* #3  Geist Mono Regular 12 Red for text. figma: 16:2154, 16:2156 */
+.t-field-value { font: var(--type-field-value); color: var(--color-text-primary); }                           /* #4  Geist Regular 12 Black. figma: I16:1915;10:37 */
+.t-field-unit { font: var(--type-field-unit); color: var(--color-text-secondary); }                           /* #5  Geist Regular 12 Grey 3. figma: 16:2018 */
+.t-blotter-header { font: var(--type-blotter-header); color: var(--color-text-tertiary); letter-spacing: 0px; } /* #6  Geist Regular 12 Grey 2, ls 0px. figma: 16:1993 */
+.t-ticker-price { font: var(--type-ticker-price); color: var(--color-text-primary); }                         /* #7  Geist Mono SemiBold 14 Black. figma: 16:2151 */
+.t-balance-asset { font: var(--type-balance-asset); color: var(--color-text-primary); }                       /* #8  Geist Medium 14 Black. figma: 16:1964, 16:2132 */
+.t-blotter-dim { font: var(--type-blotter-dim); color: var(--color-text-dim); }                               /* #9  Geist Medium 12 Grey 2. figma: 16:2014 */
+.t-book-ask { font: var(--type-book-ask); color: var(--color-text-positive); }                                /* #10 Geist Mono Medium 14 green for text. figma: 16:1941 */
+.t-book-bid { font: var(--type-book-bid); color: var(--color-text-negative); }                                /* #11 Geist Mono Medium 14 Red for text. figma: 16:1939 */
+.t-panel-title { font: var(--type-panel-title); color: var(--color-text-title); text-transform: uppercase; }   /* #12 Geist Regular 20 Black, textCase UPPER on mixed-case text. figma: 16:1913, 16:1956, 16:1980, 16:1984 */
+.t-book-header { font: var(--type-book-header); color: var(--color-text-tertiary); letter-spacing: 0px; }     /* #13 Geist Regular 14 Grey 2, ls 0px. figma: 16:1934 */
+.t-book-qty { font: var(--type-book-qty); color: var(--color-text-primary); }                                 /* #14 Geist Mono Regular 14 Black. figma: 16:1940 */
+.t-badge-limit { font: var(--type-badge-limit); color: var(--color-text-limit); }                             /* #15 Geist Medium 12 #9236F2 (raw). figma: 16:2011 */
+.t-side-sell { font: var(--type-side-sell); color: var(--color-text-negative); }                              /* #16 Geist Medium 12 Red for text. figma: 16:2013 */
+.t-badge-market { font: var(--type-badge-market); color: var(--color-text-market); }                          /* #17 Geist Medium 12 #3A77F2 (raw). figma: 16:2026 */
+.t-side-buy { font: var(--type-side-buy); color: var(--color-text-positive); }                                /* #18 Geist Medium 12 green for text. figma: 16:2028 */
+.t-tab-inactive { font: var(--type-tab-inactive); color: var(--color-text-tab-inactive); }                    /* #19 Geist Regular 14 Grey 3. figma: I16:2127;11:251, 56:208, 16:2393 */
+.t-ticker-change-positive { font: var(--type-ticker-change-positive); color: var(--color-text-positive); }    /* #20 Geist Mono Regular 12 green for text. figma: 16:2218, 16:2220 */
+.t-tile-big { font: var(--type-tile-big); color: var(--color-text-on-tile); text-transform: uppercase; }      /* #21 Geist Mono Regular 32 Black UPPER. figma: 16:1921, 16:1924 */
+.t-tile-decimals { font: var(--type-tile-decimals); color: var(--color-text-on-tile); text-transform: uppercase; } /* #22 Geist Mono Regular 14 Black UPPER. figma: 16:1922, 16:1925 */
+.t-ticker-price-negative { font: var(--type-ticker-price-negative); color: var(--color-text-negative); }      /* #23 Geist Mono SemiBold 14 Red for text. figma: 16:2232, 16:2294 */
+.t-button-black-label { font: var(--type-button-black-label); color: var(--color-text-on-black); }            /* #24 Geist Medium 12 Main color. figma: 56:200 */
+.t-spread-value { font: var(--type-spread-value); color: var(--color-text-primary); }                         /* #25 Geist Mono Regular 16 Black. figma: 16:1928 */
+.t-book-ask-dim { font: var(--type-book-ask-dim); color: var(--color-text-dim); }                             /* #26 Geist Mono Medium 14 Grey 2. figma: 16:1945 */
+.t-tab-title-inactive { font: var(--type-tab-title-inactive); color: var(--color-text-tab-inactive); text-transform: uppercase; } /* #27 Geist Regular 20 Grey 3 UPPER. figma: 16:1985 */
+.t-env-pill { font: var(--type-env-pill); color: var(--color-text-primary); }                                 /* #28 Geist Medium 16 Black. figma: 16:2390 */
+.t-exposure-value { font: var(--type-exposure-value); color: var(--color-text-primary); }                     /* #29 Geist SemiBold 14 Black. figma: 16:2394 */
+.t-clock { font: var(--type-clock); color: var(--color-text-primary); letter-spacing: 0px; }                  /* #30 Geist Regular 12 Black, ls 0px. figma: 16:2400 */
+.t-avatar-initials { font: var(--type-avatar-initials); color: var(--color-text-primary); letter-spacing: var(--ls-avatar); } /* #31 Geist Regular 14 Black, ls 2px. figma: 16:2403 */
 
-/* Danger — outlined red */
-.btn-danger {
-  height: var(--h-btn-danger);
-  background: transparent;
-  color: var(--color-status-danger);
-  border: 1.5px solid var(--color-status-danger);
-  font-size: var(--text-base);
-}
-.btn-danger:hover { background: rgba(229, 104, 106, 0.06); }
-
-/* Small */
-.btn-sm {
-  height: var(--h-btn-sm);
-  padding: 0 12px;
-  font-size: var(--text-base);
-}
-
-/* Icon button — square, no label */
-.btn-icon {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: none;
-  border-radius: var(--radius);
-  background: transparent;
-  color: var(--color-text-secondary);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background var(--duration-fast), color var(--duration-fast);
-}
-.btn-icon:hover {
-  background: var(--color-brand-ghost);
-  color: var(--color-brand-dark);
-}
-.btn-icon svg { width: var(--icon-md); height: var(--icon-md); }
-
-/* Link button */
-.btn-link {
-  background: none;
-  border: none;
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  color: var(--color-brand-dark);
-  cursor: pointer;
-  padding: 4px 2px;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  transition: opacity var(--duration-fast);
-}
-.btn-link:hover   { opacity: 0.75; }
-.btn-link:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-
-/* Loading state — works on any .btn variant */
-.btn .btn-label     { }
-.btn .btn-spinner   {
-  width: 18px; height: 18px;
-  border: 2.5px solid rgba(0,0,0,0.15);
-  border-top-color: currentColor;
-  border-radius: 50%;
-  animation: spin 0.65s linear infinite;
-  display: none;
-  position: absolute;
-}
-.btn.loading .btn-label  { visibility: hidden; }
-.btn.loading .btn-spinner { display: block; }
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-
-/* ============================================================
-   OPTION TOGGLE (pill-style radio / button group)
-   ============================================================ */
-
-.option-group {
-  display: inline-flex;
-  gap: 0;
-}
-.option-group .option {
-  height: 36px;
-  padding: 0 14px;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  transition:
-    background var(--duration-fast),
-    border-color var(--duration-fast),
-    color var(--duration-fast);
-}
-/* First/last rounded corners */
-.option-group .option:first-child { border-radius: var(--radius) 0 0 var(--radius); }
-.option-group .option:last-child  { border-radius: 0 var(--radius) var(--radius) 0; }
-.option-group .option:not(:first-child) { margin-left: -1px; }
-
-/* Active / selected option */
-.option-group .option.active,
-.option-group .option[aria-selected="true"],
-.option-group .option[aria-pressed="true"] {
-  background: var(--color-brand);
-  border-color: var(--color-brand);
-  color: var(--color-text-on-brand);
-  font-weight: var(--font-semibold);
-  z-index: 1;
-}
-.option-group .option:hover:not(.active) { border-color: var(--color-brand-ghost-border); }
-
-/* Standalone option chip (not in a group) */
-.option-chip {
-  height: 36px;
-  padding: 0 14px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  transition: background var(--duration-fast), border-color var(--duration-fast), color var(--duration-fast);
-}
-.option-chip.active {
-  background: var(--color-brand);
-  border-color: var(--color-brand);
-  color: var(--color-text-on-brand);
-  font-weight: var(--font-semibold);
-}
-
-
-/* ============================================================
-   INPUTS
-   ============================================================ */
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-.field-label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  color: var(--color-text-secondary);
-  letter-spacing: 0.04em;
-}
-.field-wrap { position: relative; }
-
-.field-input {
-  width: 100%;
-  height: var(--h-input);
-  padding: 0 var(--space-7);
-  background: var(--color-surface-2);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius);
-  font-family: var(--font-primary);
-  font-size: var(--text-md);
-  color: var(--color-text-primary);
-  outline: none;
-  transition: border-color var(--duration-normal), box-shadow var(--duration-normal), background var(--duration-normal);
-  -webkit-appearance: none;
-}
-.field-input:focus {
-  border-color: var(--color-border-focus);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-focus);
-}
-.field-input::placeholder { color: var(--color-text-tertiary); }
-.field-input.error {
-  border-color: var(--color-status-danger);
-  box-shadow: 0 0 0 4px rgba(229, 104, 106, 0.08);
-}
-
-.field-error {
-  font-size: var(--text-sm);
-  color: var(--color-status-danger);
-  margin-top: var(--space-1);
-  display: none;
-}
-.field-error.show { display: block; }
-
-/* Password toggle */
-.field-toggle {
-  position: absolute;
-  right: 6px; top: 50%; transform: translateY(-50%);
-  width: 40px; height: 40px;
-  background: none; border: none;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  color: var(--color-text-tertiary);
-  transition: color var(--duration-fast);
-}
-.field-toggle:hover { color: var(--color-text-secondary); }
-.field-toggle svg { width: 18px; height: 18px; }
-
-/* Input with icon prefix */
-.field-input.with-prefix { padding-left: 36px; }
-.field-prefix-icon {
-  position: absolute;
-  left: 10px; top: 50%; transform: translateY(-50%);
-  color: var(--color-text-tertiary);
-  display: flex; align-items: center;
-}
-.field-prefix-icon svg { width: 16px; height: 16px; }
-
-/* Number / quantity input */
-.field-input.input-qty {
-  text-align: right;
-  font-family: var(--font-mono);
-  font-size: var(--text-base);
-}
-
-
-/* ============================================================
-   SELECT / DROPDOWN
-   ============================================================ */
-
-.select-wrap {
-  position: relative;
+/* ---------------------------------------------------------------------
+   ICONS (mask utility). Monochrome assets: .icon { background-color: currentColor; mask: url(assets/<name>.currentColor.svg) }
+   Never redrawn: only the exported SVG files. Sizes = EXPORT sizes (stroke bleed included), see assets/MANIFEST.md.
+   --------------------------------------------------------------------- */
+.icon {
   display: inline-block;
-  width: 100%;
+  flex: none;
+  width: var(--icon-16);
+  height: var(--icon-16);
+  background-color: currentColor;
+  -webkit-mask: var(--icon-src) center / contain no-repeat;
+  mask: var(--icon-src) center / contain no-repeat;
 }
-.select-wrap::after {
-  content: '';
-  position: absolute;
-  right: 14px; top: 50%; transform: translateY(-50%);
-  width: 0; height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 5px solid var(--color-text-tertiary);
-  pointer-events: none;
-  transition: transform var(--duration-fast);
+/* figma: 56:157 lucide/search 16x16, stroke Main color darker 1 */
+.icon-search { --icon-src: url(assets/icon-search.currentColor.svg); width: var(--icon-16); height: var(--icon-16); color: var(--color-icon-field); }
+/* figma: 56:128 lucide/chevron-down 16x16, stroke Main color darker 1.2 */
+.icon-chevron-down { --icon-src: url(assets/icon-chevron-down.currentColor.svg); width: var(--icon-16); height: var(--icon-16); color: var(--color-icon-field); }
+/* figma: 56:227 refresh vector (export 18x18), stroke Grey 3 1.5 */
+.icon-refresh { --icon-src: url(assets/icon-refresh.currentColor.svg); width: var(--icon-18); height: var(--icon-18); color: var(--color-icon-default); }
+/* figma: 56:232 filter vector (export 18x18), stroke Grey 3 1.5 */
+.icon-filter { --icon-src: url(assets/icon-filter.currentColor.svg); width: var(--icon-18); height: var(--icon-18); color: var(--color-icon-default); }
+/* figma: 56:237 hands vector (export 20x18), stroke Grey 3 1.5 */
+.icon-hands { --icon-src: url(assets/icon-hands.currentColor.svg); width: var(--icon-hands); height: var(--icon-18); color: var(--color-icon-default); }
+/* figma: 56:168 check vector (export 10x8), stroke Black 1.5 */
+.icon-check { --icon-src: url(assets/icon-check.currentColor.svg); width: var(--icon-check); height: 8px; }
+/* figma: 56:178 minus vector (export 10x2), stroke Black 1.5 */
+.icon-minus { --icon-src: url(assets/icon-minus.currentColor.svg); width: var(--icon-check); height: 2px; }
+
+/* STATUS DOT — figma: 16:2005 (success, green for text), 16:2020 (danger, Red for text); circle 6.6667 */
+.status-dot {
+  display: inline-block;
+  flex: none;
+  width: var(--icon-status-dot);
+  height: var(--icon-status-dot);
+  background-color: currentColor;
+  -webkit-mask: url(assets/status-dot.currentColor.svg) center / contain no-repeat;
+  mask: url(assets/status-dot.currentColor.svg) center / contain no-repeat;
+  color: var(--color-status-success);
 }
-.select-native {
-  width: 100%;
-  height: var(--h-input);
-  padding: 0 36px 0 var(--space-7);
-  background: var(--color-surface-2);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius);
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  color: var(--color-text-primary);
-  outline: none;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  transition: border-color var(--duration-normal);
+.status-dot--success { color: var(--color-status-success); }
+.status-dot--danger { color: var(--color-status-danger); }
+
+/* LOGO — figma: 16:2388 (163x40 wordmark + hexagon-maze mark), 58:84 (40x40 mark only); fill Main color darker.
+   Drawn as a mask of the exported SVG so the colour follows the theme (the SVG files themselves are #3DBFBF). <img src="assets/logo-enigma.svg"> is equally valid in the light theme. */
+.logo-enigma, .logo-enigma-mark {
+  display: block;
+  flex: none;
+  height: var(--h-logo);
+  background-color: var(--color-icon-logo);
+  -webkit-mask: var(--logo-src) left center / contain no-repeat;
+  mask: var(--logo-src) left center / contain no-repeat;
 }
-.select-native:focus { border-color: var(--color-border-focus); box-shadow: var(--shadow-focus); }
-.select-native.placeholder-shown { color: var(--color-text-tertiary); }
+.logo-enigma { --logo-src: url(assets/logo-enigma.svg); width: var(--w-logo); }
+.logo-enigma-mark { --logo-src: url(assets/logo-enigma-mark.svg); width: var(--h-logo); }
 
+/* COIN ICONS — <img class="coin coin--btc" src="assets/coin-btc.svg" alt="BTC">. figma: 16:2137 (18x18, radius 16 = circle); coloured art, never recoloured */
+.coin { display: block; flex: none; width: var(--icon-coin); height: var(--icon-coin); border-radius: var(--radius-pill); }
+.coin--eth { content: url(assets/coin-eth.svg); }
+.coin--btc { content: url(assets/coin-btc.svg); }
+.coin--usdt { content: url(assets/coin-usdt.svg); }
+.coin--sol { content: url(assets/coin-sol.svg); }
+.coin--shib { content: url(assets/coin-shib.svg); }
+.coin--ada { content: url(assets/coin-ada.svg); }
+.coin--avax { content: url(assets/coin-avax.svg); }
+.coin--xlm { content: url(assets/coin-xlm.svg); }
 
-/* ============================================================
-   CHECKBOX
-   ============================================================ */
+/* ---------------------------------------------------------------------
+   FIELD (label + control stack) — figma: Select 56:124/56:130, Input with 2 text 56:136/56:141, Input 56:146/56:150, Search 56:154/56:160
+   Wrapper: VERTICAL, gap 4, padding 0, HUG x HUG (148 wide, 52 high with label / 32 without). Label: Geist Regular 12 Grey 2, 16 high, FILL width.
+   --------------------------------------------------------------------- */
+.field { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-4); width: var(--w-field); }
+.field__label { display: block; height: var(--h-label); font: var(--type-field-label); color: var(--color-text-tertiary); }
+/* figma: Dashboard 16:1914 / 16:1929 rows — instances 188x52 FILL in a 392 row, gap 16; RFQ Instrument search 132x52 (16:2130) */
+.field--dashboard { width: var(--w-field-dashboard); }
+.field--fill { width: auto; flex: 1 1 0; min-width: 0; }
+.field--rfq-instrument { width: var(--w-field-rfq-instrument); }
 
-.checkbox-row {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3);
-  cursor: pointer;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-.cb-box {
-  width: 16px; height: 16px;
-  border-radius: 2px;
-  border: 1px solid var(--color-text-tertiary);
-  background: var(--color-surface);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  transition: background var(--duration-fast), border-color var(--duration-fast);
-}
-.checkbox-row.checked .cb-box {
-  background: var(--color-brand);
-  border-color: var(--color-brand);
-}
-.cb-check {
-  width: 10px; height: 10px;
-  opacity: 0;
-  transition: opacity var(--duration-fast);
-}
-.checkbox-row.checked .cb-check { opacity: 1; }
-
-/* Indeterminate / "All" state */
-.checkbox-row.indeterminate .cb-box {
-  background: var(--color-brand-ghost);
-  border-color: var(--color-brand);
-}
-.cb-label {
-  font-size: var(--text-base);
-  color: var(--color-text-primary);
-  font-weight: var(--font-normal);
-}
-
-
-/* ============================================================
-   BADGES / PILLS
-   ============================================================ */
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 22px;
-  padding: 0 8px;
-  border-radius: var(--radius);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  white-space: nowrap;
-}
-
-/* Order type */
-.badge-market {
-  background: rgba(122, 239, 239, 0.15);
-  color: var(--color-brand-dark);
-}
-.badge-limit {
-  background: rgba(150, 130, 220, 0.15);
-  color: #7B5EA7;
-}
-
-/* Trade side */
-.badge-buy  { color: var(--color-status-success); font-weight: var(--font-semibold); }
-.badge-sell { color: var(--color-status-danger);  font-weight: var(--font-semibold); }
-
-/* Status */
-.badge-active  { background: var(--color-status-active-bg);  color: var(--color-brand-dark); }
-.badge-success { background: var(--color-status-success-bg); color: var(--color-status-success); }
-.badge-danger  { background: var(--color-status-danger-bg);  color: var(--color-status-danger); }
-.badge-pending { background: var(--color-status-pending-bg); color: var(--color-status-pending); }
-
-/* Environment badge (UAT / PROD) */
-.badge-env {
-  height: var(--h-chip);
-  padding: 0 12px;
-  border-radius: var(--radius);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  letter-spacing: 0.04em;
-}
-
-/* Currency chip (e.g. BTC tag) */
-.currency-chip {
-  height: 24px;
-  padding: 0 8px;
-  border-radius: var(--radius);
-  background: rgba(245, 158, 11, 0.15);
-  color: var(--color-status-pending);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-}
-
-
-/* ============================================================
-   SECTION LABEL (eyebrow pattern)
-   ============================================================ */
-
-.section-label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-text-tertiary);
-}
-
-/* Teal eyebrow (on dark or as heading prefix) */
-.eyebrow {
-  font-size: var(--text-sm);
-  font-weight: var(--font-bold);
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-  color: var(--color-brand-dark);
-}
-
-
-/* ============================================================
-   TABS
-   ============================================================ */
-
-.tab-bar {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--color-border);
-}
-.tab {
-  padding: 10px 16px;
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--color-text-tertiary);
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  cursor: pointer;
-  transition: color var(--duration-fast), border-color var(--duration-fast);
-  white-space: nowrap;
-  background: none;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  font-family: var(--font-primary);
-}
-.tab:hover { color: var(--color-text-secondary); }
-.tab.active {
-  color: var(--color-text-primary);
-  border-bottom-color: var(--color-brand);
-  font-weight: var(--font-semibold);
-}
-
-
-/* ============================================================
-   TABLES
-   ============================================================ */
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  color: var(--color-text-primary);
-}
-.data-table th {
-  padding: 8px 12px;
-  text-align: left;
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-text-tertiary);
-  border-bottom: 1px solid var(--color-border);
-  white-space: nowrap;
-}
-.data-table td {
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--color-border);
-  white-space: nowrap;
-}
-.data-table tbody tr:hover { background: var(--color-surface-2); }
-.data-table tbody tr:last-child td { border-bottom: none; }
-
-/* Price columns — mono font */
-.data-table .col-price,
-.data-table .col-qty,
-.data-table .col-id {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-}
-
-/* Bid/Ask book colors */
-.data-table .col-bid   { color: var(--color-status-danger); }
-.data-table .col-ask   { color: var(--color-brand); }
-
-/* Right-align numeric columns */
-.data-table .col-price,
-.data-table .col-qty  { text-align: right; }
-
-
-/* ============================================================
-   BID / ASK PRICE DISPLAY (Spot Trader large cards)
-   ============================================================ */
-
-.price-panel {
-  display: flex;
-  gap: 0;
-}
-.price-side {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 12px 16px;
-  border-radius: var(--radius);
-  cursor: pointer;
-  user-select: none;
-  transition: opacity var(--duration-fast);
-}
-.price-side:active { opacity: 0.85; }
-
-.price-side-bid {
-  background: rgba(229, 104, 106, 0.12);
-  border: 1px solid rgba(229, 104, 106, 0.25);
-  margin-right: 2px;
-}
-.price-side-ask {
-  background: rgba(122, 239, 239, 0.12);
-  border: 1px solid rgba(122, 239, 239, 0.25);
-  margin-left: 2px;
-}
-
-.price-label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-.price-side-bid .price-label { color: var(--color-status-danger); }
-.price-side-ask .price-label { color: var(--color-brand-dark); }
-
-.price-value {
-  font-family: var(--font-mono);
-  font-weight: var(--font-semibold);
-  line-height: 1.1;
-}
-.price-side-bid .price-value { color: var(--color-status-danger); font-size: 32px; }
-.price-side-ask .price-value { color: var(--color-brand); font-size: 32px; }
-
-.price-sub {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  margin-top: 2px;
-}
-
-
-/* ============================================================
-   TICKER BAR
-   ============================================================ */
-
-.ticker-bar {
+/* ---------------------------------------------------------------------
+   CONTROL BOX — shared by Select / Input / Input with 2 text / Search (the 32px inner frame)
+   figma: 56:126, 56:131, 56:148, 56:151, 56:138, 56:142, 56:156, 56:161 — 148x32, FIXED/FIXED, fill Grey 0, NO stroke, radius 4, clip,
+   HORIZONTAL, counter CENTER, Geist Regular 12.
+   --------------------------------------------------------------------- */
+.select, .input, .input-2text, .search {
   display: flex;
   align-items: center;
-  gap: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface);
-  padding: 0 8px;
-}
-.ticker-bar::-webkit-scrollbar { display: none; }
-
-.ticker-item {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  padding: 6px 12px;
-  border-right: 1px solid var(--color-border);
-  cursor: pointer;
-  transition: background var(--duration-fast);
-  min-width: 80px;
-  flex-shrink: 0;
-}
-.ticker-item:first-child { align-items: flex-start; }
-.ticker-item:hover { background: var(--color-surface-2); }
-
-.ticker-pair {
-  font-size: 10px;
-  font-weight: var(--font-semibold);
-  letter-spacing: 0.05em;
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-}
-.ticker-price {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  color: var(--color-text-primary);
-  margin-top: 1px;
-}
-.ticker-delta {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  margin-top: 1px;
-}
-.ticker-delta.up   { color: var(--color-status-success); }
-.ticker-delta.down { color: var(--color-status-danger); }
-
-
-/* ============================================================
-   NAVIGATION BAR (trading web)
-   ============================================================ */
-
-.top-nav {
-  height: var(--h-nav);
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  gap: var(--space-9);
-}
-.nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-.nav-logo-text {
-  font-size: var(--text-md);
-  font-weight: var(--font-bold);
-  color: var(--color-text-primary);
-  letter-spacing: 0.04em;
-}
-.nav-spacer { flex: 1; }
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-5);
-}
-
-/* Exposure indicator */
-.nav-exposure {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 12px;
-  height: 32px;
-  background: var(--color-brand);
-  border-radius: var(--radius);
-}
-.nav-exposure-label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: rgba(0,0,0,0.6);
-}
-.nav-exposure-value {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--font-bold);
-  color: var(--color-text-on-brand);
-}
-
-/* User avatar pill */
-.nav-avatar {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: var(--color-text-primary);
-  color: var(--color-text-on-dark);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  letter-spacing: 0.02em;
-}
-
-
-/* ============================================================
-   CARD / PANEL
-   ============================================================ */
-
-.card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
+  width: var(--w-field);
+  height: var(--h-control);
+  padding: var(--space-7) var(--space-12);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-field);
   overflow: hidden;
-}
-.card-header {
-  padding: var(--space-5) var(--space-7);
-  border-bottom: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  gap: var(--space-5);
-}
-.card-title {
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
+  font: var(--type-field-value);
   color: var(--color-text-primary);
-  flex: 1;
+  text-align: left;
 }
-.card-body { padding: var(--space-7); }
+.field > .select, .field > .input, .field > .input-2text, .field > .search { width: 100%; }
 
+/* SELECT — figma: 56:126 padding T7 R8 B7 L12, gap 32, SPACE_BETWEEN; text "Please Select" Grey 2 (56:127); chevron lucide 16x16 (56:128) */
+.select { justify-content: space-between; gap: var(--space-32); padding: var(--space-7) var(--space-8) var(--space-7) var(--space-12); cursor: pointer; }
+.select__value { color: var(--color-text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* figma: Dashboard Select 16:1931 — value "MKT" overridden to Black */
+.select.is-filled .select__value { color: var(--color-text-primary); }
 
-/* ============================================================
-   DIVIDER
-   ============================================================ */
+/* INPUT — figma: 56:148 gap 0, padding T7 R12 B7 L12, primary MIN; text "0" Geist Regular 12 Grey 2 (56:149) = placeholder look.
+   Entered value = Black (Dashboard 16:1915 value override); dimmed value (Slippage "2", Dashboard 16:1930) = Grey 2 */
+.input { justify-content: flex-start; gap: 0; }
+.input__field {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--h-label);
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: var(--type-field-value);
+  color: var(--color-text-primary);
+}
+.input__field::placeholder { color: var(--color-text-tertiary); opacity: 1; }
+.input__field.is-dim { color: var(--color-text-tertiary); }
+.input__unit { flex: none; font: var(--type-field-unit); color: var(--color-text-secondary); white-space: nowrap; }
 
-.divider {
+/* INPUT WITH 2 TEXT — figma: 56:138 padding T7 R12 B7 L12, gap 32, SPACE_BETWEEN; "0" Grey 2 + suffix "abc" Geist Regular 12 Grey 3 (56:140) */
+.input-2text { justify-content: space-between; gap: var(--space-32); }
+
+/* SEARCH — figma: 56:156 gap 8, padding T7 R8 B7 L8, MIN/CENTER; lucide/search 16x16 (56:157), text "Search" Grey 2 (56:159) */
+.search { justify-content: flex-start; gap: var(--space-8); padding: var(--space-7) var(--space-8); }
+
+/* EXTENDED — not in Figma: field focus = 1px Main color stroke (the Button/hover stroke language: Main color, 1px INSIDE) via inset box-shadow; Figma draws no focus state. */
+.select:focus-visible, .select.is-focus,
+.input:focus-within, .input.is-focus,
+.input-2text:focus-within, .input-2text.is-focus,
+.search:focus-within, .search.is-focus {
+  outline: 0;
+  box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-border-focus);
+}
+/* EXTENDED — not in Figma: invalid field = 1px Red for text stroke (border.error); Figma draws no error state. */
+.select.is-error, .input.is-error, .input-2text.is-error, .search.is-error {
+  box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-border-error);
+}
+/* EXTENDED — not in Figma: disabled field = Grey 1 fill (surface.hover, the neutral muted fill) + Grey 2 text/icons (text.tertiary); not-allowed cursor. */
+.select:disabled, .select.is-disabled,
+.input.is-disabled, .input:has(.input__field:disabled),
+.input-2text.is-disabled, .input-2text:has(.input__field:disabled),
+.search.is-disabled, .search:has(.input__field:disabled) {
+  background: var(--color-surface-hover);
+  cursor: not-allowed;
+}
+.select:disabled .select__value, .select.is-disabled .select__value,
+.input.is-disabled .input__field, .input .input__field:disabled,
+.input-2text.is-disabled .input__field, .input-2text .input__field:disabled,
+.search.is-disabled .input__field, .search .input__field:disabled { color: var(--color-text-tertiary); cursor: not-allowed; }
+.select:disabled .icon, .select.is-disabled .icon, .search.is-disabled .icon, .search:has(.input__field:disabled) .icon,
+.input-2text.is-disabled .input__unit, .input-2text:has(.input__field:disabled) .input__unit { color: var(--color-text-tertiary); }
+/* EXTENDED — not in Figma: open Select = chevron turned 180deg (CSS rotate of the exported chevron). */
+.select.is-open .icon-chevron-down { transform: rotate(180deg); }
+
+/* EXTENDED — not in Figma: open Select list / dropdown menu. Panel surface (White) with a 1px Grey 1 inset hairline (no shadow: Figma has none),
+   radius 4 (control radius), padding 4 (observed gap), items = field metrics (32 high, 7/12, Geist Regular 12); hover = Grey 0 (field fill);
+   selected = Main color transp + Geist Medium 12. */
+.select-wrap { position: relative; }
+.menu {
+  position: absolute;
+  z-index: var(--z-menu);
+  left: 0;
+  right: 0;
+  top: calc(100% + var(--space-4));
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-panel);
+  box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-border-divider);
+}
+.menu--static { position: static; }
+.menu__item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 20px 0;
-}
-.divider-line {
-  flex: 1;
-  height: 1px;
-  background: var(--color-border);
-}
-.divider-text {
-  font-size: var(--text-sm);
-  color: var(--color-text-tertiary);
-  font-weight: var(--font-medium);
-}
-
-
-/* ============================================================
-   TOAST
-   ============================================================ */
-
-.toast {
-  position: fixed;
-  bottom: 32px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  opacity: 0;
-  background: var(--color-text-on-brand);
-  color: var(--color-text-on-dark);
-  border-radius: var(--radius);
-  padding: 14px 20px;
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
+  height: var(--h-control);
+  padding: var(--space-7) var(--space-12);
+  border-radius: var(--radius-control);
+  font: var(--type-field-value);
+  color: var(--color-text-primary);
+  cursor: pointer;
   white-space: nowrap;
-  pointer-events: none;
-  z-index: var(--z-dialog);
-  transition:
-    transform var(--duration-slide) var(--ease-screen),
-    opacity   var(--duration-enter) var(--ease-default);
 }
-.toast.show {
-  transform: translateX(-50%) translateY(0);
-  opacity: 1;
+.menu__item:hover, .menu__item.is-hover { background: var(--color-surface-field); }
+.menu__item.is-selected { background: var(--color-brand-transp); font: var(--type-blotter-cell); }
+.menu__item.is-disabled, .menu__item[aria-disabled="true"] { color: var(--color-text-disabled); cursor: not-allowed; }
+
+/* ---------------------------------------------------------------------
+   CHECKBOX — figma: set 56:165 (final). Row 120x16 FIXED/HUG, HORIZONTAL gap 8, counter CENTER; box 16x16 radius 2; label Geist Regular 12.
+   Markup: <label class="checkbox"><input class="checkbox__input" type="checkbox"><span class="checkbox__box"></span><span class="checkbox__label">Selected</span></label>
+   Variants: selected 56:166 | not selected 56:170 | all (indeterminate) 56:176 | disabled (checked) 56:184 | disabled 2 (unchecked) 56:173 | disabled all 56:180.
+   FINAL page colours (the drafts page keeps the old dark-green style #005268 — not used).
+   --------------------------------------------------------------------- */
+.checkbox { position: relative; display: inline-flex; align-items: center; gap: var(--space-8); width: var(--w-checkbox-row); height: var(--h-checkbox); font: var(--type-field-value); color: var(--color-text-primary); cursor: pointer; }
+.checkbox__input { position: absolute; opacity: 0; width: 0; height: 0; margin: 0; }
+/* not selected 56:170 — fill none, stroke Grey 2 1px INSIDE, radius 2 */
+.checkbox__box { position: relative; flex: none; width: var(--h-checkbox); height: var(--h-checkbox); border-radius: var(--radius-checkbox); background: transparent; box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-border-checkbox); color: var(--color-text-on-brand); }
+.checkbox__label { white-space: nowrap; }
+/* selected 56:166 — fill Main color, no stroke; check vector 8x6 at (4,5), Black 1.5 round (export 10x8 at (3,4) = assets/icon-check) */
+:is(.checkbox__input:checked + .checkbox__box, .checkbox.is-checked .checkbox__box) { background: var(--color-brand); box-shadow: none; }
+:is(.checkbox__input:checked + .checkbox__box, .checkbox.is-checked .checkbox__box)::after {
+  content: ""; position: absolute; left: 3px; top: 4px; width: var(--icon-check); height: 8px;
+  background-color: currentColor;
+  -webkit-mask: url(assets/icon-check.currentColor.svg) center / contain no-repeat; mask: url(assets/icon-check.currentColor.svg) center / contain no-repeat;
 }
-.toast.danger { background: var(--color-status-danger); }
-
-
-/* ============================================================
-   OTP INPUT (authenticator)
-   ============================================================ */
-
-.otp-row {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
+/* all (indeterminate) 56:176 — fill Main color; dash vector 8x0 at (4,8), Black 1.5 round (export 10x2 at (3,7) = assets/icon-minus) */
+:is(.checkbox__input:indeterminate + .checkbox__box, .checkbox.is-indeterminate .checkbox__box) { background: var(--color-brand); box-shadow: none; }
+:is(.checkbox__input:indeterminate + .checkbox__box, .checkbox.is-indeterminate .checkbox__box)::after {
+  content: ""; position: absolute; left: 3px; top: 7px; width: var(--icon-check); height: 2px;
+  background-color: currentColor;
+  -webkit-mask: url(assets/icon-minus.currentColor.svg) center / contain no-repeat; mask: url(assets/icon-minus.currentColor.svg) center / contain no-repeat;
 }
-.otp-slot {
-  width: 44px; height: 56px;
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-2);
-  font-family: var(--font-mono);
-  font-size: var(--text-3xl);
-  font-weight: var(--font-semibold);
-  text-align: center;
-  color: var(--color-text-primary);
-  outline: none;
-  caret-color: var(--color-brand);
-  transition: border-color var(--duration-normal), box-shadow var(--duration-normal);
-}
-.otp-slot:focus {
-  border-color: var(--color-border-focus);
-  box-shadow: var(--shadow-focus);
-}
-.otp-slot.filled { border-color: var(--color-brand-dark); }
-.otp-slot.error  { border-color: var(--color-status-danger); }
+/* disabled 56:184 / disabled all 56:180 — box fill Grey 3, glyph Grey 0 1.5, label Grey 3; disabled 2 56:173 — unchecked: stroke Grey 2 1px INSIDE, label Grey 3 */
+.checkbox:has(.checkbox__input:disabled), .checkbox.is-disabled { color: var(--color-text-disabled); cursor: not-allowed; }
+:is(.checkbox__input:disabled:checked + .checkbox__box, .checkbox.is-disabled.is-checked .checkbox__box,
+    .checkbox__input:disabled:indeterminate + .checkbox__box, .checkbox.is-disabled.is-indeterminate .checkbox__box) { background: var(--color-surface-disabled); color: var(--color-text-on-disabled); }
+/* EXTENDED — not in Figma: checkbox hover = unchecked stroke Grey 3 (text.secondary); checked/indeterminate fill Main color hover (the Button hover recipe). Not applied to disabled. */
+.checkbox:not(.is-disabled):not(:has(.checkbox__input:disabled)):hover .checkbox__input:not(:checked):not(:indeterminate) + .checkbox__box,
+.checkbox.is-hover:not(.is-checked):not(.is-indeterminate):not(.is-disabled) .checkbox__box { box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-text-secondary); }
+.checkbox:not(.is-disabled):not(:has(.checkbox__input:disabled)):hover .checkbox__input:is(:checked, :indeterminate) + .checkbox__box,
+.checkbox.is-hover.is-checked:not(.is-disabled) .checkbox__box,
+.checkbox.is-hover.is-indeterminate:not(.is-disabled) .checkbox__box { background: var(--color-brand-hover); }
+/* EXTENDED — not in Figma: checkbox keyboard focus = 1.5px Main color outline, offset 2px (global focus-ring recipe). */
+.checkbox__input:focus-visible + .checkbox__box, .checkbox.is-focus .checkbox__box { outline: var(--stroke-icon) solid var(--color-border-focus); outline-offset: 2px; }
 
-
-/* ============================================================
-   INSTRUMENT SELECTOR (pair dropdown in spot trader)
-   ============================================================ */
-
-.instrument-select {
+/* ---------------------------------------------------------------------
+   BUTTON — figma: set 56:193. 86x32 HUG x FIXED(32), HORIZONTAL, gap 8, padding T7 R24 B7 L24, primary CENTER, counter CENTER, radius 4, clip.
+   Label Geist Medium 12, Black. Default 56:194 fill Main color, no stroke | hover 56:196 fill Main color hover + 1px Main color stroke INSIDE.
+   --------------------------------------------------------------------- */
+.btn, .btn-outline, .btn-black {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 32px;
-  padding: 0 10px;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  justify-content: center;
+  gap: var(--space-8);
+  height: var(--h-control);
+  padding: var(--space-7) var(--space-24);
+  border: 0;
+  border-radius: var(--radius-control);
+  font: var(--type-blotter-cell);
+  white-space: nowrap;
   cursor: pointer;
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--color-text-primary);
-  transition: border-color var(--duration-fast);
+  text-decoration: none;
 }
-.instrument-select:hover { border-color: var(--color-brand-ghost-border); }
-.instrument-select .instrument-icon { color: var(--color-text-tertiary); }
-.instrument-select svg { width: 12px; height: 12px; color: var(--color-text-tertiary); }
+.btn { background: var(--color-brand); color: var(--color-text-on-brand); }
+.btn:hover, .btn.is-hover { background: var(--color-brand-hover); box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-border-brand); }
 
+/* BUTTON OUTLINE — figma: set 56:188. Same geometry; primary axis MIN (!) — label is left-aligned when the button is stretched.
+   Default 56:189: no fill, 1px Black stroke INSIDE | hover 56:191: fill Main color transp (0.20) + same stroke. Label Black. */
+.btn-outline { justify-content: flex-start; background: transparent; color: var(--color-text-primary); box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-border-outline); }
+.btn-outline:hover, .btn-outline.is-hover { background: var(--color-brand-transp); }
 
-/* ============================================================
-   BALANCE ROW
-   ============================================================ */
+/* BUTTON BLACK — figma: set 56:198. Default 56:199: fill Black, label Geist Medium 12 Main color, no stroke | Variant2 56:201 (unnamed, treated as hover): + 1px Main color stroke OUTSIDE. */
+.btn-black { background: var(--color-surface-button-black); color: var(--color-text-on-black); }
+.btn-black:hover, .btn-black.is-hover { box-shadow: 0 0 0 var(--stroke-hairline) var(--color-border-brand); }
 
-.balance-row {
+/* DASHBOARD primary button — figma: 16:2132 (Button/Default stretched to 392x40, label Geist Medium 14 uppercase typed in the text, fill Main color, no stroke).
+   .btn--lg = 40 high / 14px label; .btn--block = FILL width. */
+.btn--lg { height: var(--h-control-lg); font: var(--type-balance-asset); }
+.btn--block { display: flex; width: 100%; }
+.btn-outline.btn--block { display: flex; }
+
+/* EXTENDED — not in Figma: pressed = Main color pressed (brand.pressed = Main color darker #3DBFBF) fill; Outline/Black pressed = their hover look. */
+.btn:active, .btn.is-active { background: var(--color-brand-pressed); box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-border-brand); }
+.btn-outline:active, .btn-outline.is-active { background: var(--color-brand-transp); }
+.btn-black:active, .btn-black.is-active { box-shadow: 0 0 0 var(--stroke-hairline) var(--color-border-brand); }
+/* EXTENDED — not in Figma: disabled = the Figma disabled-checkbox recipe (Grey 3 fill, Grey 0 content); Outline: Grey 2 stroke + Grey 3 label (disabled 2 checkbox). */
+.btn:disabled, .btn.is-disabled, .btn-black:disabled, .btn-black.is-disabled { background: var(--color-surface-disabled); color: var(--color-text-on-disabled); box-shadow: none; cursor: not-allowed; }
+.btn-outline:disabled, .btn-outline.is-disabled { background: transparent; color: var(--color-text-disabled); box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-border-checkbox); cursor: not-allowed; }
+/* EXTENDED — not in Figma: button focus-visible = 1.5px Main color outline, offset 2px (global ring); .is-focus forces it. */
+.btn.is-focus, .btn-outline.is-focus, .btn-black.is-focus { outline: var(--stroke-icon) solid var(--color-border-focus); outline-offset: 2px; }
+
+/* ---------------------------------------------------------------------
+   TABS — figma: set 56:203 (variants 1 / 2 = which side is selected). Component HUG x FIXED(40) = 184x40, HORIZONTAL gap 0, MIN/CENTER, radius 4, NO fill.
+   Each tab: HUG x FILL (40 tall), gap 8, padding T7 R24 B7 L24, CENTER/CENTER, radius 4, label 14px.
+   Selected: fill Main color, Geist Medium 14 Black | unselected: no fill, Geist Regular 14 Grey 3. No stroke.
+   --------------------------------------------------------------------- */
+.tabs { display: inline-flex; align-items: stretch; gap: 0; height: var(--h-tab); border-radius: var(--radius-control); }
+.tab {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--color-border);
+  justify-content: center;
+  gap: var(--space-8);
+  padding: var(--space-7) var(--space-24);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  font: var(--type-tab-inactive);
+  color: var(--color-text-tab-inactive);
+  white-space: nowrap;
+  cursor: pointer;
 }
-.balance-row:last-child { border-bottom: none; }
-.balance-asset {
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
+.tab.is-selected, .tab[aria-selected="true"] { background: var(--color-brand); font: var(--type-balance-asset); color: var(--color-text-on-brand); }
+/* EXTENDED — not in Figma: unselected tab hover = label Black (text.primary); selected = Main color hover (Button recipe); focus = inset 1.5px Main color outline; disabled = Grey 3 label (selected disabled = Grey 3 fill, Grey 0 label, the disabled-checkbox recipe) */
+.tab:hover:not(.is-selected):not([aria-selected="true"]), .tab.is-hover:not(.is-selected) { color: var(--color-text-primary); }
+.tab.is-selected:hover, .tab[aria-selected="true"]:hover, .tab.is-selected.is-hover { background: var(--color-brand-hover); }
+.tab.is-focus { outline: var(--stroke-icon) solid var(--color-border-focus); outline-offset: -1.5px; }
+.tab:disabled, .tab.is-disabled { color: var(--color-text-disabled); cursor: not-allowed; }
+.tab.is-selected:disabled, .tab.is-selected.is-disabled { background: var(--color-surface-disabled); color: var(--color-text-on-disabled); }
+
+/* DASHBOARD SELL/BUY tabs — figma: 16:2127 (tabs variant 2 stretched to 392x40): container fill Grey 0 ADDED, tabs FILL/FILL (196 each),
+   labels typed uppercase, selected BUY fill green #8BEEC8 (not Main color), text Geist Medium 14 Black. */
+.tabs--track { display: flex; width: 100%; background: var(--color-surface-tabs-track); }
+.tabs--track .tab { flex: 1 1 0; }
+.tab--buy.is-selected, .tab--buy[aria-selected="true"] { background: var(--color-surface-tab-buy); }
+/* EXTENDED — not in Figma: selected SELL = Red fill (mirror of BUY = green); the SELL-active variant is not drawn on the Dashboard. */
+.tab--sell.is-selected, .tab--sell[aria-selected="true"] { background: var(--color-surface-tab-sell); }
+
+/* TABS in input-with-tabs — figma: tabs 107x32 (56:217): HUG x FIXED(32), radius 4, no fill, gap 0; tab padding T7 R8 B7 L8, label 12px:
+   selected Geist Medium 12 Black on Main color | unselected Geist Regular 12 Grey 3 (selected 54 / unselected 53 wide). */
+.tabs--sm { height: var(--h-tab-sm); }
+.tabs--sm .tab { padding: var(--space-7) var(--space-8); font: var(--type-field-value); color: var(--color-text-tab-inactive); }
+.tabs--sm .tab.is-selected, .tabs--sm .tab[aria-selected="true"] { font: var(--type-blotter-cell); color: var(--color-text-on-brand); }
+/* figma: Dashboard RFQ quantity 16:2131 — selected currency tab BTC fill Orange #FFB051 (not Main color), Geist Medium 12 Black */
+.tab--warning.is-selected, .tab--warning[aria-selected="true"],
+.tabs--sm .tab.tab--warning.is-selected, .tabs--sm .tab.tab--warning[aria-selected="true"] { background: var(--color-surface-warning); color: var(--color-text-on-warning); } /* stage 2 bug fix: the 2nd selector pair out-ranks `.tabs--sm .tab.is-selected`, so the dark label is text.on-warning (#000) not text.on-brand (#2B2B2B); light unchanged */
+
+/* ---------------------------------------------------------------------
+   INPUT WITH TABS — figma: set 56:214 (4 variants: 1 label 56:215 | 2 label 56:218 | 2 no label 56:221 | 1 no label 56:223).
+   244x32 (+16 label +4 gap = 52): HORIZONTAL itemSpacing -106 — the Input (243 wide, FILL) sits under a 107-wide tabs frame placed flush right
+   (x=137). Implemented as relative wrapper + absolutely placed tabs. Variant "1" = first tab selected, "2" = second.
+   --------------------------------------------------------------------- */
+.input-tabs { position: relative; display: flex; align-items: center; width: var(--w-input-with-tabs); height: var(--h-control); }
+.input-tabs > .input { flex: none; width: calc(100% - 1px); }
+.input-tabs > .tabs { position: absolute; top: 0; right: 0; }
+.field--input-tabs { width: var(--w-input-with-tabs); }
+.field > .input-tabs { width: 100%; }
+
+/* ---------------------------------------------------------------------
+   ICON BUTTONS — figma: refresh 56:225, filter 56:230, hands 56:235. 32x32 FIXED, radius 4, clip, padding 7 all, CENTER/CENTER.
+   Glyph stroke Grey 3 1.5 (baked in the asset; export sizes 18x18 / 20x18 centre exactly on the figma 16x16 / 18x16 node boxes).
+   Default: no fill | hover (refresh "hover", filter/hands "Variant2" — presumed hover): fill Grey 1. Icon colour unchanged.
+   --------------------------------------------------------------------- */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--h-icon-button);
+  height: var(--h-icon-button);
+  padding: var(--space-7);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--color-icon-default);
+  cursor: pointer;
+}
+.icon-btn:hover, .icon-btn.is-hover { background: var(--color-surface-hover); }
+/* EXTENDED — not in Figma: pressed = hover fill; disabled = glyph Grey 2 (text.tertiary), no hover fill; focus = 1.5px Main color outline. */
+.icon-btn:active, .icon-btn.is-active { background: var(--color-surface-hover); }
+.icon-btn:disabled, .icon-btn.is-disabled { background: transparent; color: var(--color-text-tertiary); cursor: not-allowed; }
+.icon-btn:disabled .icon, .icon-btn.is-disabled .icon { color: var(--color-text-tertiary); }
+.icon-btn.is-focus { outline: var(--stroke-icon) solid var(--color-border-focus); outline-offset: 2px; }
+
+/* ---------------------------------------------------------------------
+   ORDER-TYPE CHIPS (no component in Figma; raw frames) — figma: Limit 16:2010 (76x24, fill #E4CAFF, text Geist Medium 12 #9236F2),
+   Market 16:2025 (88x24, fill #CADCFF, #3A77F2). Chip: H hug, h24, padding 0/24, gap 10, CENTER/CENTER, radius 16, no stroke.
+   (Blotter cell wrapper 117x16, padding 0/30 — stage 2.)
+   --------------------------------------------------------------------- */
+.chip { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-10); height: var(--h-chip); padding: 0 var(--space-24); border-radius: var(--radius-pill); font: var(--type-badge-limit); white-space: nowrap; }
+.chip--limit { background: var(--color-surface-chip-limit); color: var(--color-text-limit); }
+.chip--market { background: var(--color-surface-chip-market); color: var(--color-text-market); }
+
+/* ---------------------------------------------------------------------
+   BID / ASK PRICE TILES — figma: BID 16:1920, ASK/BUY 16:1923. 188x100, radius 8, V gap 4, padding 12 all, MIN/MIN; no stroke, no shadow.
+   BID fill Red #FB9697, left aligned. ASK fill green #8BEEC8, cross-axis MAX (digits right aligned).
+   Digits Geist Mono Regular 32 Black UPPER (42 box) + decimals Geist Mono Regular 14 Black UPPER (18 box). No BID/ASK word on the tiles.
+   --------------------------------------------------------------------- */
+.price-tile { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: var(--space-4); width: var(--w-tile); height: var(--h-tile); padding: var(--space-12); border-radius: var(--radius-panel); }
+.price-tile--bid { background: var(--color-surface-tile-bid); }
+.price-tile--ask { background: var(--color-surface-tile-ask); text-align: right; }
+.price-tile__big { font: var(--type-tile-big); color: var(--color-text-on-tile); text-transform: uppercase; white-space: nowrap; }
+.price-tile__dec { font: var(--type-tile-decimals); color: var(--color-text-on-tile); text-transform: uppercase; white-space: nowrap; }
+
+/* SPREAD TAB — figma: 16:1927. 120x32, fill White, per-corner radius [8,8,0,0], padding T11 R36 B11 L36, CENTER/CENTER; value Geist Mono Regular 16 Black (98.23).
+   Sits on the tile seam (overlap stack -36 = stage 2 pattern). */
+.spread-tab { display: inline-flex; align-items: center; justify-content: center; width: var(--w-spread); height: var(--h-spread); padding: var(--space-11) var(--space-36); border-radius: var(--radius-spread-tab); background: var(--color-surface-spread); font: var(--type-spread-value); color: var(--color-text-primary); white-space: nowrap; }
+
+/* ---------------------------------------------------------------------
+   EXTENDED — not in Figma: CHART PANEL (owner decision 2026-10-15, from the live-app capture 1:3: title, toolbar row, plot area).
+   Container = the panel recipe (White, r8, padding 16/24/24/24, gap 16; Chart panel 16:1978 = 952x392 with only its title);
+   title = panel title (Geist Regular 20 UPPER); toolbar slot = 32 high strip (control height; capture strip ~38 high incl. its edge — visual estimate)
+   on surface.chart-toolbar (light: Grey 0 derived; dark: #0F0F0F sampled at (1450,166)); buttons = control metrics, active = surface.chart-toolbar-active
+   (light: Grey 1; dark #3D3D3D sampled at (973,160)); plot area = empty slot (no TradingView assets), legend text = field-value.
+   --------------------------------------------------------------------- */
+.chart-panel { display: flex; flex-direction: column; gap: var(--space-16); width: var(--layout-panel-width-lg); height: var(--layout-panel-height-chart); padding: var(--space-16) var(--space-24) var(--space-24); border-radius: var(--radius-panel); background: var(--color-surface-panel); }
+.chart-panel__title { height: var(--h-panel-title); font: var(--type-panel-title); color: var(--color-text-title); text-transform: uppercase; }
+.chart-toolbar { display: flex; align-items: center; gap: var(--space-4); height: var(--h-control); padding: 0 var(--space-8); border-radius: var(--radius-control); background: var(--color-surface-chart-toolbar); }
+.chart-toolbar__btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-8); height: var(--h-control); padding: var(--space-7) var(--space-8); border: 0; border-radius: var(--radius-control); background: transparent; font: var(--type-field-value); color: var(--color-text-primary); cursor: pointer; white-space: nowrap; }
+.chart-toolbar__btn:hover, .chart-toolbar__btn.is-hover, .chart-toolbar__btn.is-active { background: var(--color-surface-chart-toolbar-active); }
+.chart-toolbar__sep { flex: none; width: var(--stroke-hairline); height: var(--icon-16); background: var(--color-border-divider); }
+.chart-toolbar__spacer { flex: 1 1 auto; }
+.chart-plot { position: relative; flex: 1 1 auto; min-height: 0; border-radius: var(--radius-control); background: var(--color-surface-panel); }
+.chart-plot__legend { position: absolute; left: var(--space-8); top: var(--space-8); font: var(--type-field-value); color: var(--color-text-primary); }
+.chart-plot__placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font: var(--type-field-label); color: var(--color-text-tertiary); }
+
+/* ---------------------------------------------------------------------
+   EXTENDED — not in Figma: TOAST. Panel surface (White) r8 with a 1px Grey 1 inset hairline (Figma has no shadows), padding 12/16 (observed 12 / 16),
+   status dot = the blotter status dots (success green for text / danger Red for text), message Geist Medium 12 Black. Stack = fixed bottom-right.
+   --------------------------------------------------------------------- */
+.toast-stack { position: fixed; right: var(--space-24); bottom: var(--space-24); z-index: var(--z-toast); display: flex; flex-direction: column; gap: var(--space-8); }
+.toast { display: flex; align-items: center; gap: var(--space-8); min-width: 240px; padding: var(--space-12) var(--space-16); border-radius: var(--radius-panel); background: var(--color-surface-panel); box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-border-divider); font: var(--type-blotter-cell); color: var(--color-text-primary); }
+.toast--success .status-dot { color: var(--color-status-success); }
+.toast--danger .status-dot { color: var(--color-status-danger); }
+.toast__message { flex: 1 1 auto; }
+
+/* EXTENDED — not in Figma: MODAL. Scrim = Black @0.20 (the one alpha value Figma uses); card = the panel recipe (White, r8, padding 16/24/24/24, gap 16, width 440 = panel width),
+   title = panel title (Geist Regular 20 UPPER), actions = Button Outline + Button (right aligned, gap 8). 1px Grey 1 inset hairline instead of a shadow. */
+.modal-backdrop { position: fixed; inset: 0; z-index: var(--z-scrim); display: flex; align-items: center; justify-content: center; background: var(--color-surface-scrim); }
+.modal { z-index: var(--z-modal); display: flex; flex-direction: column; gap: var(--space-16); width: var(--layout-panel-width-sm); padding: var(--space-16) var(--space-24) var(--space-24); border-radius: var(--radius-panel); background: var(--color-surface-panel); box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-border-divider); }
+.modal__title { font: var(--type-panel-title); color: var(--color-text-title); text-transform: uppercase; }
+.modal__body { font: var(--type-field-value); color: var(--color-text-primary); }
+.modal__actions { display: flex; justify-content: flex-end; gap: var(--space-8); }
+
+/* EXTENDED — not in Figma: TOOLTIP. Black-button recipe (fill surface.button-black, label Main color 12 Medium), radius 4, padding 4/8 (observed), no shadow. */
+.tooltip { display: inline-flex; align-items: center; padding: var(--space-4) var(--space-8); border-radius: var(--radius-control); background: var(--color-surface-button-black); font: var(--type-button-black-label); color: var(--color-text-on-black); white-space: nowrap; }
+
+/* ===== PART 2: PATTERNS — stage 2 appends below this line ===== */
+
+/* =====================================================================
+   PART 2 — LAYOUT PATTERNS (stage 2). Source: figma-spec/dashboard.md (Dashboard 16:1910, 1920x1080), foundations.md 5.
+   Every block starts with "figma: <node ids>". Semantic tokens only -> body.dark / .theme-dark flip every pattern (EXTENDED theme).
+   Sizes with no token (observed Figma frame sizes) are literal px with their node id. "ALT" = documented Figma/capture alternates, never default.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   DASHBOARD CANVAS — figma: 16:1910. 1920x1080, fill Grey 0 (surface.page), clip, NO layout mode: children absolutely placed.
+   Placement of children (x,y) is applied by `.dashboard > .<pattern>` rules below; outside `.dashboard` every pattern is a normal static box.
+   --------------------------------------------------------------------- */
+.dashboard {
+  position: relative;
+  width: var(--layout-screen-width);
+  height: var(--layout-screen-height);
+  overflow: hidden;
+  background: var(--color-surface-page);
+  font: var(--type-regular-12);
   color: var(--color-text-primary);
 }
-.balance-qty {
-  font-family: var(--font-mono);
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  color: var(--color-text-primary);
+.dashboard > .nav,
+.dashboard > .ticker,
+.dashboard > .panel,
+.dashboard > .chart-panel { position: absolute; }
+/* figma: 16:2386 (24,16) · 16:2133 (0,104) · 16:1911 (24,200) · 16:2124 (24,744) · 16:1954 (480,200) · 16:1978 (936,200) · 16:1981 (480,608) */
+.dashboard > .nav { left: var(--layout-nav-x); top: var(--layout-nav-y); }
+.dashboard > .ticker { left: 0; top: var(--layout-ticker-y); }
+.dashboard > .panel--trader { left: var(--layout-margin-left); top: var(--layout-panels-y); }
+.dashboard > .panel--rfq { left: var(--layout-margin-left); top: var(--layout-rfq-y); }
+.dashboard > .panel--balances { left: var(--layout-col2-x); top: var(--layout-panels-y); }
+.dashboard > .chart-panel { left: var(--layout-col3-x); top: var(--layout-panels-y); }
+.dashboard > .panel--blotter { left: var(--layout-col2-x); top: var(--layout-blotter-y); }
+
+/* ALT (Figma inconsistency kept as drawn by default): panels end at x=1888 while the header ends at 1896, and RFQ ends y=1022 vs Trades y=1046.
+   .dashboard--alt-aligned = right edge flush with the header (chart 960, blotter 1416 -> 1896) and RFQ bottom flush with Trades (302 high -> 1046). Tables stretch, so inner widths follow. */
+.dashboard--alt-aligned > .chart-panel { width: calc(var(--layout-panel-width-lg) + 8px); }
+.dashboard--alt-aligned > .panel--blotter { width: calc(var(--layout-panel-width-blotter) + 8px); }
+.dashboard--alt-aligned > .panel--rfq { height: calc(var(--layout-panel-height-rfq) + 24px); }
+.dashboard--alt-aligned .data-table--blotter { width: auto; }
+/* ALT (live-app capture vs light Figma): dark-theme panel titles are grey (#7A9091) in the capture; this modifier forces text.primary like the light Figma Black. */
+.dashboard--alt-title-primary .panel__title,
+.dashboard--alt-title-primary .chart-panel__title,
+.dashboard--alt-title-primary .modal__title,
+.dashboard--alt-title-primary .blotter-tab.is-active { color: var(--color-text-primary); }
+
+/* ---------------------------------------------------------------------
+   PANEL (card) — figma: 16:1911, 16:2124, 16:1954, 16:1978, 16:1981. White (surface.panel), radius 8, NO border, NO shadow, NO clip,
+   auto-layout V, padding T16 R24 B24 L24, itemSpacing 16 (blotter 8), align MIN/MIN; children are 392 wide = 440 - 48 (stretch).
+   --------------------------------------------------------------------- */
+.panel { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: var(--layout-panel-gap); padding: var(--layout-panel-padding); border-radius: var(--radius-panel); background: var(--color-surface-panel); }
+.panel--trader { width: var(--layout-panel-width-sm); height: var(--layout-panel-height-trader); }          /* 16:1911 440x528 */
+.panel--rfq { width: var(--layout-panel-width-sm); height: var(--layout-panel-height-rfq); }                 /* 16:2124 440x278 */
+.panel--balances { width: var(--layout-panel-width-sm); height: var(--layout-panel-height-balances); }      /* 16:1954 440x392 */
+.panel--blotter { gap: var(--layout-panel-gap-blotter); width: var(--layout-panel-width-blotter); height: var(--layout-panel-height-blotter); } /* 16:1981 1408x438, gap 8 */
+
+/* PANEL TITLE ROW — figma: 16:1912 (Spot Trader 392x26), 16:1955 (Balances 392x32 with refresh), 16:1982 (Blotter 1360x38), 16:2125 (RFQ 26), 16:1979 (Chart 26).
+   H, gap 10, counter CENTER. Title = Geist Regular 20, textCase UPPER applied by text-transform on the stored mixed-case text (Spot Trader / Spot balances / Chart / RFQ / trades blotter / BALANCE MOVEMENT). */
+.panel__head { display: flex; align-items: center; gap: var(--space-10); height: var(--h-panel-title); }
+.panel__title { font: var(--type-panel-title); color: var(--color-text-title); text-transform: uppercase; white-space: nowrap; }
+.panel__head--balances { justify-content: space-between; height: 32px; }   /* 16:1955 392x32 (refresh 32x32 at right; title y3) */
+.panel__head--blotter { justify-content: space-between; height: 38px; }    /* 16:1982 1360x38 (tabs left, icon cluster 96x32 right) */
+.panel__actions { display: flex; align-items: center; gap: 0; }            /* 16:1986 icon-button cluster 96x32 (refresh / filter / hands), gap 0 */
+
+/* PANEL BODY ROWS — figma: 16:1914 / 16:1929 / 16:2129: H gap 16; fields 188x52 FILL (Trader) or 132 + 244 (RFQ). */
+.form-row { display: flex; align-items: center; gap: var(--space-16); }
+.form-row--top { align-items: flex-start; }
+/* figma: 16:2128 RFQ form V gap 48 (row 52 -> primary button 40) */
+.form-stack { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-48); }
+
+/* ---------------------------------------------------------------------
+   TOP NAV (floating) — figma: 16:2386. 1872x72 at (24,16), fill White (surface.nav), radius 8, NO stroke/shadow; auto-layout H SPACE_BETWEEN, CENTER,
+   padding T16 R24 B16 L24 (stored itemSpacing 271 is a stale leftover: actual free space 274 = (1824-1276)/2; logo ends 552, UAT pill x826, right cluster x1320, nav-relative).
+   Light: no edge line (border.nav transparent). Dark (EXTENDED): bottom hairline = border.nav #393939 (capture, y=55).
+   --------------------------------------------------------------------- */
+.nav { display: flex; align-items: center; justify-content: space-between; width: var(--layout-nav-width); height: var(--layout-nav-height); padding: var(--layout-nav-padding); border-radius: var(--radius-panel); background: var(--color-surface-nav); box-shadow: inset 0 calc(-1 * var(--stroke-hairline)) 0 var(--color-border-nav); }
+/* ALT (capture): header drawn full-bleed on the page colour with square corners — x0, full width. (Capture header height ~56 is a visual estimate and is NOT applied.) */
+.nav--alt-fullbleed { width: 100%; border-radius: 0; }
+.dashboard > .nav--alt-fullbleed { left: 0; top: 0; width: var(--layout-screen-width); }
+/* figma: 16:2387 logo frame "SVG" 528x40 FIXED, clip; contains Union 86 163x40 at (0,0) */
+.nav__logo { flex: none; width: 528px; height: var(--h-logo); overflow: hidden; }
+/* figma: 16:2389 UAT environment chip 220x40, fill Main color transp (surface.env), radius 4, no stroke, H gap 8 padding 7/24, CENTER/CENTER, clip; label Geist Medium 16. Non-interactive. */
+.pill-env { display: flex; flex: none; align-items: center; justify-content: center; gap: var(--space-8); width: 220px; height: var(--h-control-lg); padding: var(--space-7) var(--space-24); border-radius: var(--radius-control); background: var(--color-surface-env); overflow: hidden; font: var(--type-env-pill); color: var(--color-text-primary); white-space: nowrap; }
+/* figma: 16:2391 right cluster, H gap 1, hug (528x40) */
+.nav__right { display: flex; flex: none; align-items: center; gap: 1px; height: var(--h-control-lg); }
+/* figma: 16:2392 Exposure pill 255x40, fill green for text @0.2 (surface.exposure), stroke green for text 1px INSIDE (border.exposure), radius 4, H gap 8 padding 7/24 SPACE_BETWEEN CENTER, clip.
+   "Exposure" Geist Regular 14 Grey 3, "$5,000,000" Geist SemiBold 14 Black (Geist, not Mono) */
+.pill-exposure { display: flex; flex: none; align-items: center; justify-content: space-between; gap: var(--space-8); width: 255px; height: var(--h-control-lg); padding: var(--space-7) var(--space-24); border-radius: var(--radius-control); background: var(--color-surface-exposure); box-shadow: inset 0 0 0 var(--stroke-hairline) var(--color-border-exposure); overflow: hidden; white-space: nowrap; }
+.pill-exposure__label { font: var(--type-tab-inactive); color: var(--color-text-secondary); }
+.pill-exposure__value { font: var(--type-exposure-value); color: var(--color-text-primary); }
+/* figma: 16:2395 date/user group, H gap 16, hug (272x40) */
+.nav__user { display: flex; flex: none; align-items: center; gap: var(--space-16); height: var(--h-control-lg); }
+/* figma: 16:2396 date block 216x40, no fill, stroke Grey 1 right-only 1px INSIDE (divider), V gap 4 padding 0/16, primary CENTER, cross MAX (right aligned) */
+.clock { display: flex; flex: none; flex-direction: column; align-items: flex-end; justify-content: center; gap: var(--space-4); width: 216px; height: var(--h-control-lg); padding: 0 var(--space-16); box-shadow: inset calc(-1 * var(--stroke-hairline)) 0 0 var(--color-border-divider); }
+.clock__date { display: block; width: 184px; text-align: right; font: var(--type-field-label); color: var(--color-text-tertiary); }       /* 16:2397 row 1: 184x16 right aligned, Regular 12 Grey 2 */
+.clock__row { display: flex; align-items: center; gap: var(--space-4); }                                                              /* 16:2399 row 2, H gap 4 */
+.clock__time { font: var(--type-clock); color: var(--color-text-primary); letter-spacing: 0px; white-space: nowrap; }                /* 16:2400 Regular 12 Black ls 0px */
+.clock__version { font: var(--type-field-label); color: var(--color-text-tertiary); }                                                 /* 16:2401 v1.0.2 Regular 12 Grey 2 */
+/* figma: 16:2402 avatar 40x40, fill Grey 1 (surface.avatar), radius 24 (circle), V CENTER/CENTER, clip; initials Geist Regular 14 Black ls 2px. No icon/menu chevron drawn. */
+.avatar { display: flex; flex: none; align-items: center; justify-content: center; width: var(--h-avatar); height: var(--h-avatar); border-radius: var(--radius-24); background: var(--color-surface-avatar); overflow: hidden; font: var(--type-avatar-initials); color: var(--color-text-primary); letter-spacing: var(--ls-avatar); }
+
+/* ---------------------------------------------------------------------
+   TICKER STRIP — figma: 16:2133 (strip 1920x80, fill White (surface.ticker), r0, clip, full-bleed at y104) / 16:2134 inner marquee track "Frame 1000000943"
+   x=-60, width 2040, H gap 0, MIN/CENTER, clip, 15 cells (first cell cut by the -60 offset).
+   --------------------------------------------------------------------- */
+.ticker { position: relative; width: var(--layout-screen-width); height: var(--layout-ticker-height); overflow: hidden; background: var(--color-surface-ticker); }
+.ticker__track { position: absolute; left: -60px; top: 0; display: flex; align-items: center; justify-content: flex-start; gap: 0; width: 2040px; height: var(--layout-ticker-height); overflow: hidden; }
+/* figma: 16:2135 cell V gap 4, padding T12 R16 B12 L16, MIN/MIN, hug width, h80; no fill; stroke Grey 0 (border.ticker) right-only 1px INSIDE (very low contrast).
+   Widths hug content: 138 (ETH) / 159 (BTC) / 130 (USDT, SOL, SHIB, ADA, AVAX, XLM) — measured with Geist Mono. */
+.ticker__cell { display: flex; flex: none; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: var(--space-4); height: var(--layout-ticker-height); padding: var(--layout-ticker-cell-padding); box-shadow: inset calc(-1 * var(--stroke-hairline)) 0 0 var(--color-border-ticker); }
+/* figma: 16:2136 row 1 "Container" H gap 8, CENTER, h18: coin 18x18 + symbol (Geist Regular 12 Black) */
+.ticker__id { display: flex; align-items: center; gap: var(--space-8); height: var(--h-coin); }
+.ticker__symbol { font: var(--type-field-value); color: var(--color-text-primary); white-space: nowrap; }
+/* figma: row 2 = 34 high, V gap 0: price container 18 (Geist Mono SemiBold 14) + change row H gap 4 h16 (abs + "(pct)", Geist Mono Regular 12, same colour). 12 + 18 + 4 + 34 + 12 = 80 */
+.ticker__quote { display: flex; flex-direction: column; align-items: flex-start; gap: 0; height: 34px; }
+.ticker__price { height: 18px; font: var(--type-ticker-price); color: var(--color-text-primary); white-space: nowrap; }
+.ticker__price--negative { font: var(--type-ticker-price-negative); color: var(--color-text-negative); }   /* red price on SOL-USD 16:2232 / XLM-USD 16:2294 */
+.ticker__change { display: flex; align-items: center; gap: var(--space-4); height: 16px; white-space: nowrap; }
+.ticker__change--negative { font: var(--type-ticker-change-negative); color: var(--color-text-negative); }
+.ticker__change--positive { font: var(--type-ticker-change-positive); color: var(--color-text-positive); }
+/* EXTENDED — not in Figma (the file implies a scrolling marquee but has no prototype/motion): continuous leftward scroll.
+   Markup: put TWO identical copies of the cell set in `.ticker__track` and add `.ticker__track--marquee`; the track becomes max-content wide and translates -50% (one set) per cycle, linear, infinite.
+   Duration is a local custom property (no duration tokens exist; Figma defines no motion): --ticker-duration, default 60s. Pauses on hover; disabled for prefers-reduced-motion. */
+@keyframes ticker-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.ticker__track--marquee { left: 0; width: max-content; overflow: visible; animation: ticker-marquee var(--ticker-duration, 60s) linear infinite; }
+.ticker:hover .ticker__track--marquee { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .ticker__track--marquee { animation: none; } }
+
+/* ---------------------------------------------------------------------
+   SPOT TRADER stack pieces — figma: 16:1917 tile group V gap 8 (392x160) = tile stack 16:1918 (392x100) + slippage/type row 16:1929 (392x52 at y108).
+   Tile stack: V itemSpacing -36: tiles container 16:1919 (H gap 16, 188 + 188) then the spread frame 16:1926 (V CENTER/CENTER) pulled up by 36 so the 120x32 white spread tab (16:1927)
+   sits at y68..100 centred (x136) on the tile seam. Tiles keep their own fills (.price-tile--bid / --ask from PART 1).
+   --------------------------------------------------------------------- */
+.tile-group { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-8); }
+.tile-stack { display: flex; flex-direction: column; align-items: stretch; height: 100px; }
+.tile-stack__tiles { display: flex; flex: none; gap: var(--space-16); height: var(--h-tile); }
+.tile-stack__spread { position: relative; z-index: 1; display: flex; flex: none; align-items: center; justify-content: center; height: 40px; margin-top: var(--layout-tile-overlap); } /* 40 = frame holding the 32 tab centred (4/4): tab lands at y68 */
+
+/* ---------------------------------------------------------------------
+   DATA TABLE — 3 Figma instances: order book 16:1932 (392x202), balances 16:1958 (392x244), trades 16:1990 (1360x352).
+   Container: fill Grey 0 (surface.table), stroke Grey 0 1px OUTSIDE (border.table -> outer box-shadow, no layout impact), radius 8, V gap 0, fixed width / hug height, NO clip.
+   Header row: no fill, text Grey 2 sentence case ls 0px. Body zebra: odd rows White (surface.row-odd), even rows Grey 0 (surface.row-even = container colour);
+   rows are square-cornered over the rounded container exactly as drawn. Numerics: Geist Mono in book/balances, proportional Geist in the blotter (Figma inconsistency, kept).
+   --------------------------------------------------------------------- */
+.data-table { display: flex; flex-direction: column; align-items: stretch; gap: 0; border-radius: var(--radius-panel); background: var(--color-surface-table); box-shadow: 0 0 0 var(--stroke-hairline) var(--color-border-table); }
+.data-table__head, .data-table__row { display: flex; align-items: center; justify-content: space-between; }
+.data-table__body { display: flex; flex-direction: column; align-items: stretch; }
+.data-table__body > .data-table__row:nth-child(odd) { background: var(--color-surface-row-odd); }
+.data-table__body > .data-table__row:nth-child(even) { background: var(--color-surface-row-even); }
+.data-table__th { flex: 1 1 0; min-width: 0; white-space: nowrap; }
+.data-table__td { white-space: nowrap; }
+.align-left { text-align: left; }
+.align-center { text-align: center; }
+.align-right { text-align: right; }
+.dim { color: var(--color-text-dim); }            /* greyed decimals / trailing zeros: integer part keeps the value colour, ".00" is Grey 2 (text.dim) */
+.date-part { color: var(--color-text-secondary); } /* timestamp date part = Grey 3 (text.secondary) */
+
+/* BOOK / BALANCES variant — figma: header 16:1933 / 16:1959: 392x34, padding T8 R24 B8 L24, SPACE_BETWEEN, Geist Regular 14 Grey 2 ls 0px; rows 16:1938… / 16:1963…: 392x42, padding 12/24 SPACE_BETWEEN CENTER. */
+.data-table--book { width: var(--layout-table-inner-width-sm); }
+.data-table--book .data-table__head { height: var(--h-header-book); padding: var(--space-8) var(--space-24); font: var(--type-book-header); color: var(--color-text-tertiary); letter-spacing: 0px; }
+.data-table--book .data-table__row { height: var(--h-row-book); padding: var(--space-12) var(--space-24); }
+/* order book cells — figma: bid price Geist Mono Medium 14 Red for text, right aligned FIXED 76 (16:1939); qty Geist Mono Regular 14 Black centred (16:1940); ask price Geist Mono Medium 14 green for text, right aligned FIXED 76 (16:1941);
+   header cells BID (left) / Qty (centre) / ASK (right) each FILL 114.67 */
+.book__bid, .book__ask { flex: none; width: 76px; text-align: right; font: var(--type-book-bid); }
+.book__bid { color: var(--color-text-negative); }
+.book__ask { color: var(--color-text-positive); }
+.book__qty { font: var(--type-book-qty); color: var(--color-text-primary); text-align: center; }
+/* balances cells — figma: asset Geist Medium 14 Black (16:1964, hugs, left), quantity Geist Mono Medium 14 coloured by sign (16:1965…), right aligned; no +/- on positives; header Asset (left) / Quantity (right) each FILL 172 */
+.balance__asset { font: var(--type-balance-asset); color: var(--color-text-primary); }
+.balance__qty { font: var(--type-book-ask); text-align: right; }
+.balance__qty--positive { color: var(--color-text-positive); }
+.balance__qty--negative { color: var(--color-text-negative); }
+
+/* TRADES BLOTTER variant — figma: table 16:1990 1360x352; header 16:1991 1360x32 padding T8 R12 B8 L12, Geist Regular 12 Grey 2 ls 0px, centre aligned; rows 16:2004… 1360x40 padding 12 all, SPACE_BETWEEN CENTER, gap 0 effective.
+   Columns (header and rows): status dot 6.67 | Id 140 | Order Id 140 | Instrument FILL | Order Type (row: chip wrapper 117 FIXED; header label FILL -> ~0.5px drift, as drawn) | Time In Force FILL | Side FILL | Quantity FILL | Executed Price FILL | User FILL | Channel FILL | Executed At 140.
+   The header keeps a hidden 6.67 dot placeholder (16:1992, visible:false but occupying its space) so labels align with the rows. All body cells centre aligned. */
+.data-table--blotter { width: var(--layout-table-inner-width-blotter); }
+.data-table--blotter .data-table__head { height: var(--h-header-trades); padding: var(--space-8) var(--space-12); font: var(--type-blotter-header); color: var(--color-text-tertiary); letter-spacing: 0px; text-align: center; }
+.data-table--blotter .data-table__row { height: var(--h-row-trades); padding: var(--space-12); font: var(--type-blotter-cell); color: var(--color-text-primary); text-align: center; }
+.col { flex: 1 1 0; min-width: 0; text-align: center; white-space: nowrap; }       /* FILL */
+.col--140 { flex: none; width: 140px; }                                             /* Id / Order Id / Executed At FIXED 140 */
+.col--dot { display: flex; flex: none; align-items: center; width: var(--icon-status-dot); }   /* status dot column 6.67 (header: empty placeholder) */
+/* order-type cell wrapper — figma: 16:2009 117x16 FIXED, V auto-layout CENTER/CENTER, padding 0/30/0/30; chip (24 high) overflows the 16 wrapper by 4px top and bottom, centred */
+.col--chip { display: flex; flex: none; flex-direction: column; align-items: center; justify-content: center; width: 117px; height: 16px; padding: 0 var(--space-30); }
+.col--chip > .chip { flex: none; }
+/* side / quantity / timestamp cells — figma: SELL/BUY Geist Medium 12 coloured, text only (16:2013, 16:2028) via .t-side-sell/.t-side-buy; quantity "1." + greyed "00" (16:2014) via .t-blotter-dim;
+   executed-at Geist Regular 12: date Grey 3 + " HH:MM:SS*" Grey 2 (16:2018). The time part uses text.dim (= Grey 2 light; #808080 dark, sampled on blotter decimals) */
+.blotter__executed { font: var(--type-regular-12); }
+.blotter__executed .date-part { color: var(--color-text-secondary); }
+.blotter__executed .time-part { color: var(--color-text-dim); }
+
+/* BLOTTER TABS — figma: 16:1983 tabs group (H gap 0, h38). Tab = plain frame (NOT the tabs component): 19:126 active 214x38, padding T0 R24 B12 L24, CENTER/CENTER gap 10,
+   bottom stroke 1.5 INSIDE Black (border.tab-active) as inset shadow, label Geist Regular 20 UPPER Black; 19:127 inactive 255x38 no stroke, label Grey 3 (BALANCE MOVEMENT). */
+.blotter-tabs { display: flex; align-items: flex-start; gap: 0; height: 38px; }
+.blotter-tab { display: flex; align-items: center; justify-content: center; gap: var(--space-10); height: 38px; padding: 0 var(--space-24) var(--space-12); border: 0; background: transparent; font: var(--type-panel-title); color: var(--color-text-tab-inactive); text-transform: uppercase; white-space: nowrap; cursor: pointer; }
+.blotter-tab.is-active, .blotter-tab[aria-selected="true"] { color: var(--color-text-tab-active); box-shadow: inset 0 calc(-1 * var(--stroke-tab-underline)) 0 var(--color-border-tab-active); }
+/* EXTENDED — not in Figma: inactive tab hover = text.primary (same recipe as .tab hover); keyboard focus = 1.5px Main color outline pulled inside (offset -1.5, like .tab.is-focus); disabled = text.disabled. */
+.blotter-tab:hover:not(.is-active):not([aria-selected="true"]), .blotter-tab.is-hover:not(.is-active) { color: var(--color-text-primary); }
+.blotter-tab:focus-visible, .blotter-tab.is-focus { outline: var(--stroke-icon) solid var(--color-border-focus); outline-offset: -1.5px; }
+.blotter-tab:disabled, .blotter-tab.is-disabled { color: var(--color-text-disabled); cursor: not-allowed; }
+
+/* ALT (live-app capture): rows separated by 1px hairlines in the container colour instead of zebra (dark capture shows hairlines #383838 on panel-coloured rows). */
+.data-table--alt-hairlines .data-table__body > .data-table__row:nth-child(odd),
+.data-table--alt-hairlines .data-table__body > .data-table__row:nth-child(even) { background: var(--color-surface-panel); box-shadow: inset 0 calc(-1 * var(--stroke-hairline)) 0 var(--color-border-table); }
+
+/* ---------------------------------------------------------------------
+   EXTENDED — not in Figma: TABLE STATES (Figma draws none: no row hover/selected, sort arrows, loading, empty).
+   All derived from existing tokens; each rule is a separate, labelled block.
+   --------------------------------------------------------------------- */
+/* row hover = surface.hover (Grey 1: the icon-button hover fill); selected = brand.transp (Main color transp: the Button Outline hover fill). Header rows are never interactive. */
+.data-table__body > .data-table__row:hover, .data-table__body > .data-table__row.is-hover { background: var(--color-surface-hover); }
+.data-table__body > .data-table__row.is-selected { background: var(--color-brand-transp); }
+/* sortable header: pointer; sorted column = text.secondary label + exported chevron (assets/icon-chevron-down) 16px after the label; ascending = chevron turned 180deg. aria-sort drives it. */
+.data-table__th.is-sortable { cursor: pointer; }
+.data-table__th.is-sortable:hover { color: var(--color-text-secondary); }
+.data-table__th[aria-sort="ascending"], .data-table__th[aria-sort="descending"] { color: var(--color-text-secondary); }
+.data-table__th[aria-sort="ascending"]::after, .data-table__th[aria-sort="descending"]::after {
+  content: ""; display: inline-block; width: var(--icon-16); height: var(--icon-16); margin-left: var(--space-4); vertical-align: middle;
+  background-color: currentColor; -webkit-mask: url(assets/icon-chevron-down.currentColor.svg) center / contain no-repeat; mask: url(assets/icon-chevron-down.currentColor.svg) center / contain no-repeat;
 }
-.balance-qty.positive { color: var(--color-status-success); }
-.balance-qty.negative { color: var(--color-status-danger); }
+.data-table__th[aria-sort="ascending"]::after { transform: rotate(180deg); }
+/* loading = skeleton bars (surface.hover, radius 4, 16 high = text line box) on the normal zebra rows; optional opacity pulse (motion is not defined in Figma: local 1.2s, disabled for reduced-motion). */
+.skeleton { display: block; flex: none; height: var(--h-label); border-radius: var(--radius-control); background: var(--color-surface-hover); }
+@keyframes skeleton-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.skeleton--pulse { animation: skeleton-pulse 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .skeleton--pulse { animation: none; } }
+/* empty = the table container keeps its drawn size, message centred: Geist Regular 14 Grey 2 (the table-header type). Also the "Balance movement" tab content (not drawn in Figma). */
+.data-table--empty { align-items: center; justify-content: center; }
+.data-table--empty.data-table--blotter { height: 352px; }    /* 16:1990 drawn height (32 + 8x40) */
+.data-table--empty.data-table--book { height: 202px; }       /* 16:1932 drawn height */
+.table-empty { font: var(--type-book-header); color: var(--color-text-tertiary); letter-spacing: 0px; text-align: center; }
+
+/* ---------------------------------------------------------------------
+   EXTENDED — not in Figma: ORDER CONFIRMATION (summary list inside .modal). Figma draws no confirmation/quote screen.
+   Summary = the data-table recipe (container surface.table + outside hairline, radius 8) with rows 32 high (control height), padding 7/12 (observed),
+   label Geist Regular 12 Grey 2 (.field__label look), value Geist Medium 12 (.t-blotter-cell look), zebra like the tables. Compose: .modal > .modal__title + .summary + .modal__actions.
+   --------------------------------------------------------------------- */
+.summary { display: flex; flex-direction: column; align-items: stretch; border-radius: var(--radius-panel); background: var(--color-surface-table); box-shadow: 0 0 0 var(--stroke-hairline) var(--color-border-table); }
+.summary__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-16); height: var(--h-control); padding: var(--space-7) var(--space-12); }
+.summary > .summary__row:nth-child(odd) { background: var(--color-surface-row-odd); }
+.summary > .summary__row:nth-child(even) { background: var(--color-surface-row-even); }
+.summary__label { font: var(--type-field-label); color: var(--color-text-tertiary); }
+.summary__value { font: var(--type-blotter-cell); color: var(--color-text-primary); }
+.summary__value--buy { color: var(--color-text-positive); }
+.summary__value--sell { color: var(--color-text-negative); }

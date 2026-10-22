@@ -1,289 +1,101 @@
-# OG Risk Arb — Design System
-**For Claude agents building or modifying this platform**
+# OG Risk Arb - agent brief (design system)
 
-Load this file at the start of any session working on og-risk-arb. All design decisions must follow these rules. Do not invent, substitute, or "improve" values.
+Read this first, then use `components.md` (copy-paste HTML), `components.css`, `tokens.css` / `tokens.json` and `showcase.html` (live reference). Values here come from the Figma harvest in `../figma-spec/`; **no value may be invented**. Where Figma is silent the system is EXTENDED from existing tokens and every such rule is marked `EXTENDED` (CSS) / "Extended" (showcase) / listed in the Extended table of `components.md`.
 
-## Companion files — load these too
-- `components.css` — full CSS for all components, all states
-- `components.md` — copy-paste HTML for every component with JS behavior notes
-- `tokens.css` — all design tokens as CSS custom properties
-- `tokens.json` — same tokens in JSON for programmatic access
+## 1. What the platform is
+OG Risk Arb is Oscar Gruss's risk-arbitrage research and deal-monitoring web platform. Desktop only (every Figma frame is 1920 wide; no mobile / tablet frames, no breakpoints), light UI only (no dark theme). Screens: Dashboard (All Deals table + Upcoming Events + Recent Updates), All Deals / Drafts lists with a filter drawer, Deal page (+ Deal Edit Events), New Deal form with live preview, Events Calendar (month / week / day-list), global search, login / forgot password / OTP, Admin (Account Settings; Admin Internal patterns). It is a dense data UI: 12px text, 32px controls, 4px radius, hairline strokes, flat white surfaces.
 
-**When implementing any UI:** check `components.md` first. If the component exists there, use that exact HTML + the corresponding CSS class. Do not write new CSS for something already in the component library.
+## 2. Source of truth and owner decisions
+- Figma file `VlOfBG6fJt7ijm0iKasAMP`. Canonical: page "final" (48:850) > SECTION **"Section 1" (2496:2003)** + page "components" (924:3460). Figma has NO variables and no bound tokens; 13 library paint styles are applied in Section 1; text styles `Geist: Medium/Regular` exist but are applied to 0 nodes.
+- Owner decisions: **12px body** (page "final fonts 2px up" 2079:13698 - body 14, nav open 203 - is NOT used); the **Section 1 shell** (left nav 72 collapsed / 219 expanded, top search bar, tab strip) is canonical; the section "changes for Laura" (2159:13682: no side nav, History / Reports tabs, Drafts / New Deal buttons, date-range picker) is only a documented alternate and is NOT built; **Admin Internal** (1895:17439) and **Admin External** (1895:21099) lie outside Section 1 - their patterns exist and are labelled.
+- Harvest files: `../figma-spec/{foundations,components-page,nav-chrome,dashboard-deals,deal-pages,events-admin-login}.md`; assets: `assets/` + `assets/MANIFEST.md`; build notes `../figma-spec/build-notes.md`; measured results `../figma-spec/VERIFICATION.md`.
 
----
+## 3. Non-negotiables (each proven by the spec)
+1. **Font = Geist** (Regular 400 / Medium 500 / SemiBold 600 / Bold 700). Inter appears ONLY in calendar DAY tags, "View More" and the Admin disclaimer (kept as drawn; probable unintended fallback). Times New Roman ONLY for the rich-text toolbar B / I / U / S glyphs. No monospace anywhere. Use only these weights.
+2. **Base text 12px**, Geist Regular, black `#000000`. Letter-spacing 0 on every node; **no uppercase transform** anywhere (UPPERCASE in the UI is typed text: calendar weekdays "MON ... THUR", the morning-note title).
+3. **Brand = dark green `#005268`** (links, active nav / tab, primary button, selected checkbox / radio, select chevron). Tints are the same hex at alpha 0.1 / 0.2, never a separate solid.
+4. **Control height 32** (buttons, inputs, selects, calendar fields, search, tabs, segmented items); 40 for the top-bar search, login / Password inputs, nav items and main search. Radius **4** is dominant (574 nodes); 16 for pills / chips; 8 for panels; 2 for checkbox / icon buttons.
+5. **Strokes are INSIDE-aligned**: draw them with `box-shadow: inset ...`, never `border`. Weights: 1px (default), 1.2px (outline buttons, select chevron, nav icons), 1.5px (primary button, disabled outline, checkbox glyph), tab underline 3px (2px alternate).
+6. **Primary button is dark green** `#005268` with white Regular 12 text - not a dark navy / black button.
+7. **Panels are flat**: white, hairline strokes `#E5E7EC` / `#F5F5F8`, no card shadows. The only effects: the 5-layer "Shadow" (search dropdown, modal, account menu), the footer-bar shadow (pointing UP), and a 20px background blur on the modal / drawer scrim.
+8. **Icons are lucide / noun glyphs exported as SVG**; stroke 1 / 1.2 / 1.5; sizes 12, 14, 16, 18, 20, 24, 32. Never redraw.
+9. No hover / focus / pressed states exist in Figma except the five button families (Default / hover / disabled), checkbox disabled variants, the Password error and the focused top search. Everything else is EXTENDED.
 
-## What this platform is
+## 4. Tokens (CSS variable -> hex). Named tokens keep the exact Figma names
+**Figma paint styles** (tokens.json group `figma`)
+| Figma name | Var | Hex | Role |
+|---|---|---|---|
+| White / white | `--color-white` / `--color-white-lowercase` | #FFFFFF | surfaces; text on dark |
+| Grey 4 | `--color-grey-4` | #F5F5F8 | table header, chips, tags, top search, active tab, 1px dividers |
+| Grey 3 | `--color-grey-3` | #E5E7EC | field / panel borders, scroll track, outline-button hover, disabled text on dark |
+| Grey 2 | `--color-grey-2` | #A8B6CD | tertiary text (labels, timestamps), disabled fill / stroke, checkbox stroke, scroll thumb |
+| Grey 1 | `--color-grey-1` | #7C8DAC | secondary text and icons, placeholders, toggle OFF |
+| Black | `--color-black` | #000000 | primary text, outline icons |
+| dark green main | `--color-dark-green-main` | #005268 | brand |
+| Orange | `--color-orange` | #FF8132 | alert / bell, Medium priority, Reset All / Edit Events, today chip |
+| Green | `--color-green` | #179484 | success / "new", toggle ON, Definitive text |
+| Red | `--color-red` | #DA4D43 | error, High priority, log-out, trash |
+| Green light | `--color-green-light` | #C1F0D5 | Definitive pill bg |
+| Icons gradient | `--color-icons-gradient` | #005268 0, #1B9D83 .361, #3675D2 .716, #00C7CE 1 | brand logo + AI icon only (angle 207deg is a visual estimate - use the SVG assets) |
 
-OG Risk Arb is a **desktop-only, light-mode research and deal monitoring platform** for Oscar Gruss Risk Arbitrage (mergers & acquisitions). It is NOT a trading platform — it is a deal tracker and research tool for risk arbitrage professionals.
+**Raw hues (unbound in Figma)**: `--color-blue` #3675D2 (events, external links, Actual, selected day, Join), `--color-slate-blue` #4162A3 (Cash Merger / Financials pill text, Deal-page comment authors), `--color-blue-pale` #CAD8F4, `--color-cyan-pale` #C1ECF0, `--color-cyan-text` #008D9A (industry pills), `--color-yellow` #ECA100 (Low priority, Post-Event, yellow button), `--color-faint` #FBFBFC (expanded-row panel), `--color-comments-panel-bg` rgba(226,226,226,.25), `--color-comments-panel-border` #F7F7F7; Admin / list extras `--color-positive` #3B951A, `--color-subheader-tint` rgba(234,235,237,.3), `--color-delete-tint` #F0C4C1, `--color-activity-events` #7541A3, `--color-activity-comments` #3090C0.
+**Tints**: `--color-dark-green-main-10/-20`, `--color-orange-10/-20`, `--color-yellow-20/-35`, `--color-white-20`, `--color-blue-05/-10/-20/-30/-90`, `--color-scrim` (#E5E7EC@.2).
+**Semantic aliases (pick by role)**: text `--color-text-{primary #000, secondary #7C8DAC, tertiary #A8B6CD, on-brand #FFF, on-disabled #E5E7EC, disabled #7C8DAC, link #005268, link-external #3675D2, link-action #FF8132, success #179484, error #DA4D43, warning #FF8132}`; surface `--color-surface-{default #FFF, subtle #F5F5F8, muted #E5E7EC, disabled #A8B6CD, faint #FBFBFC, brand #005268, brand-tint, info-tint, events-panel, comments-panel, scrim}`; border `--color-border-{default #E5E7EC, subtle #F5F5F8, strong #A8B6CD, brand #005268, error #DA4D43, on-dark #FFF}`; icon `--color-icon-{default #000, secondary #7C8DAC, brand #005268, alert #FF8132, info #3675D2, danger #DA4D43, success #179484, disabled #A8B6CD}`; also `--color-brand-*`, `--color-status-*`.
+**Pills** (`--color-pill-<key>-bg` / `-text`; bg = hue at the alpha shown, text opaque): Predeal #3090C0@.25 · Proposal #30B2C0@.2 · Definitive #C1F0D5 / #179484 · Terminated #DC432B@.2 · Withdrawn #6074A0@.2 · Spinoff - Definitive #A752A9@.2 · Did Not Happen #4C7794@.25 · Post-Event #ECA100@.2 · Cash Merger #CAD8F4 / #4162A3 · Cash Tender #C6226C@.1 · Stock Merger #7541A3@.2 · Dutch Auction #DC5E2B@.2 · Investment bg #179475@.2 / text **#179464** (as drawn) · Exchange Offer #36A30F@.2 · Not Available #F5F5F8 / #7C8DAC · Cash-Stock Merger #4199A3@.2 · Financials #CAD8F4 / #4162A3 · Insurance #C1ECF0 / #008D9A · empty placeholder #E5E7EC / #7C8DAC. Priority text (no bg): Low #ECA100, Medium #FF8132, High #DA4D43. Statuses / types not in this map have NO colour in Figma.
+**Radii** `--radius-{2,4,5,8,12,16,24,40}` + aliases `--radius-{checkbox,control,panel,pill,toggle}` + mixed corners (`--radius-tab` 4 4 0 0, `--radius-nav` 0 0 8 0, `--radius-content-frame` 0 8 8 8, `--radius-calendar-surface` 0 12 12 12, `--radius-drawer` 0 8 8 0, `--radius-segment-end` 0 4 4 0, ...).
+**Spacing (observed, no Figma tokens)** `--space-{0,2,3,4,6,7,8,10,12,16,20,24,26,32,40,48,56,72,80}`; 8 is the common gap; **3 and 7 occur on 24 / 32-high controls** (buttons are exactly padding 7/24).
+**Shadows** `--shadow-popover` = `2 1 5 .17, 7 6 9 .15, 3 4 12 .09, -3 24 14 .03, 42 37 16 0` all #5B6380 (effect style "Shadow"); `--shadow-footer-bar` = #26395E `0 -4 9 .04, 0 -16 16 .03`; `--backdrop-blur` 20px (CSS `blur(10px)` = radius / 2).
+**Strokes** `--stroke-{hairline 1px, button-outline 1.2px, button-primary 1.5px, tab-underline 3px, tab-underline-alt 2px, nav-sub-accent 3px, icon 1px}`.
+No durations, easings or z-index in Figma (`--z-*` are EXTENDED).
 
-Users track M&A deals, monitor deal status (Definitive Agreement, Proposal, Terminated), view upcoming events and timelines, read recent updates/commentary, and analyze deal details including acquirer/target info, conditions, dates, and descriptions.
-
-The aesthetic is professional, data-dense, and clean — suited for institutional research. Reference: Bloomberg research portal, Refinitiv Eikon research views, FactSet deal monitor.
-
-The brand is "Oscar Gruss" with an "OG" circular teal logo.
-
----
-
-## Non-negotiables
-
-- **Primary font is Inter.** Clean, modern sans-serif. No DM Sans, no DM Mono.
-- **Brand color is `#1B8C8C`.** Deep teal — not bright cyan. This is a research tool, not a trading terminal.
-- **Border radius is 6px** for cards, buttons, inputs, dropdowns. Status badges use `999px` (pill). The OG logo is circular (`50%`).
-- **Light mode only.** No dark mode.
-- **No trading colors.** There is no BID/ASK convention here. Green (`#22C55E`) means positive % change. Red (`#EF4444`) means negative % change.
-- **No gradients, no decorative effects.** Flat surfaces.
-- **No Tailwind or CSS frameworks.** All styles are custom.
-- **No monospace for body copy.** Inter everywhere. Numerical data (dates, percentages) uses Inter as well — this is a research tool, not a price feed.
-- **Sidebar is icon-only, 56px wide.** Active icon gets teal fill/background. No text labels in sidebar.
-- **Tab bar uses underline-only active state** — no background fill on tabs. Teal underline `2px solid #1B8C8C`.
-
----
-
-## Color System
-
-### Brand
-| Token | Value | Use |
+## 5. Typography (`font: var(--type-<key>)`; Figma line-height is AUTO, tokens pin the measured box)
+| Key | Tuple | Use |
 |---|---|---|
-| `--color-brand` | `#1B8C8C` | Active sidebar icons, active tab underline, links, focus, buttons |
-| `--color-brand-hover` | `#156B6B` | Hover states |
-| `--color-brand-ghost` | `rgba(27,140,140,0.08)` | Highlighted row backgrounds, subtle bg tints |
-| `--color-brand-focus` | `rgba(27,140,140,0.12)` | Focus rings |
-| `--color-brand-ghost-border` | `rgba(27,140,140,0.24)` | Subtle teal borders |
+| regular-12 | Geist 400 12 / 16 | body, table cells, inputs, button labels, checkbox labels |
+| medium-12 | 500 12 / 16 | nav labels, tabs, pills, priority, Join button, yellow button, links (+ underline) |
+| semibold-12 | 600 12 / 16 | list-table headers, event titles, Deal Value |
+| bold-12 | 700 12 / 16 | emphasised values ($1.1B), search match highlight |
+| regular-10 / medium-10 / semibold-10 | 10 / 13 | Deal-table dates, placeholders in forms, helper text; table header 10px variant, count badge; Admin count pill |
+| regular-14 / medium-14 / semibold-14 | 14 / 18 | login inputs, Password, avatar initials; calendar day number, panel title, nav section label; comment titles |
+| regular-16 / medium-16 | 16 / 21 | top-bar search, OTP digits, account-menu rows; "Account Settings", selected A-Z letter |
+| regular-18 / medium-18 | 18 / 23 | "Forgot Password"; deal title (Medium) + company names (Regular #7C8DAC) |
+| medium-24 | 500 24 / 31 | login title "  Risk Arb DB" (two leading spaces) #7C8DAC |
+| medium-12-lh20 | 500 12 / **20** | the ONLY fixed line-height: calendar Day / Week / Month toggle |
+| inter-regular-12 / -10, inter-medium-12 | Inter 15 / 12 / 15 | DAY tags, DAY event description, View More |
+| tnr-* | Times New Roman | rich-text toolbar B (bold), I (bold italic), U (underline), S (14, strikethrough) |
+Roles: link = Medium 12 UNDERLINE `#005268` (internal) / `#3675D2` (external, tickers) / `#FF8132` (action); secondary label Regular 12 `#7C8DAC`, tertiary `#A8B6CD`; nav label Medium 12 (active `#005268`); nav section label Medium 14 `#7C8DAC`; panel / page title Medium 14 `#005268`; table header SemiBold 12 (lists, Deal view), **Medium 12 (dashboard)**, Medium 10 (Edit / New Deal); calendar weekday Medium 12 `#A8B6CD`. Dates are MM/DD/YYYY.
 
-### Surfaces
-| Token | Value | Use |
-|---|---|---|
-| `--color-bg` | `#F5F6F8` | Page background |
-| `--color-surface` | `#FFFFFF` | Cards, panels, sidebar, modals |
-| `--color-surface-2` | `#F5F6F8` | Inputs default bg, raised areas |
+## 6. Controls and geometry (all values from the spec)
+- **Button** (5 families): HORIZONTAL, gap 8, padding 7/24, radius 4, height 32, width hug, Regular 12. Primary `#005268` + 1.5px same-colour stroke; hover = `#FFFFFF@0.2` overlay and no stroke; disabled `#A8B6CD` fill, `#E5E7EC` text. Outline `#000` 1.2px (hover fill `#E5E7EC`); Outline green `#005268` 1.2 (hover `#005268@0.1`); yellow `#ECA100@0.2` / `@0.35`, text Medium 12; orange outline `#FF8132` 1.2 (hover `@0.2`). Every disabled outline: stroke `#A8B6CD` 1.5 + text `#A8B6CD`. Cancel = fill `#7C8DAC`, white text. Login buttons: 40 high, Regular 14.
+- **Field box**: fill #FFF, stroke #E5E7EC 1px inside, radius 4, padding 7/12, height 32, gap 32; placeholder Regular 12 `#7C8DAC`; label Regular 12 `#A8B6CD` + 4px gap. Input / Select 148 wide, calendar 178 (177 with label) / range 210, search 200 (main 40 high / 14px; top bar 840x40 fill #F5F5F8, icon 16, Regular 16, focus = `#005268` stroke), Password 240x40 Regular 14 (admin 260x32 / 12; error = `#DA4D43` stroke + "Incorrect password" Regular 10).
+- **Checkbox** box 16 radius 2 (selected fill `#005268` + white check 1.5; unselected stroke `#A8B6CD`); **radio** circle **12x12** (active ring + 8x8 dot `#005268`); **toggle** 32x16 radius 40, thumb 12, ON `#179484`, OFF `#7C8DAC`; **scroll** 4px, track `#E5E7EC` thumb `#A8B6CD` radius 16.
+- **Pills** 24 high (32 on Deal page, 24 / Medium 10 in New Deal preview), radius 16, padding 4/16, gap 10, Medium 12. **Filter chip** 28 high radius 16 (default `#F5F5F8`, padding 6/4/6/16 + 20x20 count badge `#E5E7EC`; active `#005268@0.1` + `#005268` stroke, Medium 12 `#005268`).
+- **Shell**: screen 1920x1080 white; nav 72 / 191 / 219 x 1032 (padding 16, stroke #F5F5F8, radius 0 0 8 0; nav item 40 high, icon 32, selected `#005268@0.1`, icon always `#005268`); top bar x72 1848x64 (padding 16/48/8/16); tab strip x88 y72 1784x32 (Deal screens y73); content frame x88 y103 1784x929 (stroke #E5E7EC, radius 0 8 8 8, padding 16, gap 8); right margin 48, bottom 48. Content always starts at x88 whatever the nav width.
+- **Tab**: 32 high, radius 4 4 0 0, Medium 12; active = fill `#F5F5F8` + 3px `#005268` bottom + text `#005268`; inactive = 1px `#F5F5F8` outline, text `#000`; closable = padding 12/12/12/16 + 16px `circle-x` (fill #E5E7EC).
+- **Dashboard**: panels 952 (fill) / 420 / 364, y119, height 897, gap 8: All Deals (stroke #F5F5F8, radius 8) · Upcoming Events (`#3675D2@0.05`) · Recent Updates (`#E2E2E2@0.25`, stroke #F7F7F7, radius 8). Deals table columns 312 / 110 / 110 / 167 / 185, rows 32, header 32 Medium 12, A-Z rail 24x578.
+- **Tables**: row = 1px bottom stroke (`#F5F5F8` rows / `#E5E7EC` header), cell = 1px right stroke, cell padding 4/8 (4/12 on events / summary, 8/12 on Edit timeline), no zebra / hover / selection. List table 1343 (expanded) / 1381 (collapsed), header 30, rows 41. Deal Dates Summary radius **8**, Edit / New timeline radius **4**.
+- **Deal page grid** 406 / 964 / 398: header y121, key-terms card 1354x441 (stroke #A8B6CD outside), conditions 406x878, anchor menu 374x160, comments 374x518.96. **New Deal**: form column 780 (field grid 3 x 241.33 x 52, gap 8 / 16) + preview 1004 (card 944), footer bar 64 high.
+- **Events**: month 1502x864 (4 rows x 216; columns 231.08 x5 + 173.31 x2), week 1489 (columns 226.2 / 179, **no time grid**), list 1752, Selected Event 231x848, Day | Week | Month toggle 346x32.
+- **Login**: card 384 (OTP 425) radius 12, padding 56/72, no shadow, on the raster background; inputs 40; OTP slots 40x64.
+- **Search dropdown** 844x420 (fill #FFF, radius 8, Shadow, three selects 265.33 + result rows 812x60) over a scrim `#E5E7EC@0.2` + blur.
 
-### Text
-| Token | Value | Use |
-|---|---|---|
-| `--color-text-primary` | `#1A1A28` | All body text, headings |
-| `--color-text-secondary` | `#6B7896` | Labels, subtitles, column headers |
-| `--color-text-tertiary` | `#A0AABC` | Placeholders, metadata, timestamps |
-| `--color-text-on-brand` | `#FFFFFF` | Text ON the teal (active sidebar icon areas) |
-| `--color-text-link` | `#1B8C8C` | Deal title links, teal anchor text |
+## 7. Components (class -> status)
+Figma-defined: `.btn .btn-outline .btn-outline-green .btn-yellow .btn-orange-outline` (+ screen variants `.btn-grey .btn-join .btn-lg .btn-outline-sm`) · `.input .select .calendar-field .search .password` (+ `.field` label wrapper) · `.checkbox .radio .toggle .scroll` · `.rt-toolbar` · `.day` (10 variants) · `.pill--<key> .priority--* .event-status .chip .count-badge .segmented` · `.nav` (min / open / max) `.nav-item .nav-subitem` · `.tab .tabbar` · `.topbar .avatar` · `.search-dropdown .search-result .scrim` · `.account-menu` · `.table` (+ `--deals --list --events --summary --timeline --admin --mailing`, `.kv-table`) · `.deals-panel .az-rail .events-panel .day-tile .event-card .time-chip .updates-panel .update-card` · `.filter-sidebar .slider .view-toggle .list-controls` · `.deal-header .terms-card .anchor-menu .comments-panel .comment-card .conditions-panel .dates-summary .deal-sections .additional-data` · `.field-grid .input-currency .input-stepper .editor .deal-preview .preview-card .footer-bar` · `.date-label .day-toggle .calendar .selected-event` · `.login-screen .login-card .otp` · `.settings-panel .password-rules .settings-card .pill--tone .modal .sector-list` (Admin: outside Section 1).
+EXTENDED (marked in CSS, badged in the showcase): focus ring, button pressed, all field hover / focus / error / disabled states (except the Password error), radio / toggle disabled, rich-text button states, DAY tag hover / ellipsis, chip / segmented / nav / tab / row / card hovers, `.table--hoverable`, `.tooltip`, `.toast`, `.skeleton`, `.empty-state`, `.accordion`, `.menu`, `.form-error`, login error / success / loading, `.modal__title`, `.btn-plus` construction, native `select.select` adaptor, `.scrollable` skin, `--z-*`.
 
-### Borders
-| Token | Value | Use |
-|---|---|---|
-| `--color-border` | `#E5E7EC` | All inputs, cards, table cells |
-| `--color-border-focus` | `#1B8C8C` | Input focus border |
+## 8. Icons
+`assets/` holds 123 SVG + 2 JPG (see `MANIFEST.md`). Monochrome: `<span class="icon icon-<name>"></span>` (mask over `<name>.currentColor.svg`; size = exported box; default colour = the Figma colour; override `.icon-c-{black,grey-1,grey-2,brand,orange,blue,red,green,white,purple,sky,inherit}`, `.icon-flip-x/-y`). Colour / gradient assets are `<img>`: `og-wordmark.svg` 72x40 (Nav open / max), `og-mark.svg` 26x40 (shown 31x48 in Nav min, same art x1.2), `og-wordmark-login-132x72.svg`, `noun-ai-sparkle.svg`, `circle-x-16.svg`, checkbox / radio SVGs, `zoom-logo.svg`, `noun-pdf.svg`, `bell-notify-24.svg`, `bookmark-24-blue.svg`. Chevron variants differ by context: nav 24 (#005268 / #000, asset points UP), select 16 (#005268, 1.2), search dropdown 16 (#000, 1), Admin 12 (#7C8DAC), stepper 8 (#005268). Calendar icon colour depends on context (#005268 fields, #179484 updates, #7541A3 events count). Login background: `assets/login-background-2.jpg` (200 KB) by default; the 9.2 MB original via `--login-background-image`.
 
-### Status & % Change
-| Token | Value | Use |
-|---|---|---|
-| `--color-status-positive` | `#22C55E` | Positive % change |
-| `--color-status-negative` | `#EF4444` | Negative % change |
-| `--color-status-warning` | `#D97706` | Warning / pending |
+## 9. Known Figma inconsistencies (canonical value first; alternate kept as `--alt-*`)
+Active tab stroke 3px vs 2px (`.tab--alt-stroke2`) and text teal Medium vs black Medium / black Regular (`.tab--alt-text-black`, `.tab--alt-regular`), inactive padding 24 vs 16 (`.tab--alt-pad16`), strip y72 vs y73 (`.tabbar--alt-y73`) · view-toggle active teal vs blue (`.view-toggle--alt-blue`) · label grey #7C8DAC vs #A8B6CD (`.filter-section__label--grey-2`, `.field__label--tertiary`) · table header Medium 12 (dashboard) vs SemiBold 12 vs Medium 10 · page card radius 12 (Deal / Events / lists, `.content-frame--r12`) vs 8 (New Deal, Dashboard) · table radius 8 (view) vs 4 (edit / new) · Investment pill bg #179475 vs text #179464 · "Risk Arbitrage" (nav) vs "Risk Arb DB" (pull-tab nav, login) · comment authors #4162A3 (Deal) vs #005268 (Recent Updates) · DAY cells in Inter · radio 12 vs 16 · calendar field 177 vs 178 · Select "no label" MIN vs SPACE_BETWEEN · Password placeholder #A8B6CD / 14 vs #7C8DAC / 12 · login username placeholder #A8B6CD vs #7C8DAC (`.input--ph-tertiary`) · disabled checkbox glyph #E5E7EC vs disabled-all dash #FFF · dates LEFT (dashboard) vs CENTER (lists), row line #F5F5F8 vs #E5E7EC (`.table--alt-row-line-grey3`), sidebar gap 16 vs 12 (`.list-page--alt-gap12`), sort select 197 vs 202 (`.select--alt-sort-202`) · Day toggle inactive radius 8 (smoothing) vs active 4 · Nav open 191 shows an expanded chevron with no sub-list (Nav max 219 is definitive) · pull-tab nav (`.nav-handle`, `.nav__brand--alt-28`) stroke #E5E7EC / radius 12 / gap 42 · typos kept verbatim: "Cash Bankrupcy", "disables", "Check you email at", "THUR". Details: `showcase.html#inconsistencies`.
 
-### Deal Status Badges
-| Badge type | Background | Text |
-|---|---|---|
-| Definitive / Closed | `rgba(34,197,94,0.12)` | `#16A34A` |
-| Cash Merger / Cash | `rgba(27,140,140,0.12)` | `#1B8C8C` |
-| Proposal / Pending | `rgba(245,158,11,0.12)` | `#D97706` |
-| Terminated / Withdrawn | `rgba(239,68,68,0.10)` | `#DC2626` |
-| Neutral (sector tags) | `rgba(107,120,150,0.10)` | `#6B7896` |
-
----
-
-## Typography
-
-- **Body base:** 14px / 1.5 / Inter / weight 400
-- **Section titles / card headings:** 14–16px, weight 600
-- **Page headings:** 18–24px, weight 700
-- **Table headers:** 12px, weight 600, uppercase, `letter-spacing: 0.06em`, `--color-text-tertiary`
-- **Timestamps / metadata:** 12px, weight 400, `--color-text-tertiary`
-- **Deal title links:** 14px, weight 500, `--color-text-link`, underline on hover
-
-### Size scale
-```
-10px  micro labels
-12px  badges, table headers, timestamps, form labels
-14px  body, buttons, inputs, table cell data  ← standard UI text
-15px  emphasized body, card titles
-16px  section headings
-18px  panel headings
-20px  page titles
-24px  screen headings
-```
-
----
-
-## Layout
-
-- **Left sidebar:** 56px wide, icon-only, white background, border-right `#E5E7EC`
-- **Top tab bar:** pinnable deal tabs, white background, border-bottom `#E5E7EC`, tab height ~40px
-- **Main area:** `#F5F6F8` background, 16–24px padding
-- **Cards/panels:** white surface, `1px solid #E5E7EC`, 6px radius, `var(--shadow-card)`
-- **Two-column deal detail:** left col = deal info + acquirer; right col = deal terms/conditions sidebar
-
----
-
-## Spacing
-
-```
-4px   --space-1   tight icon gaps
-6px   --space-2
-8px   --space-3   checkbox gap, small row gap
-10px  --space-4
-12px  --space-5   table cell padding (tight)
-14px  --space-6
-16px  --space-7   standard card padding, table cell padding
-20px  --space-8   card section gap
-24px  --space-9   panel gap
-28px  --space-10
-32px  --space-11  card padding LG
-40px  --space-12  page section gap
-48px  --space-13  page padding top
-```
-
----
-
-## Control Heights
-
-```
-22px  --h-badge     inline badges
-24px  --h-chip      deal status badges, filter pills
-32px  --h-btn-sm    compact/icon buttons
-36px  --h-btn       standard action button
-36px  --h-input     text inputs, search bar
-40px  --h-btn-lg    primary action button
-40px  --h-tab       top tab bar
-56px  sidebar width (icon-only left nav)
-```
-
----
-
-## Shadows
-
-```
-SM:       0 1px 3px rgba(0,0,0,0.06)
-Card:     0 2px 8px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)
-Card LG:  0 4px 20px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)
-Dialog:   0 8px 40px rgba(0,0,0,0.16)
-Dropdown: 0 4px 16px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.06)
-Focus:    0 0 0 3px rgba(27,140,140,0.12)
-```
-
----
-
-## Transitions
-
-```
-0.08s  --duration-instant   button :active scale
-0.12s  --duration-fast      color/opacity changes, hover
-0.15s  --duration-base      borders, backgrounds
-0.20s  --duration-normal    inputs, focus rings
-0.22s  --duration-enter     panel entry
-0.28s  --duration-slide     slide transitions
-```
-
-Easing: `ease` for most. `cubic-bezier(0.0,0,0.2,1)` for enter transitions.
-
----
-
-## Components — Key Rules
-
-### Sidebar (left nav)
-- 56px wide, white background, `border-right: 1px solid #E5E7EC`
-- Icon-only — no text labels
-- Each nav item: 40×40px clickable area, centered icon, `border-radius: 6px`
-- Default icon: `color #A0AABC`
-- Active: `background rgba(27,140,140,0.10)`, `color #1B8C8C`
-- Hover: `background rgba(27,140,140,0.06)`, `color #1B8C8C`
-- OG logo circle at top: 32px, `background #1B8C8C`, white "OG" text, `border-radius: 50%`
-
-### Tab bar (deal tabs)
-- White background, `border-bottom: 1px solid #E5E7EC`
-- Each tab: `height: 40px`, `padding: 0 16px`, `font-size: 14px`
-- Default: `color #6B7896`, no border
-- Active: `color #1A1A28`, `border-bottom: 2px solid #1B8C8C`, `font-weight: 600`, `margin-bottom: -1px`
-- Hover: `color #1A1A28`
-- Close button (×): small, appears on hover, `color #A0AABC`
-- Pinned/fixed tab (e.g. Dashboard): always visible
-
-### Buttons
-- **Primary (dark fill):** `background #1A1A28`, `color #FFFFFF`, `height: 36px`, `padding: 0 16px`, `border-radius: 6px`, hover `opacity: 0.85`
-- **Outlined:** `border: 1px solid #E5E7EC`, `color #1A1A28`, hover `border-color #1B8C8C`, `color #1B8C8C`
-- **Brand fill:** `background #1B8C8C`, `color #FFFFFF`, hover `background #156B6B`
-- **Ghost / teal text:** no border, `color #1B8C8C`, hover `background rgba(27,140,140,0.08)`
-- All buttons: `border-radius: 6px`, `font-size: 14px`, `font-weight: 600`, `:active scale(0.98)`
-
-### Search bar
-- Full-width, `height: 36px`, `border: 1px solid #E5E7EC`, `border-radius: 6px`, `background #FFFFFF`
-- Prefix search icon: `color #A0AABC`
-- Focus: `border-color #1B8C8C`, `box-shadow: var(--shadow-focus)`
-
-### Form inputs
-- `height: 36px`, `border: 1px solid #E5E7EC`, `border-radius: 6px`, `background #F5F6F8`
-- Focus: `border-color #1B8C8C`, `box-shadow: var(--shadow-focus)`, `background #FFFFFF`
-- Placeholder: `color #A0AABC`
-
-### Deal list table
-- Columns: Deal Title (link), Start Date, End Date, Status badge, Deal Type badge — plus sort/filter icons
-- Header: 12px, weight 600, uppercase, `color #A0AABC`, `letter-spacing: 0.06em`
-- Cell: 14px, `color #1A1A28`
-- Deal title cell: teal link (`color #1B8C8C`, `font-weight: 500`, underline on hover)
-- Row hover: `background rgba(27,140,140,0.04)`
-- Highlighted row (e.g. Makor Group): `background rgba(27,140,140,0.08)`
-
-### Deal type filter pills
-- Pill-style chips: `border-radius: 999px`, `height: 28px`, `padding: 0 12px`
-- Default: `background #FFFFFF`, `border: 1px solid #E5E7EC`, `color #6B7896`
-- Active: `background #1B8C8C`, `border-color #1B8C8C`, `color #FFFFFF`
-- Count badge inline: `font-weight: 600`
-
-### Open/Closed toggle
-- Two-button segmented control
-- Active: dark fill `background #1A1A28`, `color #FFFFFF`
-- Inactive: `background #FFFFFF`, `border: 1px solid #E5E7EC`, `color #6B7896`
-
-### Status badges
-- All badges: `border-radius: 999px`, `height: 22px`, `padding: 0 10px`, `font-size: 12px`, `font-weight: 600`
-- See "Deal Status Badges" table above for per-type colors
-
-### Sector / industry tags
-- Same pill shape as status badges: `border-radius: 999px`
-- Use neutral badge style: `background rgba(107,120,150,0.10)`, `color #6B7896`
-
-### % change display
-- Positive: `color #22C55E`, `font-weight: 600`
-- Negative: `color #EF4444`, `font-weight: 600`
-- Always shown with + or − prefix
-
-### Accordion sections (deal detail)
-- Panel with `border: 1px solid #E5E7EC`, `border-radius: 6px`
-- Header: `padding: 12px 16px`, `font-weight: 600`, chevron icon rotates on expand
-- Body: `padding: 12px 16px`, `border-top: 1px solid #E5E7EC`
-
-### Comment / update feed
-- Each entry: avatar circle (initials, teal bg) + name + timestamp + body text
-- Avatar: 28px, `border-radius: 50%`, `background #1B8C8C`, `color #FFFFFF`, 12px initials
-- Timestamp: 12px, `color #A0AABC`
-
-### PDF attachment card
-- `border: 1px solid #E5E7EC`, `border-radius: 6px`, `padding: 12px`
-- PDF icon + filename + file size
-- Download button: outlined small
-
-### User avatar pill (top right)
-- 32px circle, `background #1B8C8C`, `color #FFFFFF`, initials, `border-radius: 50%`
-
----
-
-## What NOT to do
-
-- Do not use Tailwind or any CSS framework — all styles are custom
-- Do not use DM Sans or DM Mono — Inter only
-- Do not use bright cyan `#7AEFEF` — that is Enigma X's brand. OG Risk Arb is `#1B8C8C` deep teal
-- Do not add dark mode — light mode only
-- Do not add trading UI patterns (BID/ASK panels, order book, price ticker) — this is a research tool
-- Do not hardcode hex values in component CSS — always reference `var(--color-*)` tokens
-- Do not use gradients or decorative shadows beyond what is defined above
-- Do not use border-radius above 12px except for pills (999px) and the OG logo circle (50%)
-- Do not make the sidebar wider than 56px or add text labels to sidebar icons
+## 10. What NOT to do (the previous design system was wrong)
+- Do NOT use Inter as the UI font (Geist; Inter only in DAY cells), a 14px body (12px), or monospace.
+- Do NOT use teal `#1B8C8C`, a bright cyan, or any "trading" palette: brand is `#005268`; green / red are `#179484` / `#DA4D43` (not `#22C55E` / `#EF4444`); there is no BID / ASK colour convention.
+- Do NOT use 6px radius (controls are 4; panels 8; pills 16), `999px` pills, or a circular "OG" logo badge as the nav: the nav is a 72 / 191 / 219px panel with the OG monogram / Oscar Gruss wordmark and labelled items; never a 56px icon-only sidebar.
+- Do NOT use a dark `#1A1A28` / navy primary button, a 36px / 40px default button height, `opacity` hovers or `scale(.98)` pressed effects: primary is `#005268`, 32 high, hover = white 20% overlay.
+- Do NOT use UPPERCASE section labels, `letter-spacing`, or 600-weight 12px headers everywhere (header weight depends on the table - see section 5).
+- Do NOT add card shadows, gradients (except the logo / AI icon), dark mode, or `border:` strokes (use inset shadows).
+- Do NOT confuse this platform with another one in the hub: its brand is dark green `#005268`, not another platform's bright teal / cyan, and its font is Geist.
+- Do NOT hard-code hex in component CSS (use `var(--...)`); do NOT merge near-equal values (e.g. `#179475` / `#179464` / `#179484`); do NOT draw a time grid in the week view (Figma has none); do NOT build the "Laura" shell unless the owner asks.
+- Do NOT invent states: use the Extended classes (they are derived from existing tokens) and keep them visually modest.

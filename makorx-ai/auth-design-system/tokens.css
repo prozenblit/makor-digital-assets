@@ -1,0 +1,393 @@
+/* =====================================================================
+   MAKOR (MakorX.AI) AUTH - design tokens (stage A)
+   Source of truth: the HTML prototypes (there is NO Figma for auth)
+     hub/auth/makor-signin.html                 (web sign-in, light only)       "S"
+     hub/auth/makor-authenticator.html          (mobile authenticator, light)   "A"
+     hub/auth/makor-authenticator-dark.html     (mobile authenticator, dark)    "D"
+   Specs: makorx-ai/auth-html-spec/web-signin.md + authenticator.md
+   Comments carry "src: <file> L<line>" ("D<line>" = line in the dark file).
+   Mirrors tokens.json 1:1 (generated from the same data).
+   Every custom property uses the --mauth- prefix: NONE of the main HR app's token
+   names (--color-bg, --text-*, --h-input, --space-*, --radius-pill ...) is reused.
+   THEMES: web sign-in = light only. Mobile authenticator = light values on :root and
+   dark pairs under [data-theme="dark"] (put the attribute on the phone wrapper or <html>).
+   ===================================================================== */
+:root {
+
+  /* ---------- COLOUR - WEB SIGN-IN (light only; no dark theme exists for the web portal) ---------- */
+  /* Prototype names -> mauth names: --c-bg=web-bg, --c-surface=web-surface, --c-surface-2=web-field, --c-primary=web-primary, --c-primary-hover=web-primary-hover, --c-primary-ghost=web-primary-ghost, --c-text(-2/-3)=web-text(-2/-3), --c-border=web-border, --c-danger=web-danger, --c-disabled=web-disabled. */
+  --mauth-web-bg: #C8D8DF; /* Page backdrop (solid colour, no gradient). html+body. src: makor-signin.html L12, L41 */
+  --mauth-web-surface: #EDF3F6; /* Card background; unchecked checkbox bg. src: makor-signin.html L13, L87, L176 */
+  --mauth-web-field: #FFFFFF; /* Input background and OTP slot background (white on the #EDF3F6 card). src: makor-signin.html L14, L139, L241 */
+  --mauth-web-primary: #005268; /* Brand: primary button, links, focus border, filled slot border, caret, eyebrow accent, success tick, checked checkbox, logo + watermark fill (hard-coded #005268 in the SVG). src: makor-signin.html L15 */
+  --mauth-web-primary-hover: #003D4F; /* Primary button hover only. src: makor-signin.html L16, L204 */
+  --mauth-web-primary-ghost: rgba(0,82,104,0.07); /* Focus ring (3px) on input + OTP slot; success-ring fill. src: makor-signin.html L17, L149, L253, L295 */
+  --mauth-web-text: #0B2530; /* Headings, input text, slot digits, back-link hover. src: makor-signin.html L18 */
+  --mauth-web-text-2: #537380; /* Sub text, eyebrow, labels, back link, timer value, footer text, toggle hover. src: makor-signin.html L19 */
+  --mauth-web-text-3: #90AEBC; /* Placeholders, terms text, timer label, resend note, toggle rest colour. Low contrast on surface (2.09:1, spec 1.1) - reproduced as designed. src: makor-signin.html L20 */
+  --mauth-web-border: #CCDDE4; /* OTP slot border (rest), checkbox border (unchecked). src: makor-signin.html L21, L242, L176 */
+  --mauth-web-danger: #B53A3A; /* Field error + OTP error text/border, timer warn. src: makor-signin.html L22 */
+  --mauth-web-disabled: #7FA0AB; /* Disabled primary button background (also what a loading button looks like: JS sets disabled). src: makor-signin.html L23, L206 */
+  --mauth-web-danger-ghost: rgba(181,58,58,.07); /* Error ring (3px) on inputs. Raw in source (no variable). src: makor-signin.html L152 */
+  --mauth-web-danger-tint: rgba(181,58,58,.04); /* OTP slot error background tint. Raw in source. src: makor-signin.html L258 */
+  --mauth-web-on-primary: #fff; /* Text/spinner top on primary button; checkbox tick. Raw in source. src: makor-signin.html L203, L209, L372 */
+  --mauth-web-on-disabled: rgba(255,255,255,.65); /* Disabled primary button label. Raw in source. src: makor-signin.html L206 */
+  --mauth-web-spinner-track: rgba(255,255,255,.3); /* Spinner ring track on the primary button. Raw in source. src: makor-signin.html L209 */
+  --mauth-web-constellation: #002D46; /* Canvas ink = rgb(0,45,70). Dots rgba(...,.3), links rgba(...,.1*(1-d/155)). Consumed by constellation.js only. src: makor-signin.html L448 */
+
+  /* ---------- COLOUR - MOBILE AUTHENTICATOR (light on :root, dark pairs under [data-theme="dark"]) ---------- */
+  /* Prototype names -> mauth names: --c-bg=app-bg, --c-surface=app-surface, --c-surface-2=app-surface-2, --c-primary=app-primary, --c-primary-ghost=app-primary-ghost, --c-text(-2/-3)=app-text(-2/-3), --c-border=app-border, --c-danger=app-danger, --c-success=app-success. DEAD/duplicate prototype tokens NOT carried: --c-primary-dark (light = primary; dark #0A7A8E is overridden to primary at D33/D138), --c-primary-dim (never referenced), --c-black (only the light toast used it, see app-toast-bg). */
+  --mauth-app-bg: #F5F5F8; /* Shell background, home content card, page bg (light). src: makor-authenticator.html L13, L39, L49 */
+  --mauth-app-surface: #FFFFFF; /* Cards, sheet, dialog, password screen, session rows. src: makor-authenticator.html L14 */
+  --mauth-app-surface-2: #F5F5F8; /* Flag tile, input bg, code card, cancel button, spec grid. Equals app-bg in light (kept as its own role). src: makor-authenticator.html L15 */
+  --mauth-app-primary: #005268; /* CTA fill, eyebrow, dots, loc-dot, launch app name, confirmed icon, focus outline. src: makor-authenticator.html L16 */
+  --mauth-app-primary-hover: #003D4F; /* Primary button hover. Raw in source. src: makor-authenticator.html L152 */
+  --mauth-app-primary-ghost: #00526814; /* Pulse-dot ring, input focus ring, confirmed-icon bg. 8-digit hex = rgba(0,82,104,.0784) (source notation kept; dark uses rgba .13). src: makor-authenticator.html L19 */
+  --mauth-app-text: #000000; /* Primary text. src: makor-authenticator.html L21 */
+  --mauth-app-text-2: #7C8DAC; /* Secondary text, subtitle, labels. src: makor-authenticator.html L22 */
+  --mauth-app-text-3: #A8B6CD; /* Tertiary text, meta, section labels, disabled button bg. src: makor-authenticator.html L23, L154 */
+  --mauth-app-border: #E5E7EC; /* Input border, sheet handle, dividers, map placeholder. src: makor-authenticator.html L24 */
+  --mauth-app-danger: #DA4D43; /* Sign out, block link, danger toast + confirm button, urgent timer. src: makor-authenticator.html L25 */
+  --mauth-app-success: #179484; /* "Active now" label only. src: makor-authenticator.html L26, L728 */
+  --mauth-app-page-bg: #F5F5F8; /* Document backdrop outside the phone shell. src: makor-authenticator.html L39 */
+  --mauth-app-toast-bg: #000000; /* Toast background (source used --c-black). src: makor-authenticator.html L169 */
+  --mauth-app-toast-text: #fff; /* Toast text. Raw in source. src: makor-authenticator.html L169 */
+  --mauth-app-launch-bg: #C8D8DF; /* Launch screen background (opaque; same hex as web-bg but a separate role). src: makor-authenticator.html L184 */
+  --mauth-app-faceid-blur-bg: rgba(235,235,235,.12); /* Face ID overlay veil (with blur(6px)). src: makor-authenticator.html L218 */
+  --mauth-app-faceid-card-bg: transparent; /* Face ID card background (light = transparent; the glass card is dark-only). src: makor-authenticator.html L250 */
+  --mauth-app-faceid-tint: transparent; /* Dark-only blend tint over the Lottie; light has none (a transparent layer = no visible effect). src: makor-authenticator-dark.html D287-296 */
+  --mauth-app-fallback-bg: rgba(0,0,0,.06); /* Secondary "Use Passcode" button bg. src: makor-authenticator.html L280 */
+  --mauth-app-fallback-bg-hover: rgba(0,0,0,.10); /* Secondary button hover bg. src: makor-authenticator.html L289 */
+  --mauth-app-fallback-bg-active: rgba(0,0,0,.15); /* Secondary button active bg. src: makor-authenticator.html L290 */
+  --mauth-app-banner-bg: rgba(0,0,0,0.20); /* Push banner glass bg (with blur(48px)). src: makor-authenticator.html L96 */
+  --mauth-app-banner-border: rgba(255,255,255,0.14); /* Push banner 1px border. src: makor-authenticator.html L101 */
+  --mauth-app-banner-time: rgba(255,255,255,0.60); /* Push banner "now". src: makor-authenticator.html L112 */
+  --mauth-app-banner-sub: rgba(255,255,255,0.78); /* Push banner subtitle. src: makor-authenticator.html L122 */
+  --mauth-app-overlay-confirm: rgba(0,0,0,.4); /* Confirm dialog scrim. src: makor-authenticator.html L473 */
+  --mauth-app-overlay-sheet: rgba(0,0,0,.45); /* Bottom sheet scrim. src: makor-authenticator.html L516 */
+  --mauth-app-map-bg: #E5E7EC; /* Sheet map placeholder bg under the map art (= app-border). src: makor-authenticator.html L546 */
+  --mauth-app-pill-bg: rgba(255,255,255,.92); /* Map location pill bg (with blur(8px)). src: makor-authenticator.html L551 */
+
+  /* ---------- COLOUR - MOBILE AUTHENTICATOR, SAME IN BOTH THEMES ---------- */
+  --mauth-app-on-primary: #fff; /* Label on primary / copy button (white on dark #17C3AF teal = ~2.2:1, source contrast bug, reproduced as rendered). src: makor-authenticator.html L148, L603 */
+  --mauth-app-on-danger: #fff; /* Label on danger confirm button and danger toast. src: makor-authenticator.html L511; makor-authenticator-dark.html D181 */
+  --mauth-app-status-home-bg: #0D8090; /* Status bar background while the home screen is active (!important in source). src: makor-authenticator.html L335 */
+  --mauth-app-status-home-fg: rgba(255,255,255,0.9); /* Status bar text + icons on home. src: makor-authenticator.html L336, L338 */
+  --mauth-app-home-grad-1: #0D8090; /* Home header gradient stop 1 @0px. src: makor-authenticator.html L330 */
+  --mauth-app-home-grad-2: #0A5888; /* Home header gradient stop 2 @50px. src: makor-authenticator.html L330 */
+  --mauth-app-home-grad-3: #1E3578; /* Home header gradient stop 3 @110px; last stop = app-bg @170px. src: makor-authenticator.html L330 */
+  --mauth-app-on-gradient: #fff; /* Home logo name on the gradient. src: makor-authenticator.html L325 */
+  --mauth-app-glass-bg: rgba(255,255,255,0.14); /* Home logo icon glass bg (+blur(16px)). src: makor-authenticator.html L317 */
+  --mauth-app-glass-border: rgba(255,255,255,0.22); /* Home logo icon 1px border. src: makor-authenticator.html L320 */
+  --mauth-app-glass-inset: rgba(255,255,255,0.25); /* Home logo icon inset highlight. src: makor-authenticator.html L321 */
+  --mauth-app-banner-appname: rgba(255,255,255,0.80); /* Push banner app name. src: makor-authenticator.html L109 */
+  --mauth-app-banner-title: rgba(255,255,255,1.0); /* Push banner title. src: makor-authenticator.html L121 */
+  --mauth-app-logo-glyph: #fff; /* Logo mark fill on the logo gradient / glass (app-makor-logo-mark.svg fill="white"). src: makor-authenticator.html (markup L645) */
+  --mauth-app-logo-base: #005268; /* Logo gradient base colour (last layer). src: makor-authenticator.html L130 */
+  --mauth-app-logo-g1: rgba(0,89,159,0.9); /* Logo gradient layer 1 (ellipse at 82% 10%, 0% -> transparent 55%). src: makor-authenticator.html L127 */
+  --mauth-app-logo-g2: rgba(0,99,91,0.85); /* Logo gradient layer 2 (ellipse at 73% 68%, 0% -> transparent 55%). src: makor-authenticator.html L128 */
+  --mauth-app-logo-g3: rgba(0,184,184,0.75); /* Logo gradient layer 3 (ellipse at 25% 83%, 0% -> transparent 50%). src: makor-authenticator.html L129 */
+  --mauth-app-faceid-lottie-card: #404042; /* DOCUMENTED, not drawn: the remote Lottie "iOS Face ID - Prompt" tile colour (measured in-browser, authenticator.md 0). Used only to colour the clearly-labelled placeholder. */
+
+  /* ---------- GRADIENTS ---------- */
+  /* Composite tokens that reference app-bg live in the shared block below (a var() inside a custom property resolves where it is DECLARED, so a single :root declaration would never flip in the dark scope). */
+  --mauth-app-shell-bg: var(--mauth-app-bg); /* Shell background, light. src: makor-authenticator.html L49 */
+
+  /* ---------- TYPOGRAPHY ---------- */
+  --mauth-font-sans: 'Geist', -apple-system, sans-serif; /* src: makor-signin.html L25; makor-authenticator.html L28 */
+  --mauth-font-serif: 'EB Garamond', Georgia, serif; /* WEB only (titles, OTP digits, timer). src: makor-signin.html L24 */
+  --mauth-font-mono: var(--mauth-font-sans); /* alias of font-sans (used for the IP value only). src: makor-authenticator.html L29, L740 */
+  --mauth-text-10: 10px; /* Web footer; app eyebrow, spec-grid label, sheet section title, sheet info label. src: makor-signin.html L70; makor-authenticator.html L135, L569, L578 */
+  --mauth-text-11: 11px; /* Web eyebrow "Step 2 of 2". src: makor-signin.html L112 */
+  --mauth-text-12: 12px; /* Web field error, terms; app banner app/time/sub, meta, flag, sign-out chip, spec values, section label, input label, map pill, code label. src: makor-signin.html L162, L218; makor-authenticator.html L109, L412 */
+  --mauth-text-13: 13px; /* Web checkbox label, link button, back link, OTP error, timer row, resend note. src: makor-signin.html L183-185, L225, L265, L274, L284 */
+  --mauth-text-14: 14px; /* Web sub/input/success sub; app passcode, session loc, back, confirm, block link, sheet info value, toast. src: makor-signin.html L126, L142; makor-authenticator.html L142, L278, L411 */
+  --mauth-text-15: 15px; /* Web primary button. src: makor-signin.html L198 */
+  --mauth-text-16: 16px; /* App status time, input text, primary + copy button, code expiry, confirm title. src: makor-authenticator.html L64, L451, L148, L599, L493 */
+  --mauth-text-18: 18px; /* App home title "Your devices", confirmed title. src: makor-authenticator.html L345, L632 */
+  --mauth-text-20: 20px; /* App launch name, "Locked" label, home logo name. src: makor-authenticator.html L201, L271, L324 */
+  --mauth-text-30: 30px; /* Web OTP digit, OTP-step title, success title. src: makor-signin.html L245, L395, L303 */
+  --mauth-text-32: 32px; /* App password-screen title. src: makor-authenticator.html L139 */
+  --mauth-text-38: 38px; /* Web login title "Welcome back". src: makor-signin.html L121 */
+  --mauth-text-44: 44px; /* App sheet OTP code "482 716". src: makor-authenticator.html L593 */
+  --mauth-weight-regular: 400; /* Body, input text, sub, meta, launch name (dark), "Locked", home logo name. src: makor-signin.html / makor-authenticator.html */
+  --mauth-weight-medium: 500; /* Garamond titles/digits/timer (web); launch name (light), screen title, code expiry, OTP digits (app), toast, back link. src: makor-signin.html / makor-authenticator.html */
+  --mauth-weight-semibold: 600; /* Buttons, links, session loc, web eyebrow, labels. src: makor-signin.html / makor-authenticator.html */
+  --mauth-weight-bold: 700; /* App eyebrow, section labels, banner title, confirm title, confirmed title; web inline "Resend" (inline style, the only 700 in the web file). src: makor-signin.html / makor-authenticator.html */
+  --mauth-leading-web-title: 1.1; /* Web .card-title (38px -> 41.8px; OTP title 30px -> 33px). Success title uses `normal`. src: makor-signin.html L121 */
+  --mauth-leading-web-body: 1.6; /* Web sub + success sub (14px -> 22.4px). src: makor-signin.html L127, L307 */
+  --mauth-leading-web-terms: 1.5; /* Web terms row (12px -> 18px). src: makor-signin.html L218 */
+  --mauth-leading-app-heading: 1.2; /* App screen title (32px -> 38.4px; home 18px -> 21.6px). src: makor-authenticator.html L140 */
+  --mauth-leading-app-body: 1.55; /* App screen sub (14px -> 21.7px). src: makor-authenticator.html L142 */
+  --mauth-leading-app-compact: 1.45; /* App confirm body (14px -> 20.3px). src: makor-authenticator.html L499 */
+  --mauth-leading-app-snug: 1.4; /* App launch name (20px -> 28px), banner sub (12px -> 16.8px). src: makor-authenticator.html L203, L122 */
+  --mauth-leading-app-tight: 1.3; /* App banner title (14px -> 18.2px). src: makor-authenticator.html L121 */
+  --mauth-tracking-title: .01em; /* Web title, web primary button, launch name, "Locked", home logo name. src: makor-signin.html L123, L201; makor-authenticator.html L202, L273, L325 */
+  --mauth-tracking-eyebrow-web: .14em; /* Web eyebrow. src: makor-signin.html L113 */
+  --mauth-tracking-footer: .1em; /* Web footer text; app section label, sheet section title. src: makor-signin.html L71; makor-authenticator.html L392, L570 */
+  --mauth-tracking-eyebrow-app: .12em; /* App eyebrow (10px -> 1.2px). src: makor-authenticator.html L135 */
+  --mauth-tracking-label: .04em; /* App input label, flag tile (12px -> .48px). src: makor-authenticator.html L443, L407 */
+  --mauth-tracking-spec: .09em; /* London spec-grid labels (inline). src: makor-authenticator.html L739 */
+  --mauth-tracking-code: .08em; /* Sheet code label. src: makor-authenticator.html L590 */
+  --mauth-tracking-info: .07em; /* Sheet info label. src: makor-authenticator.html L578 */
+  --mauth-tracking-banner: .02em; /* Push banner app name. src: makor-authenticator.html L110 */
+  --mauth-tracking-tight: -.01em; /* Passcode link, confirm title. src: makor-authenticator.html L284, L494 */
+  --mauth-tracking-otp: .22em; /* App OTP code (44px -> 9.68px; the trailing letter-space shifts optical centring). src: makor-authenticator.html L594 */
+  --mauth-app-launch-name-weight: 500; /* App launch name weight, light. src: makor-authenticator.html L201 */
+
+  /* ---------- SPACING - OBSERVED padding/margin/gap/offset values (the source defines NO spacing tokens) ---------- */
+  --mauth-space-2: 2px; /* OBSERVED literal 2px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-4: 4px; /* OBSERVED literal 4px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-6: 6px; /* OBSERVED literal 6px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-8: 8px; /* OBSERVED literal 8px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-10: 10px; /* OBSERVED literal 10px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-12: 12px; /* OBSERVED literal 12px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-14: 14px; /* OBSERVED literal 14px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-16: 16px; /* OBSERVED literal 16px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-18: 18px; /* OBSERVED literal 18px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-20: 20px; /* OBSERVED literal 20px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-22: 22px; /* OBSERVED literal 22px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-24: 24px; /* OBSERVED literal 24px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-28: 28px; /* OBSERVED literal 28px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-32: 32px; /* OBSERVED literal 32px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-36: 36px; /* OBSERVED literal 36px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-40: 40px; /* OBSERVED literal 40px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-44: 44px; /* OBSERVED literal 44px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-48: 48px; /* OBSERVED literal 48px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+  --mauth-space-80: 80px; /* OBSERVED literal 80px in makor-signin.html / makor-authenticator.html (padding, margin, gap or fixed offset) */
+
+  /* ---------- BORDER RADIUS - mapped to elements ---------- */
+  --mauth-radius-checkbox: 3px; /* Web checkbox box. src: makor-signin.html L175 */
+  --mauth-radius-control: 4px; /* App controls: primary/secondary/chip/confirm buttons, input, toast, flag tile, map + pill, sheet handle. (The web focus-visible 4px override is a source bug, not reproduced.) src: makor-authenticator.html L147, L281, L415, L450, L170, L402, L545, L552, L537 */
+  --mauth-radius-web-field: 8px; /* Web input + web primary button. src: makor-signin.html L141, L197 */
+  --mauth-radius-card-sm: 8px; /* App session card, spec grid, code card, copy button. src: makor-authenticator.html L396, L737, L583, L602 */
+  --mauth-radius-sheet: 8px 8px 0 0; /* App bottom sheet (top corners only). src: makor-authenticator.html L526 */
+  --mauth-radius-home-icon: 10px; /* App home glass logo icon. src: makor-authenticator.html L314 */
+  --mauth-radius-otp-slot: 12px; /* Web OTP slot. src: makor-signin.html L243 */
+  --mauth-radius-faceid: 12px; /* App Face ID frame (and dark ::after tint). src: makor-authenticator.html L262 */
+  --mauth-radius-banner-icon: 12px; /* App push banner app icon. src: makor-authenticator.html L115 */
+  --mauth-radius-dialog: 14px; /* App confirm dialog. src: makor-authenticator.html L482 */
+  --mauth-radius-web-card: 16px; /* Web sign-in card. src: makor-signin.html L88 */
+  --mauth-radius-home-card: 20px 20px 0 0; /* App home content card (top corners). src: makor-authenticator.html L302 */
+  --mauth-radius-banner: 22px; /* App push banner inner. src: makor-authenticator.html L99 */
+  --mauth-radius-launch-icon: 22px; /* App launch logo tile. src: makor-authenticator.html L196 */
+  --mauth-radius-faceid-card: 28px; /* App Face ID glass card, DARK only (light card has no radius). src: makor-authenticator-dark.html D260-265 */
+  --mauth-radius-shell: min(44px, 4vw); /* Phone frame (44px at >=1100px wide; 15-17px on phone-width viewports). src: makor-authenticator.html L50 */
+  --mauth-radius-round: 50%; /* Success ring, spinner, status dots, confirmed icon. src: makor-signin.html L294, L210; makor-authenticator.html L366, L558, L626 */
+
+  /* ---------- BORDERS (widths; themed dark-only borders are full shorthands) ---------- */
+  --mauth-border-width-field: 1.5px; /* Web input, OTP slot, checkbox; app input, active-session card (computed 1.33333px at DPR 1.5). src: makor-signin.html L140, L242, L176; makor-authenticator.html L449 */
+  --mauth-border-width-hairline: 1px; /* App sign-out chip, pw divider, banner, glass icon. src: makor-authenticator.html L414, L430, L101, L320 */
+  --mauth-border-width-spinner: 2.5px; /* Web button spinner ring (computed 2.66667px at DPR 1.5). src: makor-signin.html L209 */
+  --mauth-focus-outline-width: 2px; /* Keyboard focus outline (web buttons; app buttons + inputs). src: makor-signin.html L32; makor-authenticator.html L33 */
+  --mauth-focus-outline-offset: 2px; /* Keyboard focus outline offset. src: makor-signin.html L33; makor-authenticator.html L34 */
+  --mauth-app-border-faceid-card: none; /* Face ID card border: none in light. src: makor-authenticator.html L250 */
+  --mauth-app-border-dialog: none; /* Confirm dialog border: none in light. src: makor-authenticator.html L480-490 */
+  --mauth-app-border-sheet-top: none; /* Bottom sheet top border: none in light. src: makor-authenticator.html L523-533 */
+  --mauth-app-border-pill: none; /* Map pill border: none in light. src: makor-authenticator.html L549-556 */
+  --mauth-app-border-code-card: none; /* OTP code card border: none in light. src: makor-authenticator.html L582-585 */
+  --mauth-app-border-toast: none; /* Toast border: none in light. src: makor-authenticator.html L167-178 */
+
+  /* ---------- SHADOWS & BLUR ---------- */
+  --mauth-shadow-web-card: 0 2px 40px rgba(0,30,50,.10), 0 1px 4px rgba(0,30,50,.05); /* Web sign-in card (tinted blue-black). src: makor-signin.html L89 */
+  --mauth-shadow-web-focus-ring: 0 0 0 3px var(--mauth-web-primary-ghost); /* Web input + OTP slot focus ring. src: makor-signin.html L149, L253 */
+  --mauth-shadow-web-error-ring: 0 0 0 3px var(--mauth-web-danger-ghost); /* Web input error ring. src: makor-signin.html L152 */
+  --mauth-shadow-app-focus-ring: 0 0 0 4px var(--mauth-app-primary-ghost); /* App input focus ring. src: makor-authenticator.html L458 */
+  --mauth-shadow-app-shell: 0 24px 64px rgba(0,0,0,.18), 0 0 0 2px rgba(0,0,0,.07); /* Phone frame. src: makor-authenticator.html L51 */
+  --mauth-shadow-app-banner: 0 6px 32px rgba(0,0,0,0.18), inset 0 2px 0 rgba(255,255,255,0.22); /* Push banner. src: makor-authenticator.html L102 */
+  --mauth-shadow-app-launch-icon: 0 8px 28px rgba(0,82,104,0.30); /* Launch logo tile. src: makor-authenticator.html L198 */
+  --mauth-shadow-app-faceid-card: none; /* Face ID card: none in light. src: makor-authenticator.html L250 */
+  --mauth-shadow-app-glass-icon: inset 0 1px 0 var(--mauth-app-glass-inset); /* Home glass logo icon inset highlight. src: makor-authenticator.html L321 */
+  --mauth-shadow-app-dialog: 0 8px 40px rgba(0,0,0,.2); /* Confirm dialog. src: makor-authenticator.html L486 */
+  --mauth-shadow-app-sheet: 0 -8px 40px rgba(0,0,0,.18); /* Bottom sheet. src: makor-authenticator.html L532 */
+  --mauth-shadow-app-pill: 0 2px 8px rgba(0,0,0,.12); /* Map location pill. src: makor-authenticator.html L555 */
+  --mauth-shadow-app-dot-ring: 0 0 0 4px var(--mauth-app-primary-ghost); /* Session dot resting ring (pulse 0%/100%). src: makor-authenticator.html L368, L372 */
+  --mauth-shadow-app-dot-ring-wide: 0 0 0 6px transparent; /* Session dot ring at 50% of the pulse. src: makor-authenticator.html L373 */
+  --mauth-blur-faceid: blur(6px); /* Face ID veil, light. src: makor-authenticator.html L219 */
+  --mauth-blur-faceid-card: none; /* Face ID card backdrop: none in light. src: makor-authenticator.html L250 */
+  --mauth-blur-banner: blur(48px); /* Push banner. src: makor-authenticator.html L97 */
+  --mauth-blur-glass-icon: blur(16px); /* Home glass logo icon. src: makor-authenticator.html L318 */
+  --mauth-blur-pill: blur(8px); /* Map location pill. src: makor-authenticator.html L551 */
+
+  /* ---------- OPACITY & SCALE ---------- */
+  --mauth-opacity-watermark: .045; /* Web background watermark. src: makor-signin.html L57 */
+  --mauth-opacity-footer: .7; /* Web page footer text. src: makor-signin.html L72 */
+  --mauth-opacity-link-hover: .7; /* Web link button hover. src: makor-signin.html L191 */
+  --mauth-opacity-link-disabled: .4; /* Web link button disabled (resend cooldown). src: makor-signin.html L192 */
+  --mauth-opacity-pressed-confirm: .7; /* App confirm button :active. src: makor-authenticator.html L509 */
+  --mauth-opacity-pressed-copy: .85; /* App copy button :active. src: makor-authenticator.html L608 */
+  --mauth-scale-press-web: .99; /* Web primary button :active. src: makor-signin.html L205 */
+  --mauth-scale-press-app: .98; /* App primary button :active. src: makor-authenticator.html L153 */
+  --mauth-scale-otp-focus: 1.03; /* Web OTP slot :focus. src: makor-signin.html L254 */
+  --mauth-scale-dialog-rest: .95; /* App confirm dialog closed state (-> 1). src: makor-authenticator.html L487 */
+  --mauth-scale-session-exit: .97; /* App session row removal end state. src: makor-authenticator.html JS L1120 */
+
+  /* ---------- SIZES (fixed widths/heights as rendered) ---------- */
+  --mauth-height-web-field: 48px; /* Web input. src: makor-signin.html L137 */
+  --mauth-height-web-button: 50px; /* Web primary button. src: makor-signin.html L196 */
+  --mauth-height-web-otp-slot: 68px; /* Web OTP slot (width = flex: (inner-40)/6 -> 54px in the 460 card). src: makor-signin.html L240 */
+  --mauth-height-app-button: 52px; /* App primary + copy button. src: makor-authenticator.html L145, L601 */
+  --mauth-height-app-input: 48px; /* App input. src: makor-authenticator.html L447 */
+  --mauth-height-app-confirm-button: 44px; /* App confirm button min-height (computed 46). src: makor-authenticator.html L506 */
+  --mauth-height-app-chip: 36px; /* App sign-out chip min-height. src: makor-authenticator.html L418 */
+  --mauth-height-app-back: 44px; /* App "Back to Face ID" min-height. src: makor-authenticator.html L436 */
+  --mauth-size-web-card-max: 460px; /* Web card max-width (inner 364 at desktop). src: makor-signin.html L86 */
+  --mauth-size-web-logo-w: 90px; /* Web card logo mark width. src: makor-signin.html L338 */
+  --mauth-size-web-logo-h: 72px; /* Web card logo mark height. src: makor-signin.html L338 */
+  --mauth-size-web-watermark-w: 360px; /* Web watermark box. src: makor-signin.html L56 */
+  --mauth-size-web-watermark-h: 288px; /* Web watermark box. src: makor-signin.html L56 */
+  --mauth-size-web-watermark-offset: -40px; /* Web watermark bottom/right offset. src: makor-signin.html L55 */
+  --mauth-size-web-toggle: 44px; /* Web show/hide toggle hit area. src: makor-signin.html L157 */
+  --mauth-size-web-toggle-icon: 18px; /* Web toggle icon. src: makor-signin.html L161 */
+  --mauth-size-web-checkbox: 16px; /* Web checkbox box. src: makor-signin.html L175 */
+  --mauth-size-web-checkbox-tick: 10px; /* Web checkbox tick. src: makor-signin.html L181 */
+  --mauth-size-web-spinner: 18px; /* Web button spinner. src: makor-signin.html L208 */
+  --mauth-size-web-clock: 14px; /* Web timer clock icon. src: makor-signin.html L277 */
+  --mauth-size-web-back-icon: 15px; /* Web back arrow. src: makor-signin.html L390 */
+  --mauth-size-web-success-ring: 68px; /* Web success ring. src: makor-signin.html L294 */
+  --mauth-size-web-success-icon: 32px; /* Web success tick. src: makor-signin.html L300 */
+  --mauth-size-web-footer-bottom: 22px; /* Web footer offset from viewport bottom. src: makor-signin.html L64 */
+  --mauth-size-app-shell-w: min(390px, 100vw); /* Phone frame width. src: makor-authenticator.html L47 */
+  --mauth-size-app-shell-h: min(844px, 100dvh); /* Phone frame height. src: makor-authenticator.html L48 */
+  --mauth-size-app-status-bar: 44px; /* Status bar height. src: makor-authenticator.html L59 */
+  --mauth-size-app-status-icon: 16px; /* Status bar icons. src: makor-authenticator.html L66 */
+  --mauth-size-app-launch-icon: 96px; /* Launch logo tile. src: makor-authenticator.html L195 */
+  --mauth-size-app-launch-glyph-w: 56px; /* Launch logo mark. src: makor-authenticator.html (markup L645) */
+  --mauth-size-app-launch-glyph-h: 45px; /* Launch logo mark. src: makor-authenticator.html (markup L645) */
+  --mauth-size-app-faceid: 180px; /* Face ID frame (square). src: makor-authenticator.html L259 */
+  --mauth-size-app-faceid-bleed: 14px; /* Lottie player bleed (inset -14px, 208x208). src: makor-authenticator.html L265-267 */
+  --mauth-size-app-home-icon: 44px; /* Home glass logo icon. src: makor-authenticator.html L313 */
+  --mauth-size-app-home-glyph-w: 28px; /* Home logo mark. src: makor-authenticator.html (markup) */
+  --mauth-size-app-home-glyph-h: 22px; /* Home logo mark. src: makor-authenticator.html (markup) */
+  --mauth-size-app-banner-icon: 44px; /* Push banner app icon. src: makor-authenticator.html L115 */
+  --mauth-size-app-banner-glyph-w: 24px; /* Push banner logo mark (CSS wins over the 28 attr). src: makor-authenticator.html L119 */
+  --mauth-size-app-banner-glyph-h: 19px; /* Push banner logo mark. src: makor-authenticator.html L119 */
+  --mauth-size-app-flag: 36px; /* Session flag tile. src: makor-authenticator.html L402 */
+  --mauth-size-app-toggle: 44px; /* App input toggle hit area. src: makor-authenticator.html L464 */
+  --mauth-size-app-toggle-icon: 18px; /* App input toggle icon. src: makor-authenticator.html L467 */
+  --mauth-size-app-back-icon: 15px; /* App back arrow. src: makor-authenticator.html (markup L792) */
+  --mauth-size-app-dialog-max: 320px; /* Confirm dialog max-width. src: makor-authenticator.html L484 */
+  --mauth-size-app-handle-w: 36px; /* Sheet handle. src: makor-authenticator.html L537 */
+  --mauth-size-app-handle-h: 4px; /* Sheet handle. src: makor-authenticator.html L537 */
+  --mauth-size-app-map-h: 160px; /* Sheet map. src: makor-authenticator.html L544 */
+  --mauth-size-app-sheet-max-h: 88%; /* Sheet max-height. src: makor-authenticator.html L530 */
+  --mauth-size-app-dot: 8px; /* Session dot / map loc-dot. src: makor-authenticator.html L366, L558 */
+  --mauth-size-app-copy-icon: 18px; /* Copy button icon. src: makor-authenticator.html (markup L914) */
+  --mauth-size-app-confirmed-icon: 56px; /* Confirmed ring. src: makor-authenticator.html L626 */
+  --mauth-size-app-confirmed-glyph: 28px; /* Confirmed check. src: makor-authenticator.html L631 */
+  --mauth-breakpoint-web-card: 560px; /* The ONLY media query: (max-width: 560px) -> card padding 0 32px 40px. Custom properties cannot be used inside @media, so components.css repeats the literal. src: makor-signin.html L92 */
+
+  /* ---------- MOTION - durations, easings, animations ---------- */
+  --mauth-duration-press-web: .08s; /* Web primary button transform. src: makor-signin.html L200 */
+  --mauth-duration-otp-scale: .1s; /* Web OTP slot transform. src: makor-signin.html L248 */
+  --mauth-duration-hover: .12s; /* Web toggle/checkbox/link/back colour+opacity; app primary bg. src: makor-signin.html L144-200; makor-authenticator.html L150 */
+  --mauth-duration-button-bg: .15s; /* Web primary bg + web OTP border/shadow; app secondary bg + confirm opacity. src: makor-signin.html L200, L248; makor-authenticator.html L286, L505 */
+  --mauth-duration-field: .18s; /* Input border-color + box-shadow (web + app). src: makor-signin.html L144; makor-authenticator.html L452 */
+  --mauth-duration-press-app: .08s; /* App primary transform. src: makor-authenticator.html L150 */
+  --mauth-duration-dialog: .2s; /* Confirm overlay opacity + dialog transform. src: makor-authenticator.html L477, L488 */
+  --mauth-duration-faceid-content: .2s; /* faceIDContentIn. src: makor-authenticator.html L241 */
+  --mauth-duration-faceid-content-delay: .25s; /* faceIDContentIn delay. src: makor-authenticator.html L241 */
+  --mauth-duration-faceid-overlay: .25s; /* Face ID overlay fade. src: makor-authenticator.html L211 */
+  --mauth-duration-session-row: .23s; /* Session row transition (+ removal fade/scale). src: makor-authenticator.html L399, L1120 */
+  --mauth-duration-toast: .28s; /* Toast transform + opacity. src: makor-authenticator.html L173 */
+  --mauth-duration-fade: .3s; /* Launch fade-out; screen opacity; London reveal (JS). src: makor-authenticator.html L189, L78 */
+  --mauth-duration-shake: .35s; /* Web OTP slot shake. src: makor-signin.html L258 */
+  --mauth-duration-sheet-overlay: .35s; /* Sheet scrim opacity. src: makor-authenticator.html L518 */
+  --mauth-duration-screen: .38s; /* Screen slide transform. src: makor-authenticator.html L78 */
+  --mauth-duration-slide: .42s; /* Push banner + bottom sheet slide. src: makor-authenticator.html L91, L528 */
+  --mauth-duration-pop-in: .45s; /* Web success ring. src: makor-signin.html L298 */
+  --mauth-duration-spin: .65s; /* Web spinner. src: makor-signin.html L210 */
+  --mauth-duration-blur-in: .65s; /* Face ID veil blurFadeIn. src: makor-authenticator.html L234 */
+  --mauth-duration-pulse: 2.4s; /* Session dot pulse. src: makor-authenticator.html L369 */
+  --mauth-ease-default: ease; /* Browser `ease` (inputs, fades, shake). src: makor-signin.html L144, L258 */
+  --mauth-ease-linear: linear; /* Spinner only. src: makor-signin.html L210 */
+  --mauth-ease-standard: cubic-bezier(.4,0,.2,1); /* Screen slide + toast transform. src: makor-authenticator.html L78, L173 */
+  --mauth-ease-slide: cubic-bezier(.32,0,.04,1); /* Push banner + bottom sheet slide. src: makor-authenticator.html L91, L528 */
+  --mauth-ease-spring: cubic-bezier(.34,1.56,.64,1); /* Web success ring pop-in (the only spring). src: makor-signin.html L298 */
+  --mauth-animation-spin: mauth-spin var(--mauth-duration-spin) var(--mauth-ease-linear) infinite; /* Web spinner (@keyframes spin: to rotate(360deg)). src: makor-signin.html L210, L310 */
+  --mauth-animation-shake: mauth-shake var(--mauth-duration-shake) var(--mauth-ease-default); /* Web OTP error (0%,100% translateX(0); 25% -6px; 75% 6px). src: makor-signin.html L258, L311 */
+  --mauth-animation-pop-in: mauth-pop-in var(--mauth-duration-pop-in) var(--mauth-ease-spring); /* Web success ring (scale .2 + opacity 0 -> scale 1 + opacity 1; no fill-mode). src: makor-signin.html L298, L312 */
+  --mauth-animation-blur-in: mauth-blur-fade-in var(--mauth-duration-blur-in) var(--mauth-ease-default) both; /* Face ID veil (opacity 0 -> 1). src: makor-authenticator.html L234, L236-239 */
+  --mauth-animation-faceid-content: mauth-faceid-content-in var(--mauth-duration-faceid-content) var(--mauth-ease-default) var(--mauth-duration-faceid-content-delay) both; /* Face ID content (opacity 0 -> 1, delay .25s). src: makor-authenticator.html L241, L243-246 */
+  --mauth-animation-dot-pulse: mauth-dot-pulse var(--mauth-duration-pulse) var(--mauth-ease-default) infinite; /* Session dot (box-shadow 0 0 0 4px ghost -> 0 0 0 6px transparent @50%). src: makor-authenticator.html L369, L371-374 */
+
+  /* ---------- Z-INDEX ---------- */
+  --mauth-z-web-canvas: 0; /* Web constellation canvas. src: makor-signin.html L50 */
+  --mauth-z-web-watermark: 0; /* Web watermark. src: makor-signin.html L58 */
+  --mauth-z-web-page: 1; /* Web .page. src: makor-signin.html L77 */
+  --mauth-z-web-footer: 2; /* Web page footer (overlaps the card on short viewports - source bug). src: makor-signin.html L67 */
+  --mauth-z-app-faceid-content: 1; /* Face ID content above the veil. src: makor-authenticator.html L225 */
+  --mauth-z-app-faceid-tint: 2; /* Dark Face ID tint layer above the Lottie. src: makor-authenticator-dark.html D293 */
+  --mauth-z-app-launch: 40; /* Launch screen. src: makor-authenticator.html L183 */
+  --mauth-z-app-faceid: 50; /* Face ID overlay. src: makor-authenticator.html L209 */
+  --mauth-z-app-sheet-overlay: 100; /* Bottom-sheet scrim. src: makor-authenticator.html L519 */
+  --mauth-z-app-sheet: 101; /* Bottom sheet. src: makor-authenticator.html L529 */
+  --mauth-z-app-confirm: 200; /* Confirm overlay. src: makor-authenticator.html L474 */
+  --mauth-z-app-banner: 300; /* Push banner. src: makor-authenticator.html L89 */
+  --mauth-z-app-toast: 999; /* Toast. src: makor-authenticator.html L174 */
+}
+
+/* ---------- Composite tokens re-resolved in EVERY theme scope (they reference themed tokens) ---------- */
+:root,
+[data-theme="dark"] {
+  --mauth-app-logo-gradient: radial-gradient(ellipse at 82% 10%, var(--mauth-app-logo-g1) 0%, transparent 55%), radial-gradient(ellipse at 73% 68%, var(--mauth-app-logo-g2) 0%, transparent 55%), radial-gradient(ellipse at 25% 83%, var(--mauth-app-logo-g3) 0%, transparent 50%), var(--mauth-app-logo-base); /* Logo gradient ("logo color.svg" mirror) on the launch logo tile + push banner app icon. src: makor-authenticator.html L125-131 */
+  --mauth-app-home-gradient: linear-gradient(180deg, var(--mauth-app-home-grad-1) 0px, var(--mauth-app-home-grad-2) 50px, var(--mauth-app-home-grad-3) 110px, var(--mauth-app-bg) 170px); /* Home screen background; last stop = app-bg of the active theme. src: makor-authenticator.html L330 */
+}
+
+/* =====================================================================
+   DARK THEME - mobile authenticator only. src: makor-authenticator-dark.html (D<line>)
+   Apply as <div data-theme="dark"> around the phone shell (or on <html>).
+   Only values that differ from light are listed (the dark file differs only by palette,
+   glass Face ID card + blend tint, a few borders/shadows and the launch canvas script).
+   ===================================================================== */
+[data-theme="dark"] {
+  --mauth-app-bg: #0C1219; /* src: makor-authenticator-dark.html D13 */
+  --mauth-app-surface: #121C26; /* src: makor-authenticator-dark.html D14 */
+  --mauth-app-surface-2: #192533; /* src: makor-authenticator-dark.html D15 */
+  --mauth-app-primary: #17C3AF; /* Dark brand teal. src: makor-authenticator-dark.html D16 */
+  --mauth-app-primary-hover: #10A898; /* src: makor-authenticator-dark.html D154 */
+  --mauth-app-primary-ghost: rgba(23,195,175,0.13); /* src: makor-authenticator-dark.html D19 */
+  --mauth-app-text: #E6EFF4; /* src: makor-authenticator-dark.html D21 */
+  --mauth-app-text-2: #87A8B5; /* src: makor-authenticator-dark.html D22 */
+  --mauth-app-text-3: #4E6A78; /* src: makor-authenticator-dark.html D23 */
+  --mauth-app-border: #1E2F3C; /* src: makor-authenticator-dark.html D24 */
+  --mauth-app-danger: #FF6B6B; /* src: makor-authenticator-dark.html D25 */
+  --mauth-app-success: #2DD4BF; /* src: makor-authenticator-dark.html D26 */
+  --mauth-app-page-bg: #080F15; /* src: makor-authenticator-dark.html D39 */
+  --mauth-app-toast-bg: #192533; /* Hard-coded in the dark toast (equals app-surface-2). src: makor-authenticator-dark.html D171 */
+  --mauth-app-toast-text: var(--mauth-app-text); /* src: makor-authenticator-dark.html D171 */
+  --mauth-app-launch-bg: radial-gradient(ellipse at 50% 22%, rgba(10,115,132,0.72) 0%, rgba(8,90,108,0.30) 38%, transparent 60%), radial-gradient(ellipse at 80% 85%, rgba(5,75,92,0.38) 0%, transparent 40%), #071018; /* Launch gradient on #071018. src: makor-authenticator-dark.html D187-190 */
+  --mauth-app-faceid-blur-bg: rgba(7,12,18,0.42); /* with blur(8px). src: makor-authenticator-dark.html D228 */
+  --mauth-app-faceid-card-bg: rgba(18,28,38,0.70); /* Dark glass card (+blur(12px)). src: makor-authenticator-dark.html D260 */
+  --mauth-app-faceid-tint: rgba(10,35,55,0.72); /* mix-blend-mode:color tint over the grey Lottie. src: makor-authenticator-dark.html D287-296 */
+  --mauth-app-fallback-bg: rgba(255,255,255,.07); /* src: makor-authenticator-dark.html D308 */
+  --mauth-app-fallback-bg-hover: rgba(255,255,255,.12); /* src: makor-authenticator-dark.html D317 */
+  --mauth-app-fallback-bg-active: rgba(255,255,255,.17); /* src: makor-authenticator-dark.html D318 */
+  --mauth-app-banner-bg: rgba(0,0,0,0.55); /* src: makor-authenticator-dark.html D98 */
+  --mauth-app-banner-border: rgba(255,255,255,0.10); /* src: makor-authenticator-dark.html D103 */
+  --mauth-app-banner-time: rgba(255,255,255,0.55); /* src: makor-authenticator-dark.html D114 */
+  --mauth-app-banner-sub: rgba(255,255,255,0.65); /* src: makor-authenticator-dark.html D124 */
+  --mauth-app-overlay-confirm: rgba(0,0,0,.6); /* src: makor-authenticator-dark.html D501 */
+  --mauth-app-overlay-sheet: rgba(0,0,0,.60); /* src: makor-authenticator-dark.html D545 */
+  --mauth-app-map-bg: #152030; /* src: makor-authenticator-dark.html D576 */
+  --mauth-app-pill-bg: rgba(18,28,38,.94); /* src: makor-authenticator-dark.html D581 */
+  --mauth-app-shell-bg: radial-gradient(ellipse at 50% -5%, rgba(10,115,132,0.48) 0%, transparent 55%), var(--mauth-app-bg); /* Dark shell: top teal glow over app-bg. src: makor-authenticator-dark.html D49-51 */
+  --mauth-app-launch-name-weight: 400; /* src: makor-authenticator-dark.html D211 */
+  --mauth-app-border-faceid-card: 1px solid rgba(255,255,255,.08); /* src: makor-authenticator-dark.html D260-265 */
+  --mauth-app-border-dialog: 1px solid var(--mauth-app-border); /* src: makor-authenticator-dark.html D511 */
+  --mauth-app-border-sheet-top: 1px solid var(--mauth-app-border); /* src: makor-authenticator-dark.html D562 */
+  --mauth-app-border-pill: 1px solid rgba(255,255,255,.09); /* src: makor-authenticator-dark.html D582 */
+  --mauth-app-border-code-card: 1px solid var(--mauth-app-border); /* src: makor-authenticator-dark.html D615 */
+  --mauth-app-border-toast: 1px solid #1E2F3C; /* Hard-coded in source (= app-border dark). src: makor-authenticator-dark.html D172 */
+  --mauth-shadow-app-focus-ring: 0 0 0 4px var(--mauth-app-primary-ghost); /* src: makor-authenticator-dark.html D460 */
+  --mauth-shadow-app-shell: 0 24px 64px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06); /* src: makor-authenticator-dark.html D53 */
+  --mauth-shadow-app-banner: 0 6px 32px rgba(0,0,0,.40), inset 0 2px 0 rgba(255,255,255,.08); /* src: makor-authenticator-dark.html D104 */
+  --mauth-shadow-app-launch-icon: 0 8px 32px rgba(0,82,104,0.55), 0 0 0 1px rgba(255,255,255,.06); /* src: makor-authenticator-dark.html D208 */
+  --mauth-shadow-app-faceid-card: 0 8px 32px rgba(0,0,0,.28); /* src: makor-authenticator-dark.html D270 */
+  --mauth-shadow-app-dialog: 0 8px 40px rgba(0,0,0,.45); /* src: makor-authenticator-dark.html D515 */
+  --mauth-shadow-app-sheet: 0 -8px 40px rgba(0,0,0,.40); /* src: makor-authenticator-dark.html D561 */
+  --mauth-shadow-app-pill: 0 2px 8px rgba(0,0,0,.35); /* src: makor-authenticator-dark.html D585 */
+  --mauth-shadow-app-dot-ring: 0 0 0 4px var(--mauth-app-primary-ghost); /* src: makor-authenticator-dark.html D396 */
+  --mauth-blur-faceid: blur(8px); /* src: makor-authenticator-dark.html D229 */
+  --mauth-blur-faceid-card: blur(12px); /* src: makor-authenticator-dark.html D261 */
+}

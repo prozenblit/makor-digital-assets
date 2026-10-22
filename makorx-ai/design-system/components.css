@@ -1,0 +1,1412 @@
+/* =====================================================================
+   MakorX.AI HR app - components.css
+   Source of truth: makor-hr/employees.html (the built app). Every rule block is preceded by a comment beginning "src: employees.html L<line(s)>" (plus "computed" when a number came from a browser measurement).
+   Only var(--...) tokens (tokens.css) are used; raw colours appear ONLY inside the SVG data-URIs of the
+   native-select chevrons (an image, as in the app).
+   THEMING: light = :root tokens; dark = body.dark (the app's own switch). Almost every colour is a role token
+   that flips; only STRUCTURAL differences (e.g. dark .btn-cancel has no border) are written as
+   :is(body.dark, .theme-dark) overrides. .theme-light / .theme-dark let a container force a theme (showcase).
+   Class names = the app's class names (1:1 mapping to employees.html). Exactly-equal duplicates are grouped.
+   Source bugs are NOT reproduced - see makorx-ai/html-spec/build-notes.md and CLAUDE.md "Known source bugs".
+   Anything the app lacks is marked "EXTENDED" and lives in the EXTENDED section at the end of PART 1.
+   ===================================================================== */
+
+/* ===== PART 1: BASE + CONTROLS (stage 1) — START ===== */
+
+/* ---- 0. BASE / RESET ---- */
+/* src: employees.html L11-14, L487 */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--font-primary);background:var(--color-page-bg);color:var(--color-text-primary);font-size:var(--font-size-14);line-height:var(--line-height-body);overflow-y:scroll}
+input,select,textarea,button{font-family:inherit;font-size:inherit}
+
+/* EXTENDED — not in app: container theme scope for side-by-side theme display (tokens re-declared by tokens.css) */
+.theme-light,.theme-dark{background:var(--color-page-bg);color:var(--color-text-primary)}
+
+/* src: employees.html L1049-1053 (dark scrollbars, global) */
+:is(body.dark,.theme-dark){scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-color-dark) transparent}
+:is(body.dark,.theme-dark) *::-webkit-scrollbar{width:var(--size-scrollbar);height:var(--size-scrollbar)}
+:is(body.dark,.theme-dark) *::-webkit-scrollbar-track{background:transparent}
+:is(body.dark,.theme-dark) *::-webkit-scrollbar-thumb{background:var(--color-scrollbar-thumb);border-radius:var(--radius-hairline)}
+:is(body.dark,.theme-dark) *::-webkit-scrollbar-thumb:hover{background:var(--color-scrollbar-thumb-hover)}
+
+/* ---- scroll containers (light: per-container thin scrollbar; the thumb token flips in dark) ---- */
+/* src: employees.html L47-49 (.tab-body), L398-400 (.modal-body) */
+.scroll-thin{scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb) transparent}
+.scroll-thin::-webkit-scrollbar{width:var(--size-scrollbar)}
+.scroll-thin::-webkit-scrollbar-thumb{background:var(--color-scrollbar-thumb);border-radius:var(--radius-hairline)}
+/* src: employees.html L238-240 (.rv-list), L288-289, L598 (.phone-code-drop) */
+.scroll-thin-list{scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb-list) transparent}
+.scroll-thin-list::-webkit-scrollbar{width:var(--size-scrollbar)}
+.scroll-thin-list::-webkit-scrollbar-thumb{background:var(--color-scrollbar-thumb-list);border-radius:var(--radius-hairline)}
+/* src: employees.html L100-102 (.emp-table tbody), L421, L797 */
+.scroll-thin-table{scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb-table) transparent}
+.scroll-thin-table::-webkit-scrollbar{width:var(--size-scrollbar)}
+.scroll-thin-table::-webkit-scrollbar-thumb{background:var(--color-scrollbar-thumb-table);border-radius:var(--radius-hairline)}
+
+/* ---- 1. ICONS (mask utility; every file in assets/ is a VERBATIM app SVGs, colour = currentColor) ---- */
+.icon{display:inline-block;flex-shrink:0;width:16px;height:16px;background-color:currentColor;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain;vertical-align:middle}
+.icon-12{width:12px;height:12px}.icon-13{width:13px;height:13px}.icon-14{width:14px;height:14px}.icon-16{width:16px;height:16px}
+.icon-18{width:18px;height:18px}.icon-20{width:20px;height:20px}.icon-22{width:22px;height:22px}.icon-22x20{width:22px;height:20px}
+.icon-24{width:24px;height:24px}.icon-28{width:28px;height:28px}.icon-32{width:32px;height:32px}.icon-36{width:36px;height:36px}.icon-40{width:40px;height:40px}
+.icon-moon{-webkit-mask-image:url(assets/moon.svg);mask-image:url(assets/moon.svg)}
+.icon-plus{-webkit-mask-image:url(assets/plus.svg);mask-image:url(assets/plus.svg)}
+.icon-search{-webkit-mask-image:url(assets/search.svg);mask-image:url(assets/search.svg)}
+.icon-chevron-down{-webkit-mask-image:url(assets/chevron-down.svg);mask-image:url(assets/chevron-down.svg)}
+.icon-user{-webkit-mask-image:url(assets/user.svg);mask-image:url(assets/user.svg)}
+.icon-calendar-light{-webkit-mask-image:url(assets/calendar-light.svg);mask-image:url(assets/calendar-light.svg)}
+.icon-calendar-dots{-webkit-mask-image:url(assets/calendar-dots.svg);mask-image:url(assets/calendar-dots.svg)}
+.icon-briefcase{-webkit-mask-image:url(assets/briefcase.svg);mask-image:url(assets/briefcase.svg)}
+.icon-phone{-webkit-mask-image:url(assets/phone.svg);mask-image:url(assets/phone.svg)}
+.icon-mobile{-webkit-mask-image:url(assets/mobile.svg);mask-image:url(assets/mobile.svg)}
+.icon-mail{-webkit-mask-image:url(assets/mail.svg);mask-image:url(assets/mail.svg)}
+.icon-pencil{-webkit-mask-image:url(assets/pencil.svg);mask-image:url(assets/pencil.svg)}
+.icon-calendar-compact{-webkit-mask-image:url(assets/calendar-compact.svg);mask-image:url(assets/calendar-compact.svg)}
+.icon-star{-webkit-mask-image:url(assets/star.svg);mask-image:url(assets/star.svg)}
+.icon-chevron-down-sm{-webkit-mask-image:url(assets/chevron-down-sm.svg);mask-image:url(assets/chevron-down-sm.svg)}
+.icon-calendar{-webkit-mask-image:url(assets/calendar.svg);mask-image:url(assets/calendar.svg)}
+.icon-chevron-left{-webkit-mask-image:url(assets/chevron-left.svg);mask-image:url(assets/chevron-left.svg)}
+.icon-chevron-right{-webkit-mask-image:url(assets/chevron-right.svg);mask-image:url(assets/chevron-right.svg)}
+.icon-search-line{-webkit-mask-image:url(assets/search-line.svg);mask-image:url(assets/search-line.svg)}
+.icon-chevron-left-bold{-webkit-mask-image:url(assets/chevron-left-bold.svg);mask-image:url(assets/chevron-left-bold.svg)}
+.icon-chevron-right-bold{-webkit-mask-image:url(assets/chevron-right-bold.svg);mask-image:url(assets/chevron-right-bold.svg)}
+.icon-arrow-up-right{-webkit-mask-image:url(assets/arrow-up-right.svg);mask-image:url(assets/arrow-up-right.svg)}
+.icon-calculator{-webkit-mask-image:url(assets/calculator.svg);mask-image:url(assets/calculator.svg)}
+.icon-home{-webkit-mask-image:url(assets/home.svg);mask-image:url(assets/home.svg)}
+.icon-activity{-webkit-mask-image:url(assets/activity.svg);mask-image:url(assets/activity.svg)}
+.icon-plus-bold{-webkit-mask-image:url(assets/plus-bold.svg);mask-image:url(assets/plus-bold.svg)}
+.icon-user-sm{-webkit-mask-image:url(assets/user-sm.svg);mask-image:url(assets/user-sm.svg)}
+.icon-heart{-webkit-mask-image:url(assets/heart.svg);mask-image:url(assets/heart.svg)}
+.icon-briefcase-sm{-webkit-mask-image:url(assets/briefcase-sm.svg);mask-image:url(assets/briefcase-sm.svg)}
+.icon-book-open{-webkit-mask-image:url(assets/book-open.svg);mask-image:url(assets/book-open.svg)}
+.icon-close{-webkit-mask-image:url(assets/close.svg);mask-image:url(assets/close.svg)}
+.icon-check{-webkit-mask-image:url(assets/check.svg);mask-image:url(assets/check.svg)}
+.icon-chevron-down-md{-webkit-mask-image:url(assets/chevron-down-md.svg);mask-image:url(assets/chevron-down-md.svg)}
+.icon-sort-unsorted{-webkit-mask-image:url(assets/sort-unsorted.svg);mask-image:url(assets/sort-unsorted.svg)}
+.icon-sort-asc{-webkit-mask-image:url(assets/sort-asc.svg);mask-image:url(assets/sort-asc.svg)}
+.icon-sort-desc{-webkit-mask-image:url(assets/sort-desc.svg);mask-image:url(assets/sort-desc.svg)}
+.icon-request-annual{-webkit-mask-image:url(assets/request-annual.svg);mask-image:url(assets/request-annual.svg)}
+.icon-request-sick{-webkit-mask-image:url(assets/request-sick.svg);mask-image:url(assets/request-sick.svg)}
+.icon-request-wfh{-webkit-mask-image:url(assets/request-wfh.svg);mask-image:url(assets/request-wfh.svg)}
+.icon-request-location{-webkit-mask-image:url(assets/request-location.svg);mask-image:url(assets/request-location.svg)}
+.icon-pool-holder{-webkit-mask-image:url(assets/pool-holder.svg);mask-image:url(assets/pool-holder.svg)}
+.icon-pool-members{-webkit-mask-image:url(assets/pool-members.svg);mask-image:url(assets/pool-members.svg)}
+.icon-close-bold{-webkit-mask-image:url(assets/close-bold.svg);mask-image:url(assets/close-bold.svg)}
+.icon-pin-qcard{-webkit-mask-image:url(assets/pin-qcard.svg);mask-image:url(assets/pin-qcard.svg)}
+.icon-reports-to{-webkit-mask-image:url(assets/reports-to.svg);mask-image:url(assets/reports-to.svg)}
+.icon-copy{-webkit-mask-image:url(assets/copy.svg);mask-image:url(assets/copy.svg)}
+.icon-mail-envelope{-webkit-mask-image:url(assets/mail-envelope.svg);mask-image:url(assets/mail-envelope.svg)}
+
+/* ---- 2. TYPE UTILITIES (roles from foundations.md section 3.1; colour tokens flip in dark) ---- */
+/* src: employees.html L54,137,395,982,379,365,973,922,888,870,769,324,151,167 */
+.type-page-title{font-size:var(--font-size-16);font-weight:var(--font-weight-extrabold);color:var(--color-text-primary)}
+.type-detail-name{font-size:var(--font-size-18);font-weight:var(--font-weight-extrabold);line-height:var(--line-height-heading);color:var(--color-text-primary)}
+.type-modal-title{font-size:var(--font-size-16);font-weight:var(--font-weight-bold);color:var(--color-text-primary)}
+.type-dialog-title{font-size:var(--font-size-18);font-weight:var(--font-weight-extrabold);color:var(--color-brand)}
+.type-confirm-title{font-size:var(--font-size-15);font-weight:var(--font-weight-bold);color:var(--color-text-primary)}
+.type-fillall-title{font-size:var(--font-size-17);font-weight:var(--font-weight-bold);color:var(--color-brand)}
+.type-success-title{font-size:var(--font-size-20);font-weight:var(--font-weight-extrabold);color:var(--color-brand)}
+.type-hero-title{font-size:var(--font-size-26);font-weight:var(--font-weight-extrabold);color:var(--color-brand)}
+.type-stat-xl{font-size:var(--font-size-28);font-weight:var(--font-weight-extrabold);line-height:var(--line-height-none);color:var(--color-text-primary)}
+.type-stat-xl-brand{font-size:var(--font-size-28);font-weight:var(--font-weight-extrabold);color:var(--color-brand)}
+.type-stat-lg{font-size:var(--font-size-26);font-weight:var(--font-weight-extrabold);line-height:var(--line-height-tight);color:var(--color-brand)}
+.type-stat-md{font-size:var(--font-size-22);font-weight:var(--font-weight-bold);line-height:var(--line-height-none);color:var(--color-text-primary)}
+.type-stat-sm{font-size:var(--font-size-18);font-weight:var(--font-weight-extrabold);line-height:var(--line-height-heading);color:var(--color-text-primary)}
+.type-stat-value{font-size:var(--font-size-16);font-weight:var(--font-weight-bold);color:var(--color-text-primary)}
+.type-section-band{font-size:var(--font-size-14);font-weight:var(--font-weight-bold);color:var(--color-text-primary)}
+/* uppercase labels L / M / S (table headers etc.) src: employees.html L104,291,326,631,152 */
+.type-label-l{font-size:var(--font-size-12);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);color:var(--color-text-tertiary)}
+.type-label-l--secondary{color:var(--color-text-secondary)}
+.type-label-m{font-size:var(--font-size-11);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label-wide);color:var(--color-text-tertiary)}
+.type-label-m--secondary{color:var(--color-text-secondary)}
+.type-label-s{font-size:var(--font-size-10);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);color:var(--color-text-tertiary)}
+/* field label / value (view mode) src: employees.html L195,205,455,408,926 */
+.type-field-label{font-size:var(--font-size-12);font-weight:var(--font-weight-medium);color:var(--color-text-tertiary)}
+.type-field-value{font-size:var(--font-size-14);font-weight:var(--font-weight-medium);color:var(--color-text-primary)}
+.type-form-label{font-size:var(--font-size-12);font-weight:var(--font-weight-medium);color:var(--color-text-secondary)}
+.type-body{font-size:var(--font-size-14);font-weight:var(--font-weight-regular);color:var(--color-text-primary)}
+.type-body-sm{font-size:var(--font-size-13);font-weight:var(--font-weight-regular);color:var(--color-text-primary)}
+.type-meta{font-size:var(--font-size-12);font-weight:var(--font-weight-regular);color:var(--color-text-secondary)}
+.type-meta-sm{font-size:var(--font-size-11);font-weight:var(--font-weight-regular);color:var(--color-text-secondary)}
+.type-muted{color:var(--color-text-tertiary)}
+.type-secondary{color:var(--color-text-secondary)}
+.type-brand{color:var(--color-brand)}
+/* Lexend Exa: nav lock-up ONLY (.nav-wordmark/.nav-sub are the real classes, see section 3) */
+.type-wordmark{font-family:var(--font-display);font-size:var(--font-size-18);font-weight:var(--font-weight-regular);line-height:var(--line-height-none);color:var(--color-text-black);white-space:nowrap}
+.type-nav-sub{font-family:var(--font-display);font-size:var(--font-size-14);font-weight:var(--font-weight-regular);line-height:var(--line-height-none);color:var(--color-text-secondary)}
+/* monospace: the single use in the app (.mf-value.mono) src: employees.html L456 */
+.type-mono{font-family:var(--font-mono);font-size:var(--font-size-14);font-weight:var(--font-weight-semibold);color:var(--color-brand)}
+
+/* ---- 3. NAV ITEMS (the nav bar shell itself is a stage-2 layout pattern) ---- */
+/* src: employees.html L20, L1058 (apps launcher, inline <svg class="nav-apps-icon">; dark = filled circles) */
+.nav-apps-icon{flex-shrink:0;cursor:pointer;opacity:var(--opacity-hover-link)}
+.nav-apps-icon:hover,.nav-apps-icon.is-hover{opacity:1}
+.nav-apps-icon circle{fill:var(--color-apps-icon-fill);stroke:var(--color-apps-icon-stroke)}
+/* src: employees.html L21-23 (wordmark lock-up; .nav-sub dark colour is a FIX: the source has no dark rule) */
+.nav-logo-text{display:flex;flex-direction:column;gap:var(--space-2)}
+.nav-wordmark{font-family:var(--font-display);font-size:var(--font-size-18);font-weight:var(--font-weight-regular);color:var(--color-text-black);line-height:var(--line-height-none);white-space:nowrap}
+.nav-sub{font-family:var(--font-display);font-size:var(--font-size-14);font-weight:var(--font-weight-regular);color:var(--color-text-secondary);line-height:var(--line-height-none)}
+/* src: employees.html L25-26, L1057 */
+.nav-link{font-size:var(--font-size-14);font-weight:var(--font-weight-regular);color:var(--color-text-nav-link);text-decoration:none;white-space:nowrap}
+.nav-link:hover,.nav-link.is-hover{opacity:var(--opacity-hover-link)}
+.nav-link.active{font-weight:var(--font-weight-semibold);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:2px}
+/* src: employees.html L28, L1059 */
+.nav-avatar{width:var(--size-avatar-42);height:var(--size-avatar-42);border-radius:var(--radius-circle);border:var(--border-width-hairline) solid var(--color-nav-avatar-border);background:var(--color-nav-avatar-bg);display:flex;align-items:center;justify-content:center;font-size:var(--font-size-14);font-weight:var(--font-weight-medium);color:var(--color-text-primary);cursor:pointer;flex-shrink:0}
+
+/* ---- 4. BUTTONS ---- */
+/* src: employees.html L56-57; dark L1091-1093 (dark border is .12 = --color-border-divider, not the .10 control border) */
+.btn-outline{height:var(--control-h-btn);padding:0 var(--space-14);border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-divider);background:var(--color-control-bg-elevated);font-family:inherit;font-size:var(--font-size-14);font-weight:var(--font-weight-medium);color:var(--color-text-item);cursor:pointer;display:flex;align-items:center;gap:var(--space-6);white-space:nowrap;transition:border-color var(--duration-base),color var(--duration-base)}
+.btn-outline:not(:disabled):not(.is-disabled):hover,.btn-outline.is-hover{border-color:var(--color-brand);color:var(--color-brand)}
+/* Light border on .btn-outline is #e5e7ec = divider token value */
+/* src: employees.html L58-59; dark L1089 */
+.btn-primary{height:var(--control-h-btn);padding:0 var(--space-14);border-radius:var(--radius-base);border:none;background:var(--color-brand);font-family:inherit;font-size:var(--font-size-14);font-weight:var(--font-weight-medium);color:var(--color-text-on-brand);cursor:pointer;display:flex;align-items:center;gap:var(--space-6);white-space:nowrap;transition:opacity var(--duration-base)}
+.btn-primary:not(:disabled):not(.is-disabled):hover,.btn-primary.is-hover{opacity:var(--opacity-hover-filled)}
+/* src: employees.html L61-62, L1007-1008 (effective cancel); dark L1094-1095 (fill, no border) */
+.btn-cancel{height:var(--control-h-btn-lg);padding:0 var(--space-20);border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-strong);background:var(--color-btn-cancel-bg);font-family:inherit;font-size:var(--font-size-14);font-weight:var(--font-weight-semibold);color:var(--color-text-secondary);cursor:pointer;transition:background var(--duration-base)}
+.btn-cancel:hover,.btn-cancel.is-hover{background:var(--color-btn-cancel-hover-bg)}
+:is(body.dark,.theme-dark) .btn-cancel{border:none}
+/* src: employees.html L63-64; dark L1096 */
+.btn-cta{height:var(--control-h-btn-lg);padding:0 var(--space-24);border-radius:var(--radius-base);border:none;background:var(--color-brand);font-family:inherit;font-size:var(--font-size-14);font-weight:var(--font-weight-medium);color:var(--color-text-on-brand);cursor:pointer;transition:opacity var(--duration-base);white-space:nowrap}
+.btn-cta:not(:disabled):not(.is-disabled):hover,.btn-cta.is-hover{opacity:var(--opacity-hover-filled)}
+
+/* Filled-brand size/weight variants (all: bg brand, text on-brand, radius 4, hover opacity .85, transition opacity .12s) */
+/* src: employees.html L841-842 (.ts-btn-primary), L356-357 (.tt-btn-approve), L385-386 (.tt-confirm-ok), L351-352 (.tt-fill-save), L440-441 (.btn-add-member), L460-461 (.btn-inline-add); dark L1471,1315,1334,1311,1097,1098 */
+.ts-btn-primary,.tt-btn-approve,.tt-confirm-ok,.tt-fill-save,.btn-add-member,.btn-inline-add{border-radius:var(--radius-base);border:none;background:var(--color-brand);color:var(--color-text-on-brand);font-family:inherit;cursor:pointer;transition:opacity var(--duration-base)}
+.ts-btn-primary:not(:disabled):not(.is-disabled):hover,.tt-btn-approve:not(:disabled):not(.is-disabled):hover,.tt-confirm-ok:not(:disabled):not(.is-disabled):hover,.tt-fill-save:not(:disabled):not(.is-disabled):hover,.btn-add-member:not(:disabled):not(.is-disabled):hover,.btn-inline-add:not(:disabled):not(.is-disabled):hover,.ts-btn-primary.is-hover,.tt-btn-approve.is-hover,.tt-confirm-ok.is-hover,.tt-fill-save.is-hover,.btn-add-member.is-hover,.btn-inline-add.is-hover{opacity:var(--opacity-hover-filled)}
+.ts-btn-primary{height:var(--control-h-btn-lg);padding:0 var(--space-20);font-size:var(--font-size-14);display:flex;align-items:center;gap:var(--space-6);font-weight:var(--font-weight-medium)}
+.tt-btn-approve{height:var(--control-h-btn-lg);padding:0 var(--space-28);font-size:var(--font-size-14);font-weight:var(--font-weight-semibold);white-space:nowrap;flex-shrink:0}
+.tt-confirm-ok{height:var(--control-h-btn-lg);padding:0 var(--space-24);font-size:var(--font-size-14);font-weight:var(--font-weight-semibold)}
+.tt-fill-save{height:var(--control-h-btn-sm);padding:0 var(--space-14);font-size:var(--font-size-13);font-weight:var(--font-weight-semibold)}
+.btn-add-member{height:var(--control-h-btn-xs);padding:0 var(--space-10);font-size:var(--font-size-12);font-weight:var(--font-weight-medium);display:flex;align-items:center;gap:var(--space-4);white-space:nowrap}
+.btn-inline-add{height:var(--control-h-input);padding:0 var(--space-14);font-size:var(--font-size-13);font-weight:var(--font-weight-medium);white-space:nowrap;flex-shrink:0}
+
+/* Ghost-cancel variants (light = .btn-cancel; DARK keeps transparent bg + 1px .10 border, hover = fill-subtle) */
+/* src: employees.html L959-960 (.btn-req-cancel), L839-840 (.ts-btn), L358-359 (.tt-btn-fill-all), L383-384 (.tt-confirm-cancel), L353-354 (.tt-fill-cancel); dark L1441,1469,1316,1332,1312 */
+.btn-req-cancel,.ts-btn,.tt-btn-fill-all,.tt-confirm-cancel,.tt-fill-cancel{background:transparent;border:var(--border-width-hairline) solid var(--color-border-strong);border-radius:var(--radius-base);font-family:inherit;color:var(--color-text-secondary);cursor:pointer;transition:background var(--duration-base)}
+.btn-req-cancel:hover,.ts-btn:hover,.tt-btn-fill-all:hover,.tt-confirm-cancel:hover,.tt-fill-cancel:hover,.btn-req-cancel.is-hover,.ts-btn.is-hover,.tt-btn-fill-all.is-hover,.tt-confirm-cancel.is-hover,.tt-fill-cancel.is-hover{background:var(--color-fill-subtle)}
+.btn-req-cancel,.ts-btn,.tt-btn-fill-all,.tt-confirm-cancel{height:var(--control-h-btn-lg);padding:0 var(--space-20);font-size:var(--font-size-14);font-weight:var(--font-weight-semibold)}
+.ts-btn{display:flex;align-items:center;gap:var(--space-6)}
+.tt-btn-fill-all{white-space:nowrap;flex-shrink:0}
+.tt-fill-cancel{height:var(--control-h-btn-sm);padding:0 var(--space-12);font-size:var(--font-size-13);font-weight:var(--font-weight-semibold)}
+
+/* Outline-brand buttons (fill on hover) */
+/* src: employees.html L961-962 (.btn-req-send), L1022-1023 (.btn-close-calc), L1019-1020 (.calc-accrual-btn); dark L1443-1444,1510-1511,1507-1508 (hover text stays #fff on #0cb8d0) */
+.btn-req-send,.btn-close-calc{background:var(--color-surface);color:var(--color-brand);border:var(--border-width-medium) solid var(--color-brand);border-radius:var(--radius-base);height:var(--control-h-input);font-size:var(--font-size-14);font-weight:var(--font-weight-medium);cursor:pointer;transition:background var(--duration-medium),color var(--duration-medium)}
+.btn-req-send{padding:0 var(--space-24);display:flex;align-items:center;gap:var(--space-8)}
+.btn-close-calc{padding:0 26px}
+.btn-req-send:hover,.btn-close-calc:hover,.btn-req-send.is-hover,.btn-close-calc.is-hover{background:var(--color-brand);color:var(--color-text-on-brand-hover)}
+.calc-accrual-btn{display:inline-flex;align-items:center;gap:7px;margin-top:var(--space-14);border:var(--border-width-medium) solid var(--color-brand);border-radius:var(--radius-base);padding:7px var(--space-14);font-size:var(--font-size-14);font-weight:var(--font-weight-semibold);color:var(--color-brand);cursor:pointer;background:var(--color-surface);transition:background var(--duration-medium)}
+.calc-accrual-btn:hover,.calc-accrual-btn.is-hover{background:var(--color-tint-hover-outline-calc)}
+/* Timesheet entry "save" — disabled look until .ready (JS toggles .ready when all rows are valid) */
+/* src: employees.html L1009-1011; dark L1390-1392 */
+.btn-save{background:var(--color-control-bg-elevated);border:var(--border-width-medium) solid var(--color-border-btn-save-disabled);border-radius:var(--radius-base);height:var(--control-h-input);padding:0 var(--space-24);font-size:var(--font-size-14);font-weight:var(--font-weight-medium);color:var(--color-text-tertiary);cursor:not-allowed;transition:background var(--duration-medium),color var(--duration-medium),border-color var(--duration-medium)}
+.btn-save.ready{border-color:var(--color-brand);color:var(--color-brand);cursor:pointer}
+.btn-save.ready:hover,.btn-save.ready.is-hover{background:var(--color-brand);color:var(--color-text-on-brand-hover)}
+
+/* Approve / deny (HR requests) src: employees.html L273-276; dark L1099-1102 */
+.rv-btn-approve,.rv-btn-deny{height:var(--control-h-btn-xs);padding:0 var(--space-12);border-radius:var(--radius-base);background:transparent;font-family:inherit;font-size:var(--font-size-13);font-weight:var(--font-weight-semibold);cursor:pointer;white-space:nowrap;transition:background var(--duration-base)}
+.rv-btn-approve{border:var(--border-width-hairline) solid var(--color-approve);color:var(--color-approve)}
+.rv-btn-approve:hover,.rv-btn-approve.is-hover{background:var(--color-approve-hover-bg)}
+.rv-btn-deny{border:var(--border-width-hairline) solid var(--color-danger-strong);color:var(--color-danger-strong)}
+.rv-btn-deny:hover,.rv-btn-deny.is-hover{background:var(--color-danger-strong-hover-bg)}
+
+/* Save bar buttons (sit on the brand-coloured .save-bar) src: employees.html L641-644 (unchanged in dark) */
+.btn-save-bar{background:var(--color-save-bar-btn-bg);color:var(--color-save-bar-btn-text);border:none;border-radius:var(--radius-base);height:var(--control-h-btn-bar);padding:0 18px;font-size:var(--font-size-14);font-weight:var(--font-weight-semibold);cursor:pointer;font-family:inherit;transition:opacity var(--duration-medium)}
+.btn-save-bar:hover,.btn-save-bar.is-hover{opacity:var(--opacity-hover-filled)}
+.btn-discard-bar{background:transparent;color:var(--color-text-discard-bar);border:var(--border-width-medium) solid var(--color-border-discard-bar);border-radius:var(--radius-base);height:var(--control-h-btn-bar);padding:0 var(--space-16);font-size:var(--font-size-14);font-weight:var(--font-weight-medium);cursor:pointer;font-family:inherit;transition:color var(--duration-medium),border-color var(--duration-medium)}
+.btn-discard-bar:hover,.btn-discard-bar.is-hover{color:var(--color-text-discard-bar-hover);border-color:var(--color-border-discard-bar-hover)}
+/* src: employees.html L638-640; dark L1580 */
+.save-bar{display:none;position:sticky;top:0;z-index:var(--z-save-bar);background:var(--color-save-bar-bg);color:var(--color-save-bar-text);padding:var(--space-10) var(--space-24);align-items:center;justify-content:space-between;font-size:var(--font-size-14);font-weight:var(--font-weight-medium);margin:-24px -24px 24px}
+.save-bar.visible,.save-bar.is-visible{display:flex}
+.save-bar-actions{display:flex;gap:var(--space-8)}
+
+/* Disabled (decision: class/attribute-based in BOTH themes — the app has it inline-only in light, class-based in dark).
+   light = same colours + opacity .45 + not-allowed (what the inline style rendered); dark = explicit colours + opacity 1 (L1090,L1093) */
+/* src: employees.html L1090, L1093 (dark); L2627,2651,2652 (light inline: opacity:0.45;cursor:not-allowed) */
+.btn-primary:disabled,.btn-primary.is-disabled,.btn-cta:disabled,.btn-cta.is-disabled{background:var(--color-btn-primary-disabled-bg);color:var(--color-btn-primary-disabled-text);opacity:var(--opacity-disabled);cursor:not-allowed}
+.btn-outline:disabled,.btn-outline.is-disabled{background:var(--color-btn-outline-disabled-bg);border-color:var(--color-btn-outline-disabled-border);color:var(--color-btn-outline-disabled-text);opacity:var(--opacity-disabled);cursor:not-allowed}
+
+/* Icon-only buttons ---------------------------------------------------- */
+/* src: employees.html L396-397 (family A close); dark L1197-1198 */
+.modal-close{width:var(--control-h-btn-sm);height:var(--control-h-btn-sm);border:none;background:transparent;cursor:pointer;border-radius:var(--radius-base);display:flex;align-items:center;justify-content:center;color:var(--color-text-secondary);transition:background var(--duration-base),color var(--duration-base)}
+.modal-close:hover,.modal-close.is-hover{background:var(--color-fill-neutral);color:var(--color-text-primary)}
+/* src: employees.html L983-984 (family B close = circle); dark L1374-1375 */
+.modal-backdrop .modal-close{width:var(--control-h-btn-sm);height:var(--control-h-btn-sm);border-radius:var(--radius-circle);border:var(--border-width-medium) solid var(--color-border-control);background:var(--color-control-bg-elevated);display:flex;align-items:center;justify-content:center;font-size:var(--font-size-16);cursor:pointer;color:var(--color-text-secondary);transition:border-color var(--duration-medium);flex-shrink:0}
+.modal-backdrop .modal-close:hover,.modal-backdrop .modal-close.is-hover{border-color:var(--color-border-hover-strong);color:var(--color-text-close-hover)}
+/* src: employees.html L713-714; dark L1644-1645 */
+.emp-qcard-close{position:absolute;top:16px;right:16px;width:var(--control-h-btn-sm);height:var(--control-h-btn-sm);border-radius:var(--radius-circle);border:var(--border-width-medium) solid var(--color-border-control);background:var(--color-control-bg-elevated);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-secondary);transition:background var(--duration-base)}
+.emp-qcard-close:hover,.emp-qcard-close.is-hover{background:var(--color-fill-neutral)}
+/* src: employees.html L366-367; dark L1318-1319 (dark border = .12 divider, hover text #e2e8f4) */
+.tt-fillall-close{width:var(--control-h-btn-sm);height:var(--control-h-btn-sm);border:var(--border-width-hairline) solid var(--color-border-control);background:var(--color-input-bg);border-radius:var(--radius-circle);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--color-text-secondary);transition:background var(--duration-base)}
+.tt-fillall-close:hover,.tt-fillall-close.is-hover{background:var(--color-fill-neutral)}
+:is(body.dark,.theme-dark) .tt-fillall-close{border-color:var(--color-border-divider)}
+:is(body.dark,.theme-dark) .tt-fillall-close:hover,:is(body.dark,.theme-dark) .tt-fillall-close.is-hover{color:var(--color-text-primary)}
+/* src: employees.html L740-741; dark L1514-1515 */
+.wfh-nav-btn{width:var(--control-h-btn-sm);height:var(--control-h-btn-sm);border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-control);background:var(--color-control-bg-elevated);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--color-text-secondary);transition:background var(--duration-base);flex-shrink:0}
+.wfh-nav-btn:hover,.wfh-nav-btn.is-hover{background:var(--color-menu-hover);color:var(--color-text-primary)}
+/* src: employees.html L659-660; dark L1590-1591 */
+.dp-nav{width:var(--control-h-icon-btn-sm);height:var(--control-h-icon-btn-sm);border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-control);background:var(--color-surface);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--color-text-secondary);transition:background var(--duration-medium),color var(--duration-medium),border-color var(--duration-medium);flex-shrink:0}
+.dp-nav:hover,.dp-nav.is-hover{background:var(--color-fill-neutral);color:var(--color-brand);border-color:var(--color-border-brand-soft)}
+/* src: employees.html L892-893; dark L1404-1405 */
+.bal-action-btn{width:var(--control-h-icon-btn-sm);height:var(--control-h-icon-btn-sm);border-radius:var(--radius-circle);border:var(--border-width-medium) solid var(--color-border-control);background:var(--color-control-bg-elevated);display:flex;align-items:center;justify-content:center;font-size:var(--font-size-12);cursor:pointer;transition:border-color var(--duration-medium)}
+.bal-action-btn:hover,.bal-action-btn.is-hover{border-color:var(--color-border-hover-strong)}
+/* src: employees.html L727-729; dark L1653-1654 */
+.eqa-btn{width:var(--control-h-btn-sm);height:var(--control-h-btn-sm);border:none;background:transparent;color:var(--color-text-tertiary);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-base);transition:color var(--duration-base),background var(--duration-base);padding:0;flex-shrink:0}
+.eqa-btn:hover,.eqa-btn.is-hover{color:var(--color-brand);background:var(--color-tint-action-hover)}
+.eqa-btn svg,.eqa-btn .icon{width:18px;height:18px;flex-shrink:0}
+/* src: employees.html L1000-1001; dark L1388-1389 */
+.entry-remove{width:var(--control-h-icon-btn-sm);height:var(--control-h-icon-btn-sm);border-radius:var(--radius-circle);border:var(--border-width-medium) solid var(--color-border-danger-soft);background:var(--color-control-bg-elevated);color:var(--color-danger-text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:var(--font-size-14);flex-shrink:0;margin-bottom:var(--space-2);transition:background var(--duration-medium)}
+.entry-remove:hover,.entry-remove.is-hover{background:var(--color-danger-bg)}
+/* src: employees.html L468-469; dark L1241-1242 */
+.inline-list-item-remove{width:var(--control-h-icon-btn-xs);height:var(--control-h-icon-btn-xs);border:none;background:transparent;cursor:pointer;border-radius:var(--radius-base);display:flex;align-items:center;justify-content:center;color:var(--color-text-tertiary);flex-shrink:0;transition:background var(--duration-base),color var(--duration-base)}
+.inline-list-item-remove:hover,.inline-list-item-remove.is-hover{background:var(--color-danger-bg);color:var(--color-danger-text)}
+
+/* Link buttons ---------------------------------------------------------- */
+/* src: employees.html L1002-1003; dark L1382 */
+.modal-add-entry{display:inline-flex;align-items:center;gap:var(--space-6);font-size:var(--font-size-14);font-weight:var(--font-weight-semibold);color:var(--color-brand);cursor:pointer;margin-top:var(--space-14);user-select:none}
+.modal-add-entry:hover,.modal-add-entry.is-hover{opacity:var(--opacity-hover-text)}
+/* src: employees.html L878-880; dark L1491 (hidden until the day row is hovered) */
+.add-entry-link{display:inline-flex;align-items:center;gap:var(--space-5);font-size:var(--font-size-12);font-weight:var(--font-weight-semibold);color:var(--color-brand);cursor:pointer;margin-top:var(--space-4);user-select:none;opacity:0;transition:opacity var(--duration-medium)}
+.day-row:hover .add-entry-link,.day-row.is-hover .add-entry-link{opacity:1}
+.add-entry-link:hover,.add-entry-link.is-hover{opacity:var(--opacity-hover-text)}
+/* src: employees.html L920-921; dark L1420-1421 */
+.back-link{display:inline-flex;align-items:center;gap:var(--space-6);font-size:var(--font-size-14);color:var(--color-text-secondary);cursor:pointer;margin-bottom:18px;font-weight:var(--font-weight-medium);transition:color var(--duration-medium)}
+.back-link:hover,.back-link.is-hover{color:var(--color-brand)}
+/* src: employees.html L219-220, L143-144, L708-709 (in-text brand links; hover underline) */
+.fc-link{color:var(--color-link);cursor:pointer;font-size:var(--font-size-14);font-weight:var(--font-weight-semibold)}
+.fc-link:hover,.fc-link.is-hover{text-decoration:underline}
+.drawer-meta-link{color:var(--color-link);cursor:pointer;font-size:var(--font-size-12);font-weight:var(--font-weight-medium);flex-shrink:0}
+.drawer-meta-link:hover,.drawer-meta-link.is-hover{text-decoration:underline}
+.dir-manager-link{color:var(--color-link);font-weight:var(--font-weight-semibold);cursor:pointer;text-decoration:none}
+.dir-manager-link:hover,.dir-manager-link.is-hover{text-decoration:underline;text-underline-offset:2px}
+
+/* ---- 5. TEXT INPUTS ---- */
+/* Native-select chevrons are background images in the app (data-URI SVG, brand stroke). Light #005268 / dark #0cb8d0.
+   NOTE: in the source the dark .dir-select and .ampm-select keep the light #005268 stroke (no dark image rule) - a leak; the intended dark stroke is used here. */
+/* src: employees.html L636 (field), L416 (modal), L686 (dir); dark L1578,1207 */
+:root,.theme-light{
+  --img-chevron-field:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23005268' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8l9 9 9-9'/%3E%3C/svg%3E");
+  --img-chevron-modal:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23005268' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  --img-chevron-dir:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23005268' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+:is(body.dark,.theme-dark){
+  --img-chevron-field:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230cb8d0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8l9 9 9-9'/%3E%3C/svg%3E");
+  --img-chevron-modal:url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%230cb8d0' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  --img-chevron-dir:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230cb8d0' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
+/* search — src: employees.html L68-73; dark L1104-1107 (no transition on the search input in the app) */
+.search-wrap{position:relative;flex:1;min-width:var(--size-search-min);max-width:var(--size-search-max)}
+.search-icon{position:absolute;left:var(--space-12);top:50%;transform:translateY(-50%);color:var(--color-text-search-icon);display:flex;align-items:center;pointer-events:none}
+.search-input{width:100%;height:var(--control-h-input);border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);background:var(--color-input-bg);padding:0 var(--space-12) 0 36px;font-size:var(--font-size-14);color:var(--color-text-primary);outline:none;font-family:inherit}
+.search-input::placeholder{color:var(--color-text-placeholder-control)}
+.search-input:focus,.search-input.is-focus{border-color:var(--color-brand);box-shadow:var(--shadow-focus)}
+
+/* modal-input / modal-select — src: employees.html L406-416; dark L1201-1209 */
+.modal-field{display:flex;flex-direction:column;gap:var(--space-6)}
+.modal-field.full{grid-column:1/-1}
+.modal-label{font-size:var(--font-size-12);font-weight:var(--font-weight-medium);color:var(--color-text-secondary)}
+.modal-input,.modal-select{width:100%;height:var(--control-h-input);border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);background:var(--color-input-bg);padding:0 var(--space-12);font-size:var(--font-size-14);color:var(--color-text-primary);outline:none;font-family:inherit;transition:border-color var(--duration-base),box-shadow var(--duration-base)}
+.modal-input::placeholder{color:var(--color-text-placeholder)}
+.modal-input:focus,.modal-select:focus,.modal-input.is-focus,.modal-select.is-focus{border-color:var(--color-brand);box-shadow:var(--shadow-focus)}
+.modal-input[type="date"]::-webkit-calendar-picker-indicator{opacity:var(--opacity-picker-indicator);cursor:pointer;width:16px;height:16px}
+.modal-input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:0.65}
+.modal-input[type="date"].dt-empty::-webkit-datetime-edit{color:var(--color-text-placeholder)}
+:is(body.dark,.theme-dark) .modal-input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(1);opacity:0.30}
+:is(body.dark,.theme-dark) .modal-input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:0.55}
+.modal-select{appearance:none;background-image:var(--img-chevron-modal);background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
+
+/* field-value (My Info) — src: employees.html L629-637; dark L1572-1579 */
+.field-group{margin-bottom:var(--space-20)}
+.field-group:last-child{margin-bottom:0}
+.field-label{font-size:var(--font-size-10);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);color:var(--color-text-tertiary);margin-bottom:var(--space-6)}
+.field-value{background:var(--color-input-bg);border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);padding:0 var(--space-12);font-size:var(--font-size-14);font-family:inherit;color:var(--color-text-primary);height:var(--control-h-input);display:flex;align-items:center;width:100%;outline:none;-webkit-appearance:none;appearance:none;transition:border-color var(--duration-medium),box-shadow var(--duration-medium)}
+.field-value::placeholder{color:var(--color-text-placeholder)}
+.field-value.readonly-field{background:var(--color-fill-subtle);color:var(--color-text-secondary);cursor:default;pointer-events:none}
+.field-value:not(.readonly-field):hover,.field-value.is-hover:not(.readonly-field){border-color:var(--color-border-hover)}
+.field-value:not(.readonly-field):focus,.field-value.is-focus:not(.readonly-field){border-color:var(--color-brand);box-shadow:var(--shadow-focus)}
+select.field-value{cursor:pointer;background-image:var(--img-chevron-field);background-repeat:no-repeat;background-position:right 10px center;padding-right:32px;background-color:var(--color-input-bg)}
+.field-note{font-size:var(--font-size-12);color:var(--color-text-tertiary);margin-top:var(--space-6);line-height:var(--line-height-text-md)}
+/* required marker: dark colour is a FIX (source has no dark rule: #da4d43 leaks) — src: employees.html L926-927 */
+.req-label{font-size:var(--font-size-12);font-weight:var(--font-weight-semibold);color:var(--color-text-primary);margin-bottom:7px;display:flex;gap:var(--space-2)}
+.req-label .req-star{color:var(--color-danger-text)}
+.req-star{color:var(--color-danger-text)}
+
+/* time / date / amount inputs (timesheet + time-off request modals) */
+/* src: employees.html L992-997 (.time-input, .time-label, .ampm-select); dark L1383-1387 */
+.time-label{font-size:var(--font-size-12);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);color:var(--color-text-tertiary)}
+.time-input{width:80px;border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);height:var(--control-h-input);padding:0 var(--space-12);font-size:var(--font-size-14);color:var(--color-text-primary);background:var(--color-input-bg);outline:none;transition:border-color var(--duration-medium);text-align:center}
+.time-input::placeholder{color:var(--color-text-placeholder-control)}
+.time-input:focus,.time-input.is-focus{border-color:var(--color-brand);box-shadow:var(--shadow-focus)}
+.ampm-select{border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);height:var(--control-h-input);padding:0 28px 0 var(--space-12);font-size:var(--font-size-14);color:var(--color-text-primary);font-weight:var(--font-weight-medium);outline:none;cursor:pointer;appearance:none;background-color:var(--color-input-bg);background-image:var(--img-chevron-field);background-repeat:no-repeat;background-position:right 8px center;transition:border-color var(--duration-medium)}
+.ampm-select:focus,.ampm-select.is-focus{border-color:var(--color-brand)}
+/* src: employees.html L932-934 (.req-date-input), L938-941 (.req-amount-input), L943-945, L935; dark L1425-1432 */
+.req-date-input{border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);height:var(--control-h-input);padding:0 var(--space-12);font-size:var(--font-size-14);color:var(--color-text-primary);background:var(--color-input-bg);width:160px;outline:none;transition:border-color var(--duration-medium)}
+.req-date-input::-webkit-calendar-picker-indicator{display:none}
+.req-date-input:focus,.req-date-input.is-focus{border-color:var(--color-brand);box-shadow:var(--shadow-focus)}
+.req-amount-input{border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);height:var(--control-h-input);padding:0 var(--space-12);font-size:var(--font-size-14);color:var(--color-text-primary);background:var(--color-input-bg);width:90px;outline:none;transition:border-color var(--duration-medium)}
+.req-amount-input:focus,.req-amount-input.is-focus{border-color:var(--color-brand);box-shadow:var(--shadow-focus)}
+.req-amount-input::placeholder{color:var(--color-text-placeholder)}
+.req-amount-unit{font-size:var(--font-size-14);color:var(--color-text-secondary)}
+.req-date-sep{color:var(--color-text-tertiary);font-size:var(--font-size-16)}
+.req-date-native,.datepicker-input.req-date-native{color:var(--color-text-tertiary)}
+.req-date-native.has-date,.datepicker-input.req-date-native.has-date{color:var(--color-text-primary)}
+/* src: employees.html L845-847 (.fill-modal-label/.fill-modal-input); dark L1492-1494 */
+.fill-modal-label{font-size:var(--font-size-12);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);color:var(--color-text-tertiary);margin-bottom:var(--space-8)}
+.fill-modal-input{width:100%;border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);height:var(--control-h-input);padding:0 var(--space-12);font-size:var(--font-size-14);color:var(--color-text-primary);background:var(--color-input-bg);outline:none;transition:border-color var(--duration-medium)}
+.fill-modal-input:focus,.fill-modal-input.is-focus{border-color:var(--color-brand);box-shadow:var(--shadow-focus)}
+/* src: employees.html L349-350 (.tt-fill-input); L372-373 (.tt-fillall-input), L371 (.tt-fillall-lbl); dark L1309-1310,1324-1326 */
+.tt-fill-input{height:var(--control-h-btn-sm);border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);padding:0 var(--space-8);font-size:var(--font-size-13);font-family:inherit;color:var(--color-text-primary);background:var(--color-input-bg);outline:none;width:108px}
+.tt-fill-input:focus,.tt-fill-input.is-focus{border-color:var(--color-brand);box-shadow:var(--shadow-focus-sm)}
+.tt-fillall-lbl{font-size:var(--font-size-11);font-weight:var(--font-weight-bold);color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:var(--letter-spacing-label-wide);margin-bottom:var(--space-6)}
+.tt-fillall-input{width:100%;height:var(--control-h-input-xl);border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);padding:0 var(--space-12);font-size:var(--font-size-16);font-family:inherit;color:var(--color-text-primary);box-sizing:border-box;outline:none;background:var(--color-input-bg)}
+.tt-fillall-input:focus,.tt-fillall-input.is-focus{border-color:var(--color-brand);box-shadow:var(--shadow-focus-sm)}
+:is(body.dark,.theme-dark) .tt-fillall-input[type="time"]::-webkit-calendar-picker-indicator{filter:invert(1) sepia(1) saturate(3) hue-rotate(155deg);opacity:0.8;cursor:pointer}
+/* textarea AS RENDERED (.req-textarea-to). .modal-textarea has NO CSS in the source (renders as an unstyled UA textarea: #767676 border, white/black in dark) —
+   decision: it is styled exactly like .req-textarea-to (the app's only styled textarea). src: employees.html L942,946-947; dark L1430-1431 */
+.req-textarea-to,.modal-textarea{width:100%;border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);padding:var(--space-10) var(--space-12);font-size:var(--font-size-14);color:var(--color-text-primary);background:var(--color-surface);resize:vertical;min-height:90px;outline:none;font-family:inherit;transition:border-color var(--duration-medium)}
+.req-textarea-to::placeholder,.modal-textarea::placeholder{color:var(--color-text-placeholder)}
+.req-textarea-to:focus,.modal-textarea:focus,.req-textarea-to.is-focus,.modal-textarea.is-focus{border-color:var(--color-brand)}
+/* directory search + select (13px, 38px) — src: employees.html L679-688; dark L1618-1624 */
+.dir-search-wrap{position:relative;flex:1;max-width:420px}
+.dir-search-icon{position:absolute;left:var(--space-12);top:50%;transform:translateY(-50%);color:var(--color-text-placeholder-control);pointer-events:none}
+.dir-search{width:100%;height:var(--control-h-btn-lg);border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);padding:0 var(--space-12) 0 38px;font-size:var(--font-size-13);color:var(--color-text-primary);font-family:inherit;outline:none;background:var(--color-input-bg);transition:border-color var(--duration-base),box-shadow var(--duration-base)}
+.dir-search::placeholder{color:var(--color-text-placeholder)}
+.dir-search:focus,.dir-search.is-focus{border-color:var(--color-brand);box-shadow:var(--shadow-focus-dir)}
+.dir-select{height:var(--control-h-btn-lg);border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);padding:0 28px 0 var(--space-12);font-size:var(--font-size-13);color:var(--color-text-primary);font-family:inherit;background-color:var(--color-input-bg);background-image:var(--img-chevron-dir);background-repeat:no-repeat;background-position:right 8px center;background-size:12px;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;transition:border-color var(--duration-base)}
+.dir-select:focus,.dir-select.is-focus{border-color:var(--color-brand)}
+
+/* ---- 6. CUSTOM SELECT (.cust-select) — the main dropdown control ---- */
+/* src: employees.html L74-90; dark L1109-1117 (the panel has NO border in light AND dark; no transition on options) */
+.cust-select{position:relative;flex-shrink:0}
+.cust-select__trigger{height:var(--control-h-input);display:inline-flex;align-items:center;justify-content:space-between;gap:var(--space-8);padding:0 var(--space-12);background:var(--color-input-bg);border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);cursor:pointer;font-size:var(--font-size-14);color:var(--color-text-placeholder-control);font-family:inherit;white-space:nowrap;user-select:none;transition:border-color var(--duration-base)}
+.cust-select__trigger.has-value{color:var(--color-text-primary)}
+.cust-select__trigger:hover,.cust-select__trigger.is-hover{border-color:var(--color-border-hover)}
+.cust-select.open .cust-select__trigger,.cust-select.is-open .cust-select__trigger{border-color:var(--color-brand)}
+.cust-select__chevron{flex-shrink:0;color:var(--color-brand);transition:transform var(--duration-medium)}
+.cust-select.open .cust-select__chevron,.cust-select.is-open .cust-select__chevron{transform:rotate(180deg)}
+.cust-select__panel{display:none;position:absolute;top:calc(100% + 6px);left:0;min-width:100%;background:var(--color-surface-elevated);border-radius:var(--radius-base);box-shadow:var(--shadow-popover);z-index:var(--z-select-panel);overflow:hidden;padding:var(--space-6) 0}
+.cust-select.open .cust-select__panel,.cust-select.is-open .cust-select__panel{display:block}
+.cust-select__option{padding:var(--space-10) var(--space-16);font-size:var(--font-size-14);cursor:pointer;color:var(--color-text-item);white-space:nowrap}
+.cust-select__option:hover,.cust-select__option.is-hover{background:var(--color-menu-hover)}
+.cust-select__option.selected{color:var(--color-brand);font-weight:var(--font-weight-medium)}
+/* fixed trigger widths (toolbar) src: employees.html L86-89, L480-483 */
+.cs-dept .cust-select__trigger{width:var(--size-select-dept)}
+.cs-office .cust-select__trigger{width:var(--size-select-office)}
+.cs-status .cust-select__trigger{width:var(--size-select-status)}
+.cs-group .cust-select__trigger,.pool-cs-group .cust-select__trigger{width:var(--size-select-group)}
+.pool-cs-company .cust-select__trigger{width:var(--size-select-pool-company)}
+.pool-cs-team .cust-select__trigger{width:var(--size-select-pool-team)}
+.pool-cs-desk .cust-select__trigger{width:var(--size-select-pool-desk)}
+/* inside a modal field src: employees.html L415 */
+.modal-field .cust-select{display:block;width:100%}
+.modal-field .cust-select__trigger{width:100%;box-sizing:border-box}
+.modal-field .cust-select__panel{min-width:100%;box-sizing:border-box}
+/* "Group by" label src: employees.html L91-92 */
+.groupby-wrap{display:flex;align-items:center;gap:var(--space-8)}
+.toolbar-spacer{flex:1}
+
+/* ---- 7. COMBOBOX / AUTOCOMPLETE (pool employee search; portal panel, position:fixed via JS) ---- */
+/* src: employees.html L473-479; dark L1244-1248 */
+.pool-emp-drop{position:fixed;background:var(--color-surface-elevated);border:var(--border-width-hairline) solid var(--color-border-popover);border-radius:var(--radius-base);box-shadow:var(--shadow-combo);z-index:var(--z-combo);max-height:var(--size-combo-max-height);overflow-y:auto;display:none;scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb) transparent}
+.pool-emp-drop.open,.pool-emp-drop.is-open{display:block}
+.pool-emp-drop-item{padding:var(--space-10) var(--space-14);cursor:pointer;font-size:var(--font-size-13);color:var(--color-text-item);display:flex;align-items:center;justify-content:space-between;transition:background var(--duration-fast)}
+.pool-emp-drop-item:hover,.pool-emp-drop-item.is-hover{background:var(--color-menu-hover)}
+.pool-emp-drop-name{font-weight:var(--font-weight-medium)}
+.pool-emp-drop-meta{font-size:var(--font-size-12);color:var(--color-text-secondary)}
+.pool-emp-drop-empty{padding:var(--space-10) var(--space-14);font-size:var(--font-size-13);color:var(--color-text-tertiary)}
+
+/* ---- 8. DATEPICKER (JS-built popup; same CSS for the dp, rdp and nedp instances) ---- */
+/* src: employees.html L645-653; dark L1582-1586 */
+.datepicker-wrap{position:relative;width:100%}
+.datepicker-input-wrap{position:relative;display:flex;align-items:center}
+.datepicker-input{width:100%;height:var(--control-h-input);border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);padding:0 36px 0 var(--space-12);font-size:var(--font-size-14);font-family:inherit;color:var(--color-text-primary);background:var(--color-input-bg);outline:none;cursor:pointer;transition:border-color var(--duration-medium),box-shadow var(--duration-medium);caret-color:transparent}
+.datepicker-input::placeholder{color:var(--color-text-placeholder)}
+.datepicker-input:hover,.datepicker-input.is-hover{border-color:var(--color-border-hover)}
+.datepicker-input:focus,.datepicker-input.is-focus{border-color:var(--color-brand);box-shadow:var(--shadow-focus)}
+.datepicker-input::-webkit-calendar-picker-indicator{display:none}
+.datepicker-icon{position:absolute;right:var(--space-10);top:50%;transform:translateY(-50%);color:var(--color-brand);pointer-events:none;display:flex;align-items:center}
+/* src: employees.html L654-674; dark L1587-1602 */
+.datepicker-cal{position:absolute;top:calc(100% + 6px);left:0;z-index:var(--z-datepicker);background:var(--color-surface-elevated);border:var(--border-width-hairline) solid var(--color-border-popover);border-radius:var(--radius-base);box-shadow:var(--shadow-popover);width:var(--size-datepicker-width);padding:var(--space-16);display:none;user-select:none}
+.datepicker-cal.open,.datepicker-cal.is-open{display:block}
+.dp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-14)}
+.dp-month-label{font-size:var(--font-size-14);font-weight:var(--font-weight-bold);color:var(--color-text-primary);cursor:pointer}
+.dp-month-label:hover,.dp-month-label.is-hover{color:var(--color-brand)}
+.dp-weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:var(--space-6)}
+.dp-wd{text-align:center;font-size:var(--font-size-10);font-weight:var(--font-weight-bold);color:var(--color-text-tertiary);letter-spacing:var(--letter-spacing-badge);padding:var(--space-4) 0}
+.dp-days{display:grid;grid-template-columns:repeat(7,1fr);gap:var(--space-2)}
+.dp-day{height:var(--control-h-btn-bar);display:flex;align-items:center;justify-content:center;font-size:var(--font-size-13);font-weight:var(--font-weight-medium);color:var(--color-text-primary);border-radius:var(--radius-base);cursor:pointer;transition:background var(--duration-fast),color var(--duration-fast)}
+.dp-day:hover,.dp-day.is-hover{background:var(--color-tint-selected);color:var(--color-brand)}
+.dp-day.other-month{color:var(--color-text-disabled-day)}
+.dp-day.other-month:hover,.dp-day.other-month.is-hover{background:var(--color-fill-subtle);color:var(--color-text-tertiary)}
+.dp-day.selected{background:var(--color-brand);color:var(--color-text-on-brand-hover);font-weight:var(--font-weight-bold)}
+.dp-day.selected:hover,.dp-day.selected.is-hover{background:var(--color-brand-hover-solid)}
+.dp-day.today:not(.selected){color:var(--color-brand);font-weight:var(--font-weight-bold);border:var(--border-width-medium) solid var(--color-border-brand-soft)}
+.dp-year-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);max-height:200px;overflow-y:auto}
+.dp-year-item{height:var(--control-h-btn-bar);display:flex;align-items:center;justify-content:center;font-size:var(--font-size-13);font-weight:var(--font-weight-medium);color:var(--color-text-primary);border-radius:var(--radius-base);cursor:pointer;transition:background var(--duration-fast)}
+.dp-year-item:hover,.dp-year-item.is-hover{background:var(--color-tint-selected);color:var(--color-brand)}
+.dp-year-item.selected{background:var(--color-brand);color:var(--color-text-on-brand-hover);font-weight:var(--font-weight-bold)}
+/* native range picker (time-off history filter) src: employees.html L899-906; dark L1448-1452 */
+.hist-range-picker{display:inline-flex;align-items:center;gap:var(--space-4);height:var(--control-h-btn);padding:0 var(--space-10);border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);background:var(--color-control-bg-elevated);transition:border-color var(--duration-base);cursor:text}
+.hist-range-picker:focus-within,.hist-range-picker.is-focus{border-color:var(--color-brand)}
+.hist-range-icon{color:var(--color-brand);flex-shrink:0;margin-left:var(--space-6);cursor:pointer;opacity:var(--opacity-hover-link)}
+.hist-range-icon:hover,.hist-range-icon.is-hover{opacity:1}
+.hist-range-sep{color:var(--color-text-tertiary);font-size:var(--font-size-14);user-select:none;padding:0 var(--space-2)}
+.hist-range-input{border:none;outline:none;padding:0;font-size:var(--font-size-14);color:var(--color-text-primary);font-family:inherit;background:transparent;width:86px;cursor:pointer}
+.hist-range-input::-webkit-calendar-picker-indicator{display:none}
+
+/* ---- 9. PHONE-CODE PICKER ---- */
+/* src: employees.html L588-609; dark L1604-1616. FIX: .phone-code-val is #1a1a1a (the source leaks the DARK #e2e8f4 into light mode, L1608) */
+.phone-input-wrap{display:flex;height:var(--control-h-input);border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);overflow:visible;background:var(--color-control-bg-elevated);transition:border-color var(--duration-medium),box-shadow var(--duration-medium);position:relative}
+.phone-input-wrap:focus-within,.phone-input-wrap.is-focus{border-color:var(--color-brand);box-shadow:var(--shadow-focus)}
+.phone-code-wrap{position:relative;flex-shrink:0}
+.phone-code-btn{display:flex;align-items:center;justify-content:center;gap:var(--space-4);height:var(--control-h-btn-lg);padding:0 var(--space-8) 0 var(--space-10);border:none;border-right:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-phone-start);background:var(--color-control-bg-elevated);cursor:pointer;white-space:nowrap;user-select:none;transition:background var(--duration-base)}
+.phone-code-btn:hover,.phone-code-btn.is-hover{background:var(--color-menu-hover)}
+.phone-flag,.phone-code-val{font-size:var(--font-size-14);font-weight:var(--font-weight-medium);color:var(--color-text-primary);line-height:var(--line-height-none)}
+.phone-flag{flex-shrink:0}
+.phone-code-val{font-family:inherit}
+.phone-drop-arrow{color:var(--color-text-tertiary);flex-shrink:0;transition:transform var(--duration-medium)}
+.phone-code-wrap.open .phone-drop-arrow,.phone-code-wrap.is-open .phone-drop-arrow{transform:rotate(180deg)}
+.phone-code-drop{position:absolute;top:calc(100% + 6px);left:0;z-index:var(--z-phone-drop);background:var(--color-surface-elevated);border:var(--border-width-hairline) solid var(--color-border-popover);border-radius:var(--radius-base);box-shadow:var(--shadow-popover-sm);min-width:var(--size-phone-drop-min);max-height:240px;overflow-y:auto;display:none;scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb-list) transparent}
+.phone-code-wrap.open .phone-code-drop,.phone-code-wrap.is-open .phone-code-drop{display:block}
+.phone-code-opt{display:flex;align-items:center;gap:var(--space-10);padding:var(--space-8) var(--space-14);cursor:pointer;font-size:var(--font-size-13);color:var(--color-text-item);transition:background var(--duration-fast)}
+.phone-code-opt:first-child{border-radius:var(--radius-list-first)}
+.phone-code-opt:last-child{border-radius:var(--radius-list-last)}
+.phone-code-opt:hover,.phone-code-opt.is-hover{background:var(--color-menu-hover)}
+.phone-code-opt.selected{background:var(--color-tint-selected);color:var(--color-brand)}
+.opt-flag{font-size:var(--font-size-18);line-height:var(--line-height-none);display:flex;align-items:center;width:22px}
+.opt-code{font-weight:var(--font-weight-semibold);min-width:40px;color:inherit}
+.opt-name{color:var(--color-text-placeholder-control);font-size:var(--font-size-12)}
+.phone-number-input{border:none;outline:none;padding:0 var(--space-12);font-size:var(--font-size-14);font-family:inherit;color:var(--color-text-primary);background:transparent;flex:1;min-width:0;border-radius:var(--radius-phone-end);height:var(--control-h-btn-lg)}
+.phone-number-input::placeholder{color:var(--color-text-placeholder)}
+
+/* ---- 10. CHECKBOX-LIKE / TOGGLE / TILES ---- */
+/* WFH day check (hidden native checkbox + styled 38px box) — src: employees.html L756-765; dark L1525-1529 */
+.wfh-day-check{display:flex;flex-direction:column;align-items:center;gap:var(--space-6);cursor:pointer;user-select:none}
+.wfh-day-check input{display:none}
+.wfh-day-label{font-size:var(--font-size-11);font-weight:var(--font-weight-semibold);color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:var(--letter-spacing-label)}
+.wfh-day-box{width:var(--size-day-box);height:var(--size-day-box);border-radius:var(--radius-base);border:var(--border-width-medium) solid var(--color-border-control);background:var(--color-fill-subtle);display:flex;align-items:center;justify-content:center;transition:all var(--duration-base)}
+.wfh-day-check input:checked~.wfh-day-box,.wfh-day-check.is-checked .wfh-day-box{background:var(--color-wfh-day-checked-bg);border-color:var(--color-wfh-day-checked-border);color:var(--color-wfh-day-checked-text)}
+.wfh-day-check.pending-day input:checked~.wfh-day-box,.wfh-day-check.pending-day.is-checked .wfh-day-box{background:var(--color-wfh-pending-day-bg);border-color:var(--color-wfh-pending-day-border);color:var(--color-wfh-pending-day-text)}
+.wfh-day-check .wfh-day-box svg,.wfh-day-check .wfh-day-box .icon{opacity:0;transition:opacity var(--duration-base)}
+.wfh-day-check input:checked~.wfh-day-box svg,.wfh-day-check input:checked~.wfh-day-box .icon,.wfh-day-check.is-checked .wfh-day-box svg,.wfh-day-check.is-checked .wfh-day-box .icon{opacity:1}
+.wfh-day-check:hover .wfh-day-box,.wfh-day-check.is-hover .wfh-day-box{border-color:var(--color-border-hover-check)}
+/* Dark-mode switch — src: employees.html L1039-1042; dark L1069. Off-track dark colour is DERIVED (source has no dark rule) */
+.dm-switch{width:var(--size-switch-w);height:var(--size-switch-h);border-radius:var(--radius-switch);background:var(--color-switch-track-off);position:relative;flex-shrink:0;transition:background var(--duration-modal)}
+.dm-switch.on,.dm-switch.is-on{background:var(--color-brand)}
+.dm-thumb{position:absolute;top:var(--space-2);left:var(--space-2);width:var(--size-switch-thumb);height:var(--size-switch-thumb);border-radius:var(--radius-circle);background:var(--color-switch-thumb);box-shadow:var(--shadow-thumb);transition:transform var(--duration-modal)}
+.dm-switch.on .dm-thumb,.dm-switch.is-on .dm-thumb{transform:translateX(14px)}
+/* Request-type tiles (radio-like cards) — src: employees.html L814-821; dark L1393-1397,1690-1692 */
+.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-12)}
+.req-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-10);margin-bottom:var(--space-20)}
+.req-type-btn{padding:var(--space-16) var(--space-12);border:var(--border-width-thick) solid var(--color-border-control);border-radius:var(--radius-base);cursor:pointer;text-align:center;background:var(--color-surface);transition:all var(--duration-base);display:flex;flex-direction:column;align-items:center;gap:var(--space-6)}
+.req-type-btn:hover,.req-type-btn.is-hover{border-color:var(--color-border-hover-tile)}
+.req-type-btn.selected,.req-type-btn.is-selected{border-color:var(--color-brand);background:var(--color-tint-selected-08)}
+.req-type-icon-lg{width:var(--size-icon-tile-36);height:var(--size-icon-tile-36);border-radius:var(--radius-base);display:flex;align-items:center;justify-content:center;background:var(--color-reqtype-tile-lg-bg);color:var(--color-text-secondary)}
+.req-type-icon-lg[data-reqtype="timeoff"]{background:var(--color-reqicon-timeoff-bg);color:var(--color-reqicon-timeoff-text)}
+.req-type-icon-lg[data-reqtype="location"]{background:var(--color-reqicon-location-bg);color:var(--color-reqicon-location-text)}
+:is(body.dark,.theme-dark) .req-type-icon-lg,:is(body.dark,.theme-dark) .req-type-icon-lg[data-reqtype]{background:var(--color-reqtype-tile-lg-bg);color:var(--color-text-secondary)}
+.req-type-label{font-size:var(--font-size-13);font-weight:var(--font-weight-semibold);color:var(--color-text-primary)}
+.req-type-desc{font-size:var(--font-size-11);color:var(--color-text-secondary)}
+
+/* ---- 11. TABS ---- */
+/* Detail tabs (underline) — src: employees.html L155-160; dark L1174-1177 */
+.detail-tabs{display:flex;background:var(--color-surface);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);padding:0 0 0 var(--space-4);flex-shrink:0}
+.detail-tab{padding:var(--space-12) var(--space-16);border:none;background:transparent;font-family:inherit;font-size:var(--font-size-14);font-weight:var(--font-weight-medium);color:var(--color-text-secondary);cursor:pointer;border-bottom:var(--border-width-thick) solid transparent;margin-bottom:-1px;transition:color var(--duration-base),border-color var(--duration-base);white-space:nowrap}
+.detail-tab:hover,.detail-tab.is-hover{color:var(--color-text-primary)}
+.detail-tab.active,.detail-tab.is-active{color:var(--color-brand);border-bottom-color:var(--color-brand);font-weight:var(--font-weight-semibold)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+/* Profile tabs (My Profile; 2.5px underline, 600 -> 700) — src: employees.html L531, L534-536; dark L1565-1568 */
+.content-tabs{display:flex;gap:0;border-bottom:var(--border-width-hairline) solid var(--color-border-divider);padding:0 var(--space-24);background:var(--color-surface)}
+.profile-tab{padding:13px 18px;font-size:var(--font-size-14);font-weight:var(--font-weight-semibold);color:var(--color-text-secondary);cursor:pointer;border-bottom:var(--border-width-tab-underline) solid transparent;margin-bottom:-1px;transition:color var(--duration-medium);white-space:nowrap;user-select:none}
+.profile-tab:hover,.profile-tab.is-hover{color:var(--color-text-primary)}
+.profile-tab.active,.profile-tab.is-active{color:var(--color-brand);border-bottom-color:var(--color-brand);font-weight:var(--font-weight-bold)}
+/* Filter pill tabs (used instead of radios) — src: employees.html L793-795; dark L1410-1411 */
+.req-filter-tabs{display:flex;gap:var(--space-4)}
+.req-tab{height:var(--control-h-btn-sm);padding:0 var(--space-14);border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-control);background:var(--color-control-bg-elevated);font-size:var(--font-size-12);font-weight:var(--font-weight-medium);color:var(--color-text-secondary);cursor:pointer;font-family:inherit;transition:all var(--duration-base)}
+.req-tab.active,.req-tab.is-active{background:var(--color-tint-chip);border-color:var(--color-brand);color:var(--color-brand)}
+
+/* ---- 12. BADGES / PILLS ---- */
+/* Employee / pool / inline status — src: employees.html L123-125, L451-452, L470-472, L752-754; dark L1136-1137,1154-1157,1522-1523 */
+.status-pill{display:inline-flex;align-items:center;justify-content:center;font-size:var(--font-size-12);font-weight:var(--font-weight-semibold);padding:3px var(--space-10);border-radius:var(--radius-base)}
+.status-active,.active-badge,.inline-badge.active,.wfh-prefs-badge.approved{background:var(--color-status-active-bg);color:var(--color-status-active-text)}
+.status-inactive,.inactive-badge,.inline-badge.inactive{background:var(--color-status-inactive-bg);color:var(--color-status-inactive-text)}
+.active-badge,.inactive-badge{font-size:var(--font-size-12);font-weight:var(--font-weight-semibold);padding:3px var(--space-10);border-radius:var(--radius-base)}
+.inline-badge{display:inline-flex;align-items:center;padding:var(--space-2) var(--space-8);border-radius:var(--radius-base);font-size:var(--font-size-11);font-weight:var(--font-weight-semibold)}
+.record-badge{padding:3px var(--space-8);border-radius:var(--radius-base);font-size:var(--font-size-12);font-weight:var(--font-weight-semibold);background:var(--color-fill-badge);color:var(--color-text-secondary);letter-spacing:var(--letter-spacing-record)}
+/* HR requests status (height 26, 12/600, padding 4 10) — src: employees.html L261-265; dark L1355-1358. "New" = #d4eee9, NOT rgba(0,82,104,0.08) */
+.rv-status{display:inline-flex;align-items:center;gap:var(--space-4);padding:var(--space-4) var(--space-10);border-radius:var(--radius-base);font-size:var(--font-size-12);font-weight:var(--font-weight-semibold);white-space:nowrap}
+.rv-status.new{background:var(--color-request-new-bg);color:var(--color-request-new-text)}
+.rv-status.pending{background:var(--color-request-pending-bg);color:var(--color-request-pending-text)}
+.rv-status.approved{background:var(--color-request-approved-bg);color:var(--color-request-approved-text)}
+.rv-status.denied{background:var(--color-request-denied-bg);color:var(--color-request-denied-text)}
+/* My-requests status (11/700) + WFH prefs badge — src: employees.html L805-808, L752-754; dark L1416-1418,1522-1523 */
+.req-status{font-size:var(--font-size-11);font-weight:var(--font-weight-bold);padding:3px var(--space-10);border-radius:var(--radius-base);white-space:nowrap;display:inline-block}
+.req-status.pending,.wfh-prefs-badge.pending{background:var(--color-myreq-pending-bg);color:var(--color-myreq-pending-text)}
+.req-status.approved{background:var(--color-myreq-approved-bg);color:var(--color-myreq-approved-text)}
+.req-status.denied{background:var(--color-myreq-denied-bg);color:var(--color-myreq-denied-text)}
+.wfh-prefs-badge{font-size:var(--font-size-11);font-weight:var(--font-weight-bold);padding:3px var(--space-10);border-radius:var(--radius-base);white-space:nowrap}
+/* Timesheet status — src: employees.html L307-308; dark L1272-1273 (.tt-badge-none is dead CSS: never emitted, not built) */
+.tt-badge-pending,.tt-badge-approved{display:inline-flex;align-items:center;padding:3px var(--space-10);border-radius:var(--radius-base);font-size:var(--font-size-12);font-weight:var(--font-weight-semibold)}
+.tt-badge-pending{background:var(--color-timesheet-pending-bg);color:var(--color-timesheet-pending-text)}
+.tt-badge-approved{background:var(--color-timesheet-approved-bg);color:var(--color-timesheet-approved-text)}
+/* WFH status pill (.away is dead CSS: never emitted, not built) — src: employees.html L782-784; dark L1541-1542 */
+.wfh-status-pill{font-size:var(--font-size-10);font-weight:var(--font-weight-bold);padding:3px 7px;border-radius:var(--radius-base);text-transform:uppercase;letter-spacing:var(--letter-spacing-badge);align-self:flex-start;margin-top:var(--space-4)}
+.wfh-status-pill.wfh{background:var(--color-wfh-pill-wfh-bg);color:var(--color-wfh-pill-wfh-text)}
+.wfh-status-pill.office{background:var(--color-wfh-pill-office-bg);color:var(--color-wfh-pill-office-text)}
+/* App-drop "Current" badge, directory "You" badge — src: employees.html L39, L702; dark L1078,1635 */
+.app-drop-item-badge{font-size:var(--font-size-10);font-weight:var(--font-weight-bold);color:var(--color-brand);background:var(--color-tint-badge-current);padding:var(--space-2) var(--space-6);border-radius:var(--radius-base);letter-spacing:var(--letter-spacing-badge)}
+.dir-you{font-size:var(--font-size-10);font-weight:var(--font-weight-bold);padding:var(--space-2) var(--space-6);border-radius:var(--radius-base);background:var(--color-tint-dir-you);color:var(--color-brand)}
+/* Department badges — LIGHT colours are the JS map DC (employees.html L3508, applied inline); DARK = !important rules L1139-1152.
+   Here one data-dept CSS map serves both modes (tokens flip). INTENDED inactive behaviour: grey in light AND dark
+   (the source's dark [data-dept] rules out-specify the grey rule, so inactive rows keep their department colour - bug, not reproduced). */
+/* src: employees.html L122, L141, L3508, L1139-1152 */
+.dept-badge,.drawer-dept-badge{display:inline-block;padding:3px var(--space-10);border-radius:var(--radius-base);font-size:var(--font-size-12);white-space:nowrap;background:var(--color-dept-unknown-bg);color:var(--color-dept-unknown-text)}
+.dept-badge{font-weight:var(--font-weight-medium)}
+.drawer-dept-badge{font-weight:var(--font-weight-semibold)}
+.dept-badge[data-dept="Equities"],.drawer-dept-badge[data-dept="Equities"]{background:var(--color-dept-equities-bg);color:var(--color-dept-equities-text)}
+.dept-badge[data-dept="Fixed Income"],.drawer-dept-badge[data-dept="Fixed Income"]{background:var(--color-dept-fixed-income-bg);color:var(--color-dept-fixed-income-text)}
+.dept-badge[data-dept="Technology"],.drawer-dept-badge[data-dept="Technology"]{background:var(--color-dept-technology-bg);color:var(--color-dept-technology-text)}
+.dept-badge[data-dept="Operations"],.drawer-dept-badge[data-dept="Operations"]{background:var(--color-dept-operations-bg);color:var(--color-dept-operations-text)}
+.dept-badge[data-dept="Compliance"],.drawer-dept-badge[data-dept="Compliance"]{background:var(--color-dept-compliance-bg);color:var(--color-dept-compliance-text)}
+.dept-badge[data-dept="Finance"],.drawer-dept-badge[data-dept="Finance"]{background:var(--color-dept-finance-bg);color:var(--color-dept-finance-text)}
+/* inactive employee (the app sets data-inactive="true" in JS and inline #e5e7ec/#a8b6cd): must come AFTER the data-dept rules */
+.dept-badge[data-inactive="true"],.drawer-dept-badge[data-inactive="true"],.dept-badge.is-inactive,.drawer-dept-badge.is-inactive{background:var(--color-dept-inactive-bg);color:var(--color-dept-inactive-text)}
+/* Pool badges — src: employees.html L433-437; dark L1224-1226. Count span: black in light (inline #000), inherits in dark */
+.pool-badge{display:inline-flex;align-items:center;gap:var(--space-8);font-size:var(--font-size-14);font-weight:var(--font-weight-medium);padding:var(--space-6) var(--space-14);border-radius:var(--radius-base)}
+.pool-badge.holders{background:var(--color-pool-holders-bg);color:var(--color-pool-holders-text)}
+.pool-badge.members{background:var(--color-pool-members-bg);color:var(--color-pool-members-text)}
+.pool-badge.grey{opacity:var(--opacity-dimmed)}
+.pool-badge svg,.pool-badge .icon{flex-shrink:0}
+.pool-badge span{color:var(--color-text-black)}
+:is(body.dark,.theme-dark) .pool-badge span{color:inherit}
+/* Request-type icon tiles — light colours are inline JS (REQ_TYPE_META L3815-3818, REQ_BG L4933); dark = !important rules L1364-1368, L1698-1701.
+   Here: data-reqtype CSS map (tokens flip). Two DIFFERENT palettes exist in the source (rv-type-icon vs req-icon-sm) and both are kept. */
+/* src: employees.html L253, L804 */
+.rv-type-icon{width:var(--size-icon-tile-30);height:var(--size-icon-tile-30);border-radius:var(--radius-base);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--color-reqtype-default-bg);color:var(--color-reqtype-default-text)}
+.rv-type-icon[data-reqtype="annual"]{background:var(--color-reqtype-annual-bg);color:var(--color-reqtype-annual-text)}
+.rv-type-icon[data-reqtype="sick"]{background:var(--color-reqtype-sick-bg);color:var(--color-reqtype-sick-text)}
+.rv-type-icon[data-reqtype="wfh"]{background:var(--color-reqtype-wfh-bg);color:var(--color-reqtype-wfh-text)}
+.rv-type-icon[data-reqtype="location"]{background:var(--color-reqtype-location-bg);color:var(--color-reqtype-location-text)}
+.req-icon-sm{width:var(--size-icon-tile-28);height:var(--size-icon-tile-28);border-radius:var(--radius-base);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--color-reqicon-default-bg);color:var(--color-reqicon-default-text)}
+.req-icon-sm[data-reqtype="timeoff"]{background:var(--color-reqicon-timeoff-bg);color:var(--color-reqicon-timeoff-text)}
+.req-icon-sm[data-reqtype="sick"]{background:var(--color-reqicon-sick-bg);color:var(--color-reqicon-sick-text)}
+.req-icon-sm[data-reqtype="location"]{background:var(--color-reqicon-location-bg);color:var(--color-reqicon-location-text)}
+/* WFH stat icon tiles + legend dots — src: employees.html L744-747, L768, L1712-1719 */
+.wfh-stat-icon{width:40px;height:40px;border-radius:var(--radius-base);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wfh-stat-icon-wfh{background:var(--color-wfh-icon-bg)}
+.wfh-stat-icon-wfh svg{stroke:var(--color-wfh-icon-text)}
+.wfh-stat-icon-office{background:var(--color-off-icon-bg)}
+.wfh-stat-icon-office svg{stroke:var(--color-off-icon-text)}
+.wfh-stat-icon-wfh .icon{color:var(--color-wfh-icon-text)}
+.wfh-stat-icon-office .icon{color:var(--color-off-icon-text)}
+.wfh-legend-dot{width:var(--space-10);height:var(--space-10);border-radius:var(--radius-hairline);flex-shrink:0}
+.wfh-legend-dot.wfh{background:var(--color-wfh-legend-wfh)}
+.wfh-legend-dot.office{background:var(--color-wfh-legend-office)}
+
+/* ---- 13. AVATARS (initials; transparent with a ring — there is NO avatar colour palette) ---- */
+/* src: employees.html L117-118,133-134,250,304,318,444,510,524,699,716; dark L1131-1132,1160-1161,1553,1560,1633,1646 */
+.avatar,.emp-avatar,.rv-avatar,.tt-avatar,.holder-avatar,.manager-avatar,.dir-avatar,.tt-det-avatar,.drawer-avatar,.sp-avatar,.emp-qcard-avatar{width:var(--size-avatar-36);height:var(--size-avatar-36);border-radius:var(--radius-circle);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:transparent;border:var(--border-width-hairline) solid var(--color-border-avatar-ring);font-size:var(--font-size-14);font-weight:var(--font-weight-medium);color:var(--color-text-black)}
+.avatar-32,.manager-avatar{width:var(--size-avatar-32);height:var(--size-avatar-32);font-size:var(--font-size-13)}
+.avatar-34,.tt-avatar{width:var(--size-avatar-34);height:var(--size-avatar-34);font-size:var(--font-size-13)}
+.avatar-36,.emp-avatar,.rv-avatar{width:var(--size-avatar-36);height:var(--size-avatar-36);font-size:var(--font-size-14)}
+.avatar-38,.holder-avatar{width:var(--size-avatar-38);height:var(--size-avatar-38);font-size:var(--font-size-14)}
+.avatar-44,.dir-avatar,.tt-det-avatar{width:var(--size-avatar-44);height:var(--size-avatar-44)}
+.avatar-44,.dir-avatar{font-size:var(--font-size-15)}
+.tt-det-avatar{font-size:var(--font-size-16)}
+.avatar-48,.drawer-avatar{width:var(--size-avatar-48);height:var(--size-avatar-48);font-size:var(--font-size-18)}
+.avatar-52,.sp-avatar{width:var(--size-avatar-52);height:var(--size-avatar-52);font-size:var(--font-size-18)}
+.avatar-64,.emp-qcard-avatar{width:var(--size-avatar-64);height:var(--size-avatar-64);font-size:var(--font-size-21)}
+.holder-avatar{color:var(--color-text-primary)}
+.avatar.inactive,.emp-avatar.inactive,.drawer-avatar.inactive,.avatar.is-inactive{border-color:var(--color-border-avatar-ring-inactive);color:var(--color-border-avatar-ring-inactive)}
+/* square tile avatar (4px, NOT a circle) src: employees.html L1013; dark L1502 */
+.calc-user-avatar{width:var(--size-avatar-44);height:var(--size-avatar-44);border-radius:var(--radius-base);background:var(--color-avatar-square-bg);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:var(--font-size-16);font-weight:var(--font-weight-bold);color:var(--color-text-secondary)}
+
+/* ---- 14. DROPDOWN MENUS ---- */
+/* App launcher — src: employees.html L29-40; dark L1071-1078 (no open animation: display toggle) */
+.app-drop{position:fixed;top:var(--size-dropdown-top);left:var(--size-dropdown-gutter);width:var(--size-app-drop-width);background:var(--color-surface-elevated);border:var(--border-width-hairline) solid var(--color-border-popover);border-radius:var(--radius-base);box-shadow:var(--shadow-popover);z-index:var(--z-dropdown);padding:var(--space-6) 0;display:none}
+.app-drop.open,.app-drop.is-open{display:block}
+.app-drop-section{padding:var(--space-8) var(--space-14) var(--space-4);font-size:var(--font-size-10);font-weight:var(--font-weight-bold);color:var(--color-text-menu-section);text-transform:uppercase;letter-spacing:var(--letter-spacing-label-menu)}
+.app-drop-item{display:flex;align-items:center;gap:var(--space-10);padding:var(--space-9) var(--space-14);cursor:pointer;transition:background var(--duration-fast);text-decoration:none}
+.app-drop-item:hover:not(.app-drop-item-current):not(.app-drop-item-noaccess),.app-drop-item.is-hover:not(.app-drop-item-current):not(.app-drop-item-noaccess){background:var(--color-menu-hover)}
+.app-drop-item-current{background:var(--color-tint-selected);cursor:default}
+.app-drop-item-noaccess{opacity:var(--opacity-noaccess);cursor:not-allowed}
+.app-drop-item-name{font-size:var(--font-size-13);font-weight:var(--font-weight-medium);color:var(--color-text-item);flex:1}
+.app-drop-item-current .app-drop-item-name{color:var(--color-brand);font-weight:var(--font-weight-semibold)}
+.app-drop-divider{height:1px;background:var(--color-border-card);margin:var(--space-4) 0}
+/* Profile menu — src: employees.html L1028-1038; dark L1061-1069 */
+.profile-drop{position:fixed;top:var(--size-dropdown-top);right:var(--size-dropdown-gutter);width:var(--size-profile-drop-width);background:var(--color-surface-elevated);border:var(--border-width-hairline) solid var(--color-border-popover);border-radius:var(--radius-base);box-shadow:var(--shadow-popover);z-index:var(--z-dropdown);padding:var(--space-6) 0;display:none}
+.profile-drop.open,.profile-drop.is-open{display:block}
+.profile-drop-header{padding:var(--space-12) var(--space-16) var(--space-10);border-bottom:var(--border-width-hairline) solid var(--color-border-divider)}
+.profile-drop-name{font-size:var(--font-size-13);font-weight:var(--font-weight-bold);color:var(--color-text-primary)}
+.profile-drop-email{font-size:var(--font-size-11);color:var(--color-text-secondary);margin-top:var(--space-2)}
+.profile-drop-divider{height:1px;background:var(--color-border-card);margin:var(--space-4) 0}
+.profile-drop-item{display:flex;align-items:center;gap:var(--space-10);padding:var(--space-9) var(--space-16);cursor:pointer;transition:background var(--duration-fast)}
+.profile-drop-item:hover,.profile-drop-item.is-hover{background:var(--color-menu-hover)}
+.profile-drop-item-icon{flex-shrink:0;color:var(--color-text-secondary);display:flex;align-items:center}
+.profile-drop-item-label{flex:1;font-size:var(--font-size-13);font-weight:var(--font-weight-medium);color:var(--color-text-item)}
+
+/* ---- 15. TOAST + SUCCESS POPUP ---- */
+/* src: employees.html L826-827; dark L1677. JS adds .show for 2800ms. Light has NO border, dark has 1px (structural). */
+.toast{position:fixed;bottom:var(--space-32);left:50%;transform:translateX(-50%) translateY(16px);background:var(--color-toast-bg);color:var(--color-toast-text);font-size:var(--font-size-14);font-weight:var(--font-weight-medium);padding:var(--space-12) var(--space-20);border-radius:var(--radius-base);opacity:0;pointer-events:none;transition:opacity var(--duration-toast),transform var(--duration-toast);z-index:var(--z-toast);white-space:nowrap}
+.toast.show,.toast.is-visible{opacity:1;transform:translateX(-50%) translateY(0)}
+:is(body.dark,.theme-dark) .toast{border:var(--border-width-hairline) solid var(--color-toast-border)}
+/* Success popup (auto-closes after 2800ms; the app's .req-success-actions/-btn-new/-btn-back are dead CSS — the card has NO buttons) */
+/* src: employees.html L969-974; dark L1457-1461 */
+.req-success-backdrop{position:fixed;inset:0;background:var(--color-overlay-success);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:var(--z-modal-overlay);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity var(--duration-backdrop)}
+.req-success-backdrop.open,.req-success-backdrop.is-open{opacity:1;pointer-events:auto}
+.req-success-card{background:var(--color-surface-elevated);border-radius:var(--radius-base);padding:40px 36px var(--space-32);width:var(--size-dialog-success);max-width:92vw;box-shadow:var(--shadow-success);text-align:center;display:flex;flex-direction:column;align-items:center;gap:var(--space-16)}
+.req-success-icon{width:var(--size-avatar-64);height:var(--size-avatar-64);border-radius:var(--radius-circle);background:var(--color-success-icon-bg);display:flex;align-items:center;justify-content:center;color:var(--color-success-icon-text)}
+.req-success-title{font-size:var(--font-size-20);font-weight:var(--font-weight-extrabold);color:var(--color-brand);margin:0}
+.req-success-sub{font-size:var(--font-size-14);color:var(--color-text-secondary);margin:0;line-height:var(--line-height-body)}
+
+/* ---- 16. MODAL PRIMITIVES ---- */
+/* Family A (.modal-overlay > .modal, 740px, fade .18s + slide 10px) — src: employees.html L389-417; dark L1193-1210.
+   dark: scrim .55, panel #26292e, border .08; panel SHADOW stays 0 8px 40px .16 (no dark shadow exists in the app) */
+.modal-overlay{position:fixed;inset:0;background:var(--color-overlay-modal);z-index:var(--z-modal-overlay);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity var(--duration-modal)}
+.modal-overlay.open,.modal-overlay.is-open{opacity:1;pointer-events:all}
+.modal{background:var(--color-surface-elevated);border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-popover);box-shadow:var(--shadow-modal);width:var(--size-modal-a);max-height:82vh;display:flex;flex-direction:column;transform:translateY(10px);transition:transform var(--duration-modal)}
+.modal-overlay.open .modal,.modal-overlay.is-open .modal{transform:translateY(0)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:var(--space-20) var(--space-24);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);flex-shrink:0}
+.modal-title{font-size:var(--font-size-16);font-weight:var(--font-weight-bold);color:var(--color-text-primary)}
+.modal-body{overflow-y:auto;padding:var(--space-24);flex:1;scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb) transparent}
+.modal-body::-webkit-scrollbar{width:var(--size-scrollbar)}
+.modal-body::-webkit-scrollbar-thumb{background:var(--color-scrollbar-thumb);border-radius:var(--radius-hairline)}
+.modal-footer{display:flex;align-items:center;justify-content:space-between;gap:var(--space-8);padding:var(--space-16) var(--space-24);border-top:var(--border-width-hairline) solid var(--color-border-divider);flex-shrink:0}
+.modal-section{margin-bottom:var(--space-24)}
+.modal-section:last-child{margin-bottom:0}
+.modal-section-title{font-size:var(--font-size-12);font-weight:var(--font-weight-bold);color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);margin-bottom:var(--space-14)}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--space-14) var(--space-16)}
+.modal-divider{height:1px;background:var(--color-border-card);margin:var(--space-4) 0 var(--space-24)}
+/* Family B (.modal-backdrop > .modal, 560px, NO animation, circular close, 18/800 brand title).
+   The same .modal element is re-skinned by specificity (.modal-backdrop .modal beats .modal) — src: employees.html L967-968, L980-985; dark L1370-1376 */
+.modal-backdrop{display:none;position:fixed;inset:0;background:var(--color-overlay-dialog);z-index:var(--z-modal-backdrop);align-items:center;justify-content:center}
+.modal-backdrop.open,.modal-backdrop.is-open{display:flex}
+.modal-backdrop .modal{background:var(--color-surface-elevated);border-radius:var(--radius-base);width:var(--size-modal-b);max-width:94vw;overflow:hidden;box-shadow:var(--shadow-dialog);border:none;transform:none;transition:none;max-height:none;display:block}
+.modal-backdrop .modal-header{padding:22px var(--space-24) 18px;border-bottom:var(--border-width-hairline) solid var(--color-border-divider);display:flex;align-items:center;justify-content:space-between}
+.modal-backdrop .modal-title{font-size:var(--font-size-18);font-weight:var(--font-weight-extrabold);color:var(--color-brand)}
+.modal-backdrop .modal-footer{padding:var(--space-16) var(--space-24);background:var(--color-surface-elevated);border-top:var(--border-width-hairline) solid var(--color-border-divider);display:flex;align-items:center;justify-content:space-between}
+/* Family C: fill-all + approve-confirm dialogs (own overlay, scrim .28 in BOTH modes — no dark rule in the source; fade .15s + slide 8px) */
+/* src: employees.html L360-363, L364-374, L375-382; dark L1318-1334 */
+.tt-fillall-overlay,.tt-confirm-overlay{position:fixed;inset:0;background:var(--color-overlay-timesheet);z-index:var(--z-tt-overlay);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity var(--duration-medium)}
+.tt-fillall-overlay.open,.tt-confirm-overlay.open,.tt-fillall-overlay.is-open,.tt-confirm-overlay.is-open{opacity:1;pointer-events:all}
+.tt-fillall-box{background:var(--color-surface-elevated);border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-popover);box-shadow:var(--shadow-dialog-box);width:var(--size-dialog-fillall);transform:translateY(8px);transition:transform var(--duration-medium);overflow:hidden}
+.tt-confirm-box{background:var(--color-surface-elevated);border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-popover);box-shadow:var(--shadow-confirm-box);padding:var(--space-24) var(--space-24) var(--space-20);width:var(--size-dialog-confirm);transform:translateY(8px);transition:transform var(--duration-medium)}
+.tt-fillall-overlay.open .tt-fillall-box,.tt-confirm-overlay.open .tt-confirm-box,.tt-fillall-overlay.is-open .tt-fillall-box,.tt-confirm-overlay.is-open .tt-confirm-box{transform:translateY(0)}
+.tt-fillall-header{display:flex;align-items:center;justify-content:space-between;padding:22px var(--space-24) 0}
+.tt-fillall-title{font-size:var(--font-size-17);font-weight:var(--font-weight-bold);color:var(--color-brand)}
+.tt-fillall-body{padding:var(--space-14) var(--space-24) 0}
+.tt-fillall-desc{font-size:var(--font-size-13);color:var(--color-text-secondary);line-height:var(--line-height-loose);margin-bottom:var(--space-20)}
+.tt-fillall-fields{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-12);margin-bottom:var(--space-4)}
+.tt-fillall-footer{display:flex;align-items:center;justify-content:space-between;gap:var(--space-10);padding:var(--space-20) var(--space-24);border-top:var(--border-width-hairline) solid var(--color-border-divider);margin-top:var(--space-20)}
+.tt-confirm-title{font-size:var(--font-size-15);font-weight:var(--font-weight-bold);color:var(--color-text-primary);margin-bottom:var(--space-6)}
+.tt-confirm-body{font-size:var(--font-size-13);color:var(--color-text-secondary);line-height:var(--line-height-body);margin-bottom:var(--space-20)}
+.tt-confirm-emp{font-weight:var(--font-weight-semibold);color:var(--color-text-primary)}
+.tt-confirm-actions{display:flex;gap:var(--space-8);justify-content:space-between}
+
+/* ---- 17. EMPLOYEE QUICK CARD (family E; opened by clicking a directory row; JS sets display:flex) ---- */
+/* src: employees.html L710-726; dark L1642-1654 */
+.emp-qcard-backdrop{position:fixed;inset:0;z-index:var(--z-qcard);display:flex;align-items:center;justify-content:center;background:var(--color-overlay-dialog)}
+.emp-qcard{background:var(--color-surface-elevated);border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-popover);box-shadow:var(--shadow-dialog);width:var(--size-dialog-qcard);padding:var(--space-28);position:relative}
+.emp-qcard-head{display:flex;align-items:center;gap:var(--space-16);margin-bottom:var(--space-20);padding-right:var(--space-40)}
+.emp-qcard-name{font-size:var(--font-size-18);font-weight:var(--font-weight-bold);color:var(--color-text-primary);line-height:var(--line-height-heading);margin-bottom:var(--space-4)}
+.emp-qcard-sub{font-size:var(--font-size-13);color:var(--color-text-secondary);line-height:var(--line-height-text-sm)}
+.emp-qcard-rows{border-top:var(--border-width-hairline) solid var(--color-border-divider);margin-top:var(--space-2)}
+.emp-qcard-row,.emp-qcard-email-row{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-11) 0;border-bottom:var(--border-width-hairline) solid var(--color-border-line);font-size:var(--font-size-14);color:var(--color-text-primary)}
+.emp-qcard-row:last-child{border-bottom:none}
+.emp-qcard-icon{flex-shrink:0;width:var(--space-16);height:var(--space-16);color:var(--color-text-tertiary)}
+.emp-qcard-email-main{display:flex;align-items:center;gap:var(--space-12);flex:1;min-width:0}
+.emp-qcard-email-text{flex:1;min-width:0}
+.emp-qcard-email-actions{display:flex;gap:var(--space-8);flex-shrink:0;align-items:center}
+/* directory row highlight animation (the only @keyframes in the app; 1.4s ease-out) — src: employees.html L731-732.
+   FIX: the source colour #e8f4f7 is not dark-aware (a light flash on a dark page); here the flash uses the dark selected tint in dark mode. */
+@keyframes dir-flash{0%{background:var(--color-tint-flash)}60%{background:var(--color-tint-flash)}100%{background:transparent}}
+.dir-row-highlight{animation:dir-flash var(--duration-flash) var(--easing-flash)}
+
+/* =====================================================================
+   EXTENDED — NOT in the app (BUILD_RULES section 3). Derived ONLY from existing tokens; no new hue / font / radius.
+   Each block names its derivation. The app has none of these: styled keyboard focus, invalid/error, helper/error text,
+   disabled inputs, tooltip, spinner, skeleton, checkbox, radio, tag, alert/banner, progress, pagination, breadcrumb, file upload.
+   ===================================================================== */
+/* ---- EXTENDED ---- */
+
+/* EXTENDED — not in app: keyboard focus ring (the app has :focus-visible = 0 and 22 outline:none; buttons/tabs/rows keep the UA ring).
+   Derivation: brand colour at the thick border width (2px), 2px offset, border-radius untouched (no radius change). */
+:is(button,a[href],[role="button"],[role="tab"],[tabindex]):focus-visible{outline:var(--border-width-thick) solid var(--color-brand);outline-offset:2px}
+:is(input,select,textarea):focus-visible{outline:none}
+
+/* EXTENDED — not in app: invalid / error state + helper/error text (app: only an inline #dc2626 border on tt fill inputs + native alert()).
+   Derivation: border = --color-danger-strong (the app's own invalid colour); text = .field-note recipe in --color-danger-text. */
+.is-invalid,.is-invalid:focus{border-color:var(--color-danger-strong)}
+.field-error{font-size:var(--font-size-12);color:var(--color-danger-text);margin-top:var(--space-6);line-height:var(--line-height-text-md)}
+
+/* EXTENDED — not in app: disabled text inputs / selects (app: only .readonly-field).
+   Derivation: the .readonly-field palette (fill-subtle / secondary) + not-allowed cursor. */
+.modal-input:disabled,.modal-select:disabled,.field-value:disabled,.search-input:disabled,.time-input:disabled,.datepicker-input:disabled,.is-disabled.cust-select__trigger,.is-disabled.datepicker-input{background:var(--color-fill-subtle);color:var(--color-text-secondary);cursor:not-allowed;pointer-events:none}
+
+/* EXTENDED — not in app: tooltip (app: native title attribute only, 8 uses).
+   Derivation: the toast surface (toast-bg / toast-text) at the small label size; fade = duration-base. */
+.tooltip{position:absolute;z-index:var(--z-dropdown);background:var(--color-toast-bg);color:var(--color-toast-text);font-size:var(--font-size-12);font-weight:var(--font-weight-medium);padding:var(--space-6) var(--space-10);border-radius:var(--radius-base);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity var(--duration-base)}
+.tooltip.show,.tooltip.is-visible{opacity:1}
+:is(body.dark,.theme-dark) .tooltip{border:var(--border-width-hairline) solid var(--color-toast-border)}
+
+/* EXTENDED — not in app: spinner + skeleton (app: none; only a text-free UI).
+   Derivation: spinner = control border + brand top arc, 1.4s (duration-flash); skeleton = fill-neutral at disabled opacity pulse. */
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes skeleton-pulse{0%,100%{opacity:1}50%{opacity:var(--opacity-dimmed)}}
+.spinner{display:inline-block;width:var(--space-16);height:var(--space-16);border:var(--border-width-thick) solid var(--color-border-control);border-top-color:var(--color-brand);border-radius:var(--radius-circle);animation:spin var(--duration-flash) linear infinite}
+.skeleton{display:block;background:var(--color-fill-neutral);border-radius:var(--radius-base);min-height:var(--space-12);animation:skeleton-pulse var(--duration-flash) ease infinite}
+
+/* EXTENDED — not in app: checkbox + radio (app: only the WFH day box). Derivation: wfh-day-box recipe (1.5px control border, brand when checked,
+   hover = border-hover-strong), 18px = switch height, check mark = assets/check.svg mask. */
+.checkbox,.radio{display:inline-flex;align-items:center;gap:var(--space-8);cursor:pointer;user-select:none;font-size:var(--font-size-14);color:var(--color-text-primary)}
+.checkbox input,.radio input{display:none}
+.checkbox-box,.radio-box{width:var(--size-switch-h);height:var(--size-switch-h);flex-shrink:0;border:var(--border-width-medium) solid var(--color-border-control);background:var(--color-input-bg);display:flex;align-items:center;justify-content:center;transition:all var(--duration-base)}
+.checkbox-box{border-radius:var(--radius-base)}
+.radio-box{border-radius:var(--radius-circle)}
+.checkbox:hover .checkbox-box,.radio:hover .radio-box{border-color:var(--color-border-hover-strong)}
+.checkbox input:checked~.checkbox-box{background:var(--color-brand);border-color:var(--color-brand);color:var(--color-text-on-brand)}
+.checkbox-box::after{content:"";width:var(--space-12);height:var(--space-12);background-color:currentColor;-webkit-mask:url(assets/check.svg) center/contain no-repeat;mask:url(assets/check.svg) center/contain no-repeat;opacity:0}
+.checkbox input:checked~.checkbox-box::after{opacity:1}
+.radio input:checked~.radio-box{border-color:var(--color-brand)}
+.radio-box::after{content:"";width:var(--space-8);height:var(--space-8);border-radius:var(--radius-circle);background:var(--color-brand);opacity:0}
+.radio input:checked~.radio-box::after{opacity:1}
+
+/* EXTENDED — not in app: tag / chip with remove (app: dead .dept-chip only). Derivation: record-badge fill + secondary text, remove = inline-list-item-remove. */
+.tag{display:inline-flex;align-items:center;gap:var(--space-6);padding:3px var(--space-8) 3px var(--space-10);border-radius:var(--radius-base);background:var(--color-fill-badge);color:var(--color-text-secondary);font-size:var(--font-size-12);font-weight:var(--font-weight-semibold)}
+.tag-remove{display:inline-flex;align-items:center;justify-content:center;width:var(--space-16);height:var(--space-16);border:none;background:transparent;color:var(--color-text-tertiary);cursor:pointer;border-radius:var(--radius-base);padding:0}
+.tag-remove:hover{background:var(--color-danger-bg);color:var(--color-danger-text)}
+
+/* EXTENDED — not in app: alert / inline banner (app: native alert() + toast only). Derivation: status bg/text pairs, 14px body, 4px radius. */
+.alert{display:flex;align-items:flex-start;gap:var(--space-10);padding:var(--space-12) var(--space-16);border-radius:var(--radius-base);font-size:var(--font-size-14);font-weight:var(--font-weight-medium)}
+.alert-success{background:var(--color-success-bg);color:var(--color-success-text)}
+.alert-danger{background:var(--color-danger-bg);color:var(--color-danger-text)}
+.alert-warning{background:var(--color-warning-bg);color:var(--color-warning-text)}
+.alert-info{background:var(--color-info-bg);color:var(--color-info-text)}
+
+/* EXTENDED — not in app: progress bar (app: mini bar chart only). Derivation: mini-bar fill/empty tokens, 4px (mini-bar min-height), 2px radius. */
+.progress{height:var(--space-4);background:var(--color-fill-badge);border-radius:var(--radius-hairline);overflow:hidden}
+.progress-bar{height:100%;width:var(--progress,0%);background:var(--color-brand);border-radius:inherit}
+
+/* EXTENDED — not in app: pagination. Derivation: .wfh-nav-btn / .req-tab recipe (32px, control border, brand active chip). */
+.pagination{display:flex;align-items:center;gap:var(--space-4)}
+.page-btn{min-width:var(--control-h-btn-sm);height:var(--control-h-btn-sm);padding:0 var(--space-8);border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-control);background:var(--color-control-bg-elevated);font-size:var(--font-size-12);font-weight:var(--font-weight-medium);color:var(--color-text-secondary);cursor:pointer;font-family:inherit;transition:all var(--duration-base)}
+.page-btn:hover{background:var(--color-menu-hover);color:var(--color-text-primary)}
+.page-btn.active{background:var(--color-tint-chip);border-color:var(--color-brand);color:var(--color-brand)}
+
+/* EXTENDED — not in app: breadcrumb (app: .back-link only). Derivation: back-link colours/size, separator = tertiary. */
+.breadcrumb{display:flex;align-items:center;gap:var(--space-6);font-size:var(--font-size-14);font-weight:var(--font-weight-medium);color:var(--color-text-secondary)}
+.breadcrumb a{color:var(--color-text-secondary);text-decoration:none;transition:color var(--duration-medium)}
+.breadcrumb a:hover{color:var(--color-brand)}
+.breadcrumb-sep{color:var(--color-text-tertiary)}
+.breadcrumb-current{color:var(--color-text-primary)}
+
+/* EXTENDED — not in app: file-upload drop zone. Derivation: input border/hover tokens, brand on hover/drag, 4px radius, 14px secondary text. */
+.file-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-8);padding:var(--space-24);border:var(--border-width-medium) dashed var(--color-border-control);border-radius:var(--radius-base);background:var(--color-input-bg);color:var(--color-text-secondary);font-size:var(--font-size-14);cursor:pointer;transition:border-color var(--duration-base),background var(--duration-base)}
+.file-drop:hover,.file-drop.is-drag{border-color:var(--color-brand);background:var(--color-tint-selected)}
+
+/* ===== PART 1 (BASE + CONTROLS, stage 1) — END ===== */
+
+/* ===== PART 2: PATTERNS — stage 2 appends below this line ===== */
+
+/* PART 2 conventions: every block starts with "src: employees.html L<n>" (light L, dark L = the body.dark rules that the role tokens already absorb).
+   Colours flip through the role tokens; only STRUCTURAL dark differences are written as :is(body.dark,.theme-dark) .x{}.
+   Where the app styles an element by ID (#requests-view, #timetracking-view, #myprofile-view, #panel-*, #dPill, #hrReqList, #poolSplitRight) the ID selector is kept
+   AND a class twin is provided (.requests-view, .timetracking-view, .myprofile-view, .panel-*, .detail-pill, .rv-card, .pool-split-right) so a design system page can repeat the pattern. */
+
+/* ================================================================
+   18. TOP NAV (fixed 74px; no left sidebar anywhere in the app)
+   ================================================================ */
+/* src: employees.html L17-19, L24, L27; dark L1055 (bg #18181c, border .12 through the tokens) */
+.top-nav{position:fixed;top:0;left:0;right:0;height:var(--size-nav-height);background:var(--color-nav-bg);display:flex;align-items:center;justify-content:space-between;padding:0 var(--size-nav-pad-x);z-index:var(--z-nav);border-bottom:var(--border-width-hairline) solid var(--color-border-divider)}
+.nav-left{display:flex;align-items:center;gap:var(--size-nav-gap-left)}
+.nav-logo-wrap{display:flex;align-items:center;gap:var(--size-nav-gap-logo)}
+.nav-links{display:flex;align-items:center;gap:var(--size-nav-gap-links)}
+.nav-right{display:flex;align-items:center;gap:var(--size-nav-gap-right)}
+/* EXTENDED — not in app: embed the nav inside a documentation page (the real nav is position:fixed to the viewport).
+   Derivation: same box, only position:relative. */
+.top-nav.is-static{position:relative;right:auto}
+
+/* ================================================================
+   19. PAGE FRAME + SPLIT (employees, pool); view frames (requests, time tracking)
+   ================================================================ */
+/* src: employees.html L43-49; dark L1080-1082 */
+.page{padding-top:var(--size-nav-height);height:100vh;display:flex;align-items:stretch;overflow:hidden;box-sizing:border-box;padding-left:var(--size-page-gutter);padding-right:var(--size-page-gutter)}
+.page-center{display:flex;flex:1;margin:var(--size-page-card-margin-y) 0;border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-card);box-shadow:var(--shadow-page);overflow:hidden}
+.split-left{width:var(--size-split-left);flex-shrink:0;background:var(--color-surface);border-right:var(--border-width-hairline) solid var(--color-border-card);display:flex;flex-direction:column;overflow:hidden}
+.split-right{flex:1;background:var(--color-surface);display:flex;flex-direction:column;overflow:hidden}
+.tab-body{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb) transparent}
+.tab-body::-webkit-scrollbar{width:var(--size-scrollbar)}
+.tab-body::-webkit-scrollbar-thumb{background:var(--color-scrollbar-thumb);border-radius:var(--radius-hairline)}
+/* Pool right pane: inline style in the app (background #f5f5f8; overflow-y:auto; padding:24px; display:block); dark = .split-right surface via !important (L1082) */
+/* src: employees.html L2127 (inline), L1082, L1212-1215 */
+#poolSplitRight,.split-right.pool-split-right{background:var(--color-pane-muted);overflow-y:auto;padding:var(--space-24);display:block}
+:is(body.dark,.theme-dark) #poolSplitRight,:is(body.dark,.theme-dark) .split-right.pool-split-right{scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-color-dark) transparent}
+/* Whole-view frames of Requests / Time Tracking (same card chrome as .page-center, vertical flex) */
+/* src: employees.html L233, L281; dark L1252, L1337 (the 0.06 shadow has no dark rule) */
+#requests-view,.requests-view,#timetracking-view,.timetracking-view{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;margin:var(--size-page-card-margin-y) 0;border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-card);box-shadow:var(--shadow-view);background:var(--color-surface)}
+#pool-view{min-height:0}
+
+/* ================================================================
+   20. EMPLOYEE LIST (left pane)
+   ================================================================ */
+/* src: employees.html L52-55, L65, L68; dark L1085-1087 */
+.left-header{padding:var(--space-20) var(--space-20) var(--space-12);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);flex-shrink:0}
+.left-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-14)}
+.left-title{font-size:var(--font-size-16);font-weight:var(--font-weight-extrabold);color:var(--color-text-primary)}
+.btn-row{display:flex;gap:var(--space-8)}
+.emp-list-scroll{flex:1;overflow:hidden;padding:var(--space-16);display:flex;flex-direction:column;min-height:0}
+.toolbar{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap}
+/* Table card + table. LAYOUT NOTE (documented limitation): table-layout is fixed and the five data columns are fixed px (140+200+110+130+100 = 680),
+   so the Employee column = 0.54*(W-422)-715 px: 0 at <= 1440, ~94 at 1920, ~245 at 2200. The app has no @media; none is invented. */
+/* src: employees.html L97-103; dark L1119 */
+.emp-table-wrap{flex:1;min-height:0;background:var(--color-surface);border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);overflow:hidden;box-shadow:var(--shadow-card-sm);display:flex;flex-direction:column}
+.emp-table{width:100%;border-collapse:collapse;table-layout:fixed;display:flex;flex-direction:column;flex:1;min-height:0}
+.emp-table thead{display:table;width:100%;table-layout:fixed;flex-shrink:0}
+.emp-table tbody{display:block;flex:1;min-height:0;overflow-y:scroll;scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb-table) transparent;scrollbar-gutter:stable}
+.emp-table tbody::-webkit-scrollbar{width:var(--size-scrollbar)}
+.emp-table tbody::-webkit-scrollbar-thumb{background:var(--color-scrollbar-thumb-table);border-radius:var(--radius-hairline)}
+.emp-table tbody tr{display:table;width:100%;table-layout:fixed}
+/* header cells: the dark header is #111214 (table-head-bg), NOT #202226 (that is the rv/tt/req/hist family) */
+/* src: employees.html L104-108; dark L1120-1122 */
+.emp-table th{text-align:left;font-size:var(--font-size-12);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);color:var(--color-text-tertiary);padding:var(--space-12) var(--space-16);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);background:var(--color-table-head-bg);white-space:nowrap;cursor:pointer;user-select:none}
+.emp-table th:hover,.emp-table th.is-hover{color:var(--color-brand)}
+.emp-table th.sorted{color:var(--color-brand)}
+.sort-icon{margin-left:var(--space-4);opacity:var(--opacity-icon-rest);display:inline-flex;vertical-align:middle}
+.emp-table th.sorted .sort-icon{opacity:1}
+/* src: employees.html L109-114, L1044; dark L1123-1126, L1130 */
+.emp-table td{padding:var(--space-12) var(--space-16);border-bottom:var(--border-width-hairline) solid var(--color-border-row);vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--color-text-primary)}
+.emp-table td:first-child{overflow:visible}
+.emp-table tr:last-child td{border-bottom:none}
+.emp-table tr:hover td,.emp-table tr.is-hover td{background:var(--color-row-hover);cursor:pointer}
+.emp-table tr.active-row td,.emp-table tr.is-active td{background:var(--color-row-active)}
+.emp-table tr.active-row td:first-child,.emp-table tr.is-active td:first-child{box-shadow:var(--shadow-row-marker)}
+.emp-table tr.na-row td{color:var(--color-text-tertiary)}
+/* Group header row (Group by Department / Office / Division). The app uses !important to beat the row hover; a higher-specificity selector does the same here. */
+/* src: employees.html L95-96; dark L1133-1134 */
+.group-header-row td,.emp-table .group-header-row td,.emp-table .group-header-row:hover td,.emp-table .group-header-row.is-hover td{background:var(--color-table-head-bg);font-size:var(--font-size-12);font-weight:var(--font-weight-bold);color:var(--color-text-group-label);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);padding:var(--space-10) var(--space-16) var(--space-8);border-bottom:var(--border-width-hairline) solid var(--color-border-divider)}
+.group-header-row:hover td,.emp-table .group-header-row:hover td,.emp-table .group-header-row.is-hover td{cursor:default}
+/* src: employees.html L115-121; dark L1127-1129 */
+.emp-cell{display:flex;align-items:center;gap:var(--space-10);min-width:0}
+.emp-cell>div:last-child{min-width:0;overflow:hidden}
+.emp-name{font-weight:var(--font-weight-semibold);color:var(--color-text-black);font-size:var(--font-size-14);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.emp-name.inactive{color:var(--color-text-tertiary)}
+.emp-email{font-size:var(--font-size-12);color:var(--color-text-secondary);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ================================================================
+   21. EMPLOYEE DETAIL (right pane): empty state, header, stat bar, tabs, section band, fields grid, records table, timesheet placeholder
+   ================================================================ */
+/* src: employees.html L128; dark L1190 */
+.detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:var(--space-12);color:var(--color-text-tertiary);font-size:var(--font-size-14);text-align:center}
+/* src: employees.html L131-145; dark L1159-1167 */
+.detail-header{padding:var(--space-24);background:var(--color-surface);display:flex;gap:var(--space-14);align-items:flex-start;border-bottom:var(--border-width-hairline) solid var(--color-border-divider);position:relative}
+#dPill,.detail-pill{position:absolute;top:var(--space-20);right:var(--space-20)}
+.drawer-header-info{flex:1;min-width:0}
+.drawer-name-row{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap;margin-bottom:var(--space-2)}
+.drawer-name{font-size:var(--font-size-18);font-weight:var(--font-weight-extrabold);color:var(--color-text-primary);line-height:var(--line-height-heading)}
+.drawer-role{font-size:var(--font-size-14);font-weight:var(--font-weight-medium);color:var(--color-text-item);margin-bottom:var(--space-6)}
+.drawer-meta-row{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap}
+.drawer-email{font-size:var(--font-size-12);color:var(--color-text-secondary)}
+.drawer-dot{color:var(--color-text-dot);font-size:var(--font-size-12)}
+/* src: employees.html L148-152; dark L1169-1172 (separator = card border .07 in dark) */
+.detail-stat-bar{display:flex;background:var(--color-surface);border-bottom:var(--border-width-hairline) solid var(--color-border-divider)}
+.detail-stat{flex:1;padding:var(--space-14) var(--space-20);border-right:var(--border-width-hairline) solid var(--color-border-card);min-width:0;overflow:hidden}
+.detail-stat:last-child{border-right:none}
+.detail-stat-value{font-size:var(--font-size-16);font-weight:var(--font-weight-bold);color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.detail-stat-label{font-size:var(--font-size-10);font-weight:var(--font-weight-semibold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);color:var(--color-text-tertiary);margin-top:var(--space-4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* section band (full-width strip, the app's own replacement for cards; dark band = #111214) — src: employees.html L167-176; dark L1179 */
+.section-band{padding:var(--space-16) var(--space-20);background:var(--color-section-band-bg);border-top:var(--border-width-hairline) solid var(--color-border-divider);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);font-size:var(--font-size-14);font-weight:var(--font-weight-bold);color:var(--color-text-primary)}
+.section-band.first{border-top:none}
+/* 3-column fields grid: label above value; .fc-full spans all columns — src: employees.html L182-218; dark L1181-1184 */
+.fields-grid{display:grid;grid-template-columns:1fr 1fr 1fr;padding:var(--space-12) var(--space-24) var(--space-24);gap:var(--space-20) var(--space-24)}
+.fc{min-width:0;overflow:hidden}
+.fc.fc-full{grid-column:1/-1}
+.fc-label{font-size:var(--font-size-12);font-weight:var(--font-weight-medium);color:var(--color-text-tertiary);margin-bottom:var(--space-4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-value{font-size:var(--font-size-14);font-weight:var(--font-weight-medium);color:var(--color-text-primary);word-break:break-word}
+.fc-value.mono{word-break:break-all}
+.fc-value.small{font-size:var(--font-size-12);font-weight:var(--font-weight-medium)}
+/* records table (Job History) — th is 600/NOT uppercase, bg = table-head-bg (dark #111214) — src: employees.html L223-227; dark L1186-1188 */
+.records-table-wrap{border-top:var(--border-width-hairline) solid var(--color-border-divider)}
+.records-table{width:100%;border-collapse:collapse}
+.records-table th{font-size:var(--font-size-12);font-weight:var(--font-weight-semibold);color:var(--color-text-tertiary);padding:var(--space-10) var(--space-24);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);background:var(--color-table-head-bg);text-align:left;white-space:nowrap}
+.records-table td{font-size:var(--font-size-14);padding:var(--space-12) var(--space-24);border-bottom:var(--border-width-hairline) solid var(--color-border-row-subtle);color:var(--color-text-primary);vertical-align:middle}
+.records-table tr:last-child td{border-bottom:none}
+/* timesheet placeholder tab — src: employees.html L230; dark L1191 */
+.timesheet-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:var(--space-10);color:var(--color-text-tertiary);font-size:var(--font-size-14);padding:var(--space-40);border-top:var(--border-width-hairline) solid var(--color-border-divider)}
+
+/* ================================================================
+   22. MODALS — content layouts (primitives are in PART 1 section 16): New Employee + 3 pool modals
+   ================================================================ */
+/* The shells (.modal-overlay > .modal, header, body, footer, section, grid, divider) are PART 1. Pool modals only add inline widths
+   (Add holder 440, Add member 620, New pool 680 = --size-modal-holder/-member/-pool) and the inline-add pattern below. */
+/* src: employees.html L458-472; dark L1238-1243 */
+.inline-add-row{display:flex;gap:var(--space-8);align-items:flex-end;margin-bottom:var(--space-10)}
+.inline-add-row .modal-field{flex:1;margin:0}
+.inline-list{display:flex;flex-direction:column;gap:var(--space-6);min-height:32px}
+.inline-list-empty{font-size:var(--font-size-13);color:var(--color-text-tertiary);padding:var(--space-6) 0}
+.inline-list-item{display:flex;align-items:center;justify-content:space-between;padding:var(--space-8) var(--space-12);background:var(--color-fill-item);border-radius:var(--radius-base);font-size:var(--font-size-13);color:var(--color-text-primary)}
+.inline-list-item-info{display:flex;flex-direction:column;gap:var(--space-2)}
+.inline-list-item-name{font-weight:var(--font-weight-semibold);font-size:var(--font-size-13);color:var(--color-text-primary)}
+.inline-list-item-meta{font-size:var(--font-size-12);color:var(--color-text-secondary)}
+/* DEFECT NOTE (not reproduced): when a .cust-select / datepicker opens inside .modal-body the app's JS sets overflow-y:visible (csToggle L3652-3657 / nedp), which at tall viewports
+   lets the modal footer detach below the modal. Here .modal-body stays overflow-y:auto; popups inside modals need a portal (as .pool-emp-drop already does). */
+
+/* ================================================================
+   23. HR REQUESTS VIEW
+   ================================================================ */
+/* src: employees.html L234-237; dark L1338-1339 */
+.rv-header,.tt-header{padding:var(--space-20) var(--space-20) 0;border-bottom:var(--border-width-hairline) solid var(--color-border-divider);flex-shrink:0}
+.rv-title-row,.tt-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-14);min-height:var(--control-h-btn)}
+.rv-title,.tt-title{font-size:var(--font-size-16);font-weight:var(--font-weight-extrabold);color:var(--color-text-primary)}
+.rv-toolbar,.tt-toolbar{padding:0 0 var(--space-12);display:flex;align-items:center;gap:var(--space-12);flex-shrink:0}
+/* src: employees.html L238-241; dark L1340 */
+.rv-list{flex:1;overflow-y:auto;overflow-x:hidden;padding:var(--space-16);scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb-list) transparent}
+.rv-list::-webkit-scrollbar{width:var(--size-scrollbar)}
+.rv-list::-webkit-scrollbar-thumb{background:var(--color-scrollbar-thumb-list);border-radius:var(--radius-hairline)}
+#hrReqList,.rv-card{border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);overflow:hidden;box-shadow:var(--shadow-card-sm);background:var(--color-surface)}
+/* table header = the ALT family (dark #202226, not #111214) — src: employees.html L242-248, L270-272; dark L1341-1345 */
+.rv-table{width:100%;border-collapse:collapse}
+.rv-table th{font-size:var(--font-size-12);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);color:var(--color-text-tertiary);padding:var(--space-12) var(--space-16);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);background:var(--color-table-head-bg-alt);text-align:left;white-space:nowrap;position:sticky;top:0;z-index:var(--z-sticky-th)}
+.rv-table td{padding:var(--space-12) var(--space-16);border-bottom:var(--border-width-hairline) solid var(--color-border-row);vertical-align:middle;overflow:hidden;white-space:nowrap}
+.rv-table tr:last-child td{border-bottom:none}
+.rv-table tr:hover td,.rv-table tr.is-hover td{background:var(--color-row-hover)}
+.rv-table tr.is-new td{background:var(--color-row-new)}
+.rv-table tr.is-new:hover td,.rv-table tr.is-new.is-hover td{background:var(--color-row-new-hover)}
+.rv-table td:last-child{padding-right:var(--space-32)}
+.rv-table th:last-child{padding-right:var(--space-32);text-align:center;width:1px}
+.rv-table th:nth-child(4),.rv-table td:nth-child(4){text-align:center}
+/* cells — src: employees.html L249-254, L266-269; dark L1347-1348, L1361-1363 */
+.rv-emp{display:flex;align-items:center;gap:var(--space-10);white-space:nowrap}
+.rv-emp-name{font-size:var(--font-size-14);font-weight:var(--font-weight-semibold);color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.rv-type{display:flex;align-items:center;gap:var(--space-8);white-space:nowrap}
+.rv-type-label{font-size:var(--font-size-13);font-weight:var(--font-weight-medium);color:var(--color-text-primary)}
+.rv-actions{display:flex;align-items:center;gap:var(--space-8);justify-content:flex-end}
+.rv-detail-str{max-width:300px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:var(--font-size-13);color:var(--color-text-item)}
+.rv-dur-str{font-size:var(--font-size-13);font-weight:var(--font-weight-semibold);color:var(--color-text-primary)}
+.rv-submitted-str{font-size:var(--font-size-13);color:var(--color-text-secondary)}
+/* empty state — src: employees.html L277; dark L1360 */
+.rv-empty{display:flex;align-items:center;justify-content:center;padding:var(--space-60) var(--space-24);color:var(--color-text-tertiary);font-size:var(--font-size-14)}
+
+/* ================================================================
+   24. TIME TRACKING VIEW (list + detail with calendar, fill bar, overlays)
+   ================================================================ */
+/* src: employees.html L286-290, L311-316; dark L1255-1256 */
+.tt-body{flex:1;display:flex;min-height:0;overflow:hidden}
+.tt-list-panel{flex:0 0 var(--size-tt-list);display:flex;flex-direction:column;overflow:hidden;border-right:var(--border-width-hairline) solid var(--color-border-card)}
+.tt-list-scroll,.tt-detail-scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb-list) transparent}
+.tt-list-scroll::-webkit-scrollbar,.tt-detail-scroll::-webkit-scrollbar{width:var(--size-scrollbar)}
+.tt-list-scroll::-webkit-scrollbar-thumb,.tt-detail-scroll::-webkit-scrollbar-thumb{background:var(--color-scrollbar-thumb-list);border-radius:var(--radius-hairline)}
+.tt-list-scroll{padding:var(--space-16)}
+.tt-detail-scroll{padding:var(--space-24)}
+.tt-inner-card{border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);overflow:hidden;box-shadow:var(--shadow-card-sm);background:var(--color-surface)}
+/* section label (Awaiting Approval / Archive) — src: employees.html L291-294; dark L1257-1261 */
+.tt-section-lbl{display:flex;align-items:center;gap:var(--space-8);font-size:var(--font-size-11);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label-wide);color:var(--color-text-tertiary)}
+.tt-section-lbl::after{content:'';flex:1;height:1px;background:var(--color-border-card)}
+.tt-section-lbl--pending{color:var(--color-timesheet-pending-text)}
+.tt-section-lbl--pending::after{background:var(--color-timesheet-pending-line)}
+.tt-section-dot{width:6px;height:6px;border-radius:var(--radius-circle);background:var(--color-timesheet-pending-dot);flex-shrink:0}
+/* table — ALT header family — src: employees.html L295-302; dark L1262-1268 */
+.tt-table{width:100%;border-collapse:collapse}
+.tt-table th{font-size:var(--font-size-12);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);color:var(--color-text-tertiary);padding:var(--space-12) var(--space-16);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);background:var(--color-table-head-bg-alt);text-align:left;white-space:nowrap;position:sticky;top:0;z-index:var(--z-sticky-th)}
+.tt-table td{padding:var(--space-10) var(--space-16);border-bottom:var(--border-width-hairline) solid var(--color-border-row);vertical-align:middle;white-space:nowrap;font-size:var(--font-size-13);color:var(--color-text-primary)}
+.tt-table tr.tt-data-row:last-child td{border-bottom:none}
+.tt-table tr.tt-data-row:hover td,.tt-table tr.tt-data-row.is-hover td{background:var(--color-row-hover);cursor:pointer}
+.tt-table tr.tt-selected td,.tt-table tr.tt-data-row.is-selected td{background:var(--color-row-active)}
+.tt-table tr.tt-selected td:first-child,.tt-table tr.tt-data-row.is-selected td:first-child{box-shadow:var(--shadow-row-marker)}
+.tt-table tr.tt-selected:hover td,.tt-table tr.tt-selected.is-hover td{background:var(--color-row-selected-hover)}
+.tt-table tr.tt-section-row td{padding:var(--space-20) var(--space-16) var(--space-8);background:var(--color-surface);cursor:default}
+.tt-table tr.tt-section-row:first-child td{padding-top:var(--space-14)}
+/* cells — src: employees.html L303-306, L1679-1683; dark L1269-1271, L1682-1683 */
+.tt-emp-cell{display:flex;align-items:center;gap:var(--space-10)}
+.tt-emp-name{font-size:var(--font-size-13);font-weight:var(--font-weight-semibold);color:var(--color-text-primary)}
+.tt-emp-dept{font-size:var(--font-size-11);color:var(--color-text-secondary);margin-top:1px}
+.tt-days-cell,.tt-sub-cell{color:var(--color-text-secondary)}
+.tt-approved-date{font-size:var(--font-size-13);color:var(--color-text-approved-date)}
+/* detail panel — src: employees.html L311-325; dark L1275-1282 */
+.tt-detail-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tt-detail-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-10);color:var(--color-text-tertiary);font-size:var(--font-size-14);font-weight:var(--font-weight-medium);padding-bottom:120px}
+.tt-detail-inner{display:none;flex:1;flex-direction:column;overflow:hidden}
+.tt-detail-inner.visible,.tt-detail-inner.is-visible{display:flex}
+.tt-det-head{display:flex;align-items:center;gap:var(--space-14);margin-bottom:var(--space-20)}
+.tt-det-name{font-size:var(--font-size-16);font-weight:var(--font-weight-bold);color:var(--color-text-primary)}
+.tt-det-meta{font-size:var(--font-size-13);color:var(--color-text-secondary);margin-top:var(--space-2)}
+.tt-stats{display:flex;border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);overflow:hidden;margin-bottom:var(--space-22)}
+.tt-stat{flex:1;padding:var(--space-12) var(--space-14);border-right:var(--border-width-hairline) solid var(--color-border-card);text-align:center}
+.tt-stat:last-child{border-right:none}
+.tt-stat-val{font-size:var(--font-size-18);font-weight:var(--font-weight-extrabold);color:var(--color-text-primary);line-height:var(--line-height-heading)}
+.tt-stat-lbl{font-size:var(--font-size-10);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);color:var(--color-text-tertiary);margin-top:var(--space-4)}
+/* calendar (pay period grid; Sun-first, Fri+Sat weekend) — src: employees.html L326-344; dark L1283-1305 */
+.tt-cal-title{font-size:var(--font-size-11);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label-wide);color:var(--color-text-secondary);margin-bottom:var(--space-10)}
+.tt-cal{border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);overflow:hidden}
+.tt-cal-head{display:grid;grid-template-columns:repeat(7,1fr);background:var(--color-table-head-bg-alt);border-bottom:var(--border-width-hairline) solid var(--color-border-divider)}
+.tt-cal-head span{padding:var(--space-8) var(--space-4);text-align:center;font-size:var(--font-size-10);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-cal-head);color:var(--color-text-tertiary)}
+.tt-cal-head span.tt-wknd{color:var(--color-text-disabled-weekend)}
+.tt-cal-body{display:grid;grid-template-columns:repeat(7,1fr)}
+.tt-cal-cell{min-height:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-2);border-right:var(--border-width-hairline) solid var(--color-cal-line-v);border-bottom:var(--border-width-hairline) solid var(--color-cal-line-h);padding:var(--space-6) var(--space-2)}
+.tt-cal-cell:nth-child(7n){border-right:none}
+.cc-date{font-size:var(--font-size-10);font-weight:var(--font-weight-semibold);color:var(--color-text-tertiary)}
+.cc-hrs{font-size:var(--font-size-13);font-weight:var(--font-weight-bold);line-height:var(--line-height-heading)}
+.cc-time{font-size:var(--font-size-10);font-weight:var(--font-weight-medium);opacity:var(--opacity-cal-time);line-height:var(--line-height-heading)}
+.cc-absent-lbl{font-size:var(--font-size-9-5);font-weight:var(--font-weight-semibold);margin-top:1px;white-space:nowrap}
+/* day variants: cc-out (outside the pay period; its text colours are the DERIVED dark values, the source leaks the light ones), cc-wknd, cc-normal (>=7h), cc-low (<7h), cc-off, cc-sick, cc-missing (clickable) */
+.tt-cal-cell.cc-out{background:var(--color-cal-out-bg)}
+.tt-cal-cell.cc-out .cc-date{color:var(--color-cal-out-date)}
+.tt-cal-cell.cc-out .cc-hrs,.tt-cal-cell.cc-out .cc-time{color:var(--color-cal-out-text)}
+.tt-cal-cell.cc-wknd{background:var(--color-cal-wknd-bg)}
+.tt-cal-cell.cc-wknd .cc-date{color:var(--color-cal-out-text)}
+.tt-cal-cell.cc-normal{background:var(--color-cal-normal-bg)}
+.tt-cal-cell.cc-normal .cc-hrs,.tt-cal-cell.cc-normal .cc-time{color:var(--color-cal-normal-text)}
+.tt-cal-cell.cc-low{background:var(--color-cal-low-bg)}
+.tt-cal-cell.cc-low .cc-hrs,.tt-cal-cell.cc-low .cc-time{color:var(--color-cal-low-text)}
+.tt-cal-cell.cc-off,.tt-cal-cell.cc-sick{background:var(--color-cal-off-bg)}
+.tt-cal-cell.cc-off .cc-absent-lbl,.tt-cal-cell.cc-sick .cc-absent-lbl{color:var(--color-cal-off-text)}
+.tt-cal-cell.cc-missing{background:var(--color-cal-missing-bg);cursor:pointer}
+.tt-cal-cell.cc-missing:hover,.tt-cal-cell.cc-missing.is-hover{background:var(--color-cal-missing-hover-bg)}
+.tt-cal-cell.cc-missing .cc-date{color:var(--color-cal-missing-date)}
+.tt-cal-cell.cc-missing .cc-absent-lbl{color:var(--color-cal-missing-label)}
+/* fill bar (opens when a "Missing" day is clicked) — src: employees.html L345-354; dark L1306-1313 */
+.tt-fill-bar{display:none;margin-top:var(--space-14);padding:var(--space-12) var(--space-14);background:var(--color-surface);border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);align-items:center;gap:var(--space-10);flex-wrap:wrap}
+.tt-fill-bar.open,.tt-fill-bar.is-open{display:flex}
+.tt-fill-lbl{font-size:var(--font-size-13);font-weight:var(--font-weight-semibold);color:var(--color-text-primary);min-width:100px}
+.tt-fill-hint{font-size:var(--font-size-13);color:var(--color-text-secondary)}
+/* footer + approved tag — src: employees.html L355, L387; dark L1314, L1335 */
+.tt-detail-footer{padding:var(--space-16) var(--space-24);border-top:var(--border-width-hairline) solid var(--color-border-divider);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:var(--space-12)}
+.tt-approved-tag{display:inline-flex;align-items:center;gap:var(--space-6);font-size:var(--font-size-13);font-weight:var(--font-weight-semibold);color:var(--color-timesheet-approved-tag)}
+/* The two overlay dialogs (.tt-fillall-*, .tt-confirm-*) are PART 1 section 16 (family C). */
+
+/* ================================================================
+   25. POOL VIEW (split: pools list left, pool detail right)
+   ================================================================ */
+/* src: employees.html L421-431; dark L1216-1223 */
+.pools-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb-table) transparent}
+.pool-group-lbl{padding:var(--space-8) var(--space-20) var(--space-6);font-size:var(--font-size-12);font-weight:var(--font-weight-bold);color:var(--color-text-group-label);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);background:var(--color-table-head-bg);border-bottom:var(--border-width-hairline) solid var(--color-border-divider)}
+.pool-row{padding:var(--space-14) var(--space-20);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);cursor:pointer;transition:background var(--duration-fast);position:relative}
+.pool-row:hover,.pool-row.is-hover{background:var(--color-row-hover)}
+.pool-row.active,.pool-row.is-active{background:var(--color-row-active);border-left:var(--border-width-marker) solid var(--color-brand)}
+.pool-row.active .pool-name,.pool-row.is-active .pool-name{color:var(--color-brand)}
+.pool-name{font-size:var(--font-size-14);font-weight:var(--font-weight-bold);color:var(--color-text-primary);margin-bottom:var(--space-6)}
+.pool-meta{display:flex;gap:0;padding-right:120px}
+.pool-meta-item{flex:1}
+.pool-meta-label{font-size:var(--font-size-12);color:var(--color-text-tertiary);font-weight:var(--font-weight-medium);margin-bottom:1px}
+.pool-meta-value{font-size:var(--font-size-14);font-weight:var(--font-weight-semibold);color:var(--color-text-pool-meta-value)}
+.pool-badges{position:absolute;right:var(--space-20);top:var(--space-14);display:flex;gap:var(--space-6)}
+/* right pane: section card, holder rows, member cards — src: employees.html L438-457; dark L1227-1237, L1249-1250 */
+.pool-right-section{background:var(--color-surface);border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);margin-bottom:var(--space-16);overflow:hidden}
+.pool-right-section-header{padding:var(--space-12) var(--space-16) var(--space-12) var(--space-20);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);font-size:var(--font-size-14);font-weight:var(--font-weight-bold);color:var(--color-text-primary);display:flex;align-items:center;justify-content:space-between}
+.holder-row{display:flex;align-items:center;gap:var(--space-14);padding:var(--space-12) var(--space-20);border-bottom:var(--border-width-hairline) solid var(--color-border-divider)}
+.holder-row:last-child{border-bottom:none}
+.holder-name{font-size:var(--font-size-14);font-weight:var(--font-weight-semibold);color:var(--color-text-primary)}
+.holder-id{font-size:var(--font-size-12);color:var(--color-text-tertiary);margin-top:1px}
+.member-card{padding:var(--space-20) var(--space-24);border-bottom:var(--border-width-hairline) solid var(--color-border-divider)}
+.member-card:last-child{border-bottom:none}
+.member-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-14)}
+.member-name{font-size:var(--font-size-16);font-weight:var(--font-weight-extrabold);color:var(--color-text-primary)}
+.member-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-16) var(--space-24)}
+.mf-label{font-size:var(--font-size-12);color:var(--color-text-tertiary);font-weight:var(--font-weight-medium);margin-bottom:var(--space-4);white-space:nowrap}
+.mf-value{font-size:var(--font-size-14);font-weight:var(--font-weight-semibold);color:var(--color-text-primary)}
+.mf-value.mono{font-family:var(--font-mono);color:var(--color-brand)}
+.pool-empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:300px;gap:var(--space-12);color:var(--color-text-tertiary);text-align:center;font-size:var(--font-size-14)}
+
+/* ================================================================
+   26. MY PROFILE OVERLAY (fixed under the nav; left column of white cards + one content card with a tab bar)
+   The "Today" panel (#panel-today, with .today-*, .event-row, .ev-*, .announce-*, .stat-row, .card-count) is permanently display:none!important in the app
+   and has no tab: NOT built (documented). The old invented dark/220px ".sidebar" nav is NOT back: here .sidebar is the app's WHITE 360px profile card.
+   ================================================================ */
+/* src: employees.html L1025-1026, L494, L497, L529-533, L539-540; dark L1083, L1564-1565 */
+#myprofile-view,.myprofile-view{position:fixed;top:var(--size-nav-height);left:0;right:0;bottom:0;overflow-y:auto;background:var(--color-canvas);z-index:var(--z-profile-view);display:none}
+#myprofile-view.is-visible,.myprofile-view.is-visible{display:block}
+.body-wrap{display:flex;flex:1;min-height:0;max-width:var(--size-body-wrap-max);margin:0 auto;width:100%;padding:var(--space-16) var(--space-24);gap:var(--space-20);align-items:flex-start}
+/* L497 says top:90px but L1026 overrides it to 16px inside #myprofile-view: the effective 16px is used */
+.left-col{width:var(--size-left-col);flex-shrink:0;position:sticky;top:var(--size-myprofile-left-col-top);align-self:flex-start;display:flex;flex-direction:column;gap:var(--space-12);max-height:calc(100vh - 106px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb-faint) transparent}
+.content{flex:1;min-width:0}
+.content-card-wrap{background:var(--color-surface);border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-card);box-shadow:var(--shadow-card-sm);overflow:hidden;height:calc(100vh - 108px);display:flex;flex-direction:column}
+.ws-panel{display:none}
+.ws-panel.active,.ws-panel.is-active{display:block;flex:1;overflow-y:auto}
+.content-card-wrap .ws-panel{padding:var(--space-20) var(--space-24) var(--space-24)}
+/* left-column cards — src: employees.html L499-526; dark L1545-1562 */
+.sidebar{background:var(--color-surface);border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-card);box-shadow:var(--shadow-card);padding:var(--space-18) var(--space-16);flex-shrink:0}
+.reminders-card{background:var(--color-surface);border-radius:var(--radius-base);border:var(--border-width-hairline) solid var(--color-border-card);box-shadow:var(--shadow-card);padding:var(--space-18) var(--space-18) var(--space-12);flex-shrink:0}
+.reminders-card-title{font-size:var(--font-size-10);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label-sidebar);color:var(--color-text-tertiary);margin-bottom:var(--space-12)}
+.reminder-row{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-13) 0;border-bottom:var(--border-width-hairline) solid var(--color-border-line)}
+.reminder-row:last-child{border-bottom:none;padding-bottom:var(--space-6)}
+/* emoji tile; the app colours it with an inline background that dark overrides remap (L1709-1710): here a data-kind map */
+.reminder-icon{width:var(--size-avatar-38);height:var(--size-avatar-38);border-radius:var(--radius-base);display:flex;align-items:center;justify-content:center;font-size:var(--font-size-18);flex-shrink:0}
+.reminder-icon[data-kind="birthday"]{background:var(--color-reminder-birthday-bg)}
+.reminder-icon[data-kind="anniversary"]{background:var(--color-reminder-anniversary-bg)}
+.reminder-info{flex:1;min-width:0}
+.reminder-name{font-size:var(--font-size-14);font-weight:var(--font-weight-semibold);color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reminder-detail{font-size:var(--font-size-12);color:var(--color-text-secondary);margin-top:var(--space-2)}
+.reminder-when{font-size:var(--font-size-13);font-weight:var(--font-weight-bold);color:var(--color-brand);flex-shrink:0;text-align:right}
+.sidebar-profile{margin:0 0 var(--space-14);padding:var(--space-14) var(--space-16);background:var(--color-fill-subtle);border-radius:var(--radius-base);display:flex;align-items:center;gap:var(--space-14)}
+.sp-info{display:flex;flex-direction:column;min-width:0}
+.sp-name{font-size:var(--font-size-16);font-weight:var(--font-weight-extrabold);color:var(--color-text-primary);letter-spacing:var(--letter-spacing-tight);line-height:var(--line-height-heading);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-role{font-size:var(--font-size-12);color:var(--color-text-secondary);margin-top:var(--space-2);font-weight:var(--font-weight-medium)}
+.sidebar-section{margin-bottom:var(--space-14)}
+.sidebar-section:last-child{margin-bottom:0}
+.sidebar-label{font-size:var(--font-size-10);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label-sidebar);color:var(--color-text-tertiary);margin-bottom:var(--space-8)}
+.sidebar-row{display:flex;align-items:flex-start;gap:var(--space-8);margin-bottom:var(--space-8);min-height:20px}
+.sidebar-icon{margin-top:var(--space-3);flex-shrink:0;display:flex;align-items:center;justify-content:center;width:var(--space-16);color:var(--color-text-secondary)}
+.sidebar-text{font-size:var(--font-size-14);font-weight:var(--font-weight-medium);color:var(--color-text-primary);line-height:var(--line-height-text-md)}
+.sidebar-text small{display:block;font-size:var(--font-size-12);color:var(--color-text-sidebar-small);margin-top:1px}
+.sidebar-divider{height:1px;background:var(--color-divider-soft);margin:var(--space-10) 0}
+.sidebar-manager{display:flex;align-items:center;gap:var(--space-10);margin-bottom:0}
+.manager-name{font-size:var(--font-size-14);font-weight:var(--font-weight-semibold);color:var(--color-link)}
+.manager-role{font-size:var(--font-size-12);color:var(--color-text-tertiary)}
+/* upcoming time-off list (second card in the column; also .reminders-card) — src: employees.html L894-898; dark L1406-1409 */
+.upcoming-row{display:flex;align-items:center;gap:var(--space-14);padding:var(--space-11) 0;border-bottom:var(--border-width-hairline) solid var(--color-border-row-upcoming)}
+.upcoming-row:last-child{border-bottom:none}
+.upcoming-icon-wrap{width:var(--control-h-btn-sm);height:var(--control-h-btn-sm);background:var(--color-fill-neutral);border-radius:var(--radius-base);display:flex;align-items:center;justify-content:center;color:var(--color-text-secondary);flex-shrink:0}
+.upcoming-date{font-size:var(--font-size-14);font-weight:var(--font-weight-bold);color:var(--color-text-primary);min-width:110px}
+.upcoming-name{font-size:var(--font-size-14);color:var(--color-text-secondary)}
+
+/* ================================================================
+   27. CARDS + MY INFO (sticky save bar appears on the FIRST change — there is no edit toggle; discard reloads the page)
+   ================================================================ */
+/* base card (used as-is by Time Off and Timesheets; My Info re-skins it as flat divided sections) — src: employees.html L559-563; dark L1658-1660 */
+.card{background:var(--color-surface);border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base)}
+.card-header{padding:var(--space-16) var(--space-20);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:var(--font-size-12);font-weight:var(--font-weight-bold);color:var(--color-text-card-title);text-transform:uppercase;letter-spacing:var(--letter-spacing-label)}
+.card-body{padding:0 var(--space-20)}
+/* src: employees.html L614-628; dark L1570-1571 */
+#panel-myinfo,.content-card-wrap .ws-panel.panel-myinfo{padding-top:var(--space-8);scrollbar-width:none}
+#panel-myinfo::-webkit-scrollbar,.panel-myinfo::-webkit-scrollbar{display:none}
+#panel-myinfo .content-inner,.panel-myinfo .content-inner{padding:0}
+#panel-myinfo .card,.panel-myinfo .card{border:none;border-radius:var(--radius-none);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);margin-bottom:0;box-shadow:none}
+#panel-myinfo .card:last-child,.panel-myinfo .card:last-child{border-bottom:none}
+#panel-myinfo .card-header,.panel-myinfo .card-header{padding:var(--space-8) 0 var(--space-10);border-bottom:none;display:flex;align-items:center;gap:var(--space-8);justify-content:flex-start}
+#panel-myinfo .card-title,.panel-myinfo .card-title{font-size:var(--font-size-14);font-weight:var(--font-weight-bold);color:var(--color-text-primary);text-transform:none;letter-spacing:var(--letter-spacing-none)}
+#panel-myinfo .card-body,.panel-myinfo .card-body{padding:var(--space-10) 0 var(--space-20)}
+.fields{display:grid;gap:var(--space-16)}
+.fields-4{grid-template-columns:repeat(4,1fr)}
+.fields-3{grid-template-columns:repeat(3,1fr)}
+.fields-2{grid-template-columns:repeat(2,1fr)}
+/* (.fields-1 is never emitted in the app: not built) */
+
+/* ================================================================
+   28. DIRECTORY = the "People" nav page (not a tab; left column + tab bar hidden); click a row -> centred quick card (.emp-qcard, PART 1)
+   ================================================================ */
+/* src: employees.html L533, L679-709, L731-732; dark L1618-1640 */
+#panel-directory,.content-card-wrap .ws-panel.panel-directory{padding-top:var(--space-20)}
+.dir-toolbar{display:flex;align-items:center;gap:var(--space-16);margin-bottom:var(--space-14)}
+.dir-ctrl-label{font-size:var(--font-size-12);color:var(--color-text-tertiary);white-space:nowrap}
+.dir-count{font-size:var(--font-size-13);color:var(--color-text-secondary);margin-left:auto}
+.dir-list{display:flex;flex-direction:column}
+.dir-alpha-header{font-size:var(--font-size-11);font-weight:var(--font-weight-bold);color:var(--color-text-tertiary);letter-spacing:var(--letter-spacing-label-menu);padding:var(--space-12) 0 var(--space-8);border-bottom:var(--border-width-hairline) solid var(--color-border-divider)}
+.dir-row{display:grid;grid-template-columns:68px 1fr 1fr 260px;align-items:center;gap:var(--space-16);padding:var(--space-12) var(--space-16);border-bottom:var(--border-width-hairline) solid var(--color-border-row);cursor:pointer;border-radius:var(--radius-base);margin:0 -16px;transition:background var(--duration-fast)}
+.dir-row:last-child{border-bottom:none}
+.dir-row:hover,.dir-row.is-hover{background:var(--color-row-hover-directory)}
+.dir-row:hover .dir-name,.dir-row.is-hover .dir-name{color:var(--color-text-dir-name-hover)}
+.dir-info{min-width:0}
+.dir-name{font-size:var(--font-size-14);font-weight:var(--font-weight-bold);color:var(--color-text-primary);display:flex;align-items:center;gap:var(--space-6);transition:color var(--duration-fast)}
+.dir-name-link{cursor:pointer}
+.dir-sub{font-size:var(--font-size-12);color:var(--color-text-secondary);margin-top:var(--space-2)}
+.dir-contact{min-width:0;display:flex;flex-direction:column;gap:var(--space-4)}
+.dir-contact-row{display:flex;align-items:center;gap:var(--space-6);font-size:var(--font-size-12);color:var(--color-text-primary)}
+.dir-contact-icon{flex-shrink:0;color:var(--color-text-tertiary)}
+.dir-reports{font-size:var(--font-size-12);color:var(--color-text-secondary);display:flex;align-items:center;gap:var(--space-6);white-space:nowrap}
+
+/* ================================================================
+   29. WFH SCHEDULE (prefs card, 2 stat cards, month toolbar, calendar with Mon-first weeks, save row)
+   Day states in the source: weekday, .weekend (Sat/Sun), .today, .faded (other-month filler). No hover / holiday / absent / selected cell state exists (.pref-fill has no CSS).
+   ================================================================ */
+/* src: employees.html L787; panel flexes to fill the card height (no scroll) */
+#panel-wfh.active,.content-card-wrap .ws-panel.panel-wfh.active{flex:1;display:flex;flex-direction:column;overflow:hidden}
+/* src: employees.html L737-747; dark L1513-1519 */
+.wfh-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-20)}
+.wfh-month-nav{display:flex;align-items:center;gap:var(--space-10)}
+.wfh-month-label{font-size:var(--font-size-16);font-weight:var(--font-weight-bold);color:var(--color-text-primary);min-width:176px;text-align:center}
+.wfh-legend{display:flex;gap:var(--space-14);align-items:center}
+.wfh-legend-item{display:flex;align-items:center;gap:var(--space-6);font-size:var(--font-size-12);color:var(--color-text-secondary);font-weight:var(--font-weight-medium)}
+/* src: employees.html L748-755, L756, L767-770; dark L1520-1524, L1530-1532 */
+.wfh-summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-12);margin-bottom:var(--space-16)}
+.wfh-prefs-card{background:var(--color-surface);border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);padding:var(--space-20) var(--space-22);margin-bottom:var(--space-16)}
+.wfh-prefs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4)}
+.wfh-prefs-title{font-size:var(--font-size-14);font-weight:var(--font-weight-bold);color:var(--color-text-primary)}
+.wfh-prefs-sub{font-size:var(--font-size-12);color:var(--color-text-secondary);margin-bottom:var(--space-16);line-height:var(--line-height-text-sm)}
+.wfh-prefs-days{display:flex;gap:var(--space-8)}
+.wfh-stat-card{background:var(--color-surface);border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);padding:var(--space-18) var(--space-20);display:flex;align-items:center;gap:var(--space-14)}
+.wfh-stat-num{font-size:var(--font-size-22);font-weight:var(--font-weight-bold);color:var(--color-text-primary);line-height:var(--line-height-none)}
+.wfh-stat-label{font-size:var(--font-size-12);color:var(--color-text-secondary);margin-top:var(--space-2)}
+/* calendar — head = ALT header family (dark #202226); borders: vertical .05, horizontal .09 in dark — src: employees.html L771-781, L786; dark L1533-1540 */
+.wfh-cal{background:var(--color-surface);border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);overflow:hidden;flex:1;display:flex;flex-direction:column;margin-bottom:0}
+.wfh-cal-head{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);background:var(--color-table-head-bg-alt);flex-shrink:0}
+.wfh-cal-daylabel{padding:var(--space-10) 0;text-align:center;font-size:var(--font-size-11);font-weight:var(--font-weight-bold);color:var(--color-text-wfh-daylabel);text-transform:uppercase;letter-spacing:var(--letter-spacing-label)}
+.wfh-cal-body{display:grid;grid-template-columns:repeat(7,1fr);flex:1;grid-auto-rows:1fr}
+.wfh-cell{padding:var(--space-8);border-right:var(--border-width-hairline) solid var(--color-grid-line-v);border-bottom:var(--border-width-hairline) solid var(--color-border-row);cursor:pointer;transition:background var(--duration-fast);display:flex;flex-direction:column;gap:var(--space-4);min-height:0}
+.wfh-cell:nth-child(7n){border-right:none}
+.wfh-cell.faded{opacity:var(--opacity-faded);cursor:default;pointer-events:none}
+.wfh-cell.weekend{background:var(--color-wfh-weekend-bg);cursor:default}
+.wfh-cell.today{background:var(--color-tint-today)}
+.wfh-cell-num{font-size:var(--font-size-12);font-weight:var(--font-weight-semibold);color:var(--color-text-secondary)}
+.wfh-cell.today .wfh-cell-num{background:var(--color-wfh-today-num-bg);color:var(--color-wfh-today-num-text);width:22px;height:22px;border-radius:var(--radius-circle);display:flex;align-items:center;justify-content:center;font-size:var(--font-size-11)}
+.wfh-save-row{display:flex;justify-content:space-between;gap:var(--space-8);margin-top:var(--space-16);flex-shrink:0}
+
+/* ================================================================
+   30. TIMESHEETS (period day list + stats sidebar; entry modal; fill-workdays modal)
+   ================================================================ */
+/* src: employees.html L832-835, L838, L850-854; dark L1497-1500 */
+.timesheet-layout{display:flex;gap:var(--space-20);align-items:flex-start}
+.timesheet-main{flex:1;min-width:0}
+.timesheet-sidebar{width:var(--size-timesheet-sidebar);flex-shrink:0}
+.ts-controls{display:flex;align-items:center;gap:var(--space-10);margin-bottom:var(--space-20);flex-wrap:wrap}
+.ts-spacer{flex:1}
+.period-heading{display:flex;align-items:center;gap:var(--space-10);margin-bottom:var(--space-16)}
+.period-icon{width:var(--size-icon-tile-30);height:var(--size-icon-tile-30);background:var(--color-fill-neutral);border-radius:var(--radius-base);display:flex;align-items:center;justify-content:center;font-size:var(--font-size-14)}
+.period-label{font-size:var(--font-size-16);font-weight:var(--font-weight-bold);color:var(--color-text-primary)}
+.period-divider{display:flex;align-items:center;gap:var(--space-10);margin:var(--space-8) 0;color:var(--color-text-tertiary);font-size:var(--font-size-12);font-weight:var(--font-weight-semibold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label)}
+.period-divider::before,.period-divider::after{content:'';flex:1;height:1px;background:var(--color-border-card)}
+/* day rows — src: employees.html L855-866; dark L1472-1482 (dark .today chip ADDS a 1.5px brand border: structural) */
+.day-row{display:flex;align-items:center;gap:var(--space-14);padding:var(--space-10) 0;border-bottom:var(--border-width-hairline) solid var(--color-border-line-faint)}
+.day-row:last-child{border-bottom:none}
+.day-chip{width:68px;background:var(--color-day-chip-bg);border-radius:var(--radius-base);padding:var(--space-7) var(--space-10);flex-shrink:0;text-align:left}
+.day-chip.today{background:var(--color-day-chip-today-bg)}
+:is(body.dark,.theme-dark) .day-chip.today{border:var(--border-width-medium) solid var(--color-brand)}
+.day-name{font-size:var(--font-size-12);font-weight:var(--font-weight-bold);color:var(--color-text-primary)}
+.day-name.today{color:var(--color-text-today-name)}
+.day-date{font-size:var(--font-size-11);font-weight:var(--font-weight-medium);color:var(--color-text-day-date);margin-top:1px}
+.day-date.today{color:var(--color-text-on-today)}
+.day-hours{font-size:var(--font-size-14);font-weight:var(--font-weight-bold);color:var(--color-text-primary);min-width:70px}
+.day-hours.zero{color:var(--color-text-tertiary);font-weight:var(--font-weight-medium)}
+.day-hours.empty{color:var(--color-text-empty-hours);font-weight:var(--font-weight-regular)}
+.day-range{font-size:var(--font-size-12);color:var(--color-text-tertiary)}
+.approval-note{display:flex;align-items:center;gap:var(--space-8);background:var(--color-approval-note-bg);border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);padding:var(--space-12) var(--space-16);font-size:var(--font-size-12);color:var(--color-text-secondary);margin-top:var(--space-16)}
+/* sidebar stats + mini chart — src: employees.html L868-877; dark L1484-1490 */
+.ts-stat-card{background:var(--color-surface);border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);padding:var(--space-16);margin-bottom:var(--space-12)}
+.ts-stat-label{font-size:var(--font-size-10);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label-wide);color:var(--color-text-tertiary);margin-bottom:var(--space-4)}
+.ts-stat-value{font-size:var(--font-size-26);font-weight:var(--font-weight-extrabold);color:var(--color-brand);line-height:var(--line-height-tight)}
+.ts-stat-sub{font-size:var(--font-size-12);color:var(--color-text-tertiary);margin-top:var(--space-4)}
+.mini-chart{display:flex;align-items:flex-end;gap:var(--space-5);height:40px;margin-top:var(--space-14)}
+.mini-bar-wrap{display:flex;flex-direction:column;align-items:center;gap:var(--space-4);flex:1}
+.mini-bar{width:100%;border-radius:var(--radius-bar-top);min-height:var(--space-4)}
+.mini-bar.filled{background:var(--color-brand)}
+.mini-bar.empty{background:var(--color-fill-badge)}
+.mini-bar-label{font-size:var(--font-size-10);color:var(--color-text-tertiary)}
+/* modal-backdrop content: entry modal (.modal-day, .modal-entries, .entry-row, .time-*), fill modal (.fill-modal-*) — src: employees.html L843-849, L986-1006; dark L1377-1387, L1492-1496 */
+.modal-day{padding:var(--space-18) var(--space-24);display:flex;align-items:center;gap:var(--space-14);border-bottom:var(--border-width-hairline) solid var(--color-border-divider)}
+.modal-day-icon{width:42px;height:42px;background:var(--color-fill-neutral);border-radius:var(--radius-base);display:flex;align-items:center;justify-content:center;font-size:var(--font-size-18);flex-shrink:0}
+.modal-day-label{font-size:var(--font-size-18);font-weight:var(--font-weight-bold);color:var(--color-text-primary)}
+.modal-entries{padding:var(--space-20) var(--space-24)}
+.entry-row{display:flex;align-items:flex-end;gap:var(--space-10);margin-bottom:var(--space-14)}
+.entry-row:last-of-type{margin-bottom:0}
+.time-group{display:flex;flex-direction:column;gap:var(--space-6)}
+.time-inputs{display:flex;gap:var(--space-6);align-items:center}
+.modal-day-total{font-size:var(--font-size-14);color:var(--color-text-secondary)}
+.modal-day-total strong{color:var(--color-text-primary)}
+.modal-actions{display:flex;align-items:center;gap:var(--space-10)}
+.fill-modal-row{display:flex;gap:var(--space-16);margin-bottom:var(--space-20)}
+.fill-modal-field{flex:1}
+.fill-modal-note{font-size:var(--font-size-12);color:var(--color-text-secondary);margin-bottom:var(--space-20);line-height:var(--line-height-body)}
+.fill-modal-footer{display:flex;justify-content:space-between;gap:var(--space-10);border-top:var(--border-width-hairline) solid var(--color-border-divider);padding-top:var(--space-20)}
+
+/* ================================================================
+   31. TIME OFF (balance cards, Requests card + filter tabs, History card + range picker, request form, balance sidebar, calculator)
+   ================================================================ */
+/* panel + the two stacked cards that share the remaining height — src: employees.html L541-548, L618-619, L918-919 */
+#panel-timeoff.active,.content-card-wrap .ws-panel.panel-timeoff.active{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:var(--space-16) var(--space-24) var(--space-16)}
+#panel-timeoff.active .content-inner,.panel-timeoff.active .content-inner{flex:1;display:flex;flex-direction:column;min-height:0}
+#panel-timeoff .timeoff-view,.panel-timeoff .timeoff-view{flex:1;display:flex;flex-direction:column;min-height:0}
+.timeoff-view{display:block}
+.timeoff-request-view{display:none}
+#panel-timeoff .card-header,.panel-timeoff .card-header{padding:var(--space-10) var(--space-20)}
+#timeoff-main>.card:nth-child(2),#timeoff-main>.card:nth-child(3),.timeoff-main>.card:nth-child(2),.timeoff-main>.card:nth-child(3){flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+#timeoff-main>.card:nth-child(2) #reqList,.timeoff-main>.card:nth-child(2) #reqList,.timeoff-main>.card:nth-child(2) .req-list{flex:1;display:flex;flex-direction:column;min-height:0}
+#timeoff-main>.card:nth-child(2) .req-table-scroll,.timeoff-main>.card:nth-child(2) .req-table-scroll{flex:1;overflow-y:auto}
+#timeoff-main>.card:nth-child(3) .hist-table-wrap,.timeoff-main>.card:nth-child(3) .hist-table-wrap{flex:1;display:flex;flex-direction:column;min-height:0}
+#timeoff-main>.card:nth-child(3) .hist-table-scroll,.timeoff-main>.card:nth-child(3) .hist-table-scroll{flex:1;overflow-y:auto}
+/* balance cards — src: employees.html L885-893; dark L1399-1405 */
+.balance-grid{display:flex;gap:var(--space-12);margin-bottom:var(--space-16);flex-wrap:wrap}
+.balance-card{flex:1;min-width:140px;background:var(--color-surface);border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);padding:var(--space-16);position:relative}
+.bal-icon{margin-bottom:var(--space-10);color:var(--color-brand);display:flex}
+.bal-number{font-size:var(--font-size-28);font-weight:var(--font-weight-extrabold);color:var(--color-text-primary);line-height:var(--line-height-none)}
+.bal-name{font-size:var(--font-size-12);font-weight:var(--font-weight-bold);color:var(--color-text-primary);margin-top:var(--space-6)}
+.bal-sub{font-size:var(--font-size-12);color:var(--color-text-tertiary);margin-top:var(--space-3)}
+.bal-actions{display:flex;gap:var(--space-6);position:absolute;top:var(--space-12);right:var(--space-12)}
+/* my requests table (ALT header family; row divider = the soft one) — src: employees.html L796-809; dark L1412-1419 */
+.req-table-scroll{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb-table) transparent}
+.req-table-scroll::-webkit-scrollbar{width:var(--size-scrollbar)}
+.req-table-scroll::-webkit-scrollbar-thumb{background:var(--color-scrollbar-thumb-table);border-radius:var(--radius-hairline)}
+table.req-table{width:100%;border-collapse:collapse}
+.req-table th{text-align:left;padding:var(--space-8) var(--space-16);font-size:var(--font-size-11);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);color:var(--color-text-tertiary);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);background:var(--color-table-head-bg-alt);white-space:nowrap;position:sticky;top:0;z-index:var(--z-sticky-th)}
+.req-table td{padding:var(--space-8) var(--space-16);font-size:var(--font-size-14);color:var(--color-text-primary);border-bottom:var(--border-width-hairline) solid var(--color-border-row-soft);vertical-align:middle}
+.req-table tr:last-child td{border-bottom:none}
+.req-table td small{display:block;font-size:var(--font-size-12);color:var(--color-text-tertiary);margin-top:1px}
+/* the type cell = icon tile + title (the app writes an inline flex div inside the td; its .req-type-cell rule targets a td class that is never emitted) */
+.req-type-cell{display:flex;align-items:center;gap:var(--space-10)}
+.req-type-title{font-weight:var(--font-weight-regular);white-space:nowrap}
+/* DEFECT FIX (source #7): .req-sub-cell / .req-date-cell colours never apply in the app (the .req-table td rule outranks them). Intended = secondary text for the Details column. */
+.req-table td.req-sub-cell{color:var(--color-text-secondary)}
+.req-empty{text-align:center;padding:var(--space-32) 0;color:var(--color-text-tertiary);font-size:var(--font-size-14)}
+/* history table + native range picker (the picker itself is PART 1 section 8) — src: employees.html L907-917; dark L1445-1456 */
+.hist-table-wrap{overflow:hidden}
+.hist-table-scroll{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--color-scrollbar-thumb-table) transparent}
+.hist-table-scroll::-webkit-scrollbar{width:var(--size-scrollbar)}
+.hist-table-scroll::-webkit-scrollbar-thumb{background:var(--color-scrollbar-thumb-table);border-radius:var(--radius-hairline)}
+table.hist-table{width:100%;border-collapse:collapse}
+.hist-table th{text-align:left;padding:var(--space-8) var(--space-16);font-size:var(--font-size-11);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);color:var(--color-text-tertiary);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);background:var(--color-table-head-bg-alt);white-space:nowrap;user-select:none;position:sticky;top:0;z-index:var(--z-sticky-th)}
+.hist-table td{padding:var(--space-8) var(--space-16);font-size:var(--font-size-14);color:var(--color-text-primary);border-bottom:var(--border-width-hairline) solid var(--color-border-row-soft);vertical-align:middle;white-space:nowrap}
+.hist-table td:first-child{padding-right:var(--space-32);color:var(--color-text-hist-date)}
+.hist-table th:first-child{padding-right:var(--space-32)}
+.hist-table tr:last-child td{border-bottom:none}
+.hist-table td.num{text-align:right;font-weight:var(--font-weight-semibold);color:var(--color-text-tertiary)}
+.hist-table td.num:last-child{color:var(--color-text-hist-balance)}
+.hist-table td.pos{color:var(--color-myreq-approved-text)}
+.hist-table td.neg{color:var(--color-myreq-denied-text)}
+/* request form page ("Request Time Off", opened from the arrow button on a balance card) — src: employees.html L920-962; dark L1420-1444 */
+.request-page-title{font-size:var(--font-size-26);font-weight:var(--font-weight-extrabold);color:var(--color-brand);margin-bottom:var(--space-24)}
+.request-layout{display:flex;gap:var(--space-24);align-items:stretch}
+.request-form-wrap{flex:1;background:var(--color-surface);border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);padding:var(--space-24);min-width:0}
+.req-field{margin-bottom:var(--space-20)}
+.req-date-from-to{display:flex;align-items:flex-end;gap:var(--space-10)}
+.req-date-group{flex:1}
+.req-date-sep-mid{margin-bottom:var(--space-11);flex-shrink:0}
+.req-amount-row{display:flex;align-items:center;gap:var(--space-10)}
+.request-balance-sidebar{width:var(--size-balance-sidebar);flex-shrink:0;background:var(--color-surface);border:var(--border-width-hairline) solid var(--color-border-card);border-radius:var(--radius-base);overflow:hidden}
+.bal-sidebar-header{padding:var(--space-14) var(--space-18);border-bottom:var(--border-width-hairline) solid var(--color-border-divider);display:flex;align-items:center;gap:var(--space-10);font-size:var(--font-size-14);font-weight:var(--font-weight-regular);color:var(--color-text-secondary)}
+.bal-sidebar-date{border:none;height:var(--control-h-btn-sm);padding:0;font-size:var(--font-size-14);font-weight:var(--font-weight-bold);color:var(--color-text-primary);flex:1;text-align:right;outline:none;background:transparent}
+.bal-sidebar-date::-webkit-calendar-picker-indicator{display:none}
+.bal-sidebar-item{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-12) var(--space-18);border-bottom:var(--border-width-hairline) solid var(--color-border-line-faint)}
+.bal-sidebar-item:last-child{border-bottom:none}
+.bal-sidebar-icon{width:var(--size-icon-tile-30);height:var(--size-icon-tile-30);background:var(--color-fill-neutral);border-radius:var(--radius-base);display:flex;align-items:center;justify-content:center;color:var(--color-text-secondary);flex-shrink:0}
+.bal-sidebar-name{font-size:var(--font-size-12);font-weight:var(--font-weight-semibold);color:var(--color-text-primary)}
+.bal-sidebar-amount{font-size:var(--font-size-12);color:var(--color-text-tertiary);margin-top:1px}
+.request-footer{display:flex;justify-content:space-between;align-items:center;gap:var(--space-14);padding-top:var(--space-20);border-top:var(--border-width-hairline) solid var(--color-border-divider);margin-top:var(--space-24)}
+/* Calculate Time Off modal content (shell = .modal-backdrop, PART 1) — src: employees.html L1012-1023; dark L1501-1511 */
+.calc-modal-user{display:flex;align-items:center;gap:var(--space-14);padding:var(--space-18) var(--space-24);border-bottom:var(--border-width-hairline) solid var(--color-border-divider)}
+.calc-user-name{font-size:var(--font-size-16);font-weight:var(--font-weight-bold)}
+.calc-fields{padding:var(--space-20) var(--space-24);display:flex;gap:var(--space-14);border-bottom:var(--border-width-hairline) solid var(--color-border-divider)}
+.calc-result-wrap{padding:var(--space-16) var(--space-24);border-bottom:var(--border-width-hairline) solid var(--color-border-divider)}
+.calc-result-box{border:var(--border-width-hairline) solid var(--color-border-control);border-radius:var(--radius-base);padding:var(--space-18) var(--space-20)}
+.calc-result-number{font-size:var(--font-size-28);font-weight:var(--font-weight-extrabold);color:var(--color-brand)}
+.calc-footer{padding:var(--space-14) var(--space-24);background:var(--color-surface);display:flex;justify-content:flex-end}
+
+/* =====================================================================
+   EXTENDED (stage 2) — NOT in the app (BUILD_RULES section 3). Derived ONLY from existing tokens/patterns; no new hue, font, radius or breakpoint.
+   The app has: no empty/loading/error state in the employee table or lists, no row focus ring, no form error state beyond native alert(), no @media.
+   ===================================================================== */
+/* ---- EXTENDED (stage 2) ---- */
+
+/* EXTENDED — not in app: keyboard focus ring on clickable rows / cells (the app has :focus-visible = 0 and gives rows no tabindex).
+   Derivation: the PART 1 brand ring (thick 2px solid brand), INSET (offset -2px) because every row sits inside an overflow:hidden card. */
+:is(.emp-table tbody tr,.rv-table tbody tr,.tt-table tr.tt-data-row,.pool-row,.dir-row,.tt-cal-cell.cc-missing,.wfh-cell,.req-tab):focus-visible{outline:var(--border-width-thick) solid var(--color-brand);outline-offset:-2px}
+
+/* EXTENDED — not in app: empty / loading / error panels (app: .detail-empty, .rv-empty, .req-empty are plain tertiary text; the employee table renders NOTHING for 0 results).
+   Derivation: .rv-empty recipe (flex-centred, 60px 24px, tertiary 14px); loading = .spinner; error = danger text token. */
+.state-empty,.state-loading,.state-error{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-12);padding:var(--space-60) var(--space-24);color:var(--color-text-tertiary);font-size:var(--font-size-14);text-align:center}
+.state-error{color:var(--color-danger-text)}
+/* EXTENDED — not in app: "no results" row for .emp-table (derivation: .rv-empty message in a full-width cell, no hover). */
+.emp-table tr.emp-empty td,.emp-table tr.emp-empty:hover td{background:transparent;color:var(--color-text-tertiary);text-align:center;white-space:normal;padding:var(--space-60) var(--space-16);cursor:default;border-bottom:none}
+/* EXTENDED — not in app: skeleton rows while a list loads (derivation: .skeleton from PART 1 inside the standard cell padding). */
+.emp-table tr.skeleton-row td .skeleton,.tt-table tr.skeleton-row td .skeleton,.rv-table tr.skeleton-row td .skeleton{height:var(--space-12);width:100%}
+
+/* EXTENDED — not in app: invalid state for the composite controls (derivation: PART 1 .is-invalid = border danger-strong; focus keeps the danger colour). */
+.cust-select.is-invalid .cust-select__trigger,.cust-select.is-invalid.open .cust-select__trigger{border-color:var(--color-danger-strong)}
+.phone-input-wrap.is-invalid,.phone-input-wrap.is-invalid:focus-within{border-color:var(--color-danger-strong)}
+.datepicker-input.is-invalid:focus,.search-input.is-invalid:focus,.time-input.is-invalid:focus,.modal-input.is-invalid:focus,.modal-select.is-invalid:focus,.field-value.is-invalid:focus,.req-date-input.is-invalid:focus,.req-amount-input.is-invalid:focus,.req-textarea-to.is-invalid:focus{border-color:var(--color-danger-strong)}
+
+/* EXTENDED — not in app: responsive guidance. The app has ZERO @media and its layout is desktop-only (nav 74px; page gutters 210px each side; 54/46 split;
+   employee table = 680px of fixed columns + a flexible Employee column that is 0 at <= 1440px and ~94px at 1920px; comfortable from ~2200px).
+   NO breakpoint is invented. The only affordance offered is an opt-in horizontal scroll container for hosts that must show these screens in a narrower box. */
+.is-scroll-x{overflow-x:auto}
+
+/* ===== PART 2 (PATTERNS, stage 2) — END ===== */

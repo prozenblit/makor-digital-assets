@@ -1,6 +1,7 @@
 .claude/
 .agents/
 skills-lock.json
+makor-hr/
 node_modules/
 *.log
 .DS_Store

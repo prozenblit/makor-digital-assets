@@ -1,211 +1,359 @@
-/* ============================================================
-   FX Engine Room — Design Tokens
-   Extracted from Figma screenshots — dark-mode desktop platform
-   October 2026
-
-   Usage: import this file before any component styles.
-   Dark mode only — no light mode variant. Desktop only.
-   ============================================================ */
-
+/* FX Engine Room - design tokens. GENERATED from tokens.json by the stage-1 build; hand edits will be overwritten.
+   Source: Figma file yuJA7DtjFKnqTZQcu2vKYN, page "Page 1", canonical Section 3 (7114:14467). Dark-mode only.
+   Naming: Figma variables -> --color-<figma-name-kebab> (exact names); unbound raw colours -> --color-raw-<role>; semantic roles -> --color-<group>-<token>.
+   Font: load Nunito (400/500/600 + 500 italic):  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,500;0,600;1,500&display=swap" rel="stylesheet"> */
 :root {
 
-  /* ----------------------------------------------------------
-     BRAND PRIMARY — Lavender / Periwinkle
-  ---------------------------------------------------------- */
-  --color-brand:          #8080CC;  /* logo, active states, section labels, focus borders, Log In button */
-  --color-brand-hover:    #6B6BB8;  /* brand hover state */
-  --color-brand-ghost:    rgba(128, 128, 204, 0.12); /* subtle tinted bg, hover bg */
-  --color-brand-dim:      rgba(128, 128, 204, 0.08); /* very subtle background tint */
-  --color-brand-border:   rgba(128, 128, 204, 0.30); /* subtle lavender border */
+  /* ---- Figma variables (39: collection Primitives 23 + collection Variables 16; hex resolved, single mode "Mode 1") ---- */
+  --color-black: #000000;
+  --color-purple-1: #A4A4FF;
+  --color-grey-1: #39393C;
+  --color-grey-2: #171719;
+  --color-grey-3: #707079;
+  --color-grey-4: #BABEC7;
+  --color-grey-5: #E6E6E6;
+  --color-grey-6: #242428;
+  --color-orange: #FF9747;
+  --color-red: #FF7272;
+  --color-red-2: #FD7557;
+  --color-white: #FFFFFF;
+  --color-green: #30F0D6;
+  --color-green-2: #2BDF68;
+  --color-red-3: #B85944;
+  --color-purple-2: #39394E;
+  --color-purple-3: #7373BB;
+  --color-blue: #60A8FF;
+  --color-yellow: #FEE274;
+  --color-red-dark: #392C2D;
+  --color-blue-dark: #2A313D;
+  --color-yellow-dark: #3A3730;
+  --color-green-dark: #264342;
+  --color-primary-purple: #A4A4FF;
+  --color-primary-text: #FFFFFF;
+  --color-separators: #39393C;
+  --color-secondary-text: #707079;
+  --color-light-grey-text: #BABEC7;
+  --color-bg: #000000;
+  --color-bg-grey-1: #171719;
+  --color-menu-bar: #39393C;
+  --color-modal-bg: #242428;
+  --color-inputs-on-modal: #39393C;
+  /* "Black" also exists in collection Variables (29:88): same hex, same var --color-black */
+  --color-cancel-button: #E6E6E6;
+  --color-edit: #FF9747;
+  --color-active: #2BDF68;
+  --color-add-new: #30F0D6;
+  --color-delete: #FF7272;
 
-  /* ----------------------------------------------------------
-     SECONDARY — Teal / Cyan
-  ---------------------------------------------------------- */
-  --color-teal:           #7AEFEF;  /* active toggles, checked checkboxes, Give-Up button, interactive states */
-  --color-teal-ghost:     rgba(122, 239, 239, 0.10); /* teal tinted bg */
-  --color-teal-border:    rgba(122, 239, 239, 0.30); /* teal outlined button border */
+  /* ---- Raw (UNBOUND in Figma) colours, named by role ---- */
+  --color-raw-ungrouped-yellow: #FFDC51;
+  --color-raw-outlined-green: #00FEA9;
+  --color-raw-outlined-green-hover: #1B5244;
+  --color-raw-row-tint-amber: rgba(255, 184, 0, 0.15);
+  --color-raw-row-tint-teal: rgba(48, 240, 214, 0.15);
+  --color-raw-row-unallocated: #242432;
+  --color-raw-scrim: rgba(0, 0, 0, 0.5);
+  --color-raw-panel-outline-80: rgba(57, 57, 60, 0.8);
+  --color-raw-edit-hover: #FFBF8E;
+  --color-raw-outlined-red-active: #5A3834;
+  --color-raw-csv-fill: #264A35;
+  --color-raw-overlay-hover-20: rgba(255, 255, 255, 0.2);
+  --color-raw-overlay-hover-30: rgba(255, 255, 255, 0.3);
+  --color-raw-overlay-hover-40: rgba(255, 255, 255, 0.4);
+  --color-raw-overlay-shade-20: rgba(0, 0, 0, 0.2);
+  --color-raw-switch-shadow-on: rgba(0, 95, 32, 0.5);
+  --color-raw-switch-shadow-off: rgba(81, 81, 81, 0.5);
+  --color-raw-pulse-ring-20: rgba(43, 223, 104, 0.2);
+  --color-raw-pulse-ring-10: rgba(43, 223, 104, 0.1);
+  --color-raw-pulse-ring-05: rgba(43, 223, 104, 0.05);
+  --color-raw-pie-teal: rgba(48, 240, 214, 0.4);
+  --color-raw-pie-purple: rgba(164, 164, 255, 0.4);
+  --color-raw-chart-series-1: #3CC3DF;
+  --color-raw-chart-series-2: #8979FF;
+  --color-raw-chart-series-3: #FF928A;
+  --color-raw-logo-dark: #3B3B5C;
+  --color-raw-link-gold: #FFCF00;
 
-  /* ----------------------------------------------------------
-     ACCENT — Amber / Orange
-  ---------------------------------------------------------- */
-  --color-amber:          #F59E0B;  /* "+" add buttons, Group badges */
-  --color-amber-ghost:    rgba(245, 158, 11, 0.12); /* amber tinted bg */
+  /* ---- Semantic: surface ---- */
+  --color-surface-page: var(--color-bg);
+  --color-surface-panel: var(--color-bg-grey-1);
+  --color-surface-modal: var(--color-modal-bg);
+  --color-surface-card: var(--color-modal-bg);
+  --color-surface-inner-panel: var(--color-inputs-on-modal);
+  --color-surface-sidebar: var(--color-menu-bar);
+  --color-surface-table-header: var(--color-inputs-on-modal);
+  --color-surface-popover: var(--color-modal-bg);
+  --color-surface-tooltip: var(--color-inputs-on-modal);
+  --color-surface-dropdown-list: var(--color-inputs-on-modal);
+  --color-surface-user-menu: var(--color-inputs-on-modal);
+  --color-surface-row-highlight: var(--color-separators);
+  --color-surface-row-highlight-card: var(--color-purple-2);
+  --color-surface-row-highlight-green: var(--color-green-dark);
+  --color-surface-row-tint-amber: var(--color-raw-row-tint-amber);
+  --color-surface-row-tint-teal: var(--color-raw-row-tint-teal);
+  --color-surface-row-unallocated: var(--color-raw-row-unallocated);
+  --color-surface-rules-box: var(--color-bg-grey-1);
+  --color-surface-tab-hover: var(--color-bg-grey-1);
+  --color-surface-logo-tile: var(--color-primary-purple);
+  --color-surface-scrim: var(--color-raw-scrim);
+  --color-surface-circle-button: var(--color-separators);
+  --color-surface-scrollbar-track: var(--color-inputs-on-modal);
+  --color-surface-scrollbar-thumb: var(--color-secondary-text);
 
-  /* ----------------------------------------------------------
-     SURFACES
-  ---------------------------------------------------------- */
-  --color-bg:             #0F0F1E;  /* page/shell background — near-black dark navy */
-  --color-sidebar-bg:     #101020;  /* left icon sidebar */
-  --color-surface:        #1A1B2E;  /* main content area, panels */
-  --color-surface-raised: #1E2035;  /* list items, cards, raised elements */
-  --color-surface-active: #252740;  /* selected list item, input bg */
-  --color-surface-overlay: rgba(0, 0, 0, 0.55); /* modal overlay scrim */
+  /* ---- Semantic: input ---- */
+  --color-input-fill: var(--color-inputs-on-modal);
+  --color-input-fill-on-page: var(--color-modal-bg);
+  --color-input-fill-on-modal: var(--color-inputs-on-modal);
+  --color-input-fill-on-inner-panel: var(--color-modal-bg);
+  --color-input-stroke-error: var(--color-delete);
+  --color-input-stroke-locked: var(--color-secondary-text);
+  --color-input-text: var(--color-primary-text);
+  --color-input-placeholder: var(--color-secondary-text);
+  --color-input-icon: var(--color-primary-purple);
+  --color-input-error-text: var(--color-red);
+  --color-input-checkbox-fill: var(--color-menu-bar);
+  --color-input-checkbox-fill-inner: var(--color-modal-bg);
+  --color-input-chip-fill: var(--color-modal-bg);
+  --color-input-chip-pill-fill: var(--color-inputs-on-modal);
+  --color-input-chip-close: var(--color-light-grey-text);
 
-  /* ----------------------------------------------------------
-     TEXT
-  ---------------------------------------------------------- */
-  --color-text-primary:   #EEEEF8;  /* near-white, slightly cool — main body text */
-  --color-text-secondary: #8A8AAA;  /* muted lavender-gray — labels, subtitles */
-  --color-text-tertiary:  #5A5A78;  /* dim — placeholders, timestamps */
-  --color-text-on-brand:  #FFFFFF;  /* text ON brand lavender (Log In button label) */
-  --color-text-on-teal:   #000000;  /* text on teal-filled elements */
+  /* ---- Semantic: border ---- */
+  --color-border-default: var(--color-separators);
+  --color-border-modal-divider: var(--color-modal-bg);
+  --color-border-disabled: var(--color-secondary-text);
+  --color-border-active: var(--color-primary-purple);
+  --color-border-focus: var(--color-primary-purple);
+  --color-border-error: var(--color-delete);
 
-  /* ----------------------------------------------------------
-     BORDERS & DIVIDERS
-  ---------------------------------------------------------- */
-  --color-border:         #2A2A42;  /* subtle dark border for inputs, cards */
-  --color-border-focus:   #8080CC;  /* brand lavender on focus */
-  --color-divider:        #1E1E32;  /* even subtler divider between sections */
+  /* ---- Semantic: text ---- */
+  --color-text-primary: var(--color-primary-text);
+  --color-text-secondary: var(--color-secondary-text);
+  --color-text-light: var(--color-light-grey-text);
+  --color-text-on-action: var(--color-black);
+  --color-text-disabled-action: var(--color-light-grey-text);
+  --color-text-link: var(--color-blue);
+  --color-text-link-inline: var(--color-primary-purple);
+  --color-text-section-label: var(--color-purple-3);
+  --color-text-kpi-value: var(--color-primary-purple);
+  --color-text-positive: var(--color-green-2);
+  --color-text-negative: var(--color-red-2);
+  --color-text-warning: var(--color-edit);
+  --color-text-caution: var(--color-raw-ungrouped-yellow);
+  --color-text-error: var(--color-red);
 
-  /* ----------------------------------------------------------
-     STATUS — Success / Active
-  ---------------------------------------------------------- */
-  --color-status-success:        #4DCC9B;   /* active indicator dot, positive states */
-  --color-status-success-bg:     rgba(77, 204, 155, 0.12);
+  /* ---- Semantic: action ---- */
+  --color-action-primary: var(--color-primary-purple);
+  --color-action-primary-text: var(--color-black);
+  --color-action-teal: var(--color-add-new);
+  --color-action-cancel: var(--color-cancel-button);
+  --color-action-edit: var(--color-edit);
+  --color-action-delete: var(--color-delete);
+  --color-action-disabled-fill: var(--color-secondary-text);
+  --color-action-disabled-text: var(--color-light-grey-text);
+  --color-action-transparent-fill: var(--color-purple-2);
+  --color-action-outlined-teal-library: var(--color-raw-outlined-green);
+  --color-action-outlined-teal-library-hover: var(--color-raw-outlined-green-hover);
+  --color-action-outlined-teal-hover: var(--color-green-dark);
+  --color-action-red: var(--color-red-2);
+  --color-action-red-hover: var(--color-red-dark);
+  --color-action-red-active: var(--color-raw-outlined-red-active);
+  --color-action-blue: var(--color-blue);
+  --color-action-blue-hover: var(--color-blue-dark);
+  --color-action-yellow: var(--color-yellow);
+  --color-action-yellow-hover: var(--color-yellow-dark);
+  --color-action-edit-hover: var(--color-raw-edit-hover);
+  --color-action-csv-fill: var(--color-raw-csv-fill);
+  --color-action-hover-overlay-20: var(--color-raw-overlay-hover-20);
+  --color-action-hover-overlay-30: var(--color-raw-overlay-hover-30);
+  --color-action-hover-overlay-40: var(--color-raw-overlay-hover-40);
+  --color-action-shade-overlay-20: var(--color-raw-overlay-shade-20);
 
-  /* ----------------------------------------------------------
-     STATUS — Error / Danger
-  ---------------------------------------------------------- */
-  --color-status-danger:         #EF4444;   /* error borders, "Incorrect Password" text, "Forgot Password?" link */
-  --color-status-danger-bg:      rgba(239, 68, 68, 0.08);
+  /* ---- Semantic: brand ---- */
+  --color-brand-primary: var(--color-primary-purple);
+  --color-brand-tint: var(--color-purple-2);
+  --color-brand-section: var(--color-purple-3);
+  --color-brand-add-new: var(--color-add-new);
+  --color-brand-logo-dark: var(--color-raw-logo-dark);
 
-  /* ----------------------------------------------------------
-     STATUS — Warning / Pending
-  ---------------------------------------------------------- */
-  --color-status-pending:        #F59E0B;   /* same as amber — warning states */
-  --color-status-pending-bg:     rgba(245, 158, 11, 0.12);
+  /* ---- Semantic: status ---- */
+  --color-status-success: var(--color-active);
+  --color-status-live: var(--color-active);
+  --color-status-danger: var(--color-delete);
+  --color-status-warning: var(--color-edit);
+  --color-status-warning-yellow: var(--color-yellow);
+  --color-status-caution: var(--color-raw-ungrouped-yellow);
+  --color-status-info: var(--color-blue);
+  --color-status-up: var(--color-green-2);
+  --color-status-down: var(--color-red-2);
+  --color-status-inactive: var(--color-secondary-text);
 
-  /* ----------------------------------------------------------
-     STATUS — Disabled
-  ---------------------------------------------------------- */
-  --color-disabled-bg:           #2A2A42;
-  --color-disabled-text:         #5A5A78;
+  /* ---- Semantic: chart ---- */
+  --color-chart-series-1: var(--color-raw-chart-series-1);
+  --color-chart-series-2: var(--color-raw-chart-series-2);
+  --color-chart-series-3: var(--color-raw-chart-series-3);
+  --color-chart-pie-teal: var(--color-raw-pie-teal);
+  --color-chart-pie-purple: var(--color-raw-pie-purple);
+  --color-chart-pulse-ring-20: var(--color-raw-pulse-ring-20);
+  --color-chart-pulse-ring-10: var(--color-raw-pulse-ring-10);
+  --color-chart-pulse-ring-05: var(--color-raw-pulse-ring-05);
 
-  /* ----------------------------------------------------------
-     TYPOGRAPHY
-  ---------------------------------------------------------- */
-  --font-primary:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono:     'JetBrains Mono', 'Fira Mono', 'Courier New', monospace;
+  /* ---- Typography ---- */
+  --font-primary: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-csv: 'Inter', system-ui, sans-serif;
+  --font-size-8: 8px;
+  --font-size-10: 10px;
+  --font-size-12: 12px;
+  --font-size-13: 13px;
+  --font-size-14: 14px;
+  --font-size-16: 16px;
+  --font-size-18: 18px;
+  --font-size-20: 20px;
+  --font-size-24: 24px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --line-height-auto: normal;
+  --letter-spacing-default: 0;
+  /* type tuples as font shorthands: font: var(--type-<role>) ; line-height = AUTO (normal), letter-spacing 0 */
+  --type-table-cell: 500 12px/normal var(--font-primary);
+  --type-cell: 500 14px/normal var(--font-primary);
+  --type-input: 400 14px/normal var(--font-primary);
+  --type-label: 400 12px/normal var(--font-primary);
+  --type-button: 600 14px/normal var(--font-primary);
+  --type-detail: 500 16px/normal var(--font-primary);
+  --type-body-16: 400 16px/normal var(--font-primary);
+  --type-title-modal: 500 18px/normal var(--font-primary);
+  --type-button-sm: 600 12px/normal var(--font-primary);
+  --type-card-title: 600 18px/normal var(--font-primary);
+  --type-page-title: 500 20px/normal var(--font-primary);
+  --type-breadcrumb-link: 500 18px/normal var(--font-primary);  /* + text-decoration: underline */
+  --type-heading-entity: 500 24px/normal var(--font-primary);
+  --type-note-italic: italic 500 10px/normal var(--font-primary);
+  --type-range-link: 500 14px/normal var(--font-primary);  /* + text-decoration: underline */
+  --type-auth-heading: 400 18px/normal var(--font-primary);
+  --type-micro: 400 8px/normal var(--font-primary);
+  --type-link: 400 12px/normal var(--font-primary);  /* + text-decoration: underline */
+  --type-outlier-13: 400 13px/normal var(--font-primary);
+  --type-outlier-20: 400 20px/normal var(--font-primary);
+  --type-dev-tag: 600 16px/normal var(--font-primary);
+  --type-csv: 400 12px/normal var(--font-csv);
 
-  --text-xs:    10px;   /* micro labels, eyebrows */
-  --text-sm:    12px;   /* section labels, badges, timestamps */
-  --text-base:  14px;   /* body, buttons, form elements */
-  --text-md:    15px;   /* slightly prominent inputs */
-  --text-lg:    16px;   /* panel titles, tab labels */
-  --text-xl:    18px;   /* section headings */
-  --text-2xl:   22px;   /* screen titles */
-  --text-3xl:   28px;   /* brand logo "FX" in login card */
-  --text-4xl:   40px;   /* large brand display */
+  /* ---- Spacing (OBSERVED padding/gap values; Figma defines no spacing tokens) ---- */
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-7: 7px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-11: 11px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
 
-  --font-normal:   400;
-  --font-medium:   500;
-  --font-semibold: 600;
-  --font-bold:     700;
+  /* ---- Radii ---- */
+  --radius-2: 2px;
+  --radius-3: 3px;
+  --radius-4: 4px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-20: 20px;
+  --radius-32: 32px;
+  --radius-canvas: 16px 0 0 0;
+  --radius-card-header: 4px 4px 0 0;
+  --radius-card-footer: 0 0 4px 4px;
+  --radius-tab-top: 8px 8px 0 0;
+  --radius-segment-left: 4px 0 0 4px;
+  --radius-circle: 50%;
 
-  --leading-tight:   1.2;
-  --leading-snug:    1.35;
-  --leading-normal:  1.5;
-  --leading-relaxed: 1.6;
+  /* ---- Control heights ---- */
+  --h-button: 32px;
+  --h-button-sm: 24px;
+  --h-button-xs: 20px;
+  --h-input: 32px;
+  --h-input-sm: 24px;
+  --h-field-with-label: 44px;
+  --h-field-error: 56px;
+  --h-field-chips: 44px;
+  --h-field-chips-multi: 84px;
+  --h-tab-admin: 42px;
+  --h-tab-widget: 32px;
+  --h-icon-button: 32px;
+  --h-amber-add: 24px;
+  --h-checkbox: 16px;
+  --h-radio: 16px;
+  --h-switch: 16px;
+  --h-switch-knob: 12px;
+  --h-widget-title-bar: 32px;
+  --h-tooltip: 32px;
+  --h-chip: 24px;
+  --h-chip-pill: 32px;
+  --h-dev-tag: 32px;
+  --h-menu-item: 28px;
+  --h-filter-row-pitch: 32px;
+  --h-dropdown-list-item: 26px;
+  --h-user-menu: 40px;
 
-  --tracking-tight:   -0.02em;
-  --tracking-none:     0;
-  --tracking-wide:     0.04em;
-  --tracking-wider:    0.06em;
-  --tracking-widest:   0.10em;
-  --tracking-label:    0.06em;  /* uppercase section labels */
-  --tracking-mono:     0.04em;  /* account IDs, currency codes */
+  /* ---- Layout / shell geometry ---- */
+  --layout-sidebar-width: 56px;
+  --layout-sidebar-icon-pitch: 56px;
+  --layout-sidebar-icon-first-y: 72px;
+  --layout-topbar-height: 56px;
+  --layout-topbar-height-widgets: 48px;
+  --layout-logo-tile-width: 72px;
+  --layout-logo-tile-height: 56px;
+  --layout-footer-height: 46px;
+  --layout-row-pitch: 42px;
+  --layout-row-pitch-blotter: 28px;
+  --layout-breadcrumb-y: 73px;
+  --layout-panel-top: 104px;
+  --layout-margin-left: 24px;
+  --layout-margin-right: 16px;
+  --layout-widget-gutter: 8px;
+  --layout-modal-inset: 32px;
+  --layout-modal-divider-y: 61px;
+  --layout-modal-content-y: 85px;
+  --layout-field-col-width: 172px;
+  --layout-field-col-gap: 24px;
+  --layout-field-row-pitch: 68px;
+  --layout-login-card-width: 312px;
+  --layout-login-card-height: 388px;
+  --layout-frame-default-width: 1440px;
+  --layout-frame-default-height: 1024px;
+  --layout-frame-small-width: 1280px;
+  --layout-frame-small-height: 1040px;
+  --layout-frame-large-width: 1920px;
+  --layout-frame-large-height: 1080px;
+  --layout-canvas-radius: 16px 0 0 0;
 
-  /* ----------------------------------------------------------
-     CONTROL HEIGHTS
-  ---------------------------------------------------------- */
-  --h-input:       36px;  /* compact dark inputs */
-  --h-btn:         36px;  /* primary action button */
-  --h-btn-sm:      28px;  /* compact / inline buttons */
-  --h-btn-lg:      42px;  /* login button */
-  --h-chip:        24px;  /* badges and chips */
-  --h-sidebar:     100vh; /* full-height icon sidebar */
-  --h-list-item:   44px;  /* entity/account list row */
-  --h-footer:      36px;  /* bottom status bar */
-  --h-nav:         48px;  /* top navigation bar if present */
+  /* ---- Strokes ---- */
+  --border-hairline: 1px;
+  --border-tab-underline: 2px;
+  --border-chevron: 1.5px;
 
-  /* ----------------------------------------------------------
-     SIDEBAR / LAYOUT
-  ---------------------------------------------------------- */
-  --w-sidebar:     48px;   /* icon-only left sidebar */
-  --w-list-panel:  280px;  /* master list column width */
+  /* ---- Effects ---- */
+  --shadow-tooltip: -1px 2px 4px 0 rgba(0, 0, 0, 0.4);
+  --shadow-tooltip-strong: -2px 2px 4px 1px rgba(0, 0, 0, 0.5);
+  --shadow-dropdown-list: -2px 2px 4px 0 rgba(0, 0, 0, 0.5);
+  --shadow-filters-panel: -4px 0 6px 0 rgba(0, 0, 0, 0.4);
+  --shadow-scrollbar-thumb: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+  --shadow-scrollbar-thumb-tall: 0 11.870683670043945px 11.870683670043945px 0 rgba(0, 0, 0, 0.25);
+  --shadow-modal-footer: 0 -4px 4px 0 rgba(0, 0, 0, 0.25);
+  --shadow-switch-knob-on: -1px 1px 3px 0 rgba(0, 95, 32, 0.5);
+  --shadow-switch-knob-off: -1px 1px 3px 0 rgba(81, 81, 81, 0.5);
+  --blur-modal-backdrop: 10px;
 
-  /* ----------------------------------------------------------
-     AVATAR / ICON SIZES
-  ---------------------------------------------------------- */
-  --icon-xs:    12px;
-  --icon-sm:    14px;
-  --icon-md:    16px;
-  --icon-lg:    18px;
-  --icon-xl:    20px;
-  --icon-2xl:   24px;
-
-  /* ----------------------------------------------------------
-     SPACING
-  ---------------------------------------------------------- */
-  --space-1:   4px;
-  --space-2:   6px;
-  --space-3:   8px;
-  --space-4:   10px;
-  --space-5:   12px;
-  --space-6:   14px;
-  --space-7:   16px;
-  --space-8:   18px;
-  --space-9:   20px;
-  --space-10:  24px;
-  --space-12:  28px;
-  --space-14:  32px;
-  --space-16:  40px;
-
-  /* ----------------------------------------------------------
-     BORDER RADIUS
-  ---------------------------------------------------------- */
-  --radius-sm:    4px;    /* badges, small chips */
-  --radius:       6px;    /* buttons, inputs, list items */
-  --radius-md:    8px;    /* cards, panels, dropdowns */
-  --radius-lg:    12px;   /* login card, modals */
-  --radius-xl:    16px;   /* large surface cards */
-  --radius-pill:  999px;  /* pill-style buttons, tags */
-  --radius-full:  50%;    /* avatars, status dots */
-
-  /* ----------------------------------------------------------
-     SHADOWS (dark-mode optimized — stronger, bluer)
-  ---------------------------------------------------------- */
-  --shadow-sm:        0 1px 4px rgba(0, 0, 0, 0.30);
-  --shadow-card:      0 2px 12px rgba(0, 0, 0, 0.40);
-  --shadow-card-lg:   0 4px 32px rgba(0, 0, 0, 0.50);
-  --shadow-dialog:    0 8px 48px rgba(0, 0, 0, 0.60);
-  --shadow-focus:     0 0 0 3px rgba(128, 128, 204, 0.30);
-  --shadow-focus-teal: 0 0 0 3px rgba(122, 239, 239, 0.25);
-
-  /* ----------------------------------------------------------
-     TRANSITIONS
-  ---------------------------------------------------------- */
-  --duration-instant: 0.08s;   /* button active state scale */
-  --duration-fast:    0.12s;   /* color/opacity changes */
-  --duration-base:    0.15s;   /* borders, backgrounds */
-  --duration-normal:  0.18s;   /* inputs, focus rings */
-  --duration-enter:   0.20s;   /* element entry */
-  --duration-slide:   0.28s;   /* panel slide transitions */
-  --duration-screen:  0.38s;   /* screen transitions */
-
-  --ease-default: ease;
-  --ease-screen:  cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
-
-  /* ----------------------------------------------------------
-     Z-INDEX
-  ---------------------------------------------------------- */
-  --z-base:       0;
-  --z-sidebar:    10;
-  --z-footer:     20;
-  --z-nav:        100;
-  --z-dropdown:   150;
-  --z-dialog:     200;
-  --z-overlay:    190;
-  --z-toast:      300;
+  /* ---- Icon sizes ---- */
+  --icon-size-8: 8px;
+  --icon-size-10: 10px;
+  --icon-size-12: 12px;
+  --icon-size-14: 14px;
+  --icon-size-16: 16px;
+  --icon-size-18: 18px;
+  --icon-size-24: 24px;
+  --icon-size-32: 32px;
 }

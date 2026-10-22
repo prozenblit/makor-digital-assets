@@ -1,313 +1,189 @@
-# Equity Derivatives Auction — Design System
-**For Claude agents building or modifying this platform**
+# Equity Derivatives Auction - Design System (agent brief)
 
-Load this file at the start of any session working on equity-derivatives. All design decisions must follow these rules. Do not invent, substitute, or "improve" values.
+Rebuilt from the Figma harvest. Every value below is backed by `../figma-spec/*.md` (foundations.md, components.md, auction-shell.md, admin-auth.md) or `assets/MANIFEST.md`. Where Figma is silent the rule is tagged **EXTENDED** (derived only from existing tokens). Do not invent, round, or "improve" values. If something is not here, check the spec files, then ask - do not guess.
 
-## Companion files — load these too
-- `components.css` — full CSS for all components, all states
-- `components.md` — copy-paste HTML for every component with JS behavior notes
-- `tokens.css` — all design tokens as CSS custom properties
-- `tokens.json` — same tokens in JSON for programmatic access
+Companion files (load them): `tokens.css` / `tokens.json` (colours, type, spacing, radii, heights, shadows, layout), `components.css` (all classes, every rule block cites its Figma node ids), `components.md` (copy-paste HTML + behaviour JS + Extended table), `showcase.html` (live reference: foundations, every component with states, 14 re-assembled screens), `assets/` (icons + `MANIFEST.md`). Verification record: `../figma-spec/VERIFICATION.md`; build history: `../figma-spec/build-notes.md`.
 
-**When implementing any UI:** check `components.md` first. If the component exists there, use that exact HTML + the corresponding CSS class. Do not write new CSS for something already in the component library.
+## 1. What the platform is
 
----
+A dark-mode, desktop institutional web platform for **timed equity-derivatives auctions** (session types **Cash Close** and **EFP**). Traders enter size / bid / ask per instrument (e.g. FTSE 100 IDX FUT Sep25, CAC40, EURO STOXX 50 Sep25 CC) and see an **Equilibrium Price**, countdown chips, an order book and an audit log. An admin area (**Statics**) manages Clients, External Traders and (tab only) Internal Users.
 
-## What this platform is
+Screens in Figma (all frames are 1440x1024, except one 1920x1080): Log In; Trade Auction (aggregate + global order book); New Auction modal; Client Auctions (older 1440 and newer 1920 with Audit Log); New level added + partial fill; Freeze time; Summary; Clients list; External Traders list; New / Edit External Trader modals; New / Edit Internal User modals; New / Edit Client modals. Only 1440x1024 and 1920x1080 exist: **no responsive or mobile design, no light theme** (foundations 6).
 
-Equity Derivatives Auction is a dark-mode, desktop-only web platform for institutional traders running equity derivatives auctions (Cash Close, EFP, and similar session types). Traders place bid/ask prices across multiple instruments (FTSE 100 IDX FUT, CAC40, EURO STOXX 50) with real-time equilibrium price calculation and countdown timers.
+## 2. Source of truth and owner decisions
 
-The platform has two main runtime contexts:
-- **Auction view** — the primary trading view; shows active/upcoming auction session cards grouped by session, each with an instrument table and inline bid/ask inputs
-- **Admin view** — manages internal users and client accounts; features user list tables, modals for creating/editing users and clients
+- Figma file **`vtP9aj7XLJ292TjETXmrum`**. **Canonical: page "final" (`48:1021`), SECTION "Section2" (`1033:172`)** (2411 nodes). Real components live on page **"drafts"** (`0:1`): text input 76:274, search 134:218, date 1001:744, dropdown 115:702, time 85:94, check set 85:128, button set 134:904, button with arrow set 134:907, Table Header 1001:283. Drafts screens are obsolete iterations; Section2 supersedes them for screens.
+- Page **"page for Isaak"** (`738:152`) = four client-specific screen copies that add a **"LOGGED IN AS: BANK OF OG"** (and "BANK OF MAKOR") label in raw pure white `#FFFFFF`. It is NOT part of Section2 and is NOT built. **Owner decision (2026-10-14): leave it out of the design system.**
+- Figma has 23 colour variables only (collection "Collection 1", one mode). No text styles, effect styles, paint styles, spacing or radius variables; those are literals, tokenised here.
+- Rules of this rebuild (owner, audit/BUILD_RULES.md): values that exist in Figma are reproduced exactly (no rounding / merging of near-equal values); where Figma is silent we EXTEND and mark it; where Figma conflicts with itself the canonical version is used and the alternative is kept as an `--alt-*` class/token and listed in section 11.
 
-The "M" (Makor) logo appears in teal (`#7AEFEF`) in the top-left of the narrow left sidebar.
+## 3. Non-negotiables (each proven by the spec)
 
----
+1. **Font: Lato Regular (400) ONLY.** 1111 of 1114 text nodes are Lato Regular, the other 3 are mixed-size segments that are still Regular. No Bold / Medium / SemiBold anywhere. Do not synthesise bold. (`h1..h6, b, strong, th` are reset to 400 in components.css.)
+2. **Page background `#18181C`** (variable `bg`) on every frame. Panels `#2D2E3B` (bg lighter), inner blocks / tables `#22222C` (bg medium). Dark only.
+3. **Primary action blue `#7590FF`** (variable `blue`): Log In fill, product title, links, active tab, checked check, ENTER. Secondary accent **blue-green `#71E7FF`** (Add New / Save Changes fill, New Auction outline). There is **no teal `#7AEFEF`**.
+4. **Confirm / success = green `#3FF3C0`**; **danger / cancel = red `#FF6565`**; validation = **red error `#FF7553`**; warning / starting = orange `#FF982A`; partial = yellow `#FFCE53`; equilibrium / EFP / EXECUTION = purple `#B694FF`.
+5. **Controls are 32px high, fill grey dark `#373746`, NO border, radius 4**, Lato 14, padding 10/12. Outliers at 40px exist only as one-off overrides (Add New 122x40, Cancel 106x40, soft table Cancel 112x40, Equilibrium chip 197x40, Upload File 152x40) and tabs are 40.
+6. **Radii: 4 controls / 8 cards, tables, modals / 12 Log In card / 6 notification cards and tab tops / 2 checkbox / 24 sidebar top-right.** No other radii.
+7. **No shadows except**: toasts (`-2 4 8` bg medium), notification cards (`-2 4 8` bg), the open Cancel menu (`-2 4 6` bg), toggle thumb. **Cards, panels, modals and inputs have no shadow and no stroke.** No gradients, no opacity on nodes (dimming is done with the `*transparent*` colour variables).
+8. **1px strokes are drawn INSIDE** (outline buttons, cell states, chips, tab underline): use `box-shadow: inset 0 0 0 1px <colour>`, never a layout-shifting border.
+9. **Line height AUTO (`normal`), letter spacing 0, no text-transform.** Underline only on links / linked IDs / linked counts.
+10. **Icon-only sidebar** (no labels, no active pill); no breadcrumbs, no tabs on the auction screens; modals have **no close X and no shadow**.
+11. **Table rows: 1px grey dark dividers, no zebra** on order/instrument tables. Zebra exists only on the Audit Log (even rows `#2D2E3B`).
 
-## Non-negotiables
+## 4. Tokens
 
-- **Dark mode only.** The entire platform is dark. `#151729` page background, `#1E2035` cards, `#252740` modals. Do not add light mode or media-query overrides.
-- **Desktop only.** No responsive breakpoints. Minimum width is effectively ~1200px. Do not add mobile layouts.
-- **Brand color is `#7AEFEF` (teal).** Used on Confirm/Save/Add buttons, the M logo, equilibrium price labels, focus borders, checkbox checked states, and active toggles.
-- **Cancel/danger color is `#E57373` (coral/salmon).** Used on the Cancel auction dropdown button and Reject button. Never use `#EF4444` red for the cancel button — that is exclusively for input error states.
-- **Error input border is `#EF4444`.** Only for validation errors (e.g. Bid >= Ask). Do not confuse with coral cancel.
-- **Timer / warning amber is `#F59E0B`.** Used on Time Left badge text, Starting In badge text, and warning tooltips (e.g. "Bid should be lower than Ask").
-- **Success / "in the mix" green is `#4DCC9B`.** Used on the "In the mix" badge only.
-- **Border radius is 6px for buttons and inputs, 8px for cards, 10px for modals.** Do not use 4px except for inner micro-badges.
-- **Font is Inter.** Clean sans-serif throughout. Bid/ask numeric inputs should use `font-variant-numeric: tabular-nums` to ensure consistent character width.
-- **No gradients.** No decorative effects. Flat dark surfaces only.
-- **No Tailwind or CSS frameworks.** All styles are custom.
+Use CSS custom properties from `tokens.css`; never write raw hex in rules. Names follow Figma (`--color-<figma-name-kebab>`); semantic aliases (`--color-text-primary`, `--color-action-confirm`, ...) are for picking by role.
 
----
+### 4.1 Figma variables (23, exact)
 
-## Color Reference
+| Figma name | CSS var | Hex | Role |
+|---|---|---|---|
+| bg | `--color-bg` | `#18181C` | page; global order book; label ON filled buttons |
+| bg medium | `--color-bg-medium` | `#22222C` | inner blocks, tables, login card, statics panel, audit body |
+| bg lighter | `--color-bg-lighter` | `#2D2E3B` | panels / session cards, sidebar, modals, notification cards, audit header, zebra |
+| grey dark | `--color-grey-dark` | `#373746` | control fill, 1px rules / dividers, cancel-menu fill, unchecked check |
+| grey medium | `--color-grey-medium` | `#5B5D72` | placeholder, column headers, secondary text, DISABLED button fill, modal title rule, panel-header rule |
+| grey light | `--color-grey-light` | `#9597AD` | tertiary labels, inactive icons / nav, DISABLED button text, dropdown chevron, unselected tab |
+| white | `--color-white` | `#F8F7FF` | primary text, active nav icon, neutral "Cancel" button fill, toggle thumb |
+| blue | `--color-blue` | `#7590FF` | primary action, titles, links, active tab, ENTER, icon strokes |
+| blue transparent 15 | `--color-blue-transparent-15` | `#383D58` | OPAQUE. selected tab, Time Left chip, minimize / download tile, Upload File |
+| blue transparent 60 | `--color-blue-transparent-60` | `rgba(117,144,255,.6)` | the only real alpha variable: logo, focused order-input stroke |
+| green | `--color-green` | `#3FF3C0` | confirm / success, BID, selected-cell stroke, active toggle |
+| green dark | `--color-green-dark` | `#264142` | OPAQUE. "In the mix" toast bg |
+| red | `--color-red` | `#FF6565` | danger / cancel, ASK, row remove icon, Reject outline |
+| red transparent | `--color-red-transparent` | `#432C35` | OPAQUE. soft "Cancel v" table button |
+| red error | `--color-red-error` | `#FF7553` | validation stroke, toast text + icon |
+| red error transparent | `--color-red-error-transparent` | `#4E3234` | OPAQUE. validation toast bg; frozen Time Left chip |
+| orange | `--color-orange` | `#FF982A` | Starting in, MODIFY, Start In, edit icon |
+| orange transparent | `--color-orange-transparent` | `#4C3E3D` | OPAQUE. Starting-in chip, Start In button |
+| yellow | `--color-yellow` | `#FFCE53` | partial-fill stroke / text / icon |
+| yellow transparent | `--color-yellow-transparent` | `#4E4134` | OPAQUE. partial toast bg |
+| blue-green | `--color-blue-green` | `#71E7FF` | Add New / Save Changes, New Auction outline, "Cash Close", notice text |
+| blue-green transparent | `--color-blue-green-transparent` | `#374A58` | OPAQUE. new-level row highlight |
+| purple | `--color-purple` | `#B694FF` | Equilibrium label, EFP tag, EXECUTION |
 
-### Brand
-| Token | Value | Use |
+Raw (unbound) colours in Figma, tokenised by role: `--color-equilibrium-chip-bg` `#B694FF@0.2` (18 uses, canonical), `--color-equilibrium-chip-bg-alt` `#A494FF@0.3` (6 uses, ALT), `--color-modal-scrim` `#18181C@0.5`, `--color-segment-selected-bg` `#374A58`, `--color-segment-selected-text` `#71E7FF`, `--color-toggle-thumb-shadow` `#1D3C31@0.6`, `--color-pure-white` `#FFFFFF` (Isaak label only - never use).
+
+### 4.2 Semantic aliases (59, all in tokens.css)
+
+| Group | Aliases -> variable |
+|---|---|
+| surface | `page`=bg, `panel`=bg lighter, `inner`=bg medium, `control`=grey dark, `book`=bg, `sidebar`=bg lighter, `modal`=bg lighter, `auth-card`=bg medium, `zebra`=bg lighter, `tab-selected`=blue transparent 15, `scrim`=modal-scrim |
+| border | `rule`=grey dark (1px dividers), `panel-rule`=grey medium, `book-stroke`=grey medium, `cell-selected`=green, `cell-error`=red error, `cell-partial`=yellow, `cell-focus-well`=blue transparent 60, `tab-selected`=blue |
+| text | `primary`=white, `secondary`=grey medium, `tertiary`=grey light, `placeholder`=grey medium, `on-fill`=bg, `link`=blue, `title`=blue, `accent`=blue-green, `bid`=green, `ask`=red, `equilibrium`=purple, `enter`=blue, `modify`=orange, `execution`=purple |
+| action | `primary`=blue, `accent`=blue-green, `confirm`=green, `danger`=red, `danger-soft`=red transparent, `warning`=orange, `warning-soft`=orange transparent, `neutral`=white, `ghost`=blue transparent 15 |
+| disabled | `fill`=grey medium, `text`=grey light |
+| status | `success`/`-bg`=green / green dark, `error`/`-bg`=red error / red error transparent, `partial`/`-bg`=yellow / yellow transparent, `info`/`-bg`=blue-green / blue-green transparent, `time-left`/`-bg`=blue / blue transparent 15, `starting`/`-bg`=orange / orange transparent, `frozen`/`-bg`=red / red error transparent, `equilibrium-bg`=raw chip |
+
+**EXTENDED colours** (not in Figma): `--color-ext-hover` (white @0.1), `--color-ext-pressed` (white @0.2), `--color-ext-focus` (blue), `--color-ext-error` (red error).
+
+Other token groups: `--space-*` (observed), `--radius-*`, `--h-*` (heights), `--shadow-*`, `--blur-scrim`, `--layout-*`.
+
+## 5. Typography
+
+Lato Regular, `--font-primary` (`'Lato', system-ui, ...` - the fallback stack is EXTENDED). Load: `https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap`.
+
+| Size | Token | Use (counts in Section2) |
 |---|---|---|
-| `--color-brand` | `#7AEFEF` | Confirm/Save/Add buttons, M logo, equilibrium price label, focus borders, active toggles, checked checkboxes |
-| `--color-brand-hover` | `#5ADADA` | Button hover background |
-| `--color-brand-ghost` | `rgba(122,239,239,0.10)` | Focus rings, subtle bg tints |
-| `--color-brand-ghost-border` | `rgba(122,239,239,0.25)` | Subtle teal borders |
+| 12 | `--font-size-12` | audit-log table, modal field labels, "min size: N", type sub-label, toasts, BID/ASK/ENTER/MODIFY (174) |
+| **14** | `--font-size-14` | **base**: body, cells, buttons, controls, chips, tabs, notices (845) |
+| 16 | `--font-size-16` | section title "Auctions" / "Statics", "Audit Log", Upload File (66) |
+| 18 | `--font-size-18` | modal titles; legacy-shell tabs (11) |
+| 20 | `--font-size-20` | product title (blue) (13) |
+| 24 | `--font-size-24` | modal-screen title in the legacy 80px shell (2) |
 
-### Surfaces (dark)
-| Token | Value | Use |
+Colour roles: primary text white; secondary (headers, placeholders) grey medium; tertiary (labels) grey light; titles / links / active blue. Placeholder = grey medium, entered value = white. Utilities in components.css: `.t-12 ... .t-24`, `.c-<figma colour>`, role styles (`.t-product-title`, `.t-section-title`, `.t-label`, `.t-bid`, ...). 1920 tables use 12px, 1440 tables 14px; older drafts and the legacy shell use 16px.
+
+## 6. Controls and sizing (Figma-defined unless tagged)
+
+- **Shared control box**: height 32, radius 4, fill grey dark, no stroke/shadow, padding T10 R12 B10 L12, H auto-layout, text 14. Widths are always FIXED in Figma: text input 235 / 184 / 236 (password) / 400; search 235 / 184; date 235 (155 in the Audit Log); dropdown hugs (112 default, 117 "Myself", gap 40); time hugs (106; padding R8, gap 12).
+- **Button**: 32px, radius 4, padding 6/32, gap 10, hug width, label **bg `#18181C`** on every filled role. The component has NO fill: role = per-instance override.
+  - primary (blue) Log In (235 wide); accent (blue-green) Save Changes / Add New; neutral (white) modal Cancel; confirm (green) Confirm / Start Now; danger (red) Cancel Auction; outline-danger Reject; outline-accent New Auction; outline-warning (orange on orange transparent) Start In; ghost (blue transparent 15, 16px, 40 high) Upload File (hidden in Figma).
+  - disabled = grey medium fill + grey light label (overrides the role).
+  - Variant3 (261:1922) is identical to Default and is NOT implemented.
+- **Button with arrow**: 32px, padding 6/12/6/24, gap 8, 12x12 chevron (stroke 1 = label colour). Session Cancel = red. In-table "Cancel v" is a separate 112x40 custom frame, radius 0, fill red transparent, text + chevron red (`.btn-arrow--soft`); disabled = grey dark fill + grey medium text.
+- **Check** 16x16 radius 2: unchecked grey dark, checked blue + grey dark 2px tick. "Admin" label 12px right: grey light / white.
+- **Tabs** 40 high, padding 12/56, top radius 6; selected = blue transparent 15 + 1px blue INSIDE bottom stroke + blue text; unselected = no fill + grey light text. **Segmented** Cash Close | EFP 336x32.
+- **Toggle** 32x16, radius 12; off = grey light track + grey light label; on = green track + white label; thumb 12x12 white with `#1D3C31@0.6` shadow (positions are a visual estimate).
+- **Chips**: Time chip 32px, radius 4, states running (blue on blue transparent 15) / starting (orange on orange transparent) / frozen (label red on red error transparent) / ended (no fill, 1px red inside stroke); value white. Equilibrium chip 197x40, no radius, label purple, value white, fill `#B694FF@0.2`.
+- **Toast / tooltip chips** 30px, radius 4, padding 8/12, gap 8, Lato 12, shadow: success (green on green dark), validation (red error on red error transparent), partial (yellow on yellow transparent). No pointer nub, no close.
+- **Cell states** (1px INSIDE, radius 0): in the mix = green; partial = yellow; error = red error; new-level row = blue-green transparent fill; focused size well = bg fill + blue @0.6 stroke + radius BL 8.
+- **Notification cards** radius 6, fill bg lighter, shadow: "New level ..." 322x41 blue-green text; "Orders placed" 328x114 with Reject (outline red) + Confirm (green).
+- **Modal** fill bg lighter, radius 8, no shadow / stroke, title 18 white centred (y16), 1px grey medium rule at y54, body inset 24, label 12 grey light + control (8px gap, 78px row pitch), footer Cancel (white) left / primary right. **Scrim** = `#18181C@0.5` + blur 12, starts right of the 64px sidebar.
+- **Scrollbar** 4px, track grey dark, thumb grey medium, radius 12 (drawn once).
+- **Row heights**: instrument table title 40, header + body rows 33 (1px divider); statics rows 41; audit rows 38 (header 39); modal tables 33.
+
+## 7. Components (class names follow Figma names)
+
+| Component | Classes | Status |
 |---|---|---|
-| `--color-bg` | `#151729` | Page background — dark navy |
-| `--color-surface` | `#1E2035` | Cards, auction session cards |
-| `--color-surface-raised` | `#252740` | Modals, dialogs |
-| `--color-input-bg` | `#1A1B2E` | Inline bid/ask inputs, modal text inputs |
-| `--color-sidebar-bg` | `#0F1123` | Narrow left sidebar |
+| text input, search, date, dropdown, time | `.input .search .date .dropdown .time` (+ `__field __text`, `--w184 --w236 --w400`, `.search--icon-muted`) | Figma-defined; states hover / focus / error / disabled **EXTENDED** |
+| open Cancel menu | `.menu .menu__item` | Figma-defined (189:819); item hover / selected **EXTENDED**; open / close JS **EXTENDED** |
+| check, check-field | `.check .check-field` | Figma-defined; hover / focus / disabled **EXTENDED** |
+| buttons | `.btn` + `--primary --accent --neutral --confirm --danger --outline-danger --outline-accent --outline-warning --ghost --h40 --w235` | Figma-defined; hover / pressed / focus **EXTENDED** |
+| button with arrow | `.btn-arrow` + `--danger --soft` | Figma-defined |
+| icon buttons / row actions | `.icon-btn--minimize --download`, `.icon-action` | Figma-defined; `.icon-action--delete` **EXTENDED** |
+| tabs, segmented, toggle | `.tabs .tab`, `.segmented .segment`, `.toggle` | Figma-defined (drawn as frames); alternates `--alt-*` |
+| chips | `.chip-time (--starting --frozen --ended)`, `.chip-eq (--alt-a494ff)` | Figma-defined; countdown thresholds **EXTENDED** |
+| toast / tooltip | `.toast .tooltip` + `--success --error --partial` | Figma-defined |
+| cell states | `.cell--in-mix --partial --error --highlight --focus-well --well` | Figma-defined |
+| notification cards | `.notification (--stack)`, `.banner-slot` | Figma-defined; banner stacking gap **EXTENDED** |
+| modal, scrim, field | `.modal (--w448 --w720 --w916)`, `.modal-scrim`, `.field .field__label` | Figma-defined; `.field__error`, `.modal--confirm-delete` **EXTENDED** |
+| app shell | `.app (--wide --alt-legacy-80)`, `.sidebar`, `.app__title .app__rule .app__section-title .app__view-as .app__actions .app__main` | Figma-defined; nav hover / focus **EXTENDED** |
+| session card | `.session-card` (`--trade --client-1920 --alt-1440 --alt-top-68 --w855`) | Figma-defined |
+| instrument table / order books | `.itable` (`--w823 --agg --glob --frozen`), `.book-grid` | Figma-defined; row hover / selected **EXTENDED** |
+| audit log | `.audit-panel .audit` | Figma-defined; row hover / selected **EXTENDED** |
+| New Auction modal | `.modal--auction .na--* .mtable` | Figma-defined |
+| login | `.login-page .auth-card--login` | Figma-defined; `.auth-card__error` **EXTENDED** |
+| statics lists | `.statics-card .stable .tabs` | Figma-defined; `.stable__empty`, `.skeleton`, `.pager`, `.client-panel__empty` **EXTENDED** |
+| admin modals | `.form-grid .modal--internal .client-head .client-panel .ctable`, `.modal-scrim--admin --pair --centered` | Figma-defined |
+| scrollbar | `.scrollbar` | Figma-defined; `.scroll-y` **EXTENDED** |
 
-### Text
-| Token | Value | Use |
-|---|---|---|
-| `--color-text-primary` | `#F0F0F8` | All body text, instrument names, prices |
-| `--color-text-secondary` | `#8B8EA8` | Labels, metadata, column headers, min size text |
-| `--color-text-tertiary` | `#5A5C70` | Placeholders, dim metadata |
-| `--color-text-on-brand` | `#000000` | Text ON teal buttons |
-| `--color-text-on-coral` | `#FFFFFF` | Text on coral Cancel button |
+Forced states for demos: `.is-hover .is-focus .is-active .is-disabled .is-error .is-selected .is-checked .is-filled .is-on`. **EXTENDED recipes** (all derived, never new hues): hover = white `#F8F7FF` @0.1 overlay on the existing fill, pressed = @0.2, focus = 1px INSIDE blue (controls) or 1px blue outline offset 2 (buttons), error = 1px INSIDE red error, disabled controls = placeholder-colour text, row selected = blue transparent 15. Full list in `components.md` ("Extended table").
 
-### Borders
-| Token | Value | Use |
-|---|---|---|
-| `--color-border` | `#2D2F4A` | All cards, inputs, table dividers |
-| `--color-border-focus` | `#7AEFEF` | Input focus border |
+Behaviour (from the spec, wiring is ours): Bid must be lower than Ask - otherwise the Size|Ask cell gets the red error stroke and the error toast appears (text "Bid should be lower that Ask", verbatim). "In the mix" = green stroke + success toast; partial fill = yellow stroke + toast. Cancel dropdown offers "All Bid / All Ask / All". Time stepper step and countdown thresholds are not defined in Figma (`components.md` snippets are EXTENDED).
 
-### Cancel / Auction Cancel (coral)
-| Token | Value | Use |
-|---|---|---|
-| `--color-cancel` | `#E57373` | Cancel auction dropdown button bg, Reject button border/text |
-| `--color-cancel-hover` | `#EF5350` | Cancel button hover |
+## 8. Layout / shell geometry
 
-### Status
-| Token | Value | Use |
-|---|---|---|
-| `--color-status-success` | `#4DCC9B` | "In the mix" badge text |
-| `--color-status-success-bg` | `rgba(77,204,155,0.15)` | "In the mix" badge background |
-| `--color-status-danger` | `#EF4444` | Error input border (Bid >= Ask validation) |
-| `--color-status-warning` | `#F59E0B` | Timer badge text, warning tooltip text |
-| `--color-status-warning-bg` | `rgba(245,158,11,0.12)` | Timer badge background |
-| `--color-status-warning-border` | `rgba(245,158,11,0.25)` | Timer badge border |
+- Frames **1440x1024** (Trade Auction, Client Auctions old, lever / freeze / summary, Log In, Statics, modals) and **1920x1080** (Client Auctions newer).
+- **Sidebar** 64 x full height, fill bg lighter, radius `0 24 0 0`, no right border; logo 40x32 at (12,20) in blue @0.6; nav icons 24x24 at x=20, y=92 (Auctions) and y=148 (Statics), pitch 56, active = white, idle = grey light; avatar 32x32 at (16, H-64). (Legacy shell on the New / Edit Client backgrounds: 80px, `.app--alt-legacy-80`.)
+- **Header**: title "Equity Derivatives Auction" 20 blue at (80,24); rule 1px grey dark at y=61 from x=80 to W-24; section title 16 white at (80,82) ("Auctions" / "Statics"). Left margin 80 (64 + 16), right margin 24, first content row y=117 (statics card y=116). "View as:" label + dropdown right-aligned (right edge 1416, y=13); "New Auction" outline button right edge 1416, y=73; banners at y=77, right edge 1416.
+- **Session card**: fill bg lighter, radius 8, header 56 + 1px rule (grey medium on 1440, grey dark on 1920), minimize tile (16,16), title group (60,12) = name 14 white over type 12 (Cash Close blue-green / EFP purple), Time chip y=12 (centred on 1440, right on 1920), Cancel 98x32 at right 16 (Trade: Cancel Auction 157x32 at right 12). Body padding 16: instrument tables at y=72 (68 on EFP / 1920 cards), gap 8. Widths 795 / 855 / 1336.
+- **Instrument table**: bg medium, radius 8, W = card - 32 (763 / 823); title row 40 (name + "min size" + Equilibrium chip + soft Cancel flush right), header row 33, data rows 33, vertical dividers at x=273 / 557 (+763); row-cancel x-circle after Bid / Ask, add-level plus on the last row of 823-wide tables.
+- **Trade Auction**: card 1336x682; aggregate tables (839 wide, bg medium, chip `#A494FF@0.3`) at x=16, global tables (457 wide, bg `#18181C`) at x=863; y=97 / 314 / 465 (heights 205 / 139 / 205), 8px column gap, 12px row gap.
+- **Audit Log** (1920): panel 998x741 at (898,117): header 56 (From / To date 155 + 32px download tile), table header 39, rows 38, text 12, zebra on even rows.
+- **Log In**: no sidebar / header; card 312x416 centred, bg medium, radius 12; logo 70x56, username 235x32, password 236x32 (10 dots + eye), "Forgot Password?" blue underlined, Log In 235x32.
+- **Statics**: card (80,116) 1336x892: tab strip 40 (Clients 160 / External Traders 211 / Internal Users 198), content panel bg lighter with search + Add New, table 1312x796 (header 41, rows 41, vertical lines). **Modals**: External Trader / Internal User 448 wide (409 / 417 high), Client 720x584, New Auction 916x410.
 
-### Toggle / Checkbox
-| Token | Value | Use |
-|---|---|---|
-| `--color-toggle-active` | `#7AEFEF` | Active toggle track, checked checkbox bg |
-| `--color-toggle-inactive` | `#4A4B60` | Inactive toggle track, unchecked checkbox border |
+## 9. Icons
 
----
+All icons are raw Figma SVG exports in `assets/` (see `assets/MANIFEST.md`); **never redraw or hand-write paths**. Monochrome icons use the mask recipe (`.icon` + `.icon-<name>`, colour = `currentColor`, size and Figma colour set by the class); multi-colour assets and logos are used as `<img>` or `.img-*` background images.
 
-## Typography
+Exported: makor-logo (40x32), makor-logo-login (70x56), nav-auctions / nav-statics (24, + `.active` variants), nav-profile (32), eye, checkbox-checked / -unchecked, status-active-check (16), edit-square-pen (24, orange), rotate-ccw-key (24, blue), search (16, blue, stroke 1.5), calendar (16, blue, stroke 1.3), minimize-button (24 tile), download-button (32 tile), chevron-down (12), dropdown-chevron (11x6), time-spinner-arrows (10x24), arrow-big-down, status-x-circle / plus-circle / check-circle / warning / partial-fill, file-up, clock.drafts (drafts only). **Not present**: bell, trash / delete, standalone key, canonical clock, flags, instrument icons, illustrations. Stroke weights differ per icon (1 / 1.3 / 1.5): do not normalise.
 
-- **Body base:** 14px (`--text-md`) / 1.5 / Inter / weight 400
-- **Instrument names:** 14px bold (`--font-bold`)
-- **Metadata (min size, etc.):** 13px (`--text-base`) / `--color-text-secondary`
-- **Column headers:** 12px (`--text-sm`) / uppercase / `letter-spacing: 0.08em` / `--color-text-secondary`
-- **Bid/Ask inputs:** 14px / `font-variant-numeric: tabular-nums` — ensures aligned columns
-- **Session heading:** 16px bold
-- **Modal heading:** 20–24px bold
-- **Timer badge text:** 12–13px / `--color-status-warning`
+## 10. Writing HTML / CSS here
 
-### Size scale
-```
-10px  --text-xs    micro labels, secondary metadata
-12px  --text-sm    column headers, badges, timestamps
-13px  --text-base  table metadata, min size, secondary values
-14px  --text-md    body, buttons, inputs, instrument names     ← standard UI text
-16px  --text-lg    platform title, session heading
-18px  --text-xl    page headings
-22px  --text-2xl   large section titles
-24px  --text-3xl   modal headings
-```
+1. Link `tokens.css` then `components.css`; load Lato 400.
+2. Use only classes from `components.css`; check `components.md` first. New CSS only for genuinely new layout, using `var(--...)` tokens (no raw hex).
+3. Keep Figma sizing semantics: fixed vs hug widths as listed above; heights exact.
+4. When you must add a state or component Figma does not draw: derive from existing tokens, mark it `/* EXTENDED - not in Figma: <derivation> */`, add it to the Extended table in `components.md`.
 
----
+## 11. Known Figma inconsistencies (full table in `showcase.html`)
 
-## Spacing
+Alternates are kept, not dropped: Equilibrium chip `#A494FF@0.3` vs `#B694FF@0.2` (`.chip-eq--alt-a494ff`); selected tab with / without radius (`.tab--alt-selected-square`); tab height 40 vs 48 (`.tab--alt-legacy-48`); sidebar 64 vs 80 (`.app--alt-legacy-80`); instrument cards y=72 vs 68 (`.session-card--alt-top-68`); Client Auctions 1440 vs 1920 (`.session-card--alt-1440`); New Auction overlay 1373 vs 1376 (`.modal-scrim--alt-1373`); Edit Client email header x481 vs x505 (`.ctable--alt-email-header-481`). Other: frozen chip label red on red-error-transparent fill; chevron y4 vs y5 files; scrim blur 12 (Figma) vs ~6 (inference, not used); "status dot" glow = toggle thumb; Internal User modal height 417 (Cancel 40 tall, primary 8px lower); Statics card y=116 vs 117; aggregate-book numbers hand-placed (we centre on headers); no Internal Users list (tab only); frame 282:2180 is a modal pair, not a second list; third 1920 card y=530 (gap 16/17).
 
-```
-4px   --space-1   icon gaps, badge padding
-6px   --space-2   tight row gaps
-8px   --space-3   small row gap, checkbox gap
-10px  --space-4
-12px  --space-5   table cell padding (tight)
-14px  --space-6
-16px  --space-7   standard card/input padding, column gap
-18px  --space-8
-20px  --space-9   section gap, card padding
-24px  --space-10  card section gap
-28px  --space-12
-32px  --space-14  modal padding
-40px  --space-16  page padding
-```
+**Figma copy typos reproduced verbatim**: "Bid should be lower that Ask", "exampple@email.com", screen names "Acution Freeze time" / "Acution Summary". Do not silently fix them in shipped copy without owner approval.
 
----
+## 12. What NOT to do (the previous system was wrong)
 
-## Control heights
-
-```
-24px  --h-chip       inline badges
-28px  --h-badge      timer badge, type badge (EFP, Cash Close)
-32px  --h-btn-sm     compact icon-only or tight buttons
-36px  --h-btn        standard buttons (Confirm, Cancel, Save Changes, Add New)
-36px  --h-input      auction bid/ask inline inputs
-40px  --h-input-modal modal form inputs (Username, Email, Name)
-52px  --h-nav        top header bar
-```
-
----
-
-## Border radius
-
-```
-4px   --radius-sm   inner badges, micro chips
-6px   --radius      buttons, inputs, small dropdowns
-8px   --radius-md   auction session cards, panels
-10px  --radius-lg   modals, dialogs
-999px --radius-pill  pill badges
-50%   --radius-full  avatars, toggle thumbs
-```
-
----
-
-## Shadows (dark theme)
-
-```
-Card:         0 2px 12px rgba(0,0,0,0.30)
-Card LG:      0 4px 24px rgba(0,0,0,0.40), 0 2px 4px rgba(0,0,0,0.20)
-Modal:        0 8px 40px rgba(0,0,0,0.50), 0 2px 8px rgba(0,0,0,0.30)
-Dropdown:     0 4px 20px rgba(0,0,0,0.40)
-Tooltip:      0 4px 16px rgba(0,0,0,0.50)
-Focus:        0 0 0 3px rgba(122,239,239,0.20)
-Notification: 0 8px 32px rgba(0,0,0,0.45)
-```
-
----
-
-## Transitions
-
-```
-0.08s  --duration-instant   button :active scale
-0.12s  --duration-fast      color/opacity changes, hover
-0.15s  --duration-base      borders, backgrounds
-0.18s  --duration-normal    inputs, focus rings
-0.20s  --duration-enter     element entry
-0.28s  --duration-slide     dropdown slide
-0.22s  --duration-modal     modal fade in/out
-```
-
-Easing: `ease` for most. `cubic-bezier(0.0,0.0,0.2,1)` for dropdowns.
-
----
-
-## Components — Key Rules
-
-### Buttons
-- **Primary (teal — Confirm / Save Changes / Add New):** `background #7AEFEF`, `color #000`, `height 36px`, `px 16px`, `border-radius 6px`, hover → `#5ADADA`
-- **Cancel auction (coral — dropdown trigger):** `background #E57373`, `color #FFF`, `height 36px`, `border-radius 6px`, hover → `#EF5350`
-- **Reject (outlined coral):** `border 1.5px solid #E57373`, `color #E57373`, `background transparent`, hover → `rgba(229,115,115,0.10)`
-- **Modal Cancel / Close (white):** `background #FFFFFF`, `color #1A1B2E`, `height 36px`, `border-radius 6px`, hover → `rgba(255,255,255,0.85)`
-- All buttons: `font-size 14px`, `font-weight 600`, `:active scale(0.98)`
-
-### Inline Bid/Ask Inputs (auction table)
-- Height: `36px`, background: `#1A1B2E`, border: `1px solid #2D2F4A`, radius: `6px`
-- Font: `14px`, `font-variant-numeric: tabular-nums`, `text-align: right`
-- Focus: `border-color #7AEFEF`, `box-shadow: 0 0 0 3px rgba(122,239,239,0.20)`
-- Error (Bid >= Ask): `border-color #EF4444`, `box-shadow: 0 0 0 3px rgba(239,68,68,0.15)`
-- Placeholder: `color #5A5C70`
-
-### Modal Form Inputs
-- Height: `40px`, background: `#1A1B2E`, border: `1px solid #2D2F4A`, radius: `6px`
-- Same focus + error states as auction inputs
-
-### Session Card (auction card)
-- Background: `#1E2035`, border: `1px solid #2D2F4A`, border-radius: `8px`
-- Shadow: `var(--shadow-card)`
-- Session header row: left — session name (bold, 16px) + type badge (EFP/Cash Close) + timer badge; right — Cancel dropdown button (coral)
-- Instrument sub-rows: instrument name (14px bold) + min size (13px secondary) + equilibrium price (teal label)
-
-### Timer Badge (Time Left / Starting In)
-- Background: `rgba(245,158,11,0.12)`, border: `1px solid rgba(245,158,11,0.25)`
-- Text: `#F59E0B`, `font-size 12px`, `font-weight 600`, border-radius: `6px`
-- Contains a clock icon and the countdown string
-
-### Session Type Badge (EFP / Cash Close)
-- Background: `rgba(122,239,239,0.10)`, border: `1px solid rgba(122,239,239,0.25)`
-- Text: `#7AEFEF`, `font-size 12px`, `font-weight 600`, border-radius: `6px`
-
-### "In the mix" Badge
-- Background: `rgba(77,204,155,0.15)`, text: `#4DCC9B`
-- Displays a green checkmark icon + "In the mix" text, `font-size 12px bold`
-- Appears inline below a bid row when the order is competitive
-
-### Warning Tooltip (Bid > Ask validation)
-- Background: `rgba(245,158,11,0.12)`, border: `1px solid rgba(245,158,11,0.25)`
-- Text: `#F59E0B`, `font-size 12px`
-- Contains a ⚠ warning icon + "Bid should be lower than Ask"
-- Appears inline below the input row when validation fails
-
-### Cancel Dropdown Menu
-- Background: `#252740`, border: `1px solid #2D2F4A`, border-radius: `8px`
-- Shadow: `var(--shadow-dropdown)`
-- Options: "All Bid" / "All Ask" / "All" — each is a `14px` clickable row, hover → `rgba(255,255,255,0.05)` bg
-- Trigger: coral button with a chevron-down icon on the right
-
-### Order Confirmation Notification (top-right)
-- Background: `#252740`, border: `1px solid #2D2F4A`, border-radius: `10px`
-- Shadow: `var(--shadow-notification)`
-- "Orders placed: Your Buy EURO STOXX 50 Sep25 CC: 400 @ 41" — `14px text-primary`
-- Two buttons: "Reject" (outlined coral) + "Confirm" (teal fill), both `height 36px`
-
-### Toggle Switch (Active/Inactive)
-- Track: `40px × 22px`, border-radius: `999px`
-- Active: track `#7AEFEF`, thumb `#FFFFFF`
-- Inactive: track `#4A4B60`, thumb `#FFFFFF`
-- Transition: `0.15s ease`
-
-### Checkbox
-- Size: `16×16px`, border-radius: `4px`
-- Unchecked: `border 1px solid #4A4B60`, background: `#1A1B2E`
-- Checked: background `#7AEFEF`, border-color `#7AEFEF`, black checkmark inside
-
-### Modals (New/Edit User, Edit Client)
-- Background: `#252740`, border-radius: `10px`, shadow: `var(--shadow-modal)`
-- Overlay: `rgba(0,0,0,0.55)`
-- Header: modal title in `20px bold text-primary`
-- Form fields: standard modal inputs (`40px`, dark bg)
-- Footer: Cancel (white btn) + primary action (teal btn)
-
-### Admin User Table
-- Header: `12px uppercase secondary`, `letter-spacing 0.08em`
-- Row: `14px text-primary`, row hover: `rgba(255,255,255,0.03)` bg
-- First column: checkbox, then Username, First Name, Last Name, Email Address
-
-### Left Sidebar (icon-only nav)
-- Width: `56px`, background: `#0F1123`
-- M logo at top: teal `#7AEFEF`
-- Icon buttons: `40×40px`, border-radius `8px`, icon color `--color-text-secondary`
-- Active nav icon: icon color `#7AEFEF`, background `rgba(122,239,239,0.10)`
-
-### Top Header Bar
-- Height: `52px`, background: `#1E2035`, border-bottom: `1px solid #2D2F4A`
-- Left: platform title ("Equity Derivatives Auction", `16px semibold`) + breadcrumb
-- Right: user avatar (32px circle, initials)
-
-### Breadcrumb Navigation
-- `13px text-secondary` with `›` separators
-- Active/current page: `text-primary`, `font-weight 500`
-
----
-
-## What NOT to do
-
-- Do not use light mode or add `prefers-color-scheme: light` overrides
-- Do not use Tailwind or any CSS framework
-- Do not use border-radius above 10px (modals) or below 4px (except `50%` for circles)
-- Do not use colors outside this system without designer approval
-- Do not use `#EF4444` (error red) for the Cancel button — that color is only for validation errors
-- Do not use `#E57373` (coral) for validation errors — that is the Cancel/Reject color
-- Do not hardcode hex values in component CSS — always reference `var(--color-*)` tokens
-- Do not add gradients or decorative shadows beyond what is defined above
-- Do not make the layout responsive — desktop only, fixed-width sidebar
-- Do not change the teal `#7AEFEF` for the M logo or Confirm button — it must match across components
+- Do NOT use **Inter** (or any font but Lato Regular), or any **bold / 500 / 600 / 700** weight.
+- Do NOT use **teal `#7AEFEF`**, "brand-ghost" tints, or any teal as the brand colour: the primary is blue `#7590FF`, the secondary accent blue-green `#71E7FF`.
+- Do NOT use **navy `#151729` / `#1E2035` / `#252740` / `#0F1123`** or the old greys: the surfaces are `#18181C`, `#22222C`, `#2D2E3B`, controls `#373746`.
+- Do NOT use **coral `#E57373`** for Cancel / Reject (it is red `#FF6565`), amber `#F59E0B`, green `#4DCC9B`, or `#EF4444`.
+- Do NOT use **6px / 10px radii** (it is 4 / 8 / 12 / 6 / 2) or 1px borders on inputs, cards and modals (controls are borderless, cards have no stroke).
+- Do NOT add **shadows** to cards / panels / modals / dropdown buttons, **gradients**, glows on focus, `uppercase` column headers, tracked letter-spacing, `tabular-nums` bold, or transitions that Figma does not imply.
+- Do NOT make inputs 36 / 40px or buttons 36px (controls are 32), a 56px sidebar with 40px icon buttons (sidebar 64, icons 24 bare), a 52px top header bar with breadcrumbs (there is none), or a 40x22 toggle (32x16).
+- Do NOT use `#FFFFFF` for text (primary text is `#F8F7FF`), and do NOT add the "LOGGED IN AS" label (owner decided 2026-10-14 to leave it out).
+- Do NOT add responsive breakpoints, light mode, Tailwind / frameworks, or new colours / radii / fonts. Do NOT redraw icons.
+- Do NOT edit `tokens.*` / `components.css` casually: every value traces to a Figma node id; change them only with a spec reference.

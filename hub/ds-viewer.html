@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design System — Makor</title>
+  <base href="/hub/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .ds-layout { display: flex; min-height: calc(100vh - 52px); margin-top: 52px; }
+
+    /* Sidebar */
+    .ds-sidebar {
+      width: 196px; flex-shrink: 0;
+      position: sticky; top: 52px; height: calc(100vh - 52px);
+      overflow-y: auto; border-right: 1px solid var(--border);
+      padding: 24px 14px; box-sizing: border-box;
+    }
+    .ds-back { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); text-decoration: none; margin-bottom: 18px; transition: color .12s; }
+    .ds-back:hover { color: var(--text); }
+    .ds-platform-eyebrow { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--text-secondary); margin-bottom: 3px; }
+    .ds-platform-name { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.25; margin-bottom: 22px; }
+    .ds-nav { display: flex; flex-direction: column; gap: 1px; margin-bottom: 18px; }
+    .ds-nav a { display: block; padding: 7px 9px; border-radius: 6px; font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: all .12s; }
+    .ds-nav a:hover { background: rgba(0,0,0,.05); color: var(--text); }
+    .ds-nav a.active { background: var(--brand); color: #fff; font-weight: 500; }
+    .ds-divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+    .ds-ext { display: flex; align-items: center; gap: 6px; padding: 7px 9px; border-radius: 6px; font-size: 12px; color: var(--text-secondary); text-decoration: none; transition: all .12s; }
+    .ds-ext:hover { background: rgba(0,0,0,.05); color: var(--text); }
+
+    /* Main */
+    .ds-main { flex: 1; padding: 44px 52px; max-width: 860px; box-sizing: border-box; }
+
+    .ds-section { margin-bottom: 60px; scroll-margin-top: 72px; }
+    .ds-section-title { font-size: 19px; font-weight: 700; color: var(--text); padding-bottom: 12px; margin-bottom: 22px; border-bottom: 1px solid var(--border); }
+
+    /* Colors */
+    .color-group { margin-bottom: 26px; }
+    .color-group-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--text-secondary); margin-bottom: 10px; }
+    .color-swatches { display: flex; flex-wrap: wrap; gap: 12px; }
+    .swatch { width: 76px; }
+    .swatch-tile { width: 76px; height: 48px; border-radius: 7px; border: 1px solid rgba(0,0,0,.09); margin-bottom: 6px; }
+    .swatch-name { font-size: 10px; font-weight: 500; color: var(--text); line-height: 1.3; word-break: break-word; }
+    .swatch-val { font-size: 10px; color: var(--text-secondary); font-family: monospace; margin-top: 1px; word-break: break-all; }
+
+    /* Typography */
+    .font-cards { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+    .font-card { flex: 1; min-width: 160px; background: white; border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; }
+    .font-card-role { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--text-secondary); margin-bottom: 4px; }
+    .font-card-name { font-size: 12px; color: var(--text); margin-bottom: 10px; }
+    .font-card-sample { font-size: 30px; color: var(--text); line-height: 1; }
+
+    .type-row { display: flex; align-items: baseline; gap: 18px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .type-row:last-child { border-bottom: none; }
+    .type-meta { width: 68px; flex-shrink: 0; }
+    .type-key { font-size: 10px; font-weight: 600; color: var(--brand); font-family: monospace; }
+    .type-px { font-size: 10px; color: var(--text-secondary); margin-top: 1px; }
+    .type-sample { color: var(--text); line-height: 1.2; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .type-note { font-size: 10px; color: var(--text-secondary); flex-shrink: 0; max-width: 180px; text-align: right; }
+
+    /* Spacing */
+    .spacing-rows { display: flex; flex-direction: column; gap: 7px; }
+    .spacing-row { display: flex; align-items: center; gap: 14px; }
+    .spacing-key { font-size: 10px; font-weight: 600; color: var(--brand); font-family: monospace; width: 66px; flex-shrink: 0; }
+    .spacing-val { font-size: 10px; color: var(--text-secondary); width: 34px; flex-shrink: 0; }
+    .spacing-bar { height: 7px; border-radius: 4px; background: var(--brand); opacity: .5; min-width: 2px; }
+
+    /* Border radius */
+    .radius-grid { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; }
+    .radius-item { text-align: center; }
+    .radius-box { width: 64px; height: 64px; border: 2px solid var(--brand); background: var(--brand); opacity: .15; margin: 0 auto 7px; }
+    .radius-key { font-size: 10px; font-weight: 600; color: var(--brand); font-family: monospace; }
+    .radius-val { font-size: 10px; color: var(--text-secondary); margin-top: 1px; }
+
+    .ds-error { padding: 60px; color: var(--text-secondary); font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+    <svg class="nav-icon" viewBox="0 0 20 20" fill="none">
+      <rect width="20" height="20" rx="5" fill="#005268"/>
+      <path d="M6 7h8M6 10h6M6 13h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <span class="nav-logo">Makor Digital Assets</span>
+  </a>
+</nav>
+
+<div class="ds-layout">
+  <aside class="ds-sidebar" id="sidebar"></aside>
+  <main class="ds-main" id="main">
+    <p class="ds-error">Loading…</p>
+  </main>
+</div>
+
+<script src="projects.js"></script>
+<script>
+const NAV_SECTIONS = [
+  { id: 'colors',     label: 'Colors' },
+  { id: 'typography', label: 'Typography' },
+  { id: 'spacing',    label: 'Spacing' },
+  { id: 'radius',     label: 'Border Radius' },
+];
+
+const platformId = location.hash.replace('#', '') || 'enigma-x';
+const platform   = (PROJECTS.platforms || []).find(p => p.id === platformId || p.dsId === platformId) || { name: platformId };
+document.title   = platform.name + ' Design System — Makor';
+
+function buildSidebar() {
+  document.getElementById('sidebar').innerHTML = `
+    <a class="ds-back" href="index.html">← Hub</a>
+    <div class="ds-platform-eyebrow">Design System</div>
+    <div class="ds-platform-name">${platform.name}</div>
+    <nav class="ds-nav">
+      ${NAV_SECTIONS.map(s => `<a href="#${s.id}">${s.label}</a>`).join('')}
+    </nav>
+    <hr class="ds-divider">
+    <a class="ds-ext" href="../${platformId}/design-system/CLAUDE.md" target="_blank">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 2h6l3 3v9a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M9 2v4h4"/></svg>
+      CLAUDE.md
+    </a>`;
+}
+
+async function render() {
+  buildSidebar();
+  let tokens;
+  try {
+    const res = await fetch(`../${platformId}/design-system/tokens.json`);
+    if (!res.ok) throw new Error();
+    tokens = await res.json();
+  } catch {
+    document.getElementById('main').innerHTML = `<p class="ds-error">No design system found for <strong>${platform.name}</strong>.</p>`;
+    return;
+  }
+
+  // Dynamically load platform font
+  const primaryFont = tokens.font?.primary?.value || '';
+  const fontName = (primaryFont.match(/'([^']+)'/) || primaryFont.match(/^([^,]+)/))?.[1]?.trim() || '';
+  if (fontName && !['Geist', 'system-ui', '-apple-system'].includes(fontName)) {
+    const link = Object.assign(document.createElement('link'), {
+      rel: 'stylesheet',
+      href: `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;500;600;700&display=swap`
+    });
+    document.head.appendChild(link);
+  }
+
+  document.getElementById('main').innerHTML = [
+    renderColors(tokens.color),
+    renderTypography(tokens, fontName),
+    renderSpacing(tokens.spacing),
+    renderRadius(tokens.borderRadius),
+  ].join('');
+
+  initScrollSpy();
+}
+
+function section(id, title, body) {
+  return `<section class="ds-section" id="${id}"><h2 class="ds-section-title">${title}</h2>${body}</section>`;
+}
+
+// ── Colors ──────────────────────────────────────────────
+function renderColors(colorObj) {
+  if (!colorObj) return '';
+  const groups = Object.entries(colorObj).map(([group, tokens]) => {
+    const swatches = Object.entries(tokens).map(([key, tok]) => {
+      if (!tok?.value) return '';
+      return `<div class="swatch">
+        <div class="swatch-tile" style="background:${tok.value}"></div>
+        <div class="swatch-name">${key}</div>
+        <div class="swatch-val">${tok.value}</div>
+      </div>`;
+    }).join('');
+    return `<div class="color-group">
+      <div class="color-group-label">${group}</div>
+      <div class="color-swatches">${swatches}</div>
+    </div>`;
+  }).join('');
+  return section('colors', 'Colors', groups);
+}
+
+// ── Typography ───────────────────────────────────────────
+function renderTypography(tokens, fontName) {
+  const monoFont  = tokens.font?.mono?.value || '';
+  const monoName  = (monoFont.match(/'([^']+)'/) || monoFont.match(/^([^,]+)/))?.[1]?.trim() || '';
+  const fontStack = fontName ? `'${fontName}', sans-serif` : 'sans-serif';
+  const monoStack = monoName ? `'${monoName}', monospace` : 'monospace';
+
+  const fontCards = `<div class="font-cards">
+    ${fontName ? `<div class="font-card">
+      <div class="font-card-role">Primary</div>
+      <div class="font-card-name">${fontName}</div>
+      <div class="font-card-sample" style="font-family:${fontStack}">Aa</div>
+    </div>` : ''}
+    ${monoName ? `<div class="font-card">
+      <div class="font-card-role">Mono</div>
+      <div class="font-card-name">${monoName}</div>
+      <div class="font-card-sample" style="font-family:${monoStack}">Aa</div>
+    </div>` : ''}
+  </div>`;
+
+  const rows = tokens.fontSize ? Object.entries(tokens.fontSize).map(([key, tok]) =>
+    `<div class="type-row">
+      <div class="type-meta">
+        <div class="type-key">${key}</div>
+        <div class="type-px">${tok.value}</div>
+      </div>
+      <div class="type-sample" style="font-size:${tok.value};font-family:${fontStack}">The quick brown fox jumps over the lazy dog</div>
+      ${tok.comment ? `<div class="type-note">${tok.comment.split('—')[0].trim()}</div>` : ''}
+    </div>`
+  ).join('') : '';
+
+  return section('typography', 'Typography', fontCards + rows);
+}
+
+// ── Spacing ──────────────────────────────────────────────
+function renderSpacing(spacingObj) {
+  if (!spacingObj) return '';
+  const max = Math.max(...Object.values(spacingObj).map(t => parseFloat(t.value) || 0));
+  const rows = Object.entries(spacingObj).map(([key, tok]) => {
+    const pct = (parseFloat(tok.value) / max) * 100;
+    return `<div class="spacing-row">
+      <div class="spacing-key">--space-${key}</div>
+      <div class="spacing-val">${tok.value}</div>
+      <div class="spacing-bar" style="width:${pct}%"></div>
+    </div>`;
+  }).join('');
+  return section('spacing', 'Spacing', `<div class="spacing-rows">${rows}</div>`);
+}
+
+// ── Border Radius ────────────────────────────────────────
+function renderRadius(radiusObj) {
+  if (!radiusObj) return '';
+  const items = Object.entries(radiusObj).map(([key, tok]) => {
+    const val = tok.value;
+    // 999px and 50% shown as circles
+    const display = (val === '999px' || val === '50%') ? '50%' : val;
+    return `<div class="radius-item">
+      <div class="radius-box" style="border-radius:${display}"></div>
+      <div class="radius-key">${key}</div>
+      <div class="radius-val">${val}</div>
+    </div>`;
+  }).join('');
+  return section('radius', 'Border Radius', `<div class="radius-grid">${items}</div>`);
+}
+
+// ── Scroll spy ───────────────────────────────────────────
+function initScrollSpy() {
+  const links = document.querySelectorAll('.ds-nav a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting)
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  document.querySelectorAll('.ds-section').forEach(s => obs.observe(s));
+}
+
+render();
+</script>
+</body>
+</html>

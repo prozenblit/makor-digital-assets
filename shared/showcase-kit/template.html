@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Template Platform design system</title>
+<link rel="icon" href="data:,">
+<!-- A real platform links its own tokens.css + components.css here (and optional Google Fonts). -->
+<link rel="stylesheet" href="showcase-kit.css">
+<style>
+/* ===== PLATFORM PLACEHOLDER TOKENS (stand-in for tokens.css) — light set on :root, dark set on body.dark ===== */
+:root { --p-bg:#f4f1ec; --p-surface:#ffffff; --p-surface-2:#ebe7df; --p-line:#d9d3c8; --p-ink:#1d1b18; --p-ink-2:#6b655c;
+  --p-brand:#0b6e4f; --p-brand-ink:#ffffff; --p-ext:#b45309; --p-alt:#6b655c; --p-doc:#0e7490; --p-out:#7c3aed;
+  --p-r-sm:4px; --p-r-md:8px; --p-r-lg:16px; --p-shadow:0 2px 8px rgba(29,27,24,.12);
+  --p-font:"Trebuchet MS", system-ui, sans-serif; --p-mono:Consolas, monospace; }
+body.dark { --p-bg:#0f1512; --p-surface:#17201b; --p-surface-2:#1f2b25; --p-line:#2f3f37; --p-ink:#e9efe9; --p-ink-2:#9db0a4;
+  --p-brand:#3ddc97; --p-brand-ink:#06251a; --p-ext:#f0a04b; --p-alt:#9db0a4; --p-doc:#4fc3d9; --p-out:#b69cff; --p-shadow:0 2px 8px rgba(0,0,0,.5); }
+/* ===== PLATFORM PLACEHOLDER COMPONENTS (stand-in for components.css) ===== */
+body { margin: 0; background: var(--p-bg); color: var(--p-ink); font: 14px/1.4 var(--p-font); }
+.p-btn { display:inline-flex; align-items:center; height:32px; padding:0 16px; border:1px solid var(--p-brand); border-radius:var(--p-r-sm); background:var(--p-brand); color:var(--p-brand-ink); font:500 13px var(--p-font); cursor:pointer; }
+.p-btn--secondary { background:transparent; color:var(--p-brand); }
+.p-btn--ghost { background:transparent; border-color:transparent; color:var(--p-ink); }
+.p-btn.is-hover { filter:brightness(1.12); } .p-btn[disabled] { opacity:.4; cursor:not-allowed; }
+.p-input { box-sizing:border-box; width:220px; height:32px; padding:0 10px; border:1px solid var(--p-line); border-radius:var(--p-r-sm); background:var(--p-surface); color:var(--p-ink); font:13px var(--p-font); }
+.p-input.is-focus { border-color:var(--p-brand); box-shadow:0 0 0 2px color-mix(in srgb, var(--p-brand) 30%, transparent); }
+.p-input.is-error { border-color:#c0392b; }
+.p-badge { display:inline-flex; align-items:center; height:20px; padding:0 8px; border-radius:10px; font:600 11px var(--p-font); background:var(--p-surface-2); color:var(--p-ink); }
+.p-badge--ok { background:color-mix(in srgb, var(--p-brand) 18%, transparent); color:var(--p-brand); }
+.p-badge--warn { background:color-mix(in srgb, var(--p-ext) 18%, transparent); color:var(--p-ext); }
+.p-tile { padding:16px; border:1px solid var(--p-line); border-radius:var(--p-r-md); background:var(--p-surface); box-shadow:var(--p-shadow); }
+/* screen-frame content (inside <template>, so it only renders when visible) */
+.p-app { display:flex; height:100%; background:var(--p-bg); color:var(--p-ink); font:14px/1.4 var(--p-font); }
+.p-app__side { width:220px; padding:20px; background:var(--p-surface); border-right:1px solid var(--p-line); }
+.p-app__main { flex:1; padding:28px; display:grid; grid-template-columns:repeat(3,1fr); gap:20px; align-content:start; }
+.p-app__main h1 { grid-column:1/-1; margin:0; font:700 24px var(--p-font); }
+
+/* ===== PLATFORM -> KIT TOKEN MAPPING (on .sk-app, NOT :root, so body.dark reaches it) ===== */
+.sk-app {
+  --sk-bg: var(--p-bg); --sk-surface: var(--p-surface); --sk-surface-2: var(--p-surface-2); --sk-border: var(--p-line);
+  --sk-text: var(--p-ink); --sk-text-muted: var(--p-ink-2); --sk-accent: var(--p-brand); --sk-accent-text: var(--p-brand-ink);
+  --sk-code-bg: var(--p-surface-2);
+  --sk-badge-extended: var(--p-ext); --sk-badge-alt: var(--p-alt); --sk-badge-documented: var(--p-doc); --sk-badge-outside: var(--p-out);
+  --sk-radius: var(--p-r-md); --sk-font: var(--p-font); --sk-mono-font: var(--p-mono); --sk-shadow: var(--p-shadow);
+  --sk-stage-bg: var(--p-bg);
+}
+</style>
+</head>
+<body>
+<div class="sk-app">
+
+<header class="sk-top">
+  <span class="sk-top__logo"><svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="7" fill="var(--p-brand)"/><path d="M8 20V8h3l3 6 3-6h3v12h-2.5v-7l-2.5 5h-2l-2.5-5v7z" fill="var(--p-brand-ink)"/></svg></span>
+  <span class="sk-top__title">Template Platform design system</span>
+  <span class="sk-top__src">Source: Figma Template file &middot; Section 1 (node 1:2) &middot; harvested 2026-10-15</span>
+  <div class="sk-top__actions">
+    <input class="sk-search" type="search" data-sk-search placeholder="Search sections ( / )" aria-label="Search sections">
+    <button class="sk-btn" type="button" data-sk-theme-toggle aria-pressed="false">Dark mode</button>
+  </div>
+</header>
+
+<div class="sk-shell">
+<nav class="sk-nav" data-sk-nav aria-label="Sections"></nav>
+<main class="sk-main">
+
+<!-- ================= OVERVIEW (home route) ================= -->
+<section class="sk-section" id="overview" data-sk-title="Overview">
+  <header class="sk-section__head">
+    <h2 class="sk-section__title">Template Platform design system</h2>
+    <p class="sk-section__lead">Working example of the shared showcase kit. Every demo uses only documented platform classes. Values are copied from the source; anything the source does not draw is built from existing tokens and carries the Extended badge.</p>
+  </header>
+  <div class="sk-counts" data-sk-counts data-sk-assets="3"></div>
+  <h3 class="sk-h3">Badge legend</h3>
+  <dl class="sk-legend">
+    <dt><span class="sk-badge sk-badge--extended">Extended</span></dt><dd>Not drawn in the source; built from existing tokens.</dd>
+    <dt><span class="sk-badge sk-badge--alt">Alt</span></dt><dd>Alternate treatment present in the source next to the canonical one.</dd>
+    <dt><span class="sk-badge sk-badge--documented">Documented dependency</span></dt><dd>External runtime dependency, described but not copied.</dd>
+    <dt><span class="sk-badge sk-badge--outside">Outside canonical</span></dt><dd>Drawn in the source outside the canonical section.</dd>
+  </dl>
+  <div class="sk-callout"><p><b>Kit features in this page:</b> hash routing (try <code>#c-actions-buttons</code>, <code>?all</code>), grouped nav with arrow keys / Home / End, search (press <code>/</code>), prev/next links, Copy HTML, theme toggle (top right), lazy scale-to-fit frames under Screens.</p></div>
+</section>
+
+<!-- ================= FOUNDATIONS (8 fixed sections) ================= -->
+<section class="sk-section" id="f-colours" data-sk-title="Colours">
+  <header class="sk-section__head"><h2 class="sk-section__title">Colours</h2><p class="sk-section__lead">Named palette, then platform-specific groups as sub-headings.</p></header>
+  <h3 class="sk-h3">Named palette</h3>
+  <div class="sk-swatches">
+    <figure class="sk-swatch"><div class="sk-swatch__chip" style="--sk-chip: var(--p-brand)"></div><figcaption class="sk-swatch__meta"><span class="sk-swatch__name">Brand</span><code class="sk-swatch__token">--p-brand</code><span class="sk-swatch__value">#0B6E4F</span><span class="sk-swatch__role">Primary action fill</span><span class="sk-swatch__src">Source: node 1:10</span></figcaption></figure>
+    <figure class="sk-swatch"><div class="sk-swatch__chip" style="--sk-chip: var(--p-surface)"></div><figcaption class="sk-swatch__meta"><span class="sk-swatch__name">Surface</span><code class="sk-swatch__token">--p-surface</code><span class="sk-swatch__value">#FFFFFF</span><span class="sk-swatch__role">Cards, panels</span><span class="sk-swatch__src">Source: node 1:11</span></figcaption></figure>
+    <figure class="sk-swatch"><div class="sk-swatch__chip" style="--sk-chip: var(--p-ink)"></div><figcaption class="sk-swatch__meta"><span class="sk-swatch__name">Ink</span><code class="sk-swatch__token">--p-ink</code><span class="sk-swatch__value">#1D1B18</span><span class="sk-swatch__role">Primary text</span><span class="sk-swatch__src">Source: node 1:12</span></figcaption></figure>
+    <figure class="sk-swatch"><div class="sk-swatch__chip" style="--sk-chip: color-mix(in srgb, var(--p-brand) 18%, transparent)"></div><figcaption class="sk-swatch__meta"><span class="sk-swatch__name">Brand 18%</span><code class="sk-swatch__token">--p-brand @ 0.18</code><span class="sk-swatch__value">alpha tint</span><span class="sk-swatch__role">Selected row <span class="sk-badge sk-badge--extended">Extended</span></span><span class="sk-swatch__src">Source: observed</span></figcaption></figure>
+  </div>
+  <h3 class="sk-h3">Semantic aliases</h3>
+  <div class="sk-table-wrap"><table class="sk-table sk-table--compact"><thead><tr><th>Alias</th><th>Resolves to</th><th>Role</th></tr></thead><tbody>
+    <tr><td><code>--color-text-primary</code></td><td><code>--p-ink</code></td><td>Body text</td></tr>
+    <tr><td><code>--color-action</code></td><td><code>--p-brand</code></td><td>Buttons, links</td></tr>
+  </tbody></table></div>
+</section>
+
+<section class="sk-section" id="f-typography" data-sk-title="Typography">
+  <header class="sk-section__head"><h2 class="sk-section__title">Typography</h2></header>
+  <div class="sk-type">
+    <div class="sk-type__row"><div class="sk-type__meta"><span class="sk-type__use">Heading 24</span><span class="sk-type__tuple">Trebuchet MS · 24px · 700 · 1.2 · normal · #1D1B18</span><span>Source: node 2:1</span></div><div class="sk-type__sample" style="font:700 24px/1.2 var(--p-font);color:var(--p-ink)">The quick brown fox jumps</div></div>
+    <div class="sk-type__row"><div class="sk-type__meta"><span class="sk-type__use">Body 14</span><span class="sk-type__tuple">Trebuchet MS · 14px · 400 · 1.4 · normal · #1D1B18</span><span>Source: node 2:2</span></div><div class="sk-type__sample" style="font:400 14px/1.4 var(--p-font);color:var(--p-ink)">The quick brown fox jumps over the lazy dog</div></div>
+    <div class="sk-type__row"><div class="sk-type__meta"><span class="sk-type__use">Caption 11</span><span class="sk-type__tuple">Trebuchet MS · 11px · 600 · 1.3 · 0.04em · #6B655C</span><span>Source: node 2:3</span></div><div class="sk-type__sample" style="font:600 11px/1.3 var(--p-font);letter-spacing:.04em;color:var(--p-ink-2)">THE QUICK BROWN FOX</div></div>
+  </div>
+</section>
+
+<section class="sk-section" id="f-radii" data-sk-title="Radii">
+  <header class="sk-section__head"><h2 class="sk-section__title">Radii</h2></header>
+  <div class="sk-samples">
+    <figure class="sk-sample"><div class="sk-sample__bed"><div class="sk-sample__box" style="border-radius:var(--p-r-sm)"></div></div><figcaption class="sk-sample__label"><code>--p-r-sm</code><span>4px · inputs, buttons</span></figcaption></figure>
+    <figure class="sk-sample"><div class="sk-sample__bed"><div class="sk-sample__box" style="border-radius:var(--p-r-md)"></div></div><figcaption class="sk-sample__label"><code>--p-r-md</code><span>8px · cards</span></figcaption></figure>
+    <figure class="sk-sample"><div class="sk-sample__bed"><div class="sk-sample__box" style="border-radius:var(--p-r-lg)"></div></div><figcaption class="sk-sample__label"><code>--p-r-lg</code><span>16px · modals</span></figcaption></figure>
+  </div>
+</section>
+
+<section class="sk-section" id="f-spacing" data-sk-title="Spacing (observed)">
+  <header class="sk-section__head"><h2 class="sk-section__title">Spacing (observed)</h2><p class="sk-section__lead">No spacing variables in the source; values below are observed in layouts.</p></header>
+  <div class="sk-table-wrap"><table class="sk-table sk-table--compact"><thead><tr><th>Value</th><th>Used for</th><th>Source</th></tr></thead><tbody>
+    <tr><td>8px</td><td>Gap between icon and label</td><td>node 3:1</td></tr><tr><td>16px</td><td>Card padding</td><td>node 3:2</td></tr><tr><td>24px</td><td>Section gap</td><td>node 3:3</td></tr></tbody></table></div>
+</section>
+
+<section class="sk-section" id="f-shadows" data-sk-title="Shadows & effects">
+  <header class="sk-section__head"><h2 class="sk-section__title">Shadows &amp; effects</h2></header>
+  <div class="sk-samples">
+    <figure class="sk-sample"><div class="sk-sample__bed"><div class="sk-sample__box" style="background:var(--p-surface);border-radius:var(--p-r-md);box-shadow:var(--p-shadow)"></div></div><figcaption class="sk-sample__label"><code>--p-shadow</code><span>0 2px 8px · card elevation</span></figcaption></figure>
+  </div>
+</section>
+
+<section class="sk-section" id="f-motion" data-sk-title="Motion">
+  <header class="sk-section__head"><h2 class="sk-section__title">Motion</h2></header>
+  <p class="sk-empty">Not defined in the source.</p>
+</section>
+
+<section class="sk-section" id="f-sizes" data-sk-title="Sizes & layout">
+  <header class="sk-section__head"><h2 class="sk-section__title">Sizes &amp; layout</h2></header>
+  <p class="sk-empty">Not defined in the source.</p>
+</section>
+
+<section class="sk-section" id="f-icons" data-sk-title="Icons & logos">
+  <header class="sk-section__head"><h2 class="sk-section__title">Icons &amp; logos</h2></header>
+  <div class="sk-icons">
+    <figure class="sk-icon"><div class="sk-icon__sample"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--p-ink)"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></div><figcaption class="sk-icon__meta"><span class="sk-icon__name">check-circle.svg</span><span>currentColor</span></figcaption></figure>
+    <figure class="sk-icon"><div class="sk-icon__sample"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--p-brand)"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div><figcaption class="sk-icon__meta"><span class="sk-icon__name">arrow-right.svg</span><span>brand variant</span></figcaption></figure>
+    <figure class="sk-icon"><div class="sk-icon__sample"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--p-ink-2)"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></div><figcaption class="sk-icon__meta"><span class="sk-icon__name">search.svg</span><span>muted variant</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- ================= COMPONENTS (grouped by role; id = c-<group>-<name>) ================= -->
+<section class="sk-section" id="c-actions-buttons" data-sk-title="Buttons" data-sk-keywords="cta primary secondary">
+  <header class="sk-section__head"><h2 class="sk-section__title">Buttons</h2></header>
+  <article class="sk-card" id="c-actions-buttons-primary">
+    <header class="sk-card__head"><h3 class="sk-card__title">Button (primary / secondary / ghost)</h3></header>
+    <p class="sk-card__src">Source: Figma set 10:20</p>
+    <div class="sk-stage"><div class="sk-variants">
+      <figure class="sk-variant"><div class="sk-demo"><button class="p-btn" type="button">Primary</button></div><figcaption class="sk-variant__cap">Default <span class="sk-id">10:21</span></figcaption></figure>
+      <figure class="sk-variant"><div class="sk-demo"><button class="p-btn is-hover" type="button">Primary</button></div><figcaption class="sk-variant__cap">Hover (<code>.is-hover</code>) <span class="sk-id">10:22</span></figcaption></figure>
+      <figure class="sk-variant"><div class="sk-demo"><button class="p-btn" type="button" disabled>Primary</button></div><figcaption class="sk-variant__cap">Disabled <span class="sk-id">10:23</span></figcaption></figure>
+      <figure class="sk-variant"><div class="sk-demo"><button class="p-btn p-btn--secondary" type="button">Secondary</button></div><figcaption class="sk-variant__cap">Secondary <span class="sk-id">10:24</span></figcaption></figure>
+      <figure class="sk-variant"><div class="sk-demo"><button class="p-btn p-btn--ghost" type="button">Ghost</button></div><figcaption class="sk-variant__cap">Ghost <span class="sk-badge sk-badge--extended">Extended</span></figcaption></figure>
+    </div></div>
+    <div class="sk-card__foot"><button class="sk-btn" type="button" data-sk-copy>Copy HTML</button></div>
+    <div class="sk-card__notes sk-prose"><p>Height 32 fixed, width hug, radius <code>--p-r-sm</code>. Ghost is Extended: the source draws no tertiary button.</p></div>
+    <div class="sk-card__alts"><div class="sk-alt">
+      <div class="sk-alt__head"><span class="sk-badge sk-badge--alt">Alt</span> Button with trailing icon</div>
+      <div class="sk-stage"><div class="sk-variants"><figure class="sk-variant"><div class="sk-demo"><button class="p-btn" type="button">Continue &rarr;</button></div><figcaption class="sk-variant__cap">Alternate <span class="sk-id">10:40</span></figcaption></figure></div></div>
+      <div class="sk-card__foot"><button class="sk-btn" type="button" data-sk-copy>Copy HTML</button></div>
+    </div></div>
+  </article>
+</section>
+
+<section class="sk-section" id="c-forms-inputs" data-sk-title="Text input">
+  <header class="sk-section__head"><h2 class="sk-section__title">Text input</h2></header>
+  <article class="sk-card" id="c-forms-inputs-text">
+    <header class="sk-card__head"><h3 class="sk-card__title">Text input</h3><span class="sk-badge sk-badge--extended">Extended states</span></header>
+    <p class="sk-card__src">Source: Figma node 11:5</p>
+    <div class="sk-stage"><div class="sk-variants">
+      <figure class="sk-variant"><div class="sk-demo"><input class="p-input" placeholder="Default"></div><figcaption class="sk-variant__cap">Default <span class="sk-id">11:6</span></figcaption></figure>
+      <figure class="sk-variant"><div class="sk-demo"><input class="p-input is-focus" value="Focused"></div><figcaption class="sk-variant__cap">Focus <span class="sk-id">11:7</span></figcaption></figure>
+      <figure class="sk-variant"><div class="sk-demo"><input class="p-input is-error" value="Invalid"></div><figcaption class="sk-variant__cap">Error <span class="sk-badge sk-badge--extended">Extended</span></figcaption></figure>
+    </div></div>
+    <template data-sk-source><!-- source override: copied instead of the demos -->
+<input class="p-input" placeholder="Default">
+<input class="p-input is-focus" value="Focused"></template>
+    <div class="sk-card__foot"><button class="sk-btn" type="button" data-sk-copy>Copy HTML</button></div>
+    <div class="sk-card__notes sk-prose"><p>This card ships a <code>&lt;template data-sk-source&gt;</code>, so Copy HTML copies that text instead of the rendered demos.</p></div>
+  </article>
+</section>
+
+<section class="sk-section" id="c-indicators-badges" data-sk-title="Badges">
+  <header class="sk-section__head"><h2 class="sk-section__title">Badges</h2></header>
+  <article class="sk-card" id="c-indicators-badges-status">
+    <header class="sk-card__head"><h3 class="sk-card__title">Status badge</h3></header>
+    <p class="sk-card__src">Source: Figma node 12:3</p>
+    <div class="sk-stage"><div class="sk-variants">
+      <figure class="sk-variant"><div class="sk-demo"><span class="p-badge">Neutral</span></div><figcaption class="sk-variant__cap">Neutral <span class="sk-id">12:4</span></figcaption></figure>
+      <figure class="sk-variant"><div class="sk-demo"><span class="p-badge p-badge--ok">Live</span></div><figcaption class="sk-variant__cap">OK <span class="sk-id">12:5</span></figcaption></figure>
+      <figure class="sk-variant"><div class="sk-demo"><span class="p-badge p-badge--warn">Pending</span></div><figcaption class="sk-variant__cap">Warn <span class="sk-id">12:6</span></figcaption></figure>
+    </div></div>
+    <div class="sk-card__foot"><button class="sk-btn" type="button" data-sk-copy>Copy HTML</button></div>
+  </article>
+</section>
+
+<!-- ================= SCREENS (one nav item per screen/flow) ================= -->
+<section class="sk-section" id="s-dashboard" data-sk-title="Dashboard">
+  <header class="sk-section__head"><h2 class="sk-section__title">Dashboard</h2><p class="sk-section__lead">Frames are scaled to the column width and render only when scrolled into view.</p></header>
+  <figure class="sk-screen" id="s-dashboard-default">
+    <figcaption class="sk-screen__cap"><span class="sk-screen__name">Dashboard</span><span class="sk-screen__src">Source: Figma frame 20:1</span></figcaption>
+    <div class="sk-frame" data-sk-w="1440" data-sk-h="900"><template>
+      <div class="p-app"><aside class="p-app__side"><b>Template</b><p style="color:var(--p-ink-2)">Navigation</p></aside>
+        <div class="p-app__main"><h1>Dashboard</h1>
+          <div class="p-tile"><span class="p-badge p-badge--ok">Live</span><h3>Orders</h3><p>128 today</p><button class="p-btn" type="button">Open</button></div>
+          <div class="p-tile"><span class="p-badge p-badge--warn">Pending</span><h3>Approvals</h3><p>7 waiting</p><button class="p-btn p-btn--secondary" type="button">Review</button></div>
+          <div class="p-tile"><span class="p-badge">Neutral</span><h3>Reports</h3><p>3 scheduled</p><input class="p-input" placeholder="Search reports"></div>
+        </div></div>
+    </template></div>
+  </figure>
+  <div class="sk-callout sk-callout--warn"><p>Spacer so the next frame starts below the fold (lazy rendering test).</p><div style="height:520px"></div></div>
+  <figure class="sk-screen" id="s-dashboard-mobile">
+    <figcaption class="sk-screen__cap"><span class="sk-screen__name">Dashboard (mobile)</span><span class="sk-screen__src">Source: Figma frame 20:9</span></figcaption>
+    <div class="sk-frame" data-sk-w="390" data-sk-h="844"><template>
+      <div class="p-app" style="display:block"><div style="padding:24px"><h1 style="margin:0 0 16px">Dashboard</h1><div class="p-tile"><span class="p-badge p-badge--ok">Live</span><h3>Orders</h3><p>128 today</p></div></div></div>
+    </template></div>
+  </figure>
+</section>
+
+<!-- ================= REFERENCE (4 fixed sections) ================= -->
+<section class="sk-section" id="r-decisions" data-sk-title="Known inconsistencies & decisions">
+  <header class="sk-section__head"><h2 class="sk-section__title">Known inconsistencies &amp; decisions</h2></header>
+  <div class="sk-table-wrap"><table class="sk-table sk-table--decisions"><thead><tr><th>#</th><th>Source</th><th>What</th><th>Chosen behaviour</th><th>Status</th></tr></thead><tbody>
+    <tr><td>1</td><td><code>app.html L120</code></td><td>Disabled button text contrast below AA</td><td>Reproduced as rendered</td><td><span class="sk-status" data-status="decided">Decided</span></td></tr>
+    <tr><td>2</td><td><code>app.html L342</code></td><td>Focus ring changes radius</td><td>Not built; listed here</td><td><span class="sk-status" data-status="open">Open</span></td></tr>
+  </tbody></table></div>
+</section>
+<section class="sk-section" id="r-dead-code" data-sk-title="Dead code & dropped items">
+  <header class="sk-section__head"><h2 class="sk-section__title">Dead code &amp; dropped items</h2></header>
+  <p class="sk-empty">None recorded.</p>
+</section>
+<section class="sk-section" id="r-extended-index" data-sk-title="Extended index">
+  <header class="sk-section__head"><h2 class="sk-section__title">Extended index</h2><p class="sk-section__lead">Every item carrying the Extended badge.</p></header>
+  <div class="sk-table-wrap"><table class="sk-table sk-table--compact"><thead><tr><th>Item</th><th>Where</th><th>Why Extended</th></tr></thead><tbody>
+    <tr><td>Ghost button</td><td><a href="#c-actions-buttons-primary">Buttons</a></td><td>Source draws no tertiary button</td></tr>
+    <tr><td>Input error state</td><td><a href="#c-forms-inputs-text">Text input</a></td><td>Source draws default and focus only</td></tr>
+  </tbody></table></div>
+</section>
+<section class="sk-section" id="r-open-decisions" data-sk-title="Open decisions for the owner">
+  <header class="sk-section__head"><h2 class="sk-section__title">Open decisions for the owner</h2></header>
+  <div class="sk-prose"><ol><li>Keep the Ghost button as Extended, or drop it?</li><li>Should the focus ring keep its radius change (see #2)?</li></ol></div>
+</section>
+
+</main>
+</div>
+</div>
+
+<script src="showcase-kit.js"></script>
+<script>
+/* Platform wiring: the platform owns its dark mode; the kit only calls back. */
+SK.onThemeToggle(function (dark) { document.body.classList.toggle('dark', dark); });
+</script>
+</body>
+</html>

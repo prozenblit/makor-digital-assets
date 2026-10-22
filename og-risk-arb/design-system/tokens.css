@@ -1,205 +1,358 @@
-/* ============================================================
-   OG Risk Arb — Design Tokens
-   Oscar Gruss Risk Arbitrage — Deal Tracking & Research Platform
-   October 2026
-
-   Usage: import this file before any component styles.
-   Light mode only — desktop-only platform.
-   ============================================================ */
-
+/* =====================================================================
+   OG Risk Arb - design tokens (stage 1)
+   Source: Figma VlOfBG6fJt7ijm0iKasAMP / page final / SECTION "Section 1" (2496:2003)
+           + page components (924:3460). Figma defines NO variables: every value below is
+           read from nodes (comment = node id) or marked EXTENDED.
+   Mirrors tokens.json 1:1 (generated from the same data).
+   ===================================================================== */
 :root {
 
-  /* ----------------------------------------------------------
-     BRAND
-  ---------------------------------------------------------- */
-  --color-brand:          #1B8C8C;  /* deep teal — OG logo, active sidebar icons, active tab underline, links */
-  --color-brand-hover:    #156B6B;  /* darker teal — hover states */
-  --color-brand-ghost:    rgba(27, 140, 140, 0.08);  /* highlighted row backgrounds, subtle bg tints */
-  --color-brand-focus:    rgba(27, 140, 140, 0.12);  /* focus rings */
-  --color-brand-ghost-border: rgba(27, 140, 140, 0.24); /* subtle teal border */
+  /* ---------- COLOUR - Figma-named palette (library paint styles) ---------- */
+  --color-white: #FFFFFF; /* Figma paint style "White". Surface of screens, nav, panels, inputs, table body. figma: 414:2723 */
+  --color-white-lowercase: #FFFFFF; /* Figma paint style "white" (2nd, duplicate of White, lowercase). Used on Button Master "Month" text. figma: 721:2274 */
+  --color-grey-4: #F5F5F8; /* Figma paint style "Grey 4". Lightest neutral: subtle fill (table header, chips, tags, top search), 1px dividers. figma: 414:2723, 414:2765 */
+  --color-grey-3: #E5E7EC; /* Figma paint style "Grey 3". Field/panel borders, scroll track, outline-button hover fill, disabled text on dark. figma: 414:2898, 1612:4365 */
+  --color-grey-2: #A8B6CD; /* Figma paint style "Grey 2". Tertiary: input labels, password placeholder, disabled bg/stroke, checkbox stroke, scroll thumb. figma: 1541:3211, 838:2607 */
+  --color-grey-1: #7C8DAC; /* Figma paint style "Grey 1". Secondary text and icons, placeholders, toggle OFF track. figma: 1615:4421, 2044:6394 */
+  --color-black: #000000; /* Figma paint style "Black" (two styles, both #000000). Primary text, outline icons. figma: 414:2739 */
+  --color-dark-green-main: #005268; /* Figma paint style "dark green main". Brand: links, active nav, primary button, checkbox/radio selected, select chevron. figma: 414:2730 */
+  --color-orange: #FF8132; /* Figma paint style "Orange". Warning/alert accent: bell, Medium priority, today time, Reset All / Edit Events links. figma: 414:3020 */
+  --color-green: #179484; /* Figma paint style "Green". Success/new accent: New Event/Comment, calendar icon, toggle ON, Definitive text. figma: 414:2810, 1375:4128 */
+  --color-red: #DA4D43; /* Figma paint style "Red". Error / High priority, password error, log-out icon. figma: 824:8317, 1895:21136 */
+  --color-green-light: #C1F0D5; /* Figma paint style "Green light". Definitive pill background (opaque). figma: 824:8355 */
+  --color-icons-gradient: linear-gradient(207deg, #005268 0%, #1B9D83 36.1%, #3675D2 71.6%, #00C7CE 100%); /* Figma paint style "Icons gradient" (GRADIENT_LINEAR; brand logo + AI icon only). Stops EXACT: #005268@1 pos 0, #1B9D83@1 pos 0.361, #3675D2@1 pos 0.716, #00C7CE@1 pos 1. gradientTransform [[-0.476565420627594,0.5128738880157471,0.35574474930763245],[-0.4780420660972595,-0.43244510889053345,1.0065633058547974]]. CSS angle 207deg is DERIVED from the exported asset gradient vector (66,6.25)->(34.8,67.4) in assets/og-wordmark.svg - visual estimate; prefer the SVG assets. figma: 414:2726, 824:8268, 2044:6400 */
 
-  /* ----------------------------------------------------------
-     SURFACES
-  ---------------------------------------------------------- */
-  --color-bg:             #F5F6F8;  /* page background — very light blue-gray */
-  --color-surface:        #FFFFFF;  /* cards, panels, sidebar, modals */
-  --color-surface-2:      #F5F6F8;  /* inputs default bg, raised areas */
-  --color-surface-overlay: rgba(0, 0, 0, 0.35); /* modal overlay */
+  /* ---------- COLOUR - raw (unbound) hues ---------- */
+  --color-blue: #3675D2; /* Info / events / external links: Actual status, calendar day digits, Join the meeting, View More, bookmark. figma: 414:3009, 1541:3227 (raw in Figma: no style bound) */
+  --color-slate-blue: #4162A3; /* Cash Merger / Financials pill text. figma: 824:8251, 1720:6407 (raw in Figma: no style bound) */
+  --color-blue-pale: #CAD8F4; /* Cash Merger / Financials pill bg (opaque). figma: 824:8250 (raw in Figma: no style bound) */
+  --color-cyan-pale: #C1ECF0; /* Industry pill bg (Insurance / P&C Insurance / Reinsurance). figma: 1720:6411 (raw in Figma: no style bound) */
+  --color-cyan-text: #008D9A; /* Industry pill text. figma: 1720:6411-6416 (raw in Figma: no style bound) */
+  --color-yellow: #ECA100; /* Low priority text, Post-Event pill, yellow button. figma: 824:8245, 824:8499, 2293:7995 (raw in Figma: no style bound) */
+  --color-faint: #FBFBFC; /* Expanded-row detail panel bg. figma: 824:8263 (raw in Figma: no style bound) */
+  --color-comments-panel-border: #F7F7F7; /* Comments side-panel stroke. figma: 414:2801 (raw in Figma: no style bound) */
+  --color-comments-panel-bg: rgba(226, 226, 226, 0.25); /* #E2E2E2 @0.25 - comments side-panel fill. figma: 414:2801 (raw in Figma: no style bound) */
 
-  /* ----------------------------------------------------------
-     TEXT
-  ---------------------------------------------------------- */
-  --color-text-primary:   #1A1A28;  /* body text, headings — blue-tinted near-black */
-  --color-text-secondary: #6B7896;  /* labels, subtitles, muted text */
-  --color-text-tertiary:  #A0AABC;  /* placeholders, timestamps, fine print */
-  --color-text-on-brand:  #FFFFFF;  /* text ON the brand teal (active sidebar, filled buttons) */
-  --color-text-link:      #1B8C8C;  /* deal title links, inline teal text */
+  /* ---------- COLOUR - stage 2 raw hues (unbound in Figma; named after role) ---------- */
+  --color-subheader-tint: rgba(234, 235, 237, 0.3); /* #EAEBED @0.3 - Admin Internal table sub-header row + expanded child row fill. figma: 1895:18053 (raw in Figma: no style bound; section outside Section 1) */
+  --color-positive: #3B951A; /* Admin Internal Percentage Change positive text (negative = Red). figma: 1895:17760 (raw in Figma: no style bound; section outside Section 1) */
+  --color-delete-tint: #F0C4C1; /* Admin Internal sector-row delete icon-button fill. figma: 1895:20357 (raw in Figma: no style bound; section outside Section 1) */
+  --color-activity-events: #7541A3; /* All Deals / Drafts Activity cell - event-date count icon stroke (same hex as Stock Merger pill text). figma: 824:8256, 1988:6777 (raw in Figma: no style bound) */
+  --color-activity-comments: #3090C0; /* All Deals / Drafts Activity cell - comment-count icon stroke (same hex as Predeal pill text). figma: 824:8260 (raw in Figma: no style bound) */
 
-  /* ----------------------------------------------------------
-     BORDERS
-  ---------------------------------------------------------- */
-  --color-border:         #E5E7EC;  /* all cards, inputs, table cells, dividers */
-  --color-border-focus:   #1B8C8C;  /* input focus border */
+  /* ---------- COLOUR - alpha tints (same hex @ alpha) ---------- */
+  --color-dark-green-main-10: rgba(0, 82, 104, 0.1); /* #005268 @0.1 - active nav item / active filter chip / outline-green hover / active tab tint. figma: 414:2728, 1526:6281, 836:2661 */
+  --color-dark-green-main-20: rgba(0, 82, 104, 0.2); /* #005268 @0.2 - view-density active segment tint. figma: 824:8677 */
+  --color-orange-10: rgba(255, 129, 50, 0.1); /* #FF8132 @0.1 - today time block / bell chip bg. figma: 414:3019 */
+  --color-orange-20: rgba(255, 129, 50, 0.2); /* #FF8132 @0.2 - button orange outline hover. figma: 2293:8006 */
+  --color-yellow-20: rgba(236, 161, 0, 0.2); /* #ECA100 @0.2 - button yellow default. figma: 2293:7995 */
+  --color-yellow-35: rgba(236, 161, 0, 0.35); /* #ECA100 @0.35 - button yellow hover. figma: 2293:7997 */
+  --color-white-20: rgba(255, 255, 255, 0.2); /* #FFFFFF @0.2 - primary-button hover overlay (second fill layer). figma: 766:3216 */
+  --color-blue-05: rgba(54, 117, 210, 0.05); /* #3675D2 @0.05 - events right-panel bg / event card stroke. figma: 414:2969, 414:3002 */
+  --color-blue-10: rgba(54, 117, 210, 0.1); /* #3675D2 @0.1 - bookmark btn bg, View More chip, avatar badges, right-panel header stroke. figma: 1541:3226, 553:546 */
+  --color-blue-20: rgba(54, 117, 210, 0.2); /* #3675D2 @0.2 - Join the meeting bg (over white). figma: 414:3013 */
+  --color-blue-30: rgba(54, 117, 210, 0.3); /* #3675D2 @0.3 - highlighted event card stroke. figma: 414:3035 */
+  --color-blue-90: rgba(54, 117, 210, 0.9); /* #3675D2 @0.9 - avatar-badge letters. figma: 1541:3225 */
+  --color-scrim: rgba(229, 231, 236, 0.2); /* #E5E7EC @0.2 - modal / drawer backdrop fill (paired with backdrop blur 20). figma: 461:3414, 1988:5751 */
+  --color-shadow-base: #5B6380; /* "Shadow" effect style colour (alpha set per layer). figma: style S:b5f77b6be61583e40ab3180315a7366278b8fb56 */
+  --color-footer-shadow-base: #26395E; /* sticky footer-bar shadow colour (alpha 0.04 / 0.03 per layer). figma: 1868:10443 */
 
-  /* ----------------------------------------------------------
-     STATUS — Positive / Gain
-  ---------------------------------------------------------- */
-  --color-status-positive:        #22C55E;   /* positive % change text */
-  --color-status-positive-bg:     rgba(34, 197, 94, 0.12);
+  /* ---------- COLOUR - status / deal-type / industry pills (bg = colour @ alpha, text = opaque) ---------- */
+  --color-pill-predeal-bg: rgba(48, 144, 192, 0.25); /* Status Predeal. figma: 824:8247 | bg #3090C0@0.25 */
+  --color-pill-predeal-text: #3090C0; /* Status Predeal. figma: 824:8247 | text colour */
+  --color-pill-proposal-bg: rgba(48, 178, 192, 0.2); /* Status Proposal. figma: 824:8319 | bg #30B2C0@0.2 */
+  --color-pill-proposal-text: #30B2C0; /* Status Proposal. figma: 824:8319 | text colour */
+  --color-pill-definitive-bg: #C1F0D5; /* Status Definitive (bg = Green light, opaque; text = Green). figma: 824:8355 | bg #C1F0D5@1 */
+  --color-pill-definitive-text: #179484; /* Status Definitive (bg = Green light, opaque; text = Green). figma: 824:8355 | text colour */
+  --color-pill-terminated-bg: rgba(220, 67, 43, 0.2); /* Status Terminated. figma: 824:8283 | bg #DC432B@0.2 */
+  --color-pill-terminated-text: #DC432B; /* Status Terminated. figma: 824:8283 | text colour */
+  --color-pill-withdrawn-bg: rgba(96, 116, 160, 0.2); /* Status Withdrawn. figma: 824:8391 | bg #6074A0@0.2 */
+  --color-pill-withdrawn-text: #6074A0; /* Status Withdrawn. figma: 824:8391 | text colour */
+  --color-pill-spinoff-definitive-bg: rgba(167, 82, 169, 0.2); /* Status Spinoff - Definitive. figma: 824:8427 | bg #A752A9@0.2 */
+  --color-pill-spinoff-definitive-text: #A752A9; /* Status Spinoff - Definitive. figma: 824:8427 | text colour */
+  --color-pill-did-not-happen-bg: rgba(76, 119, 148, 0.25); /* Status Did Not Happen. figma: 824:8463 | bg #4C7794@0.25 */
+  --color-pill-did-not-happen-text: #4C7794; /* Status Did Not Happen. figma: 824:8463 | text colour */
+  --color-pill-post-event-bg: rgba(236, 161, 0, 0.2); /* Status Post-Event. figma: 824:8499 | bg #ECA100@0.2 */
+  --color-pill-post-event-text: #ECA100; /* Status Post-Event. figma: 824:8499 | text colour */
+  --color-pill-cash-merger-bg: #CAD8F4; /* Type Cash Merger (bg opaque). figma: 824:8250 | bg #CAD8F4@1 */
+  --color-pill-cash-merger-text: #4162A3; /* Type Cash Merger (bg opaque). figma: 824:8250 | text colour */
+  --color-pill-cash-tender-bg: rgba(198, 34, 108, 0.1); /* Type Cash Tender (bg alpha 0.1). figma: 824:8286 | bg #C6226C@0.1 */
+  --color-pill-cash-tender-text: #C6226C; /* Type Cash Tender (bg alpha 0.1). figma: 824:8286 | text colour */
+  --color-pill-stock-merger-bg: rgba(117, 65, 163, 0.2); /* Type Stock Merger. figma: 824:8322 | bg #7541A3@0.2 */
+  --color-pill-stock-merger-text: #7541A3; /* Type Stock Merger. figma: 824:8322 | text colour */
+  --color-pill-dutch-auction-bg: rgba(220, 94, 43, 0.2); /* Type Dutch Auction. figma: 824:8358 | bg #DC5E2B@0.2 */
+  --color-pill-dutch-auction-text: #DC5E2B; /* Type Dutch Auction. figma: 824:8358 | text colour */
+  --color-pill-investment-bg: rgba(23, 148, 117, 0.2); /* Type Investment. Figma bg #179475 vs text #179464 - reproduced EXACTLY as drawn (differs from Green #179484). figma: 824:8394 | bg #179475@0.2 */
+  --color-pill-investment-text: #179464; /* Type Investment. Figma bg #179475 vs text #179464 - reproduced EXACTLY as drawn (differs from Green #179484). figma: 824:8394 | text colour */
+  --color-pill-exchange-offer-bg: rgba(54, 163, 15, 0.2); /* Type Exchange Offer. figma: 824:8430 | bg #36A30F@0.2 */
+  --color-pill-exchange-offer-text: #36A30F; /* Type Exchange Offer. figma: 824:8430 | text colour */
+  --color-pill-not-available-bg: #F5F5F8; /* Type Not Available (bg Grey 4 opaque, text Grey 1). figma: 824:8466 | bg #F5F5F8@1 */
+  --color-pill-not-available-text: #7C8DAC; /* Type Not Available (bg Grey 4 opaque, text Grey 1). figma: 824:8466 | text colour */
+  --color-pill-cash-stock-merger-bg: rgba(65, 153, 163, 0.2); /* Type Cash-Stock Merger. figma: 824:8502 | bg #4199A3@0.2 */
+  --color-pill-cash-stock-merger-text: #4199A3; /* Type Cash-Stock Merger. figma: 824:8502 | text colour */
+  --color-pill-industry-financials-bg: #CAD8F4; /* Industry Financials (same colours as Cash Merger). figma: 1720:6406 | bg #CAD8F4@1 */
+  --color-pill-industry-financials-text: #4162A3; /* Industry Financials (same colours as Cash Merger). figma: 1720:6406 | text colour */
+  --color-pill-industry-insurance-bg: #C1ECF0; /* Industry Insurance / P&C Insurance / Reinsurance. figma: 1720:6411-6416 | bg #C1ECF0@1 */
+  --color-pill-industry-insurance-text: #008D9A; /* Industry Insurance / P&C Insurance / Reinsurance. figma: 1720:6411-6416 | text colour */
+  --color-pill-empty-bg: #E5E7EC; /* Empty-state placeholder pills Deal Status / Deal Type (New Deal). figma: 1868:10646-10649 | bg #E5E7EC@1 */
+  --color-pill-empty-text: #7C8DAC; /* Empty-state placeholder pills Deal Status / Deal Type (New Deal). figma: 1868:10646-10649 | text colour */
 
-  /* ----------------------------------------------------------
-     STATUS — Negative / Loss
-  ---------------------------------------------------------- */
-  --color-status-negative:        #EF4444;   /* negative % change text */
-  --color-status-negative-bg:     rgba(239, 68, 68, 0.10);
+  /* ---------- COLOUR - priority (text only, no bg) ---------- */
+  --color-priority-high: #DA4D43; /* Regulatory Risk High - Geist Medium 12 text, no bg. = Red. figma: 824:8317 */
+  --color-priority-medium: #FF8132; /* Regulatory Risk Medium. = Orange. figma: 824:8281 */
+  --color-priority-low: #ECA100; /* Regulatory Risk Low. = yellow. figma: 824:8245 */
 
-  /* ----------------------------------------------------------
-     STATUS — Warning / Pending
-  ---------------------------------------------------------- */
-  --color-status-warning:         #D97706;
-  --color-status-warning-bg:      rgba(245, 158, 11, 0.12);
+  /* ---------- COLOUR - semantic alias: text ---------- */
+  --color-text-primary: var(--color-black); /* Primary text (table cells, nav labels, headings) */
+  --color-text-secondary: var(--color-grey-1); /* Secondary text: weekdays, counts, placeholders, Risk Arbitrage label */
+  --color-text-tertiary: var(--color-grey-2); /* Tertiary: input labels, timestamps, password placeholder */
+  --color-text-on-brand: var(--color-white); /* Text on dark green (primary button, active segment) */
+  --color-text-on-disabled: var(--color-grey-3); /* Text on a disabled filled button */
+  --color-text-disabled: var(--color-grey-1); /* Disabled checkbox label */
+  --color-text-link: var(--color-dark-green-main); /* Internal link: Geist Medium 12 underline */
+  --color-text-link-external: var(--color-blue); /* External / ticker link, URLs, event Actual */
+  --color-text-link-action: var(--color-orange); /* Action link: Reset All, Edit Events */
+  --color-text-success: var(--color-green); /* New Event / New Comment label */
+  --color-text-error: var(--color-red); /* Error helper text, High priority */
+  --color-text-warning: var(--color-orange); /* Medium priority / today time */
 
-  /* ----------------------------------------------------------
-     DEAL STATUS BADGES
-  ---------------------------------------------------------- */
-  /* Definitive / Closed */
-  --badge-definitive-bg:   rgba(34, 197, 94, 0.12);
-  --badge-definitive-text: #16A34A;
-  /* Cash Merger / Cash */
-  --badge-cash-bg:         rgba(27, 140, 140, 0.12);
-  --badge-cash-text:       #1B8C8C;
-  /* Proposal / Pending */
-  --badge-proposal-bg:     rgba(245, 158, 11, 0.12);
-  --badge-proposal-text:   #D97706;
-  /* Terminated / Withdrawn */
-  --badge-terminated-bg:   rgba(239, 68, 68, 0.10);
-  --badge-terminated-text: #DC2626;
-  /* Neutral — labels, sector tags */
-  --badge-neutral-bg:      rgba(107, 120, 150, 0.10);
-  --badge-neutral-text:    #6B7896;
+  /* ---------- COLOUR - semantic alias: surface ---------- */
+  --color-surface-default: var(--color-white); /* Screens, panels, nav, inputs */
+  --color-surface-subtle: var(--color-grey-4); /* Table header, tags, chips, top search, active tab */
+  --color-surface-muted: var(--color-grey-3); /* Count bubble, close chip, scroll track, outline-button hover */
+  --color-surface-disabled: var(--color-grey-2); /* Disabled filled button */
+  --color-surface-faint: var(--color-faint); /* Expanded-row detail panel */
+  --color-surface-brand: var(--color-dark-green-main); /* Primary button, active segment */
+  --color-surface-brand-tint: var(--color-dark-green-main-10); /* Active nav item / chip / hover tint */
+  --color-surface-info-tint: var(--color-blue-10); /* Blue tint chips */
+  --color-surface-events-panel: var(--color-blue-05); /* Upcoming Events panel */
+  --color-surface-comments-panel: var(--color-comments-panel-bg); /* Recent Updates panel */
+  --color-surface-scrim: var(--color-scrim); /* Modal / drawer backdrop (+ blur 20) */
 
-  /* ----------------------------------------------------------
-     DISABLED
-  ---------------------------------------------------------- */
-  --color-disabled-bg:    #D1D5DB;
-  --color-disabled-text:  #9CA3AF;
+  /* ---------- COLOUR - semantic alias: border ---------- */
+  --color-border-default: var(--color-grey-3); /* Field and panel borders, header separators */
+  --color-border-subtle: var(--color-grey-4); /* Row separators, nav outline, inactive tab outline */
+  --color-border-strong: var(--color-grey-2); /* Checkbox/radio unchecked, disabled outline, deal info box */
+  --color-border-brand: var(--color-dark-green-main); /* Active chip/tab, focus (top search drawn) */
+  --color-border-error: var(--color-red); /* Error field (one Figma instance) */
+  --color-border-on-dark: var(--color-white); /* Divider between segmented halves */
 
-  /* ----------------------------------------------------------
-     TYPOGRAPHY
-  ---------------------------------------------------------- */
-  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono:    'Inter', 'Courier New', monospace; /* mono not prominent — same family */
+  /* ---------- COLOUR - semantic alias: brand ---------- */
+  --color-brand-default: var(--color-dark-green-main); /* Brand colour */
+  --color-brand-tint-10: var(--color-dark-green-main-10); /* Brand tint 10% */
+  --color-brand-tint-20: var(--color-dark-green-main-20); /* Brand tint 20% */
 
-  --text-xs:    10px;   /* micro labels */
-  --text-sm:    12px;   /* badges, table headers, timestamps */
-  --text-base:  14px;   /* body, buttons, form elements */
-  --text-md:    15px;   /* emphasized body, card titles */
-  --text-lg:    16px;   /* section headings */
-  --text-xl:    18px;   /* panel headings */
-  --text-2xl:   20px;   /* page titles */
-  --text-3xl:   24px;   /* screen headings */
+  /* ---------- COLOUR - semantic alias: status ---------- */
+  --color-status-success: var(--color-green); /* Success / new */
+  --color-status-success-bg: var(--color-green-light); /* Success pill bg */
+  --color-status-warning: var(--color-orange); /* Warning / alert */
+  --color-status-warning-bg: var(--color-orange-10); /* Warning tint */
+  --color-status-caution: var(--color-yellow); /* Low priority / caution */
+  --color-status-caution-bg: var(--color-yellow-20); /* Caution tint */
+  --color-status-error: var(--color-red); /* Error / High */
+  --color-status-info: var(--color-blue); /* Info / event */
+  --color-status-info-bg: var(--color-blue-10); /* Info tint */
 
-  --font-normal:   400;
-  --font-medium:   500;
-  --font-semibold: 600;
-  --font-bold:     700;
+  /* ---------- COLOUR - semantic alias: icon ---------- */
+  --color-icon-default: var(--color-black); /* Outline icon default */
+  --color-icon-secondary: var(--color-grey-1); /* Muted icon (sort, funnel, chevron on nav) */
+  --color-icon-brand: var(--color-dark-green-main); /* Nav / select / calendar / eye icons */
+  --color-icon-alert: var(--color-orange); /* Bell */
+  --color-icon-info: var(--color-blue); /* Bookmark, external link */
+  --color-icon-danger: var(--color-red); /* Log-out, trash, error eye */
+  --color-icon-success: var(--color-green); /* Calendar (recent updates) */
+  --color-icon-disabled: var(--color-grey-2); /* Disabled icon */
 
-  --leading-tight:   1.2;
-  --leading-snug:    1.35;
-  --leading-normal:  1.5;
-  --leading-relaxed: 1.6;
+  /* ---------- FONT FAMILIES ---------- */
+  --font-primary: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; /* Geist (Regular 400 / Medium 500 / SemiBold 600 / Bold 700) - all UI chrome. The system fallback stack after Geist is EXTENDED. */
+  --font-inter: 'Inter', 'Geist', sans-serif; /* Inter Regular/Medium - ONLY in calendar DAY tags and View More (unintended fallback per spec; kept as drawn). figma: 553:547 */
+  --font-richtext-glyph: 'Times New Roman', Times, serif; /* Times New Roman - ONLY the rich-text toolbar B / I / U / S glyphs. figma: 1687:6987 */
 
-  --tracking-tight:   -0.02em;
-  --tracking-none:     0;
-  --tracking-wide:     0.04em;
-  --tracking-wider:    0.06em;
-  --tracking-widest:   0.08em;
+  /* ---------- TYPE - weights, line-heights, letter-spacing ---------- */
+  --font-weight-regular: 400; /* Geist weights used in Figma */
+  --font-weight-medium: 500; /* Geist weights used in Figma */
+  --font-weight-semibold: 600; /* Geist weights used in Figma */
+  --font-weight-bold: 700; /* Geist weights used in Figma */
+  --lh-auto-10: 13px; /* Figma line-height AUTO; measured Geist 10 box. Figma value is "auto" on every other text node; px boxes pin layout independent of font metrics. */
+  --lh-auto-12: 16px; /* AUTO; measured Geist 12 box. Figma value is "auto" on every other text node; px boxes pin layout independent of font metrics. */
+  --lh-auto-14: 18px; /* AUTO; measured Geist 14 box. Figma value is "auto" on every other text node; px boxes pin layout independent of font metrics. */
+  --lh-auto-16: 21px; /* AUTO; measured Geist 16 box. Figma value is "auto" on every other text node; px boxes pin layout independent of font metrics. */
+  --lh-auto-18: 23px; /* AUTO; measured Geist 18 box. Figma value is "auto" on every other text node; px boxes pin layout independent of font metrics. */
+  --lh-auto-24: 31px; /* AUTO; measured Geist 24 box. Figma value is "auto" on every other text node; px boxes pin layout independent of font metrics. */
+  --lh-inter-10: 12px; /* AUTO; measured Inter 10. Figma value is "auto" on every other text node; px boxes pin layout independent of font metrics. */
+  --lh-inter-12: 15px; /* AUTO; measured Inter 12. Figma value is "auto" on every other text node; px boxes pin layout independent of font metrics. */
+  --lh-tnr-12: 14px; /* AUTO; measured Times New Roman 12. Figma value is "auto" on every other text node; px boxes pin layout independent of font metrics. */
+  --lh-tnr-14: 16px; /* AUTO; measured Times New Roman 14. Figma value is "auto" on every other text node; px boxes pin layout independent of font metrics. */
+  --lh-fixed-20: 20px; /* ONLY calendar Button Master Month/Week/Day (721:2264/2269/2274). Figma value is "auto" on every other text node; px boxes pin layout independent of font metrics. */
+  --ls-0: 0; /* 0% on every text node (no exceptions). figma: foundations 2.1 */
 
-  /* ----------------------------------------------------------
-     CONTROL HEIGHTS
-  ---------------------------------------------------------- */
-  --h-chip:        24px;  /* deal status badges, filter pills */
-  --h-badge:       22px;  /* inline badges */
-  --h-btn-sm:      32px;  /* compact/icon buttons */
-  --h-btn:         36px;  /* standard action button */
-  --h-btn-lg:      40px;  /* primary action button */
-  --h-input:       36px;  /* text inputs, search bar */
-  --h-tab:         40px;  /* top tab bar */
-  --h-sidebar:     100vh; /* sidebar full height */
-  --w-sidebar:     56px;  /* icon-only left nav */
+  /* ---------- TYPE - font-size values ---------- */
+  --font-size-10: 10px;
+  --font-size-12: 12px;
+  --font-size-14: 14px;
+  --font-size-16: 16px;
+  --font-size-18: 18px;
+  --font-size-24: 24px;
 
-  /* ----------------------------------------------------------
-     AVATAR / ICON SIZES
-  ---------------------------------------------------------- */
-  --avatar-sm:  28px;   /* comment thread avatars */
-  --avatar-md:  32px;   /* user avatar pill */
-  --avatar-lg:  36px;   /* deal logo */
-  --icon-xs:    12px;
-  --icon-sm:    14px;
-  --icon-md:    16px;
-  --icon-lg:    18px;
-  --icon-xl:    20px;
+  /* ---------- TYPE - every real text tuple as a font shorthand: font: var(--type-<key>)   [line-height = measured auto box] ---------- */
+  --type-regular-12: 400 12px/16px var(--font-primary);
+  --type-medium-12: 500 12px/16px var(--font-primary);
+  --type-semibold-12: 600 12px/16px var(--font-primary);
+  --type-bold-12: 700 12px/16px var(--font-primary);
+  --type-regular-10: 400 10px/13px var(--font-primary);
+  --type-medium-10: 500 10px/13px var(--font-primary);
+  --type-semibold-10: 600 10px/13px var(--font-primary); /* Geist SemiBold 10 - ONLY the Admin Internal Sectors count pill (section outside Section 1). figma: 1895:20357 */
+  --type-regular-14: 400 14px/18px var(--font-primary);
+  --type-medium-14: 500 14px/18px var(--font-primary);
+  --type-semibold-14: 600 14px/18px var(--font-primary);
+  --type-regular-16: 400 16px/21px var(--font-primary);
+  --type-medium-16: 500 16px/21px var(--font-primary);
+  --type-regular-18: 400 18px/23px var(--font-primary);
+  --type-medium-18: 500 18px/23px var(--font-primary);
+  --type-medium-24: 500 24px/31px var(--font-primary);
+  --type-medium-12-lh20: 500 12px/20px var(--font-primary);
+  --type-inter-regular-12: 400 12px/15px var(--font-inter);
+  --type-inter-regular-10: 400 10px/12px var(--font-inter);
+  --type-inter-medium-12: 500 12px/15px var(--font-inter);
+  --type-tnr-bold-12: 700 12px/14px var(--font-richtext-glyph);
+  --type-tnr-bold-italic-12: italic 700 12px/14px var(--font-richtext-glyph);
+  --type-tnr-regular-12: 400 12px/14px var(--font-richtext-glyph);
+  --type-tnr-regular-14: 400 14px/16px var(--font-richtext-glyph);
 
-  /* ----------------------------------------------------------
-     SPACING
-  ---------------------------------------------------------- */
-  --space-1:   4px;
-  --space-2:   6px;
-  --space-3:   8px;
-  --space-4:   10px;
-  --space-5:   12px;
-  --space-6:   14px;
-  --space-7:   16px;
-  --space-8:   20px;
-  --space-9:   24px;
-  --space-10:  28px;
-  --space-11:  32px;
-  --space-12:  40px;
-  --space-13:  48px;
+  /* ---------- RADII ---------- */
+  --radius-2: 2px; /* checkbox 16x16, time block, bell/bookmark 32x32 button, list-view toggle segments. figma: 754:2945, 414:3019 */
+  --radius-4: 4px; /* DEFAULT control radius: buttons, inputs, select, search, nav items, tags, View More, Join. figma: 414:2728, 1567:4505 */
+  --radius-5: 5px; /* date-selector tiles, component-set frames. figma: 414:2975 */
+  --radius-8: 8px; /* panels / cards / table container / popover. figma: 414:3116, 1720:6665 */
+  --radius-12: 12px; /* login card, calendar surface corners, radio circle (12x12 box). figma: 2159:13749, 754:2925 */
+  --radius-16: 16px; /* status/type pills, filter chips, close chip, scroll track/thumb. figma: 824:8250, 1526:6279 */
+  --radius-24: 24px; /* count badge 20x20, avatar badge 24x24. figma: 1615:4378, 1541:3226 */
+  --radius-40: 40px; /* toggle track 32x16 and thumb 12x12. figma: 1868:10445 */
+  --radius-checkbox: var(--radius-2); /* alias of 2 - checkbox */
+  --radius-control: var(--radius-4); /* alias of 4 - all controls */
+  --radius-panel: var(--radius-8); /* alias of 8 - panels/cards */
+  --radius-pill: var(--radius-16); /* alias of 16 - pills and chips */
+  --radius-toggle: var(--radius-40); /* alias of 40 - toggle */
+  --radius-tab: 4px 4px 0 0; /* page tab (TL4 TR4 BR0 BL0), 32 high. figma: 414:2892 */
+  --radius-nav: 0 0 8px 0; /* left nav panels (bottom-right 8). figma: 414:2723 */
+  --radius-nav-handle: 0 12px 12px 0; /* nav union with expand/collapse handle - alternate presentation. figma: 2139:8209 */
+  --radius-content-frame: 0 8px 8px 8px; /* content frame under tabs (top-left square so the first tab joins). figma: 1612:4365 */
+  --radius-calendar-surface: 0 12px 12px 12px; /* calendar/deal big surface, top-left 0. figma: 721:2387, 1720:6845 */
+  --radius-drawer: 0 8px 8px 0; /* side drawer (TL0 TR8 BR8 BL0). figma: 824:8580 */
+  --radius-segment-end: 0 4px 4px 0; /* right half of segmented button / active nav sub-item. figma: 414:2765 */
+  --radius-left-accent: 4px 0 0 4px; /* left accent bars. figma: 824:8647 */
+  --radius-comments-header: 4px 0 0 0; /* comments panel header. figma: 414:2802 */
+  --radius-calendar-month: 8px 8px 0 0; /* calendar month frame. figma: 721:2276 */
+  --radius-admin-card: 12px 8px 8px 8px; /* Admin External card. figma: 1895:21118 */
+  --radius-events-block: 4px 4px 0 0; /* Deal Preview events block. figma: 1868:10282 */
+  --radius-smooth-8: 8px; /* calendar Button Master radius 8 with cornerSmoothing 1 (CSS has no corner smoothing - plain 8px). figma: 721:2262 */
 
-  /* ----------------------------------------------------------
-     BORDER RADIUS
-  ---------------------------------------------------------- */
-  --radius-sm:    4px;    /* inputs, small elements */
-  --radius:       6px;    /* cards, buttons, dropdowns — standard */
-  --radius-md:    8px;    /* larger cards, modals */
-  --radius-lg:    12px;   /* dialogs */
-  --radius-pill:  999px;  /* status badges, filter pills, avatar */
-  --radius-full:  50%;    /* circular elements, OG logo */
+  /* ---------- SPACING (observed padding / gap values) ---------- */
+  --space-0: 0px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): gap/padding 0 */
+  --space-2: 2px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): gap (stacked text, DAY header) */
+  --space-3: 3px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): padding on 24px tags (3/4/3/4, 3/24/3/24) */
+  --space-4: 4px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): gap label->field; padding 4/8/4/8 table cell */
+  --space-6: 6px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): gap (filter chip vertical pad, A-Z rail) */
+  --space-7: 7px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): padding on 32px controls (7/24, 7/12) - exactly as read */
+  --space-8: 8px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): THE common gap (395 frames) */
+  --space-10: 10px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): pill gap, tag gap */
+  --space-12: 12px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): field padding-x, panel gap */
+  --space-16: 16px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): panel padding, tab padding */
+  --space-20: 20px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): toolbar cell height */
+  --space-24: 24px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): button padding-x, gap */
+  --space-26: 26px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): nav-min vertical gap */
+  --space-32: 32px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): select text->icon gap, form row gap */
+  --space-40: 40px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): scroll slot top pad */
+  --space-48: 48px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): top-bar right pad, gap */
+  --space-56: 56px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): login card vertical padding */
+  --space-72: 72px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): login card horizontal padding */
+  --space-80: 80px; /* OBSERVED in Figma auto-layout (Figma defines no spacing tokens): nav logo row gap (irrelevant hug) */
 
-  /* ----------------------------------------------------------
-     SHADOWS
-  ---------------------------------------------------------- */
-  --shadow-sm:      0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-card:    0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-card-lg: 0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --shadow-dialog:  0 8px 40px rgba(0, 0, 0, 0.16);
-  --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.10), 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-focus:   0 0 0 3px rgba(27, 140, 140, 0.12);
+  /* ---------- CONTROL SIZES ---------- */
+  --h-control: 32px; /* Button / Input / Select / calendar field / search / segmented item / tab. figma: 766:3214, 830:4465 */
+  --h-control-lg: 40px; /* Password, main search, top-bar search, login inputs/buttons, nav item. figma: 2159:12813, 836:2579, 1567:4505 */
+  --h-tab: 32px; /* page tab. figma: 414:2891 */
+  --h-nav-item: 40px; /* left nav item (40x40 collapsed, 159x40 open). figma: 414:2728 */
+  --h-pill: 24px; /* status/type pill (standard). figma: 824:8247 */
+  --h-pill-lg: 32px; /* pill in Deal view (padding 8/16). figma: 1720:6147 */
+  --h-chip: 28px; /* filter chip. figma: 1526:6279 */
+  --h-count-badge: 20px; /* count bubble 20x20. figma: 1615:4378 */
+  --h-tag: 24px; /* DAY collapsed tag / View More chip. figma: 721:2293 */
+  --h-checkbox: 16px; /* checkbox box 16x16 / row height 16. figma: 754:2945 */
+  --h-radio: 12px; /* radio circle 12x12 (row 16). figma: 754:2938 */
+  --h-toggle-h: 16px; /* toggle track 32x16. figma: 1375:4132 */
+  --h-toggle-w: 32px; /* toggle track width. figma: 1375:4132 */
+  --h-icon-cell: 20px; /* rich-text toolbar button cell 20x20. figma: 1687:7037 */
+  --h-toolbar: 32px; /* rich-text toolbar (components page) height. figma: 1687:7037 */
+  --h-toolbar-editor: 28px; /* rich-text toolbar inside editors (fill Grey 4). figma: 1868:10163 */
+  --h-top-bar: 64px; /* top bar 1848x64. figma: 1567:4503 */
+  --h-avatar: 40px; /* avatar 40x40. figma: 1567:4506 */
+  --h-table-header: 32px; /* table header row (observed 29-32 + 1 border). figma: 1720:6666 */
+  --h-table-row: 40px; /* Agency/Event table rows 40 (min 30). figma: 1720:6677 */
+  --w-field-default: 148px; /* Input / Select component default width. figma: 830:4469 */
+  --w-calendar-single: 178px; /* calendar field one date (177 with label). figma: 831:2592 */
+  --w-calendar-range: 210px; /* calendar field from-to. figma: 831:2610 */
+  --w-search-default: 200px; /* search component. figma: 836:2572 */
+  --w-search-top-bar: 840px; /* top-bar search instance. figma: 1567:4505 */
+  --w-password: 240px; /* Password component. figma: 2159:12814 */
+  --w-scroll: 4px; /* scrollbar track/thumb width. figma: 838:2609 */
 
-  /* ----------------------------------------------------------
-     TRANSITIONS
-  ---------------------------------------------------------- */
-  --duration-instant: 0.08s;
-  --duration-fast:    0.12s;
-  --duration-base:    0.15s;
-  --duration-normal:  0.20s;
-  --duration-enter:   0.22s;
-  --duration-slide:   0.28s;
+  /* ---------- STROKES (Figma INSIDE alignment -> inset box-shadow) ---------- */
+  --stroke-hairline: 1px; /* default divider / field border / checkbox border (INSIDE). figma: 1612:4365 Strokes are INSIDE-aligned in Figma: implement as inset box-shadow, not CSS border. */
+  --stroke-button-outline: 1.2px; /* enabled outline button stroke (float32 1.2000000476837158). figma: 836:2650 Strokes are INSIDE-aligned in Figma: implement as inset box-shadow, not CSS border. */
+  --stroke-button-primary: 1.5px; /* primary button default stroke + disabled outline stroke + check glyph. figma: 766:3214, 836:2654 Strokes are INSIDE-aligned in Figma: implement as inset box-shadow, not CSS border. */
+  --stroke-tab-underline: 3px; /* active tab bottom stroke. figma: 414:2892 Strokes are INSIDE-aligned in Figma: implement as inset box-shadow, not CSS border. */
+  --stroke-tab-underline-alt: 2px; /* alternate active tab bottom stroke (Calendar week / All events / New Deal screens). figma: 721:2388, 1868:10765 Strokes are INSIDE-aligned in Figma: implement as inset box-shadow, not CSS border. */
+  --stroke-nav-sub-accent: 3px; /* active nav sub-item left stroke. figma: 414:2765 Strokes are INSIDE-aligned in Figma: implement as inset box-shadow, not CSS border. */
+  --stroke-icon: 1px; /* lucide icon stroke default (also 1.2 / 1.5). figma: 2044:6392 Strokes are INSIDE-aligned in Figma: implement as inset box-shadow, not CSS border. */
 
-  --ease-default: ease;
-  --ease-out:     cubic-bezier(0.0, 0, 0.2, 1);
-  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* ---------- SHADOWS / EFFECTS ---------- */
+  --shadow-popover: 2px 1px 5px rgba(91, 99, 128, 0.17), 7px 6px 9px rgba(91, 99, 128, 0.15), 3px 4px 12px rgba(91, 99, 128, 0.09), -3px 24px 14px rgba(91, 99, 128, 0.03), 42px 37px 16px rgba(91, 99, 128, 0); /* Figma effect style "Shadow": 5 stacked DROP_SHADOW #5B6380 spread 0: (2,1,blur5,a0.17) (7,6,9,0.15) (3,4,12,0.09) (-3,24,14,0.03) (42,37,16,0). Modal card 461:3415, search dropdown, account menu 1895:21153 */
+  --shadow-footer-bar: 0 -4px 9px rgba(38, 57, 94, 0.04), 0 -16px 16px rgba(38, 57, 94, 0.03); /* Sticky bottom action bar of New Deal screens (shadow goes UP): #26395E @0.04 (0,-4,blur9) + @0.03 (0,-16,blur16). figma: 1868:10443, 1868:10734, 1868:11127 */
+  --backdrop-blur: 20px; /* BACKGROUND_BLUR radius 20 on scrim fill #E5E7EC@0.2 (modal backdrop 461:3414, drawer backdrop 1988:5751) */
 
-  /* ----------------------------------------------------------
-     Z-INDEX
-  ---------------------------------------------------------- */
-  --z-base:       0;
-  --z-sidebar:    10;
-  --z-tab-bar:    20;
-  --z-dropdown:   100;
-  --z-sticky:     50;
-  --z-dialog:     200;
-  --z-overlay:    190;
-  --z-toast:      300;
+  /* ---------- ICON BOX SIZES ---------- */
+  --icon-10: 10px; /* Icon box size seen in Figma (inline). No icon token scale exists in Figma. */
+  --icon-12: 12px; /* Icon box size seen in Figma (search / chevron-up). No icon token scale exists in Figma. */
+  --icon-13: 13px; /* Icon box size seen in Figma (funnel / sort). No icon token scale exists in Figma. */
+  --icon-14: 14px; /* Icon box size seen in Figma (bell / avatar initials). No icon token scale exists in Figma. */
+  --icon-16: 16px; /* Icon box size seen in Figma (default lucide). No icon token scale exists in Figma. */
+  --icon-18: 18px; /* Icon box size seen in Figma (rotate). No icon token scale exists in Figma. */
+  --icon-20: 20px; /* Icon box size seen in Figma (toolbar cell). No icon token scale exists in Figma. */
+  --icon-24: 24px; /* Icon box size seen in Figma (eye / nav chevron / edit). No icon token scale exists in Figma. */
+  --icon-32: 32px; /* Icon box size seen in Figma (bell / nav noun icons). No icon token scale exists in Figma. */
+
+  /* ---------- SCREEN / GRID GEOMETRY ---------- */
+  --layout-screen-width: 1920px; /* All main screens are 1920 wide FRAMEs. figma: 414:2798 */
+  --layout-screen-height: 1080px; /* Dashboard frame height (scrolling screens taller: Deal 2638, New Deal Expanded 3223). figma: 414:2798 */
+  --layout-nav-collapsed: 72px; /* Nav min (collapsed). figma: 924:3461 */
+  --layout-nav-open: 191px; /* Nav open (Section 1). The "final fonts 2px up" page has 203 - NOT used. figma: 414:2723 */
+  --layout-nav-max: 219px; /* Nav max (expanded with sub-items). figma: 414:2752 */
+  --layout-nav-height: 1032px; /* Nav height on 1080 frame (48px white strip below). figma: 414:2723 */
+  --layout-top-bar-width: 1848px; /* Top bar 1848x64 at x72. figma: 1567:4503 */
+  --layout-top-bar-height: 64px; /* Top bar. figma: 1567:4503 */
+  --layout-top-bar-padding: 16px 48px 8px 16px; /* Top bar padding T/R/B/L. figma: 1567:4503 */
+  --layout-tab-bar-top: 72px; /* Tab bar y (8px below top bar). Deal screens y=73. figma: 414:2891 */
+  --layout-content-left: 88px; /* Content left margin = 72 nav + 16. figma: 1612:4365 */
+  --layout-content-right: 48px; /* Content right margin (1920-88-1784). figma: 1612:4365 */
+  --layout-content-width: 1784px; /* Content/tab frame width. figma: 1612:4365 */
+  --layout-content-height: 929px; /* Main content frame height (y103 -> 1032). figma: 1612:4365 */
+  --layout-content-top: 103px; /* Content frame y (overlaps tab bottom by 1). figma: 1612:4365 */
+  --layout-panel-padding: 16px; /* Padding inside content frame. figma: 1612:4365 */
+  --layout-panel-gap: 8px; /* Gap between dashboard panels. figma: 1612:4365 */
+  --layout-col-main: 952px; /* Dashboard All Deals column. figma: 414:3116 */
+  --layout-col-events: 420px; /* Upcoming Events panel. figma: 414:2969 */
+  --layout-col-comments: 364px; /* Recent Updates panel. figma: 414:2801 */
+  --layout-login-card: 384px; /* Login / forgot card width. figma: 2159:13749 */
+  --layout-login-card-otp: 425px; /* OTP card width. figma: 2159:13821 */
+  --layout-modal-card: 844px; /* Modal card 844x420. figma: 461:3415 */
+  --layout-popover-card: 236px; /* Account menu popover 236x112. figma: 1895:21153 */
+
+  /* ---------- Z-INDEX (EXTENDED) ---------- */
+  --z-base: 0; /* EXTENDED - not in Figma (Figma has no z-index); layering order derived from the drawn stacking (Search screen z-order: tabs < panel < scrim < dropdown < nav). */
+  --z-sticky: 10; /* EXTENDED - not in Figma (Figma has no z-index); layering order derived from the drawn stacking (Search screen z-order: tabs < panel < scrim < dropdown < nav). */
+  --z-nav: 20; /* EXTENDED - not in Figma (Figma has no z-index); layering order derived from the drawn stacking (Search screen z-order: tabs < panel < scrim < dropdown < nav). */
+  --z-dropdown: 100; /* EXTENDED - not in Figma (Figma has no z-index); layering order derived from the drawn stacking (Search screen z-order: tabs < panel < scrim < dropdown < nav). */
+  --z-scrim: 200; /* EXTENDED - not in Figma (Figma has no z-index); layering order derived from the drawn stacking (Search screen z-order: tabs < panel < scrim < dropdown < nav). */
+  --z-modal: 210; /* EXTENDED - not in Figma (Figma has no z-index); layering order derived from the drawn stacking (Search screen z-order: tabs < panel < scrim < dropdown < nav). */
 }

@@ -1,203 +1,550 @@
-/* ============================================================
-   Enigma X — Design Tokens
-   Extracted from enigma-signin.html + enigma-authenticator.html
-   October 2026
-
-   Usage: import this file before any component styles.
-   Light mode only — no dark mode variant currently.
-   ============================================================ */
-
+/* =====================================================================
+   ENIGMA X (trading app) — design tokens (stage 1)
+   Source: Figma file 3PpdEgLKQZaybhyIILCfUF, page "final" 16:1909 (Dashboard 16:1910 + 12 component sets).
+   Figma defines NO variables, NO text styles, NO effect styles: 15 paint styles + raw node values. Every value below carries a node id
+   ("figma: …") or is marked EXTENDED. Mirrors tokens.json 1:1 (generated from the same data).
+   Unprefixed names (--color-*, --type-*, --radius-* …). The Enigma X AUTH system (--eauth-*) is a separate system and is NOT touched.
+   THEMES: :root = LIGHT (Figma). .theme-dark / body.dark = DARK theme — EXTENDED: every dark value is "sampled from live-app capture raster
+   (visual estimate)" (Figma drafts 1:1949 / frame 1:3, a dark web import of uat.primeassets.app) or derived by a documented rule (see ../figma-spec/build-notes.md). .theme-light (end of file, EXTENDED) re-asserts the light values inside a dark scope.
+   Shadows: Figma defines none. Elevation = white card on Grey 0 page.
+   ===================================================================== */
 :root {
 
-  /* ----------------------------------------------------------
-     BRAND
-  ---------------------------------------------------------- */
-  --color-brand:          #7AEFEF;  /* bright cyan-teal — buttons, links, focus, active states */
-  --color-brand-dark:     #3DBFBF;  /* deeper teal — hover states, header bg, eyebrow text */
-  --color-brand-dim:      #5ADADA;  /* mid teal — button hover */
-  --color-brand-ghost:    rgba(122, 239, 239, 0.094); /* focus rings, subtle bg tints */
-  --color-brand-ghost-border: rgba(61, 191, 191, 0.30); /* subtle teal border */
+  /* ---------- COLOUR — the 15 Figma paint styles (exact names) ---------- */
+  --color-white: #FFFFFF; /* Paint style "White" (S:c1e7f7a6…). Panels/cards, header bar, ticker bar, odd table rows, spread chip, input fill in component sets. figma: 16:1911, 16:1954, 16:1978, 16:1981, 16:2124, 16:2386, 16:2133, 16:1927 */
+  --color-grey-0: #F7F8F8; /* Paint style "Grey 0" (S:1f63525e…). Page bg (Dashboard 16:1910), table container bg + 1px OUTSIDE stroke (16:1932, 16:1958, 16:1990), field/select/search bg (Select I16:1915;10:36), tabs track (16:2127), ticker cell right divider (16:2135), disabled checkbox glyph. figma: 16:1910, 16:1932, 16:2135 */
+  --color-grey-1: #DEE8ED; /* Paint style "Grey 1" (S:9f733ffd…). Icon-button hover bg (refresh 56:228, filter/Variant2 56:233, hands/Variant2 56:238), avatar disc (16:2402), header clock-block right divider (16:2396). figma: 56:228, 56:233, 56:238, 16:2402, 16:2396 */
+  --color-grey-2: #A8BECD; /* Paint style "Grey 2" (S:69030562…). Tertiary text: field labels, table column headers, date/version, dimmed decimals, time part of timestamps; checkbox unchecked border. figma: 16:1934, 16:1993, 16:2398, 16:1945, 56:171 */
+  --color-grey-3: #7C9CAC; /* Paint style "Grey 3" (S:2881711a…). Secondary text/icons: units (BTC/bps), inactive tab labels, Exposure label, date part of timestamps, icon strokes 1.5 (refresh/filter/hands), disabled checkbox fill+label. figma: 16:1985, 16:2018, 56:181 */
+  --color-main-color: #7AEFEF; /* Paint style "Main color" (S:adc47a55…). Primary CTA fill (Button/Default 56:194, REQUEST FOR QUOTE 16:2132), selected checkbox, active tab fill, Button black border + label. figma: 56:194, 16:2132, 56:167, 56:205, 56:201, 56:200 */
+  --color-main-color-hover: #B0F9F6; /* Paint style "Main color hover" (S:bbf4527b…). Button/hover fill only. figma: 56:196 */
+  --color-main-color-transp: rgba(122, 239, 239, 0.2); /* Paint style "Main color transp" (S:743f2536…): #7AEFEF at alpha 0.20000000298 (stored). Environment pill UAT (16:2389), Button Outline/hover (56:191). figma: 16:2389, 56:191 */
+  --color-main-color-darker: #3DBFBF; /* Paint style "Main color darker" (S:f0f99670…). Logo (Union 86 16:2388, 58:84), lucide search/chevron strokes in Select/Search. figma: 16:2388, 58:84, 56:129, 56:158 */
+  --color-red: #FB9697; /* Paint style "Red" (S:feeee471…). BID tile fill (Button 16:1920, 188x100 r8). figma: 16:1920 */
+  --color-red-for-text: #E5686A; /* Paint style "Red for text" (S:f54eb719…). Negative / bid / sell text, danger status dot, ticker negative change. figma: 16:1939, 16:2013, 16:2020, 16:2154 */
+  --color-green: #8BEEC8; /* Paint style "green" (lowercase in Figma, S:45d5d554…). ASK/BUY tile fill (Button 16:1923) and selected BUY segment (I16:2127;11:252). figma: 16:1923, I16:2127;11:252 */
+  --color-green-for-text: #4DCC9B; /* Paint style "green for text" (S:817cc9bb…). Positive / ask / buy text, success status dot, Exposure pill border. figma: 16:1941, 16:2028, 16:2005, 16:2392 */
+  --color-black: #000000; /* Paint style "Black" (S:c1c6dbd3…). Primary text (all values/titles), checkbox check stroke, active-tab underline, Button Outline border, Button black fill. figma: 16:1913, 56:168, 19:126, 56:189, 56:199 */
+  --color-orange: #FFB051; /* Paint style "Orange" (S:cd61336b…). ONLY the selected BTC currency tab in input with tabs. figma: I16:2131;11:418;11:367 */
 
-  /* ----------------------------------------------------------
-     SURFACES
-  ---------------------------------------------------------- */
-  --color-bg:             #F7F8F8;  /* page background — very light blue-gray */
-  --color-surface:        #FFFFFF;  /* cards, modals, popovers */
-  --color-surface-2:      #F7F8F8;  /* inputs, raised areas, subtle sections */
-  --color-surface-overlay: rgba(0, 0, 0, 0.40); /* modal + sheet overlay */
+  /* ---------- COLOUR — raw (unbound) values: order-type badges, exposure tint, coin art ---------- */
+  --color-limit-text: #9236F2; /* Limit order-type badge text. Raw in Figma, no style. figma: 16:2011 */
+  --color-limit-bg: #E4CAFF; /* Limit badge bg (76x24 r16). Raw in Figma. figma: 16:2010 */
+  --color-market-text: #3A77F2; /* Market order-type badge text. Raw in Figma. figma: 16:2026 */
+  --color-market-bg: #CADCFF; /* Market badge bg (88x24 r16). Raw in Figma. figma: 16:2025 */
+  --color-exposure-tint: rgba(77, 204, 155, 0.2); /* #4DCC9B @0.2 — Exposure pill fill (= "green for text" at 20%, alpha not a style). Raw in Figma. figma: 16:2392 */
+  --color-coin-glyph-white: #FFFFFF; /* Coin glyph vectors (17x) on coin discs. Raw in Figma. figma: 16:2143 */
+  --color-coin-eth: #3D5092; /* ETH disc. Raw. figma: 16:2137, 16:2173, 16:2302, 16:2338 */
+  --color-coin-btc: #F7931A; /* BTC disc. Raw. figma: 16:2159, 16:2324 */
+  --color-coin-usdt: #009393; /* USDT disc. Raw. figma: 16:2195 */
+  --color-coin-sol: #000000; /* SOL disc (unstyled #000000, not the Black style). Raw. figma: 16:2223 */
+  --color-coin-shib: #FC1E1F; /* SHIB disc. Raw. figma: 16:2240 */
+  --color-coin-ada: #246DD3; /* ADA disc. Raw. figma: 16:2260 */
+  --color-coin-avax: #E84142; /* AVAX disc. Raw. figma: 16:2274 */
+  --color-coin-xlm: #000000; /* XLM disc (unstyled #000000). Raw. figma: 16:2288 */
+  --color-coin-eth-tint-1: #E7F0FF; /* ETH glyph tint (x4). Raw; art lives in assets/coin-eth.svg. figma: 16:2137 */
+  --color-coin-eth-tint-2: #A5B9EE; /* ETH glyph tint (x4). Raw. figma: 16:2137 */
+  --color-coin-eth-tint-3: #A5B8F0; /* ETH glyph tint (x4). Raw. figma: 16:2137 */
+  --color-coin-eth-tint-4: #687FCB; /* ETH glyph tint (x4). Raw. figma: 16:2137 */
+  --color-coin-eth-tint-5: #A8B9EF; /* ETH glyph tint (x4). Raw. figma: 16:2137 */
+  --color-coin-eth-tint-6: #E8F1FF; /* ETH glyph tint (x4). Raw. figma: 16:2137 */
+  --color-coin-shib-art-1: #EB9A2E; /* SHIB art colour. Raw. figma: 16:2240 */
+  --color-coin-shib-art-2: #FEFFF7; /* SHIB art colour. Raw. figma: 16:2240 */
+  --color-coin-shib-art-3: #EAEAE8; /* SHIB art colour. Raw. figma: 16:2240 */
+  --color-coin-shib-art-4: #000000; /* SHIB art colour. Raw. figma: 16:2240 */
 
-  /* ----------------------------------------------------------
-     TEXT
-  ---------------------------------------------------------- */
-  --color-text-primary:   #1A1F36;  /* body text, headings — blue-tinted near-black */
-  --color-text-secondary: #7C9CAC;  /* subtitles, labels, muted text */
-  --color-text-tertiary:  #A8BECD;  /* placeholders, timestamps, fine print */
-  --color-text-on-brand:  #000000;  /* text ON the brand color (button labels) */
-  --color-text-on-dark:   #FFFFFF;  /* text on dark surfaces */
+  /* ---------- GRADIENTS (SOL coin art only; stops as stored, geometry in assets/coin-sol.svg) ---------- */
+  --gradient-coin-sol-gradient-1: #6E73E3 0%, #41B8C8 32%, #27E2B7 58%, #16FC99 100%; /* SOL art linear gradient 1 — stops exactly as stored (#6E73E3 0, #41B8C8 .32, #27E2B7 .58, #16FC99 1). Direction/handles live in assets/coin-sol.svg. figma: 16:2225 */
+  --gradient-coin-sol-gradient-2: #9E48FF 0%, #8D4DF9 34%, #6B7AE1 57%, #45B3CE 95%; /* SOL art linear gradient 2 — stops exactly as stored (#9E48FF 0, #8D4DF9 .34, #6B7AE1 .57, #45B3CE .95). figma: 16:2226 */
+  --gradient-coin-sol-gradient-3: #8654F3 0%, #549AD6 47%, #26D9B2 93%; /* SOL art linear gradient 3 — stops exactly as stored (#8654F3 0, #549AD6 .47, #26D9B2 .93). figma: 16:2227 */
 
-  /* ----------------------------------------------------------
-     BORDERS
-  ---------------------------------------------------------- */
-  --color-border:         #DEE8ED;  /* all cards, inputs, dividers */
-  --color-border-focus:   #7AEFEF;  /* input focus border */
+  /* ---------- COLOUR — SEMANTIC — text (light theme = Figma; flips under .theme-dark) ---------- */
+  --color-text-primary: var(--color-black); /* Primary text: every value, title, label on a light fill. Light = Black. figma: 16:1913, 16:2006 */
+  --color-text-secondary: var(--color-grey-3); /* Secondary text/icons: units, inactive tab labels, date part of timestamps. Light = Grey 3. figma: 16:1985, 16:2018, 16:2393 */
+  --color-text-tertiary: var(--color-grey-2); /* Tertiary text: field labels, table column headers. Light = Grey 2. figma: 16:1934, 16:1993 */
+  --color-text-dim: var(--color-grey-2); /* Dimmed trailing decimals / zero part (light = Grey 2). figma: 16:1945, 16:2014 */
+  --color-text-on-brand: var(--color-black); /* Text on a Main color / green fill (button labels, selected tab). Light = Black. figma: 16:2132, I16:2127;11:252 */
+  --color-text-on-tile: var(--color-black); /* Digits on BID/ASK tiles. Light = Black. figma: 16:1921, 16:1922 */
+  --color-text-on-warning: var(--color-black); /* Label on the Orange selected currency tab. Light = Black. figma: I16:2131;11:418;11:367 */
+  --color-text-positive: var(--color-green-for-text); /* Positive / ask / buy text. Light = green for text. Capture ticker uses TradingView #089981 instead (not used). figma: 16:1941, 16:2028 */
+  --color-text-negative: var(--color-red-for-text); /* Negative / bid / sell text. Light = Red for text. Capture ticker uses TradingView #F23645 instead (not used). figma: 16:1939, 16:2013 */
+  --color-text-title: var(--color-black); /* Panel / tab titles (20 UPPER). Light = Black; the capture draws panel titles grey. figma: 16:1913, 16:1956 */
+  --color-text-tab-active: var(--color-black); /* Selected underlined-tab title. Light = Black. figma: 16:1984 */
+  --color-text-tab-inactive: var(--color-grey-3); /* Inactive tab label. Light = Grey 3. figma: 16:1985, I16:2127;11:251 */
+  --color-text-disabled: var(--color-grey-3); /* Disabled label. Light = Grey 3. figma: 56:184, 56:173 */
+  --color-text-on-disabled: var(--color-grey-0); /* Glyph on a disabled filled control. Light = Grey 0. figma: 56:184 */
+  --color-text-on-black: var(--color-main-color); /* Label on the Black button. Light = Main color. figma: 56:200 */
+  --color-text-limit: var(--color-limit-text); /* Limit badge text. figma: 16:2011 */
+  --color-text-market: var(--color-market-text); /* Market badge text. figma: 16:2026 */
 
-  /* ----------------------------------------------------------
-     STATUS — Success / Gain
-  ---------------------------------------------------------- */
-  --color-status-success:        #4DCC9B;   /* success text + icon */
-  --color-status-success-bg:     rgba(77, 204, 155, 0.12);
-  --color-status-gain-text:      #4DCC9B;   /* positive P&L */
-  --color-status-gain-bg:        rgba(77, 204, 155, 0.12);
+  /* ---------- COLOUR — SEMANTIC — surface (light theme = Figma; flips under .theme-dark) ---------- */
+  --color-surface-page: var(--color-grey-0); /* Page canvas. Light = Grey 0. figma: 16:1910 */
+  --color-surface-panel: var(--color-white); /* Panel / card surface. Light = White. figma: 16:1911 */
+  --color-surface-nav: var(--color-white); /* Header (nav) bar surface. Light = White card r8; the capture header is full-bleed on the page colour. figma: 16:2386 */
+  --color-surface-ticker: var(--color-white); /* Ticker strip surface. Light = White. figma: 16:2133 */
+  --color-surface-field: var(--color-grey-0); /* Input / Select / Search / Input-with-2-text fill. Light = Grey 0. figma: 56:126, 56:148, 56:156 */
+  --color-surface-table: var(--color-grey-0); /* Table container (and its 1px OUTSIDE stroke). Light = Grey 0. figma: 16:1932, 16:1958, 16:1990 */
+  --color-surface-row-odd: var(--color-white); /* Odd table row (light = White over Grey 0 container). Dark zebra is derived from the light structure; the capture has hairline row dividers instead. figma: 16:1938, 16:2004 */
+  --color-surface-row-even: var(--color-grey-0); /* Even table row (container shows through; blotter has an explicit Grey 0 fill). figma: 16:1942, 16:2019 */
+  --color-surface-spread: var(--color-white); /* Spread tab 120x32 (8/8/0/0). Light = White. figma: 16:1927 */
+  --color-surface-tabs-track: var(--color-grey-0); /* Fill of the SELL/BUY track. Light = Grey 0. figma: 16:2127 */
+  --color-surface-hover: var(--color-grey-1); /* Icon-button hover / Variant2 fill. Light = Grey 1. figma: 56:228, 56:233, 56:238 */
+  --color-surface-avatar: var(--color-grey-1); /* Avatar disc. Light = Grey 1. figma: 16:2402 */
+  --color-surface-env: var(--color-main-color-transp); /* Environment pill. Light = Main color transp. figma: 16:2389 */
+  --color-surface-exposure: var(--color-exposure-tint); /* Exposure pill fill. Light = green for text @0.2. figma: 16:2392 */
+  --color-surface-tile-bid: var(--color-red); /* BID tile fill. Light = Red. figma: 16:1920 */
+  --color-surface-tile-ask: var(--color-green); /* ASK/BUY tile fill. Light = green. figma: 16:1923 */
+  --color-surface-tab-buy: var(--color-green); /* Selected BUY segment. Light = green. figma: I16:2127;11:252 */
+  --color-surface-tab-sell: var(--color-red); /* EXTENDED — selected SELL segment (not drawn in Figma). Light = Red (mirror of BUY = green). Not in Figma. */
+  --color-surface-warning: var(--color-orange); /* Selected currency tab. Light = Orange. figma: I16:2131;11:418;11:367 */
+  --color-surface-button-black: var(--color-black); /* Button black fill. Light = Black. figma: 56:199 */
+  --color-surface-chip-limit: var(--color-limit-bg); /* Limit badge bg. figma: 16:2010 */
+  --color-surface-chip-market: var(--color-market-bg); /* Market badge bg. figma: 16:2025 */
+  --color-surface-disabled: var(--color-grey-3); /* Disabled filled control (checkbox box). Light = Grey 3. figma: 56:181, 56:185 */
+  --color-surface-chart-toolbar: var(--color-grey-0); /* EXTENDED — chart toolbar strip. Light derived = Grey 0. Not in Figma final. */
+  --color-surface-chart-toolbar-active: var(--color-grey-1); /* EXTENDED — chart toolbar active/hover button. Not in Figma final. */
+  --color-surface-scrim: rgba(0, 0, 0, 0.2); /* EXTENDED — modal backdrop. Not in Figma. */
 
-  /* ----------------------------------------------------------
-     STATUS — Error / Loss / Danger
-  ---------------------------------------------------------- */
-  --color-status-danger:         #E5686A;   /* error borders, destructive */
-  --color-status-danger-bg:      rgba(229, 104, 106, 0.08);
-  --color-status-loss-text:      #E5686A;   /* negative P&L */
-  --color-status-loss-bg:        rgba(229, 104, 106, 0.08);
+  /* ---------- COLOUR — SEMANTIC — border / stroke (light theme = Figma; flips under .theme-dark) ---------- */
+  --color-border-nav: transparent; /* Header bar edge. Light: none drawn (white card on Grey 0); the capture has a 1px bottom line. figma: 16:2386 */
+  --color-border-table: var(--color-grey-0); /* Table container stroke 1px OUTSIDE. Light = Grey 0. figma: 16:1932 */
+  --color-border-ticker: var(--color-grey-0); /* Ticker cell right divider 1px. Light = Grey 0. figma: 16:2135 */
+  --color-border-divider: var(--color-grey-1); /* Header clock-block divider; popup/menu edge (EXTENDED use). Light = Grey 1. figma: 16:2396 */
+  --color-border-checkbox: var(--color-grey-2); /* Checkbox unchecked border 1px INSIDE. Light = Grey 2. figma: 56:171 */
+  --color-border-outline: var(--color-black); /* Button Outline stroke 1px INSIDE. Light = Black. figma: 56:189, 56:191 */
+  --color-border-brand: var(--color-main-color); /* Button hover stroke 1px INSIDE; Button black stroke 1px OUTSIDE. Light = Main color. figma: 56:196, 56:201 */
+  --color-border-focus: var(--color-main-color); /* EXTENDED — focus ring (not in Figma). Derived = Main color. */
+  --color-border-error: var(--color-red-for-text); /* EXTENDED — invalid field ring (not in Figma). Derived = Red for text. */
+  --color-border-exposure: var(--color-green-for-text); /* Exposure pill border 1px INSIDE. Light = green for text. figma: 16:2392 */
+  --color-border-tab-active: var(--color-black); /* Active-tab underline (1.5 INSIDE, bottom). Light = Black. figma: 19:126 */
 
-  /* ----------------------------------------------------------
-     STATUS — Pending / Neutral
-  ---------------------------------------------------------- */
-  --color-status-pending:        #F59E0B;
-  --color-status-pending-bg:     rgba(245, 158, 11, 0.12);
+  /* ---------- COLOUR — SEMANTIC — icon (light theme = Figma; flips under .theme-dark) ---------- */
+  --color-icon-default: var(--color-grey-3); /* Icon-button glyph stroke 1.5. Light = Grey 3. figma: 56:227, 56:232, 56:237 */
+  --color-icon-field: var(--color-main-color-darker); /* Search / chevron glyph in fields. Light = Main color darker. figma: 56:158, 56:129 */
+  --color-icon-logo: var(--color-main-color-darker); /* ENIGMA logo / mark. Light = Main color darker. figma: 16:2388, 58:84 */
 
-  /* ----------------------------------------------------------
-     STATUS — Active / Live session
-  ---------------------------------------------------------- */
-  --color-status-active:         #7AEFEF;
-  --color-status-active-bg:      rgba(122, 239, 239, 0.094);
+  /* ---------- COLOUR — SEMANTIC — brand (light theme = Figma; flips under .theme-dark) ---------- */
+  --color-brand: var(--color-main-color); /* Brand fill: primary button, selected checkbox/tab. Light = Main color. figma: 56:194, 56:167, 56:205 */
+  --color-brand-hover: var(--color-main-color-hover); /* Primary button hover fill. Light = Main color hover. figma: 56:196 */
+  --color-brand-transp: var(--color-main-color-transp); /* Button Outline hover fill, tinted pill. Light = Main color transp. figma: 56:191, 16:2389 */
+  --color-brand-darker: var(--color-main-color-darker); /* Darker brand (icons, logo). Light = Main color darker. figma: 16:2388 */
+  --color-brand-pressed: var(--color-main-color-darker); /* EXTENDED — pressed Button fill (not in Figma). Light derived = Main color darker. */
 
-  /* ----------------------------------------------------------
-     STATUS — Disabled
-  ---------------------------------------------------------- */
-  --color-disabled-bg:           #D1D5DB;
-  --color-disabled-text:         #7C9CAC;
+  /* ---------- COLOUR — SEMANTIC — status / trading (light theme = Figma; flips under .theme-dark) ---------- */
+  --color-status-success: var(--color-green-for-text); /* Success dot / positive. Light = green for text. figma: 16:2005 */
+  --color-status-danger: var(--color-red-for-text); /* Danger dot / negative. Light = Red for text. figma: 16:2020 */
+  --color-status-warning: var(--color-orange); /* Warning / highlight (only the selected currency tab uses it). Light = Orange. figma: I16:2131;11:418;11:367 */
 
-  /* ----------------------------------------------------------
-     TYPOGRAPHY
-  ---------------------------------------------------------- */
-  --font-primary:  'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono:     'DM Mono', 'Courier New', monospace;
+  /* ---------- COLOUR — DARK theme pairs (EXTENDED — not in Figma final). Same roles as the semantic tokens above.
+       "sampled" = read from the live-app capture raster (Figma 1:3, 1920x905 screenshot) at the stated coordinates (visual estimate);
+       "derived" = documented rule (R1 hover = mix(brand,#FFF,49%); R2 transp = brand @0.20; R4 pressed = mix(brand,#000,20%); R7 Black fill -> darkest surface; role map = same role as the named dark token). ---------- */
+  --color-dark-text-primary: #E4E7EB; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) input text BTC-USD (74..130,296..312) lightest px; blotter cell Id (528..612,640..653); MKT (262..292,355..370); spread value (222..266,236..252); clock (1695..1815,28..42). Role: text.primary — Primary text: every value, title, label on a light fill. Light = Black. figma: 16:1913, 16:2006 */
+  --color-dark-text-secondary: #7A9091; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) unit BTC (414..442,296..312); inactive SELL tab (118..156,682..698); BALANCE MOVEMENT (739..902,571..587); Exposure label (1352..1408,21..35); executed-at (1769..1888,640..653). Role: text.secondary — Secondary text/icons: units, inactive tab labels, date part of timestamps. Light = Grey 3. figma: 16:1985, 16:2018, 16:2393 */
+  --color-dark-text-tertiary: #7A9091; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) BID header (94..116,408..422); Qty header; Asset header; blotter header Id (562..576,605..618, lightest #768A8A); label Instrument (48..97,277..288, lightest #758A8B antialiased small text). Identical to dark text.secondary in the capture (hierarchy collapses; recorded, not invented). Role: text.tertiary — Tertiary text: field labels, table column headers. Light = Grey 2. figma: 16:1934, 16:1993 */
+  --color-dark-text-dim: #808080; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) order-book ask decimals ".00" (395..411,471..485); blotter quantity "00" (1324..1338,640..653). Role: text.dim — Dimmed trailing decimals / zero part (light = Grey 2). figma: 16:1945, 16:2014 */
+  --color-dark-text-on-brand: #2B2B2B; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) REQUEST FOR QUOTE label (160..326,853..870); BUY tab label (336..366,682..698); UAT (945..975,20..35). Role: text.on-brand — Text on a Main color / green fill (button labels, selected tab). Light = Black. figma: 16:2132, I16:2127;11:252 */
+  --color-dark-text-on-tile: #2B2B2B; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) BID/ASK tile digits (48..160,184..216), decimals (48..142,226..244). Role: text.on-tile — Digits on BID/ASK tiles. Light = Black. figma: 16:1921, 16:1922 */
+  --color-dark-text-on-warning: #000000; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) BTC currency tab label (366..398,741..757) darkest px. Role: text.on-warning — Label on the Orange selected currency tab. Light = Black. figma: I16:2131;11:418;11:367 */
+  --color-dark-text-positive: #0FC286; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) ask price 61,447.52 (358..412,440..454); balances qty (760..836,219..232); BUY side (1215..1235,677..690, lightest). Role: text.positive — Positive / ask / buy text. Light = green for text. Capture ticker uses TradingView #089981 instead (not used). figma: 16:1941, 16:2028 */
+  --color-dark-text-negative: #DE5D67; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) bid price 61,349.29 (76..132,440..454). Role: text.negative — Negative / bid / sell text. Light = Red for text. Capture ticker uses TradingView #F23645 instead (not used). figma: 16:1939, 16:2013 */
+  --color-dark-text-title: #7A9091; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) SPOT BALANCES title (498..622,154..170). Role: text.title — Panel / tab titles (20 UPPER). Light = Black; the capture draws panel titles grey. figma: 16:1913, 16:1956 */
+  --color-dark-text-tab-active: #39E2C9; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) TRADES BLOTTER active tab text (528..660,570..586). Role: text.tab-active — Selected underlined-tab title. Light = Black. figma: 16:1984 */
+  --color-dark-text-tab-inactive: #7A9091; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) BALANCE MOVEMENT (739..902,571..587). Role: text.tab-inactive — Inactive tab label. Light = Grey 3. figma: 16:1985, I16:2127;11:251 */
+  --color-dark-text-disabled: #7A9091; /* EXTENDED — dark theme. Derived (role map: Grey 3 -> dark text.secondary (disabled checkbox label uses Grey 3)). Role: text.disabled — Disabled label. Light = Grey 3. figma: 56:184, 56:173 */
+  --color-dark-text-on-disabled: #3F3F3F; /* EXTENDED — dark theme. Derived (role map: Grey 0 -> dark surface.field (disabled checkbox check/dash = Grey 0)). Role: text.on-disabled — Glyph on a disabled filled control. Light = Grey 0. figma: 56:184 */
+  --color-dark-text-on-black: #39E2C9; /* EXTENDED — dark theme. Derived (role map: Main color -> dark brand). Role: text.on-black — Label on the Black button. Light = Main color. figma: 56:200 */
+  --color-dark-text-limit: #A790FF; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) Limit chip text (1015..1050,640..654). Role: text.limit — Limit badge text. figma: 16:2011 */
+  --color-dark-text-market: #39E2C9; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) Market chip text (1010..1055,677..691). Role: text.market — Market badge text. figma: 16:2026 */
+  --color-dark-surface-page: #181818; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) (4,300); (483,300); (700,142). Role: surface.page — Page canvas. Light = Grey 0. figma: 16:1910 */
+  --color-dark-surface-panel: #2B2B2B; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) (300,600); (20,600); (490,640). Role: surface.panel — Panel / card surface. Light = White. figma: 16:1911 */
+  --color-dark-surface-nav: #181818; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) (600,20) header bar. Role: surface.nav — Header (nav) bar surface. Light = White card r8; the capture header is full-bleed on the page colour. figma: 16:2386 */
+  --color-dark-surface-ticker: #2B2B2B; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) (700,100) ticker cells. Role: surface.ticker — Ticker strip surface. Light = White. figma: 16:2133 */
+  --color-dark-surface-field: #3F3F3F; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) Instrument/Quantity/Type fields (200,315), (400,315), (350,370). Role: surface.field — Input / Select / Search / Input-with-2-text fill. Light = Grey 0. figma: 56:126, 56:148, 56:156 */
+  --color-dark-surface-table: #383838; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) order-book container (200,447). Role: surface.table — Table container (and its 1px OUTSIDE stroke). Light = Grey 0. figma: 16:1932, 16:1958, 16:1990 */
+  --color-dark-surface-row-odd: #2B2B2B; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) balances / blotter body rows (700,225), (700,646) = panel colour; the capture shows hairlines (#383838 at 700,240 / 700,664) instead of zebra. Role: surface.row-odd — Odd table row (light = White over Grey 0 container). Dark zebra is derived from the light structure; the capture has hairline row dividers instead. figma: 16:1938, 16:2004 */
+  --color-dark-surface-row-even: #383838; /* EXTENDED — dark theme. Derived (rule: even row = container colour (surface.table), as in light). Role: surface.row-even — Even table row (container shows through; blotter has an explicit Grey 0 fill). figma: 16:1942, 16:2019 */
+  --color-dark-surface-spread: #2B2B2B; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) spread tab (240,220..239) = panel colour. Role: surface.spread — Spread tab 120x32 (8/8/0/0). Light = White. figma: 16:1927 */
+  --color-dark-surface-tabs-track: #3F3F3F; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) SELL tab bg (60,690); USD tab bg (445,740); tabs container (240,672). Role: surface.tabs-track — Fill of the SELL/BUY track. Light = Grey 0. figma: 16:2127 */
+  --color-dark-surface-hover: #3D3D3D; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) nearest sampled analogue: chart toolbar active button bg (973,160). Role: surface.hover — Icon-button hover / Variant2 fill. Light = Grey 1. figma: 56:228, 56:233, 56:238 */
+  --color-dark-surface-avatar: #2B2B2B; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) avatar disc (1870,27). Role: surface.avatar — Avatar disc. Light = Grey 1. figma: 16:2402 */
+  --color-dark-surface-env: #02B175; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) UAT pill (820,27); solid green in the capture (light role is the Main color transp tint). Role: surface.env — Environment pill. Light = Main color transp. figma: 16:2389 */
+  --color-dark-surface-exposure: #244443; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) Exposure pill (1336,28). Role: surface.exposure — Exposure pill fill. Light = green for text @0.2. figma: 16:2392 */
+  --color-dark-surface-tile-bid: #DE5D67; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) BID tile (40,170). Role: surface.tile-bid — BID tile fill. Light = Red. figma: 16:1920 */
+  --color-dark-surface-tile-ask: #0FC286; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) ASK tile (300,170). Role: surface.tile-ask — ASK/BUY tile fill. Light = green. figma: 16:1923 */
+  --color-dark-surface-tab-buy: #0FC286; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) BUY selected tab (300,690). Role: surface.tab-buy — Selected BUY segment. Light = green. figma: I16:2127;11:252 */
+  --color-dark-surface-tab-sell: #DE5D67; /* EXTENDED — dark theme. Derived (rule: mirror of tab-buy with the BID/SELL colour (surface.tile-bid)). Role: surface.tab-sell — EXTENDED — selected SELL segment (not drawn in Figma). Light = Red (mirror of BUY = green). Not in Figma. */
+  --color-dark-surface-warning: #FF8D1C; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) BTC tab (365,740). Role: surface.warning — Selected currency tab. Light = Orange. figma: I16:2131;11:418;11:367 */
+  --color-dark-surface-button-black: #181818; /* EXTENDED — dark theme. Derived (rule R7: Black fill -> darkest sampled surface (surface.page)). Role: surface.button-black — Button black fill. Light = Black. figma: 56:199 */
+  --color-dark-surface-chip-limit: #3B225C; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) Limit chip (dominant px in 1015..1050,640..654). Role: surface.chip-limit — Limit badge bg. figma: 16:2010 */
+  --color-dark-surface-chip-market: #244443; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) Market chip (dominant px in 1010..1055,677..691). Role: surface.chip-market — Market badge bg. figma: 16:2025 */
+  --color-dark-surface-disabled: #7A9091; /* EXTENDED — dark theme. Derived (role map: Grey 3 -> dark text.secondary (disabled checkbox box)). Role: surface.disabled — Disabled filled control (checkbox box). Light = Grey 3. figma: 56:181, 56:185 */
+  --color-dark-surface-chart-toolbar: #0F0F0F; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) chart toolbar strip (1450,166). Light is derived: Grey 0 (same role as field/track). Role: surface.chart-toolbar — EXTENDED — chart toolbar strip. Light derived = Grey 0. Not in Figma final. */
+  --color-dark-surface-chart-toolbar-active: #3D3D3D; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) toolbar active "1m" button bg (973,160). Light derived = Grey 1 (hover tone). Role: surface.chart-toolbar-active — EXTENDED — chart toolbar active/hover button. Not in Figma final. */
+  --color-dark-surface-scrim: rgba(0, 0, 0, 0.2); /* EXTENDED — dark theme. Derived (no capture sample; same value in both themes (Black @0.20; 0.20 is the only alpha Figma uses on a style)). Role: surface.scrim — EXTENDED — modal backdrop. Not in Figma. */
+  --color-dark-border-nav: #393939; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) header bottom hairline y=55 (600,55). Role: border.nav — Header bar edge. Light: none drawn (white card on Grey 0); the capture has a 1px bottom line. figma: 16:2386 */
+  --color-dark-border-table: #383838; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) order-book container (200,447). Role: border.table — Table container stroke 1px OUTSIDE. Light = Grey 0. figma: 16:1932 */
+  --color-dark-border-ticker: #323232; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) ticker cell vertical divider (142,76..127). Role: border.ticker — Ticker cell right divider 1px. Light = Grey 0. figma: 16:2135 */
+  --color-dark-border-divider: #393939; /* EXTENDED — dark theme. Derived (rule: Grey 1 hairline -> nearest sampled hairline (border.nav)). Role: border.divider — Header clock-block divider; popup/menu edge (EXTENDED use). Light = Grey 1. figma: 16:2396 */
+  --color-dark-border-checkbox: #7A9091; /* EXTENDED — dark theme. Derived (role map: Grey 2 -> dark text.tertiary). Role: border.checkbox — Checkbox unchecked border 1px INSIDE. Light = Grey 2. figma: 56:171 */
+  --color-dark-border-outline: #E4E7EB; /* EXTENDED — dark theme. Derived (role map: Black -> dark text.primary). Role: border.outline — Button Outline stroke 1px INSIDE. Light = Black. figma: 56:189, 56:191 */
+  --color-dark-border-brand: #39E2C9; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) RFQ button (100,862); active underline (600,595). Role: border.brand — Button hover stroke 1px INSIDE; Button black stroke 1px OUTSIDE. Light = Main color. figma: 56:196, 56:201 */
+  --color-dark-border-focus: #39E2C9; /* EXTENDED — dark theme. Derived (role map: brand). Role: border.focus — EXTENDED — focus ring (not in Figma). Derived = Main color. */
+  --color-dark-border-error: #DE5D67; /* EXTENDED — dark theme. Derived (role map: text.negative). Role: border.error — EXTENDED — invalid field ring (not in Figma). Derived = Red for text. */
+  --color-dark-border-exposure: #39E2C9; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) Exposure pill border (1326,28) — teal in the capture, green for text in Figma (conflict recorded). Role: border.exposure — Exposure pill border 1px INSIDE. Light = green for text. figma: 16:2392 */
+  --color-dark-border-tab-active: #39E2C9; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) TRADES BLOTTER underline 2px (520,594..595). Role: border.tab-active — Active-tab underline (1.5 INSIDE, bottom). Light = Black. figma: 19:126 */
+  --color-dark-icon-default: #7A9091; /* EXTENDED — dark theme. Derived (role map: Grey 3 -> text.secondary (the capture draws refresh/filter orange #FF8D1C at (928..948,150..172): conflict recorded)). Role: icon.default — Icon-button glyph stroke 1.5. Light = Grey 3. figma: 56:227, 56:232, 56:237 */
+  --color-dark-icon-field: #39E2C9; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) search icon (44..62,295..312). Role: icon.field — Search / chevron glyph in fields. Light = Main color darker. figma: 56:158, 56:129 */
+  --color-dark-icon-logo: #39E2C9; /* EXTENDED — dark theme. Derived (role map: brand (the capture logo is a different art in a #46BBB1..#6BFDE7 teal range, not reproducible)). Role: icon.logo — ENIGMA logo / mark. Light = Main color darker. figma: 16:2388, 58:84 */
+  --color-dark-brand: #39E2C9; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) RFQ button (100,862); tab underline (600,595); search icon. Role: brand.default — Brand fill: primary button, selected checkbox/tab. Light = Main color. figma: 56:194, 56:167, 56:205 */
+  --color-dark-brand-hover: #9AF0E3; /* EXTENDED — dark theme. Derived (rule R1: mix(brand, #FFFFFF, 49%) — 49% = average per-channel white-mix of the light pair (#7AEFEF -> #B0F9F6)). Role: brand.hover — Primary button hover fill. Light = Main color hover. figma: 56:196 */
+  --color-dark-brand-transp: rgba(57, 226, 201, 0.2); /* EXTENDED — dark theme. Derived (rule R2: dark brand at alpha 0.20 (Figma alpha 0.20000000298)). Role: brand.transp — Button Outline hover fill, tinted pill. Light = Main color transp. figma: 56:191, 16:2389 */
+  --color-dark-brand-darker: #39E2C9; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) search icon (44..62,295..312) — same hex as brand in the capture. Role: brand.darker — Darker brand (icons, logo). Light = Main color darker. figma: 16:2388 */
+  --color-dark-brand-pressed: #2EB5A1; /* EXTENDED — dark theme. Derived (rule R4: mix(brand, #000000, 20%)). Role: brand.pressed — EXTENDED — pressed Button fill (not in Figma). Light derived = Main color darker. */
+  --color-dark-status-success: #0FC286; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) blotter status dot (850,646); ask price. Role: status.success — Success dot / positive. Light = green for text. figma: 16:2005 */
+  --color-dark-status-danger: #DE5D67; /* EXTENDED — dark theme. Derived (role map: text.negative). Role: status.danger — Danger dot / negative. Light = Red for text. figma: 16:2020 */
+  --color-dark-status-warning: #FF8D1C; /* EXTENDED — dark theme. Sampled from live-app capture raster (visual estimate) at (x,y) BTC tab (365,740). Role: status.warning — Warning / highlight (only the selected currency tab uses it). Light = Orange. figma: I16:2131;11:418;11:367 */
 
-  --text-xs:    10px;   /* section labels, micro metadata */
-  --text-sm:    12px;   /* badges, form labels, table headers */
-  --text-base:  14px;   /* body, buttons, form elements */
-  --text-md:    16px;   /* primary inputs, prominent buttons */
-  --text-lg:    18px;   /* section titles */
-  --text-xl:    20px;   /* screen titles */
-  --text-2xl:   22px;   /* page headings */
-  --text-3xl:   24px;   /* card titles, hero numbers */
-  --text-4xl:   38px;   /* OTP code display */
+  /* ---------- FONT FAMILIES ---------- */
+  --font-primary: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; /* Geist (Regular 400 / Medium 500 / SemiBold 600) — all labels, titles, buttons, inputs, blotter cells. The fallback stack after Geist is EXTENDED. figma: foundations 3 */
+  --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace; /* Geist Mono (Regular 400 / Medium 500 / SemiBold 600) — ticker price/change, BID/ASK tile digits, spread chip, order-book prices+qty, balance quantities. The fallback stack is EXTENDED. figma: foundations 3 */
 
-  --font-normal:   400;
-  --font-medium:   500;
-  --font-semibold: 600;
-  --font-bold:     700;
+  /* ---------- TYPE — weights, line-heights (Figma AUTO -> measured hug boxes), letter-spacing ---------- */
+  --font-weight-regular: 400; /* Geist / Geist Mono regular (the only weights Figma uses) */
+  --font-weight-medium: 500; /* Geist / Geist Mono medium (the only weights Figma uses) */
+  --font-weight-semibold: 600; /* Geist / Geist Mono semibold (the only weights Figma uses) */
+  --lh-auto-12: 16px; /* Figma line-height is AUTO on every text node; measured hug box for 12px = 16px. Pinned in px so layout does not depend on font metrics. figma: foundations 3 */
+  --lh-auto-14: 18px; /* Figma line-height is AUTO on every text node; measured hug box for 14px = 18px. Pinned in px so layout does not depend on font metrics. figma: foundations 3 */
+  --lh-auto-16: 21px; /* Figma line-height is AUTO on every text node; measured hug box for 16px = 21px (VISUAL ESTIMATE: stored 16px nodes report stale 10-11). Pinned in px so layout does not depend on font metrics. figma: foundations 3 */
+  --lh-auto-20: 26px; /* Figma line-height is AUTO on every text node; measured hug box for 20px = 26px. Pinned in px so layout does not depend on font metrics. figma: foundations 3 */
+  --lh-auto-32: 42px; /* Figma line-height is AUTO on every text node; measured hug box for 32px = 42px. Pinned in px so layout does not depend on font metrics. figma: foundations 3 */
+  --ls-0: 0; /* Letter-spacing 0 everywhere (stored 0% or 0px — equivalent) */
+  --ls-avatar: 2px; /* Avatar initials YH only. figma: 16:2403 */
 
-  --leading-tight:   1.2;
-  --leading-snug:    1.35;
-  --leading-normal:  1.5;
-  --leading-relaxed: 1.55;
+  /* ---------- TYPE — font-size values ---------- */
+  --font-size-12: 12px;
+  --font-size-14: 14px;
+  --font-size-16: 16px;
+  --font-size-20: 20px;
+  --font-size-32: 32px;
 
-  --tracking-tight:   -0.02em;
-  --tracking-none:     0;
-  --tracking-wide:     0.04em;
-  --tracking-wider:    0.07em;
-  --tracking-widest:   0.10em;
-  --tracking-label:    0.08em;  /* eyebrow + uppercase section labels */
-  --tracking-mono:     0.18em;  /* OTP / code display */
+  /* ---------- TYPE — shorthand per family/weight/size: font: var(--type-<key>)  [line-height = measured auto box] ---------- */
+  --type-regular-12: 400 12px/16px var(--font-primary); /* Geist Regular 12px, line-height auto (box 16px), letter-spacing 0 */
+  --type-medium-12: 500 12px/16px var(--font-primary); /* Geist Medium 12px, line-height auto (box 16px), letter-spacing 0 */
+  --type-regular-14: 400 14px/18px var(--font-primary); /* Geist Regular 14px, line-height auto (box 18px), letter-spacing 0 */
+  --type-medium-14: 500 14px/18px var(--font-primary); /* Geist Medium 14px, line-height auto (box 18px), letter-spacing 0 */
+  --type-semibold-14: 600 14px/18px var(--font-primary); /* Geist SemiBold 14px, line-height auto (box 18px), letter-spacing 0 */
+  --type-medium-16: 500 16px/21px var(--font-primary); /* Geist Medium 16px, line-height auto (box 21px), letter-spacing 0 */
+  --type-regular-20: 400 20px/26px var(--font-primary); /* Geist Regular 20px, line-height auto (box 26px), letter-spacing 0 */
+  --type-mono-regular-12: 400 12px/16px var(--font-mono); /* Geist Mono Regular 12px, line-height auto (box 16px), letter-spacing 0 */
+  --type-mono-regular-14: 400 14px/18px var(--font-mono); /* Geist Mono Regular 14px, line-height auto (box 18px), letter-spacing 0 */
+  --type-mono-medium-14: 500 14px/18px var(--font-mono); /* Geist Mono Medium 14px, line-height auto (box 18px), letter-spacing 0 */
+  --type-mono-semibold-14: 600 14px/18px var(--font-mono); /* Geist Mono SemiBold 14px, line-height auto (box 18px), letter-spacing 0 */
+  --type-mono-regular-16: 400 16px/21px var(--font-mono); /* Geist Mono Regular 16px, line-height auto (box 21px), letter-spacing 0 */
+  --type-mono-regular-32: 400 32px/42px var(--font-mono); /* Geist Mono Regular 32px, line-height auto (box 42px), letter-spacing 0 */
 
-  /* ----------------------------------------------------------
-     CONTROL HEIGHTS
-  ---------------------------------------------------------- */
-  --h-input:       48px;  /* all text inputs */
-  --h-btn:         50px;  /* primary action button */
-  --h-btn-mobile:  52px;  /* mobile primary button (authenticator) */
-  --h-btn-sm:      36px;  /* compact / session-level buttons */
-  --h-btn-danger:  48px;  /* danger outline button */
-  --h-chip:        32px;  /* pill badges and chips */
-  --h-nav:         56px;  /* top navigation bar */
+  /* ---------- TYPE — the 31 observed text tuples by role (font + colour + case + ls); utilities .t-<role> in components.css ---------- */
+  --type-blotter-cell: var(--type-medium-12); /* Tuple #1: Geist Medium 12 | lh auto | ls 0 | case as typed | colour var(--color-text-primary) | n=73 — Blotter body cells; button labels in Button/Button Outline/input-with-tabs. figma: 16:2006, 16:2008, 16:2012, 16:2015 */
+  --type-field-label: var(--type-regular-12); /* Tuple #2: Geist Regular 12 | lh auto | ls 0 | case as typed | colour var(--color-text-tertiary) | n=33 — Field labels (Instrument, Quantity, Slippage, Type, Label), date line, v1.0.2. figma: I16:1915;10:35, 16:2398, 16:2401 */
+  --type-ticker-change-negative: var(--type-mono-regular-12); /* Tuple #3: Geist Mono Regular 12 | lh auto | ls 0 | case as typed | colour var(--color-text-negative) | n=26 — Ticker negative change (abs and pct). figma: 16:2154, 16:2156 */
+  --type-field-value: var(--type-regular-12); /* Tuple #4: Geist Regular 12 | lh auto | ls 0 | case as typed | colour var(--color-text-primary) | n=23 — Input/select values, checkbox labels, ticker symbol. figma: I16:1915;10:37 */
+  --type-field-unit: var(--type-regular-12); /* Tuple #5: Geist Regular 12 | lh auto | ls 0 | case as typed | colour var(--color-text-secondary) | n=20 — Unit suffix (BTC, bps), timestamp date part, disabled checkbox label, abc. figma: 16:2018 */
+  --type-blotter-header: var(--type-regular-12); /* Tuple #6: Geist Regular 12 | lh auto | ls 0px | case as typed | colour var(--color-text-tertiary) | n=13 — Blotter column headers (letter-spacing stored 0px). figma: 16:1993 */
+  --type-ticker-price: var(--type-mono-semibold-14); /* Tuple #7: Geist Mono SemiBold 14 | lh auto | ls 0 | case as typed | colour var(--color-text-primary) | n=13 — Ticker price. figma: 16:2151 */
+  --type-balance-asset: var(--type-medium-14); /* Tuple #8: Geist Medium 14 | lh auto | ls 0 | case as typed | colour var(--color-text-primary) | n=9 — Spot-balances asset names, selected tab text, RFQ button label. figma: 16:1964, 16:2132 */
+  --type-blotter-dim: var(--type-medium-12); /* Tuple #9: Geist Medium 12 | lh auto | ls 0 | case as typed | colour var(--color-text-dim) | n=8 — Dimmed 00 decimals in blotter Quantity. figma: 16:2014 */
+  --type-book-ask: var(--type-mono-medium-14); /* Tuple #10: Geist Mono Medium 14 | lh auto | ls 0 | case as typed | colour var(--color-text-positive) | n=7 — ASK prices and positive balances. figma: 16:1941 */
+  --type-book-bid: var(--type-mono-medium-14); /* Tuple #11: Geist Mono Medium 14 | lh auto | ls 0 | case as typed | colour var(--color-text-negative) | n=6 — BID prices and negative balances. figma: 16:1939 */
+  --type-panel-title: var(--type-regular-20); /* Tuple #12: Geist Regular 20 | lh auto | ls 0 | case UPPER (textCase on mixed-case source text) | colour var(--color-text-title) | n=5 — Panel/tab titles (stored mixed-case, textCase UPPER). figma: 16:1913, 16:1956, 16:1980, 16:1984 */
+  --type-book-header: var(--type-regular-14); /* Tuple #13: Geist Regular 14 | lh auto | ls 0px | case as typed | colour var(--color-text-tertiary) | n=5 — Order-book / balances table headers (stored 0px). figma: 16:1934 */
+  --type-book-qty: var(--type-mono-regular-14); /* Tuple #14: Geist Mono Regular 14 | lh auto | ls 0 | case as typed | colour var(--color-text-primary) | n=4 — Order-book quantity column. figma: 16:1940 */
+  --type-badge-limit: var(--type-medium-12); /* Tuple #15: Geist Medium 12 | lh auto | ls 0 | case as typed | colour var(--color-text-limit) | n=4 — Limit badge. figma: 16:2011 */
+  --type-side-sell: var(--type-medium-12); /* Tuple #16: Geist Medium 12 | lh auto | ls 0 | case as typed | colour var(--color-text-negative) | n=4 — SELL cell. figma: 16:2013 */
+  --type-badge-market: var(--type-medium-12); /* Tuple #17: Geist Medium 12 | lh auto | ls 0 | case as typed | colour var(--color-text-market) | n=4 — Market badge. figma: 16:2026 */
+  --type-side-buy: var(--type-medium-12); /* Tuple #18: Geist Medium 12 | lh auto | ls 0 | case as typed | colour var(--color-text-positive) | n=4 — BUY cell. figma: 16:2028 */
+  --type-tab-inactive: var(--type-regular-14); /* Tuple #19: Geist Regular 14 | lh auto | ls 0 | case as typed | colour var(--color-text-tab-inactive) | n=4 — Tab/segment inactive labels, Exposure label. figma: I16:2127;11:251, 56:208, 16:2393 */
+  --type-ticker-change-positive: var(--type-mono-regular-12); /* Tuple #20: Geist Mono Regular 12 | lh auto | ls 0 | case as typed | colour var(--color-text-positive) | n=4 — Ticker positive change. figma: 16:2218, 16:2220 */
+  --type-tile-big: var(--type-mono-regular-32); /* Tuple #21: Geist Mono Regular 32 | lh auto | ls 0 | case UPPER (textCase on mixed-case source text) | colour var(--color-text-on-tile) | n=2 — BID/ASK tile big digits (42px box). figma: 16:1921, 16:1924 */
+  --type-tile-decimals: var(--type-mono-regular-14); /* Tuple #22: Geist Mono Regular 14 | lh auto | ls 0 | case UPPER (textCase on mixed-case source text) | colour var(--color-text-on-tile) | n=2 — Tile decimals. figma: 16:1922, 16:1925 */
+  --type-ticker-price-negative: var(--type-mono-semibold-14); /* Tuple #23: Geist Mono SemiBold 14 | lh auto | ls 0 | case as typed | colour var(--color-text-negative) | n=2 — Ticker price when red. figma: 16:2232, 16:2294 */
+  --type-button-black-label: var(--type-medium-12); /* Tuple #24: Geist Medium 12 | lh auto | ls 0 | case as typed | colour var(--color-text-on-black) | n=2 — Button black label. figma: 56:200 */
+  --type-spread-value: var(--type-mono-regular-16); /* Tuple #25: Geist Mono Regular 16 | lh auto | ls 0 | case as typed | colour var(--color-text-primary) | n=1 — Spread chip 98.23 (line box estimated 21; stored 10). figma: 16:1928 */
+  --type-book-ask-dim: var(--type-mono-medium-14); /* Tuple #26: Geist Mono Medium 14 | lh auto | ls 0 | case as typed | colour var(--color-text-dim) | n=1 — Dimmed .00 of ASK price. figma: 16:1945 */
+  --type-tab-title-inactive: var(--type-regular-20); /* Tuple #27: Geist Regular 20 | lh auto | ls 0 | case UPPER (textCase on mixed-case source text) | colour var(--color-text-tab-inactive) | n=1 — Inactive underlined-tab title BALANCE MOVEMENT. figma: 16:1985 */
+  --type-env-pill: var(--type-medium-16); /* Tuple #28: Geist Medium 16 | lh auto | ls 0 | case as typed | colour var(--color-text-primary) | n=1 — Env pill UAT (line box 21 = visual estimate). figma: 16:2390 */
+  --type-exposure-value: var(--type-semibold-14); /* Tuple #29: Geist SemiBold 14 | lh auto | ls 0 | case as typed | colour var(--color-text-primary) | n=1 — Exposure value $5,000,000. figma: 16:2394 */
+  --type-clock: var(--type-regular-12); /* Tuple #30: Geist Regular 12 | lh auto | ls 0px | case as typed | colour var(--color-text-primary) | n=1 — Clock 13:30:29 (UTC +00:00). figma: 16:2400 */
+  --type-avatar-initials: var(--type-regular-14); /* Tuple #31: Geist Regular 14 | lh auto | ls 2px | case as typed | colour var(--color-text-primary) | n=1 — Avatar initials YH (letter-spacing 2px — the only non-zero). figma: 16:2403 */
 
-  /* ----------------------------------------------------------
-     AVATAR / ICON SIZES
-  ---------------------------------------------------------- */
-  --avatar-sm:  28px;   /* nav icon logo */
-  --avatar-md:  36px;   /* user avatar (home screen) */
-  --avatar-lg:  40px;   /* notification icon */
-  --avatar-xl:  44px;   /* push banner icon, header icon */
-  --icon-sm:    14px;
-  --icon-md:    16px;
-  --icon-lg:    18px;
-  --icon-xl:    22px;
-  --icon-2xl:   30px;   /* large brand logo in header */
+  /* ---------- RADII ---------- */
+  --radius-2: 2px; /* Checkbox box 16x16 (x6). figma: 56:167 */
+  --radius-4: 4px; /* DEFAULT control radius (x61): Select/Input/Search/Buttons/tabs track/icon buttons/env+exposure pills. figma: I16:1915;10:36, 16:1957, 16:2389 */
+  --radius-5: 5px; /* Figma component-set wrapper frames ONLY (editor chrome, x13) — not used by any UI component; recorded for completeness. figma: 56:123 */
+  --radius-8: 8px; /* Panels/cards, header bar, BID/ASK tiles, table containers (x11). figma: 16:1911, 16:1920, 16:1932, 16:2386 */
+  --radius-16: 16px; /* Order-type badge pills 24px tall and coin discs 18x18 (x23; circular since 16 > 9). figma: 16:2010, 16:2137 */
+  --radius-24: 24px; /* Avatar 40x40 disc (effectively circle). figma: 16:2402 */
+  --radius-spread-tab: 8px 8px 0 0; /* Spread chip: per-corner [8,8,0,0] (top corners only). figma: 16:1927 */
+  --radius-checkbox: var(--radius-2); /* alias: checkbox box */
+  --radius-control: var(--radius-4); /* alias: every control */
+  --radius-panel: var(--radius-8); /* alias: panels, tiles, tables, header bar */
+  --radius-pill: var(--radius-16); /* alias: order-type badge pills, coin discs */
 
-  /* ----------------------------------------------------------
-     SPACING
-  ---------------------------------------------------------- */
-  --space-1:   4px;
-  --space-2:   6px;
-  --space-3:   8px;
-  --space-4:   10px;
-  --space-5:   12px;
-  --space-6:   14px;
-  --space-7:   16px;
-  --space-8:   18px;
-  --space-9:   20px;
-  --space-10:  24px;
-  --space-12:  28px;
-  --space-14:  32px;
-  --space-16:  40px;
+  /* ---------- SPACING — OBSERVED auto-layout padding / gap values (Figma defines no spacing tokens) ---------- */
+  --space-0: 0px; /* OBSERVED in Figma auto-layout (no spacing tokens exist): gap/padding 0 (table bodies, tab rows, icon-button group) */
+  --space-4: 4px; /* OBSERVED in Figma auto-layout (no spacing tokens exist): label->control gap, tile gap, ticker rows gap */
+  --space-7: 7px; /* OBSERVED in Figma auto-layout (no spacing tokens exist): vertical padding of every 32px control (7/8, 7/12, 7/24) — exactly as read */
+  --space-8: 8px; /* OBSERVED in Figma auto-layout (no spacing tokens exist): THE common gap (button/checkbox row/search), 8px horizontal padding (tab-sm, search) */
+  --space-10: 10px; /* OBSERVED in Figma auto-layout (no spacing tokens exist): icon-button inner gap, badge-pill gap, title-row gap */
+  --space-11: 11px; /* OBSERVED in Figma auto-layout (no spacing tokens exist): spread chip vertical padding (11/36) */
+  --space-12: 12px; /* OBSERVED in Figma auto-layout (no spacing tokens exist): field horizontal padding (7/12), tile padding, blotter row padding */
+  --space-16: 16px; /* OBSERVED in Figma auto-layout (no spacing tokens exist): form-row gap, panel internal gap, ticker cell horizontal padding */
+  --space-24: 24px; /* OBSERVED in Figma auto-layout (no spacing tokens exist): button/tab horizontal padding, panel left/right/bottom padding, order-book/balances row padding */
+  --space-30: 30px; /* OBSERVED in Figma auto-layout (no spacing tokens exist): badge-cell wrapper horizontal padding (117x16) */
+  --space-32: 32px; /* OBSERVED in Figma auto-layout (no spacing tokens exist): Select / Input-with-2-text internal gap */
+  --space-36: 36px; /* OBSERVED in Figma auto-layout (no spacing tokens exist): spread chip horizontal padding */
+  --space-48: 48px; /* OBSERVED in Figma auto-layout (no spacing tokens exist): RFQ form vertical gap (row -> button) */
 
-  /* ----------------------------------------------------------
-     BORDER RADIUS
-  ---------------------------------------------------------- */
-  --radius:       4px;    /* universal — buttons, inputs, badges, cards, toasts */
-  --radius-sm:    4px;    /* same — kept explicit for clarity */
-  --radius-md:    8px;    /* bottom sheets, OTP slots, code card sections */
-  --radius-lg:    14px;   /* sign-out confirmation dialog */
-  --radius-pill:  999px;  /* waiting badges, session chips */
-  --radius-full:  50%;    /* avatars, live dots */
+  /* ---------- CONTROL SIZES ---------- */
+  --h-control: 32px; /* Select/Input/Search/Input-2-text/Button/icon button/input-with-tabs. figma: 56:126, 56:194, 56:226 */
+  --h-control-lg: 40px; /* Dashboard tabs SELL/BUY (392x40), primary Button (392x40), env + Exposure pills, avatar. figma: 16:2127, 16:2132 */
+  --h-field-with-label: 52px; /* label 16 + gap 4 + control 32. figma: 56:124 */
+  --h-label: 16px; /* field label box. figma: 56:125 */
+  --h-checkbox: 16px; /* checkbox box 16x16 / row 16. figma: 56:166 */
+  --h-chip: 24px; /* order-type badge pill. figma: 16:2010 */
+  --h-tile: 100px; /* BID/ASK tile 188x100. figma: 16:1920 */
+  --h-spread: 32px; /* spread chip 120x32. figma: 16:1927 */
+  --h-avatar: 40px; /* avatar 40x40. figma: 16:2402 */
+  --h-coin: 18px; /* coin disc 18x18. figma: 16:2137 */
+  --h-logo: 40px; /* logo 163x40; mark 40x40. figma: 16:2388, 58:84 */
+  --h-icon-button: 32px; /* refresh/filter/hands. figma: 56:225 */
+  --h-tab: 40px; /* tabs component 184x40. figma: 56:203 */
+  --h-tab-sm: 32px; /* tabs inside input-with-tabs. figma: 56:217 */
+  --h-nav: 72px; /* header bar. figma: 16:2386 */
+  --h-ticker: 80px; /* ticker strip and cell. figma: 16:2133, 16:2135 */
+  --h-row-book: 42px; /* order-book / balances body row. figma: 16:1938, 16:1963 */
+  --h-row-trades: 40px; /* blotter body row. figma: 16:2004 */
+  --h-header-book: 34px; /* order-book / balances header row. figma: 16:1933, 16:1959 */
+  --h-header-trades: 32px; /* blotter header row. figma: 16:1991 */
+  --h-panel-title: 26px; /* panel title row (Balances 32 with refresh, Blotter 38). figma: 16:1912 */
+  --w-field: 148px; /* Select/Input/Input-2-text/Search component width (HUG). figma: 56:124 */
+  --w-field-dashboard: 188px; /* Dashboard field (FILL in a 392 row, gap 16). figma: 16:1915 */
+  --w-field-rfq-instrument: 132px; /* RFQ Instrument search. figma: 16:2130 */
+  --w-input-with-tabs: 244px; /* input with tabs. figma: 56:217 */
+  --w-button: 86px; /* Button component (HUG: 24 + label 38 + 24). figma: 56:194 */
+  --w-tabs: 184px; /* tabs component (HUG). figma: 56:204 */
+  --w-tabs-dashboard: 392px; /* SELL/BUY tabs and primary button on the Dashboard (FILL). figma: 16:2127, 16:2132 */
+  --w-checkbox-row: 120px; /* checkbox row (FIXED). figma: 56:166 */
+  --w-tile: 188px; /* BID/ASK tile. figma: 16:1920 */
+  --w-spread: 120px; /* spread chip. figma: 16:1927 */
+  --w-chip-limit: 76px; /* Limit badge (hug). figma: 16:2010 */
+  --w-chip-market: 88px; /* Market badge (hug). figma: 16:2025 */
+  --w-logo: 163px; /* logo wordmark. figma: 16:2388 */
 
-  /* ----------------------------------------------------------
-     SHADOWS
-  ---------------------------------------------------------- */
-  --shadow-card:      0 2px 10px rgba(0, 0, 0, 0.06);
-  --shadow-card-lg:   0 4px 24px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --shadow-sheet:     0 -8px 40px rgba(0, 0, 0, 0.18);
-  --shadow-dialog:    0 8px 40px rgba(0, 0, 0, 0.20);
-  --shadow-mobile:    0 24px 64px rgba(0, 0, 0, 0.18), 0 0 0 2px rgba(0, 0, 0, 0.07);
-  --shadow-focus:     0 0 0 4px rgba(122, 239, 239, 0.094);
-  --shadow-dot-pulse: 0 0 0 4px rgba(122, 239, 239, 0.094);
-  --shadow-banner:    0 6px 32px rgba(0, 0, 0, 0.18), inset 0 2px 0 rgba(255, 255, 255, 0.22);
+  /* ---------- ICON BOX SIZES (export sizes of the SVG assets) ---------- */
+  --icon-16: 16px; /* lucide frames (search, chevron-down). figma: 56:157, 56:128 */
+  --icon-18: 18px; /* refresh/filter export size (node 16 + 1.5 stroke bleed). figma: 56:227, 56:232 */
+  --icon-hands: 20px; /* hands export 20x18 (node 18x16). figma: 56:237 */
+  --icon-check: 10px; /* check export 10x8 (8x6 vector + 1.5 stroke bleed). figma: 56:168 */
+  --icon-status-dot: 6.67px; /* status dot 6.6667 (export 7x7). figma: 16:2005 */
+  --icon-coin: 18px; /* coin 18x18. figma: 16:2137 */
 
-  /* ----------------------------------------------------------
-     TRANSITIONS
-  ---------------------------------------------------------- */
-  --duration-instant: 0.08s;   /* button active state scale */
-  --duration-fast:    0.12s;   /* color/opacity changes */
-  --duration-base:    0.15s;   /* borders, backgrounds */
-  --duration-normal:  0.18s;   /* inputs, focus rings */
-  --duration-enter:   0.20s;   /* toast entry */
-  --duration-slide:   0.28s;   /* toast slide */
-  --duration-screen:  0.38s;   /* screen push transitions */
-  --duration-sheet:   0.42s;   /* bottom sheet slide */
+  /* ---------- STROKES (Figma strokes are INSIDE-aligned -> inset box-shadow; OUTSIDE ones -> outer box-shadow) ---------- */
+  --stroke-hairline: 1px; /* Box strokes: Button Outline black, Button hover Main color, checkbox border, Exposure pill, Button black (OUTSIDE), table container (OUTSIDE), dividers. Figma strokes are INSIDE except where noted -> inset box-shadow. figma: 56:189, 56:196, 56:171, 16:2392, 56:201, 16:1932 */
+  --stroke-icon: 1.5px; /* Icon glyph strokes (refresh/filter/hands, checkbox check). Baked in the SVG assets. figma: 56:227, 56:168 */
+  --stroke-search: 1px; /* lucide search stroke (Main color darker). figma: 56:158 */
+  --stroke-chevron: 1.2px; /* lucide chevron-down stroke (Main color darker). figma: 56:129 */
+  --stroke-tab-underline: 1.5px; /* Active tab underline, bottom INSIDE, Black. figma: 19:126 */
 
-  --ease-default: ease;
-  --ease-screen:  cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-sheet:   cubic-bezier(0.32, 0, 0.04, 1);
-  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* ---------- SHADOWS / EFFECTS — none ---------- */
+  --shadow-none: none; /* Figma defines NO effects: elevation is expressed only by white cards on the Grey 0 page. */
 
-  /* ----------------------------------------------------------
-     Z-INDEX
-  ---------------------------------------------------------- */
-  --z-base:       0;
-  --z-nav:        100;
-  --z-banner:     300;
-  --z-sheet:      101;
-  --z-sheet-overlay: 100;
-  --z-dialog:     200;
-  --z-faceid:     50;
-  --z-launch:     40;
+  /* ---------- DASHBOARD GEOMETRY (Dashboard 16:1910, 1920x1080) ---------- */
+  --layout-screen-width: 1920px; /* Dashboard frame. figma: 16:1910 */
+  --layout-screen-height: 1080px; /* Dashboard frame. figma: 16:1910 */
+  --layout-nav-x: 24px; /* Header bar x. figma: 16:2386 */
+  --layout-nav-y: 16px; /* Header bar y. figma: 16:2386 */
+  --layout-nav-width: 1872px; /* Header bar width (ends x=1896). figma: 16:2386 */
+  --layout-nav-height: 72px; /* Header bar height. figma: 16:2386 */
+  --layout-nav-padding: 16px 24px; /* Header bar padding T/B 16, L/R 24; gap 271 is a SPACE_BETWEEN leftover, not a token. figma: 16:2386 */
+  --layout-ticker-y: 104px; /* Ticker strip y (nav->ticker gap 16). figma: 16:2133 */
+  --layout-ticker-height: 80px; /* Ticker strip height. figma: 16:2133 */
+  --layout-ticker-cell-padding: 12px 16px; /* Ticker cell padding; V gap 4. figma: 16:2135 */
+  --layout-ticker-cell-width-sm: 130px; /* Ticker cell hug width (USDT, SOL, SHIB, ADA, AVAX, XLM). figma: 16:2195 */
+  --layout-ticker-cell-width-md: 138px; /* Ticker cell (ETH-USD/ETH-EUR). figma: 16:2135 */
+  --layout-ticker-cell-width-lg: 159px; /* Ticker cell (BTC-USD). figma: 16:2157 */
+  --layout-panels-y: 200px; /* First panel row y (ticker->panels gap 16). figma: 16:1911 */
+  --layout-margin-left: 24px; /* Left margin. figma: 16:1911 */
+  --layout-panels-right: 1888px; /* Right end of panels (right margin 32); header ends at 1896 (24) — 8px inconsistency. figma: 16:1978 */
+  --layout-gutter: 16px; /* Column gutter / row gap. figma: 16:1954 */
+  --layout-panel-padding: 16px 24px 24px 24px; /* Panel padding T/R/B/L. figma: 16:1911 */
+  --layout-panel-gap: 16px; /* Panel internal gap. figma: 16:1911 */
+  --layout-panel-gap-blotter: 8px; /* Blotter panel internal gap. figma: 16:1981 */
+  --layout-panel-width-sm: 440px; /* Spot Trader / RFQ / Spot Balances width. figma: 16:1911 */
+  --layout-panel-width-lg: 952px; /* Chart panel width. figma: 16:1978 */
+  --layout-panel-width-blotter: 1408px; /* Trades Blotter width (= 440+16+952). figma: 16:1981 */
+  --layout-panel-height-trader: 528px; /* Spot Trader height. figma: 16:1911 */
+  --layout-panel-height-balances: 392px; /* Spot Balances height. figma: 16:1954 */
+  --layout-panel-height-chart: 392px; /* Chart height. figma: 16:1978 */
+  --layout-panel-height-blotter: 438px; /* Blotter height. figma: 16:1981 */
+  --layout-panel-height-rfq: 278px; /* RFQ height. figma: 16:2124 */
+  --layout-rfq-y: 744px; /* RFQ panel y. figma: 16:2124 */
+  --layout-blotter-y: 608px; /* Blotter y. figma: 16:1981 */
+  --layout-col2-x: 480px; /* Spot Balances x (and Blotter x). figma: 16:1954 */
+  --layout-col3-x: 936px; /* Chart x. figma: 16:1978 */
+  --layout-table-inner-width-sm: 392px; /* Order-book / balances table width. figma: 16:1932 */
+  --layout-table-inner-width-blotter: 1360px; /* Blotter table width. figma: 16:1990 */
+  --layout-tile-overlap: -36px; /* BID/ASK tile + spread chip stack gap (V itemSpacing -36). figma: 16:1918 */
+
+  /* ---------- Z-INDEX (EXTENDED — Figma has no z-index; layering for menu / scrim / modal / toast) ---------- */
+  --z-menu: 100; /* EXTENDED — not in Figma (no z-index exists); stacking order for overlays added in components.css. */
+  --z-scrim: 200; /* EXTENDED — not in Figma (no z-index exists); stacking order for overlays added in components.css. */
+  --z-modal: 210; /* EXTENDED — not in Figma (no z-index exists); stacking order for overlays added in components.css. */
+  --z-toast: 300; /* EXTENDED — not in Figma (no z-index exists); stacking order for overlays added in components.css. */
+}
+
+/* =====================================================================
+   DARK THEME — EXTENDED (not in Figma final). Apply with <body class="dark"> or any ancestor .theme-dark.
+   Re-points every semantic token above at its dark pair. Components use ONLY the semantic tokens, so they flip without further rules.
+   ===================================================================== */
+.theme-dark,
+body.dark {
+  color-scheme: dark; /* EXTENDED — native form controls/scrollbars */
+  --color-text-primary: var(--color-dark-text-primary);
+  --color-text-secondary: var(--color-dark-text-secondary);
+  --color-text-tertiary: var(--color-dark-text-tertiary);
+  --color-text-dim: var(--color-dark-text-dim);
+  --color-text-on-brand: var(--color-dark-text-on-brand);
+  --color-text-on-tile: var(--color-dark-text-on-tile);
+  --color-text-on-warning: var(--color-dark-text-on-warning);
+  --color-text-positive: var(--color-dark-text-positive);
+  --color-text-negative: var(--color-dark-text-negative);
+  --color-text-title: var(--color-dark-text-title);
+  --color-text-tab-active: var(--color-dark-text-tab-active);
+  --color-text-tab-inactive: var(--color-dark-text-tab-inactive);
+  --color-text-disabled: var(--color-dark-text-disabled);
+  --color-text-on-disabled: var(--color-dark-text-on-disabled);
+  --color-text-on-black: var(--color-dark-text-on-black);
+  --color-text-limit: var(--color-dark-text-limit);
+  --color-text-market: var(--color-dark-text-market);
+  --color-surface-page: var(--color-dark-surface-page);
+  --color-surface-panel: var(--color-dark-surface-panel);
+  --color-surface-nav: var(--color-dark-surface-nav);
+  --color-surface-ticker: var(--color-dark-surface-ticker);
+  --color-surface-field: var(--color-dark-surface-field);
+  --color-surface-table: var(--color-dark-surface-table);
+  --color-surface-row-odd: var(--color-dark-surface-row-odd);
+  --color-surface-row-even: var(--color-dark-surface-row-even);
+  --color-surface-spread: var(--color-dark-surface-spread);
+  --color-surface-tabs-track: var(--color-dark-surface-tabs-track);
+  --color-surface-hover: var(--color-dark-surface-hover);
+  --color-surface-avatar: var(--color-dark-surface-avatar);
+  --color-surface-env: var(--color-dark-surface-env);
+  --color-surface-exposure: var(--color-dark-surface-exposure);
+  --color-surface-tile-bid: var(--color-dark-surface-tile-bid);
+  --color-surface-tile-ask: var(--color-dark-surface-tile-ask);
+  --color-surface-tab-buy: var(--color-dark-surface-tab-buy);
+  --color-surface-tab-sell: var(--color-dark-surface-tab-sell);
+  --color-surface-warning: var(--color-dark-surface-warning);
+  --color-surface-button-black: var(--color-dark-surface-button-black);
+  --color-surface-chip-limit: var(--color-dark-surface-chip-limit);
+  --color-surface-chip-market: var(--color-dark-surface-chip-market);
+  --color-surface-disabled: var(--color-dark-surface-disabled);
+  --color-surface-chart-toolbar: var(--color-dark-surface-chart-toolbar);
+  --color-surface-chart-toolbar-active: var(--color-dark-surface-chart-toolbar-active);
+  --color-surface-scrim: var(--color-dark-surface-scrim);
+  --color-border-nav: var(--color-dark-border-nav);
+  --color-border-table: var(--color-dark-border-table);
+  --color-border-ticker: var(--color-dark-border-ticker);
+  --color-border-divider: var(--color-dark-border-divider);
+  --color-border-checkbox: var(--color-dark-border-checkbox);
+  --color-border-outline: var(--color-dark-border-outline);
+  --color-border-brand: var(--color-dark-border-brand);
+  --color-border-focus: var(--color-dark-border-focus);
+  --color-border-error: var(--color-dark-border-error);
+  --color-border-exposure: var(--color-dark-border-exposure);
+  --color-border-tab-active: var(--color-dark-border-tab-active);
+  --color-icon-default: var(--color-dark-icon-default);
+  --color-icon-field: var(--color-dark-icon-field);
+  --color-icon-logo: var(--color-dark-icon-logo);
+  --color-brand: var(--color-dark-brand);
+  --color-brand-hover: var(--color-dark-brand-hover);
+  --color-brand-transp: var(--color-dark-brand-transp);
+  --color-brand-darker: var(--color-dark-brand-darker);
+  --color-brand-pressed: var(--color-dark-brand-pressed);
+  --color-status-success: var(--color-dark-status-success);
+  --color-status-danger: var(--color-dark-status-danger);
+  --color-status-warning: var(--color-dark-status-warning);
+}
+
+/* =====================================================================
+   LIGHT RE-ASSERTION — EXTENDED (not in Figma; a scope helper, no new values). Put .theme-light on an element INSIDE a dark scope (body.dark / .theme-dark)
+   to render that subtree with the LIGHT Figma values again (e.g. a light and a dark Dashboard frame side by side while the page theme is dark).
+   Every line repeats the :root (light) definition of the semantic token above.
+   ===================================================================== */
+.theme-light {
+  color-scheme: light;
+  --color-brand: var(--color-main-color);
+  --color-text-primary: var(--color-black);
+  --color-text-secondary: var(--color-grey-3);
+  --color-text-tertiary: var(--color-grey-2);
+  --color-text-dim: var(--color-grey-2);
+  --color-text-on-brand: var(--color-black);
+  --color-text-on-tile: var(--color-black);
+  --color-text-on-warning: var(--color-black);
+  --color-text-positive: var(--color-green-for-text);
+  --color-text-negative: var(--color-red-for-text);
+  --color-text-title: var(--color-black);
+  --color-text-tab-active: var(--color-black);
+  --color-text-tab-inactive: var(--color-grey-3);
+  --color-text-disabled: var(--color-grey-3);
+  --color-text-on-disabled: var(--color-grey-0);
+  --color-text-on-black: var(--color-main-color);
+  --color-text-limit: var(--color-limit-text);
+  --color-text-market: var(--color-market-text);
+  --color-surface-page: var(--color-grey-0);
+  --color-surface-panel: var(--color-white);
+  --color-surface-nav: var(--color-white);
+  --color-surface-ticker: var(--color-white);
+  --color-surface-field: var(--color-grey-0);
+  --color-surface-table: var(--color-grey-0);
+  --color-surface-row-odd: var(--color-white);
+  --color-surface-row-even: var(--color-grey-0);
+  --color-surface-spread: var(--color-white);
+  --color-surface-tabs-track: var(--color-grey-0);
+  --color-surface-hover: var(--color-grey-1);
+  --color-surface-avatar: var(--color-grey-1);
+  --color-surface-env: var(--color-main-color-transp);
+  --color-surface-exposure: var(--color-exposure-tint);
+  --color-surface-tile-bid: var(--color-red);
+  --color-surface-tile-ask: var(--color-green);
+  --color-surface-tab-buy: var(--color-green);
+  --color-surface-tab-sell: var(--color-red);
+  --color-surface-warning: var(--color-orange);
+  --color-surface-button-black: var(--color-black);
+  --color-surface-chip-limit: var(--color-limit-bg);
+  --color-surface-chip-market: var(--color-market-bg);
+  --color-surface-disabled: var(--color-grey-3);
+  --color-surface-chart-toolbar: var(--color-grey-0);
+  --color-surface-chart-toolbar-active: var(--color-grey-1);
+  --color-surface-scrim: rgba(0, 0, 0, 0.2);
+  --color-border-nav: transparent;
+  --color-border-table: var(--color-grey-0);
+  --color-border-ticker: var(--color-grey-0);
+  --color-border-divider: var(--color-grey-1);
+  --color-border-checkbox: var(--color-grey-2);
+  --color-border-outline: var(--color-black);
+  --color-border-brand: var(--color-main-color);
+  --color-border-focus: var(--color-main-color);
+  --color-border-error: var(--color-red-for-text);
+  --color-border-exposure: var(--color-green-for-text);
+  --color-border-tab-active: var(--color-black);
+  --color-icon-default: var(--color-grey-3);
+  --color-icon-field: var(--color-main-color-darker);
+  --color-icon-logo: var(--color-main-color-darker);
+  --color-brand-hover: var(--color-main-color-hover);
+  --color-brand-transp: var(--color-main-color-transp);
+  --color-brand-darker: var(--color-main-color-darker);
+  --color-brand-pressed: var(--color-main-color-darker);
+  --color-status-success: var(--color-green-for-text);
+  --color-status-danger: var(--color-red-for-text);
+  --color-status-warning: var(--color-orange);
 }

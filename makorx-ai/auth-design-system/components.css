@@ -1,0 +1,991 @@
+/* =====================================================================
+   MAKOR (MakorX.AI) AUTH - components (stage A)
+   Requires tokens.css (all values are var(--mauth-*)). Assets: ./assets/ (mask icons).
+   Source of truth: the HTML prototypes (no Figma). Every rule block starts with
+     a comment "src: <file> L<line(s)>"   (S = makor-signin.html, A = makor-authenticator.html,
+                                     D = makor-authenticator-dark.html; "computed" = browser measured)
+   Class scheme:  web sign-in  = .mauth-web-*      mobile authenticator = .mauth-app-*
+   State classes (also real pseudo-classes): .is-hover .is-focus .is-active .is-disabled
+     .is-loading .is-error .is-filled .is-warn .is-expired .is-shown .is-show .is-open .is-hidden .is-checked ...
+   THEMES: web = light only. Mobile = light by default; put data-theme="dark" on any ancestor
+   (the phone wrapper or <html>) for dark. Colours flip through tokens; the only dark-scope
+   selectors below are the structural dark extras (Face ID glass card radius/padding, map art).
+   "EXTENDED" = NOT in the prototypes, derived only from existing tokens.
+   Documented-not-reproduced source bugs are listed in _build-notes.md.
+   ===================================================================== */
+
+/* src: S L29 / A L31 (global reset, scoped to the auth roots; :where() keeps specificity at 0) */
+:where(.mauth-web, .mauth-web *, .mauth-web *::before, .mauth-web *::after,
+       .mauth-app, .mauth-app *, .mauth-app *::before, .mauth-app *::after) {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------------------------------------------------------------------
+   0. ICONS - mask icons from ./assets (BUILD_RULES section 5). Colour = currentColor.
+   --------------------------------------------------------------------- */
+.mauth-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+/* web (MANIFEST.md) */
+.mauth-icon--web-eye           { -webkit-mask-image: url(assets/web-icon-eye.svg);                        mask-image: url(assets/web-icon-eye.svg); }
+.mauth-icon--web-eye-off       { -webkit-mask-image: url(assets/web-icon-eye-off.svg);                    mask-image: url(assets/web-icon-eye-off.svg); }
+.mauth-icon--web-checkbox-check{ -webkit-mask-image: url(assets/web-icon-checkbox-check.currentColor.svg); mask-image: url(assets/web-icon-checkbox-check.currentColor.svg); }
+.mauth-icon--web-arrow-left    { -webkit-mask-image: url(assets/web-icon-arrow-left.svg);                 mask-image: url(assets/web-icon-arrow-left.svg); }
+.mauth-icon--web-clock         { -webkit-mask-image: url(assets/web-icon-clock.svg);                      mask-image: url(assets/web-icon-clock.svg); }
+.mauth-icon--web-success-check { -webkit-mask-image: url(assets/web-icon-success-check.svg);              mask-image: url(assets/web-icon-success-check.svg); }
+.mauth-icon--web-logo-mark     { -webkit-mask-image: url(assets/web-makor-logo-mark.currentColor.svg);    mask-image: url(assets/web-makor-logo-mark.currentColor.svg); }
+.mauth-icon--web-watermark     { -webkit-mask-image: url(assets/web-makor-watermark.currentColor.svg);    mask-image: url(assets/web-makor-watermark.currentColor.svg); }
+/* app (MANIFEST-app.md) */
+.mauth-icon--app-logo-mark     { -webkit-mask-image: url(assets/app-makor-logo-mark.currentColor.svg);    mask-image: url(assets/app-makor-logo-mark.currentColor.svg); }
+.mauth-icon--app-status-wifi   { -webkit-mask-image: url(assets/app-status-wifi.currentColor.svg);        mask-image: url(assets/app-status-wifi.currentColor.svg); }
+.mauth-icon--app-status-battery{ -webkit-mask-image: url(assets/app-status-battery.currentColor.svg);     mask-image: url(assets/app-status-battery.currentColor.svg); }
+.mauth-icon--app-arrow-left    { -webkit-mask-image: url(assets/app-icon-arrow-left.svg);                 mask-image: url(assets/app-icon-arrow-left.svg); }
+.mauth-icon--app-eye           { -webkit-mask-image: url(assets/app-icon-eye.svg);                        mask-image: url(assets/app-icon-eye.svg); }
+.mauth-icon--app-copy          { -webkit-mask-image: url(assets/app-icon-copy.svg);                       mask-image: url(assets/app-icon-copy.svg); }
+.mauth-icon--app-confirmed-check{ -webkit-mask-image: url(assets/app-icon-confirmed-check.currentColor.svg); mask-image: url(assets/app-icon-confirmed-check.currentColor.svg); }
+
+/* =====================================================================
+   PART 1 - WEB SIGN-IN (light only)   source: hub/auth/makor-signin.html
+   ===================================================================== */
+
+/* src: S L38-44 (html, body) - theme root + page typography */
+.mauth-web {
+  font-family: var(--mauth-font-sans);
+  background: var(--mauth-web-bg);
+  color: var(--mauth-web-text);
+  -webkit-font-smoothing: antialiased;
+  line-height: normal; /* FIX (stage B): the source body sets no line-height / font-size (browser default 16px); without these two the root inherits them from the host page (proven in the showcase: label line-height 18.85px vs normal; active-session head 35.33 vs 38px) */
+  font-size: var(--mauth-text-16);
+}
+
+/* src: S L47-51 (#constellation-canvas) - drawn by constellation.js (preset "web"); see components.md */
+.mauth-web-canvas {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: var(--mauth-z-web-canvas);
+}
+
+/* src: S L54-60 (.bg-watermark) - logo mark as mask, opacity .045, clipped by the bottom-right edge */
+.mauth-web-watermark {
+  position: fixed;
+  bottom: var(--mauth-size-web-watermark-offset);
+  right: var(--mauth-size-web-watermark-offset);
+  width: var(--mauth-size-web-watermark-w);
+  height: var(--mauth-size-web-watermark-h);
+  background-color: var(--mauth-web-primary);
+  -webkit-mask: url(assets/web-makor-watermark.currentColor.svg) center / 100% 100% no-repeat;
+  mask: url(assets/web-makor-watermark.currentColor.svg) center / 100% 100% no-repeat;
+  opacity: var(--mauth-opacity-watermark);
+  pointer-events: none;
+  z-index: var(--mauth-z-web-watermark);
+}
+
+/* src: S L63-73 (.page-footer, .footer-text) */
+.mauth-web-footer {
+  position: fixed; bottom: var(--mauth-size-web-footer-bottom); left: 0; right: 0;
+  display: flex; justify-content: space-between;
+  padding: 0 var(--mauth-space-36);
+  pointer-events: none;
+  z-index: var(--mauth-z-web-footer);
+}
+.mauth-web-footer-text {
+  font-size: var(--mauth-text-10); font-weight: var(--mauth-weight-semibold);
+  color: var(--mauth-web-text-2); letter-spacing: var(--mauth-tracking-footer);
+  text-transform: uppercase; opacity: var(--mauth-opacity-footer);
+}
+
+/* src: S L76-82 (.page) */
+.mauth-web-page {
+  position: relative; z-index: var(--mauth-z-web-page);
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: var(--mauth-space-80) var(--mauth-space-16) var(--mauth-space-80);
+}
+
+/* src: S L85-92 (.card). 460 wide at desktop (inner 364); one media query. */
+.mauth-web-card {
+  width: 100%; max-width: var(--mauth-size-web-card-max);
+  background: var(--mauth-web-surface);
+  border-radius: var(--mauth-radius-web-card);
+  box-shadow: var(--mauth-shadow-web-card);
+  padding: 0 var(--mauth-space-48) var(--mauth-space-48);
+}
+@media (max-width: 560px) { /* src: S L92 - the ONLY media query (token breakpoint-web-card) */
+  .mauth-web-card { padding: 0 var(--mauth-space-32) var(--mauth-space-40); }
+}
+/* src: S L498 (JS sets inline padding:40px on the success view); card-logo header is simply omitted there */
+.mauth-web-card--success { padding: var(--mauth-space-40); }
+
+/* src: S L95-98 (.card-logo-header) + L338 (logo svg 90x72, fill #005268) */
+.mauth-web-card-logo {
+  display: flex; flex-direction: column; align-items: center;
+  padding: var(--mauth-space-36) 0 var(--mauth-space-24); gap: var(--mauth-space-10);
+}
+.mauth-web-logo {
+  display: block;
+  width: var(--mauth-size-web-logo-w); height: var(--mauth-size-web-logo-h);
+  background-color: var(--mauth-web-primary);
+  -webkit-mask: url(assets/web-makor-logo-mark.currentColor.svg) center / contain no-repeat;
+  mask: url(assets/web-makor-logo-mark.currentColor.svg) center / contain no-repeat;
+}
+
+/* src: S L106-108 (.view): only the active view is displayed (instant switch, no transition) */
+.mauth-web-view { display: none; }
+.mauth-web-view.is-active { display: block; }
+
+/* src: S L111-116 (.eyebrow, .accent) */
+.mauth-web-eyebrow {
+  font-size: var(--mauth-text-11); font-weight: var(--mauth-weight-semibold);
+  letter-spacing: var(--mauth-tracking-eyebrow-web); text-transform: uppercase;
+  color: var(--mauth-web-text-2); margin-bottom: var(--mauth-space-10); text-align: center;
+}
+.mauth-web-eyebrow--accent { color: var(--mauth-web-primary); }
+
+/* src: S L119-124, L129-131, L395 (.card-title; centred in login + OTP) */
+.mauth-web-title {
+  font-family: var(--mauth-font-serif);
+  font-size: var(--mauth-text-38); font-weight: var(--mauth-weight-medium); line-height: var(--mauth-leading-web-title);
+  color: var(--mauth-web-text); margin-bottom: var(--mauth-space-8);
+  font-variant-caps: small-caps; letter-spacing: var(--mauth-tracking-title);
+  text-align: center;
+}
+/* src: S L395 (inline font-size:30px on the OTP-step title) */
+.mauth-web-title--compact { font-size: var(--mauth-text-30); }
+/* src: S L125-128, L396 (.card-sub) */
+.mauth-web-sub {
+  font-size: var(--mauth-text-14); color: var(--mauth-web-text-2);
+  line-height: var(--mauth-leading-web-body); margin-bottom: var(--mauth-space-28);
+  text-align: center;
+}
+
+/* src: S L134 (.field), L357 (inline margin-bottom:10px on the password field) */
+.mauth-web-field { display: flex; flex-direction: column; gap: var(--mauth-space-6); margin-bottom: var(--mauth-space-14); }
+.mauth-web-field--compact { margin-bottom: var(--mauth-space-10); }
+.mauth-web-field-wrap { position: relative; }
+
+/* src: S L136-152 (.field-input) */
+.mauth-web-input {
+  width: 100%; height: var(--mauth-height-web-field);
+  padding: 0 var(--mauth-space-44) 0 var(--mauth-space-16);
+  background: var(--mauth-web-field);
+  border: var(--mauth-border-width-field) solid transparent;
+  border-radius: var(--mauth-radius-web-field);
+  font-family: var(--mauth-font-sans); font-size: var(--mauth-text-14); color: var(--mauth-web-text);
+  outline: none;
+  transition: border-color var(--mauth-duration-field), box-shadow var(--mauth-duration-field);
+  -webkit-appearance: none; appearance: none;
+}
+/* src: S L352 (username input overrides padding-right:16px - it has no toggle) */
+.mauth-web-input--no-toggle { padding-right: var(--mauth-space-16); }
+.mauth-web-input:focus,
+.mauth-web-input.is-focus {
+  border-color: var(--mauth-web-primary);
+  box-shadow: var(--mauth-shadow-web-focus-ring);
+}
+.mauth-web-input::placeholder { color: var(--mauth-web-text-3); }
+/* src: S L152. Same specificity as :focus and later in source -> error ring wins while focused (as rendered) */
+.mauth-web-input.is-error {
+  border-color: var(--mauth-web-danger);
+  box-shadow: var(--mauth-shadow-web-error-ring);
+}
+/* EXTENDED - not in prototype: aria-invalid mirrors the .is-error look (the source never sets aria-invalid) */
+.mauth-web-input[aria-invalid="true"] {
+  border-color: var(--mauth-web-danger);
+  box-shadow: var(--mauth-shadow-web-error-ring);
+}
+/* EXTENDED - not in prototype (source: "Hover: none defined"): hover border = the OTP-slot rest border token */
+.mauth-web-input:hover:not(:focus):not(.is-error):not([aria-invalid="true"]):not(:disabled),
+.mauth-web-input.is-hover:not(:focus):not(.is-error) {
+  border-color: var(--mauth-web-border);
+}
+/* EXTENDED - not in prototype (source: "Disabled: none defined"): reuses the link-button disabled recipe (opacity .4) */
+.mauth-web-input:disabled,
+.mauth-web-input.is-disabled {
+  opacity: var(--mauth-opacity-link-disabled); cursor: not-allowed;
+}
+
+/* src: S L154-161 (.field-toggle, 44x44 hit area, icon 18x18) */
+.mauth-web-toggle {
+  position: absolute; right: var(--mauth-space-6); top: 50%; transform: translateY(-50%);
+  background: none; border: none; padding: 0; cursor: pointer; color: var(--mauth-web-text-3);
+  width: var(--mauth-size-web-toggle); height: var(--mauth-size-web-toggle);
+  display: flex; align-items: center; justify-content: center;
+  transition: color var(--mauth-duration-hover); -webkit-tap-highlight-color: transparent;
+}
+.mauth-web-toggle:hover,
+.mauth-web-toggle.is-hover { color: var(--mauth-web-text-2); }
+.mauth-web-toggle .mauth-icon { width: var(--mauth-size-web-toggle-icon); height: var(--mauth-size-web-toggle-icon); display: block; }
+/* two icons in the markup: eye (password hidden) / eye-off (password revealed). Intended: toggle .is-revealed + aria-pressed */
+.mauth-web-toggle .mauth-icon--web-eye-off { display: none; }
+.mauth-web-toggle.is-revealed .mauth-icon--web-eye { display: none; }
+.mauth-web-toggle.is-revealed .mauth-icon--web-eye-off { display: block; }
+
+/* src: S L162-163 (.field-error) */
+.mauth-web-field-error { font-size: var(--mauth-text-12); color: var(--mauth-web-danger); margin-top: var(--mauth-space-4); display: none; }
+.mauth-web-field-error.is-shown { display: block; }
+
+/* src: S L166-169 (.row-between) */
+.mauth-web-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--mauth-space-24); }
+
+/* src: S L170-183 (.checkbox-row / .cb-box / .cb-label). Source is a FAKE checkbox (label+div, not focusable).
+   Intended markup: <label class="mauth-web-checkbox"><input class="mauth-web-checkbox-input" type="checkbox" checked>
+   <span class="mauth-web-checkbox-box"></span><span class="mauth-web-checkbox-label">Remember me</span></label>
+   The input is visually hidden but keyboard-focusable (EXTENDED focus ring below). Default state: checked. */
+.mauth-web-checkbox {
+  position: relative;
+  display: flex; align-items: center; gap: var(--mauth-space-8);
+  cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.mauth-web-checkbox-input {
+  position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: var(--mauth-size-web-checkbox); height: var(--mauth-size-web-checkbox);
+  opacity: 0; cursor: pointer;
+}
+.mauth-web-checkbox-box {
+  width: var(--mauth-size-web-checkbox); height: var(--mauth-size-web-checkbox);
+  border-radius: var(--mauth-radius-checkbox); flex-shrink: 0;
+  border: var(--mauth-border-width-field) solid var(--mauth-web-border); background: var(--mauth-web-surface);
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--mauth-duration-hover), border-color var(--mauth-duration-hover);
+}
+.mauth-web-checkbox-box::after { /* tick: web-icon-checkbox-check.currentColor.svg, white, opacity 0 -> 1 */
+  content: '';
+  width: var(--mauth-size-web-checkbox-tick); height: var(--mauth-size-web-checkbox-tick);
+  background-color: var(--mauth-web-on-primary);
+  -webkit-mask: url(assets/web-icon-checkbox-check.currentColor.svg) center / contain no-repeat;
+  mask: url(assets/web-icon-checkbox-check.currentColor.svg) center / contain no-repeat;
+  opacity: 0; transition: opacity var(--mauth-duration-hover);
+}
+.mauth-web-checkbox-input:checked + .mauth-web-checkbox-box,
+.mauth-web-checkbox.is-checked .mauth-web-checkbox-box { background: var(--mauth-web-primary); border-color: var(--mauth-web-primary); }
+.mauth-web-checkbox-input:checked + .mauth-web-checkbox-box::after,
+.mauth-web-checkbox.is-checked .mauth-web-checkbox-box::after { opacity: 1; }
+.mauth-web-checkbox-label { font-size: var(--mauth-text-13); color: var(--mauth-web-text-2); font-weight: var(--mauth-weight-regular); }
+/* EXTENDED - not in prototype (the fake checkbox had no focus style): same 2px primary outline recipe as the buttons */
+.mauth-web-checkbox-input:focus-visible + .mauth-web-checkbox-box,
+.mauth-web-checkbox.is-focus .mauth-web-checkbox-box {
+  outline: var(--mauth-focus-outline-width) solid var(--mauth-web-primary); outline-offset: var(--mauth-focus-outline-offset);
+}
+
+/* src: S L185-192 (.link-btn). "Forgot password?" is a dead button in the source - rendered as designed, destination undefined */
+.mauth-web-link-btn {
+  background: none; border: none; font-family: var(--mauth-font-sans);
+  font-size: var(--mauth-text-13); font-weight: var(--mauth-weight-semibold); color: var(--mauth-web-primary);
+  cursor: pointer; padding: var(--mauth-space-4) 0; transition: opacity var(--mauth-duration-hover);
+  -webkit-tap-highlight-color: transparent;
+}
+.mauth-web-link-btn:hover,
+.mauth-web-link-btn.is-hover { opacity: var(--mauth-opacity-link-hover); }
+.mauth-web-link-btn:disabled,
+.mauth-web-link-btn.is-disabled { opacity: var(--mauth-opacity-link-disabled); cursor: not-allowed; pointer-events: none; }
+/* src: S L424 (inline font-size:13px; font-weight:700 on the inline "Resend") */
+.mauth-web-link-btn--strong { font-weight: var(--mauth-weight-bold); }
+
+/* src: S L195-213 (.btn, .btn-primary, spinner). Primary is the only web button variant. */
+.mauth-web-btn {
+  width: 100%; height: var(--mauth-height-web-button);
+  border: none; border-radius: var(--mauth-radius-web-field);
+  font-family: var(--mauth-font-sans); font-size: var(--mauth-text-15); font-weight: var(--mauth-weight-semibold);
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--mauth-space-8);
+  transition: background var(--mauth-duration-button-bg), transform var(--mauth-duration-press-web), opacity var(--mauth-duration-hover);
+  position: relative; overflow: hidden; letter-spacing: var(--mauth-tracking-title);
+}
+.mauth-web-btn--primary { background: var(--mauth-web-primary); color: var(--mauth-web-on-primary); }
+.mauth-web-btn--primary:hover,
+.mauth-web-btn--primary.is-hover { background: var(--mauth-web-primary-hover); }
+.mauth-web-btn--primary:active,
+.mauth-web-btn--primary.is-active { transform: scale(var(--mauth-scale-press-web)); }
+/* disabled; ALSO the look of the loading state: the source JS sets disabled together with .loading (screenshot-verified grey) */
+.mauth-web-btn--primary:disabled,
+.mauth-web-btn--primary.is-disabled,
+.mauth-web-btn--primary.is-loading { background: var(--mauth-web-disabled); color: var(--mauth-web-on-disabled); cursor: not-allowed; }
+.mauth-web-spinner {
+  width: var(--mauth-size-web-spinner); height: var(--mauth-size-web-spinner);
+  border: var(--mauth-border-width-spinner) solid var(--mauth-web-spinner-track); border-top-color: var(--mauth-web-on-primary);
+  border-radius: var(--mauth-radius-round); animation: var(--mauth-animation-spin); display: none;
+}
+.mauth-web-btn.is-loading .mauth-web-btn-label { visibility: hidden; }
+.mauth-web-btn.is-loading .mauth-web-spinner { display: block; position: absolute; }
+
+/* src: S L31-35 (button:focus-visible) - 2px primary outline, offset 2px. The source ALSO sets border-radius:4px here
+   (primary button 8px -> 4px while focused): documented bug, NOT reproduced. Applies to every web button. */
+.mauth-web-btn:focus-visible, .mauth-web-btn.is-focus,
+.mauth-web-link-btn:focus-visible, .mauth-web-link-btn.is-focus,
+.mauth-web-toggle:focus-visible, .mauth-web-toggle.is-focus,
+.mauth-web-back:focus-visible, .mauth-web-back.is-focus {
+  outline: var(--mauth-focus-outline-width) solid var(--mauth-web-primary);
+  outline-offset: var(--mauth-focus-outline-offset);
+}
+/* EXTENDED - not in prototype ("no focus-visible for a beyond the browser default"): same recipe on the terms links */
+.mauth-web-terms a:focus-visible, .mauth-web-terms a.is-focus {
+  outline: var(--mauth-focus-outline-width) solid var(--mauth-web-primary);
+  outline-offset: var(--mauth-focus-outline-offset);
+}
+
+/* src: S L216-221 (.terms-row) */
+.mauth-web-terms {
+  margin-top: var(--mauth-space-18); text-align: center;
+  font-size: var(--mauth-text-12); color: var(--mauth-web-text-3); line-height: var(--mauth-leading-web-terms);
+}
+.mauth-web-terms a { color: var(--mauth-web-primary); font-weight: var(--mauth-weight-medium); text-decoration: none; }
+.mauth-web-terms a:hover, .mauth-web-terms a.is-hover { text-decoration: underline; }
+
+/* src: S L224-232 (.back-link) + L390 (arrow icon 15x15, stroke 2.2) */
+.mauth-web-back {
+  display: inline-flex; align-items: center; gap: var(--mauth-space-6);
+  font-size: var(--mauth-text-13); color: var(--mauth-web-text-2);
+  background: none; border: none; cursor: pointer;
+  font-family: var(--mauth-font-sans); font-weight: var(--mauth-weight-medium);
+  padding: 0; margin-bottom: var(--mauth-space-28);
+  transition: color var(--mauth-duration-hover); -webkit-tap-highlight-color: transparent;
+}
+.mauth-web-back:hover, .mauth-web-back.is-hover { color: var(--mauth-web-text); }
+.mauth-web-back .mauth-icon { width: var(--mauth-size-web-back-icon); height: var(--mauth-size-web-back-icon); }
+
+/* src: S L235-238 (.otp-slots): 6 slots, flex:1 -> 54 x 68 in the 364px inner width (gap 8) */
+.mauth-web-otp { display: flex; gap: var(--mauth-space-8); margin: var(--mauth-space-24) 0 var(--mauth-space-8); }
+/* src: S L239-258 (.otp-slot) */
+.mauth-web-otp-slot {
+  flex: 1; min-width: 0; height: var(--mauth-height-web-otp-slot);
+  background: var(--mauth-web-field);
+  border: var(--mauth-border-width-field) solid var(--mauth-web-border);
+  border-radius: var(--mauth-radius-otp-slot);
+  font-family: var(--mauth-font-serif);
+  font-size: var(--mauth-text-30); font-weight: var(--mauth-weight-medium);
+  color: var(--mauth-web-text); text-align: center;
+  caret-color: var(--mauth-web-primary); outline: none;
+  transition: border-color var(--mauth-duration-button-bg), box-shadow var(--mauth-duration-button-bg), transform var(--mauth-duration-otp-scale);
+  -webkit-appearance: none; appearance: none;
+}
+.mauth-web-otp-slot:focus, .mauth-web-otp-slot:focus-visible, .mauth-web-otp-slot.is-focus {
+  border-color: var(--mauth-web-primary);
+  box-shadow: var(--mauth-shadow-web-focus-ring);
+  transform: scale(var(--mauth-scale-otp-focus));
+  outline: none;
+}
+.mauth-web-otp-slot.is-filled { border-color: var(--mauth-web-primary); }
+/* error = red border + tint + shake; later in source than focus/filled -> wins for border-colour; focus ring/scale still apply */
+.mauth-web-otp-slot.is-error {
+  border-color: var(--mauth-web-danger); background: var(--mauth-web-danger-tint);
+  animation: var(--mauth-animation-shake);
+}
+/* Disabled (code expired): source defines no style (renders identical to rest) - kept identical, cursor stays default */
+
+/* src: S L264-269 (.otp-error-msg, role=alert) */
+.mauth-web-otp-error {
+  font-size: var(--mauth-text-13); color: var(--mauth-web-danger); font-weight: var(--mauth-weight-medium);
+  text-align: center; min-height: 20px; margin-bottom: var(--mauth-space-4); display: none;
+}
+.mauth-web-otp-error.is-shown { display: block; }
+
+/* src: S L272-279 (.timer-row, .timer-label, #web-timer) + L412 (clock icon 14x14) */
+.mauth-web-timer-row {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: var(--mauth-text-13); color: var(--mauth-web-text-3); margin-bottom: var(--mauth-space-24);
+}
+.mauth-web-timer-label { display: flex; align-items: center; gap: var(--mauth-space-6); }
+.mauth-web-timer-label .mauth-icon { width: var(--mauth-size-web-clock); height: var(--mauth-size-web-clock); }
+.mauth-web-timer-value { font-family: var(--mauth-font-serif); font-weight: var(--mauth-weight-medium); color: var(--mauth-web-text-2); }
+.mauth-web-timer-value.is-warn { color: var(--mauth-web-danger); }
+/* Intended expiry (source bug: "Code expires in Expired" with warn left on): the label becomes "Code expired" and the value
+   keeps the warn colour. Same colour as the source's leaked .warn, but with correct copy. */
+.mauth-web-timer-value.is-expired { color: var(--mauth-web-danger); }
+
+/* src: S L282-286 (.resend-note) ; `strong` rule has no markup -> not carried */
+.mauth-web-resend-note { text-align: center; margin-top: var(--mauth-space-16); font-size: var(--mauth-text-13); color: var(--mauth-web-text-3); }
+
+/* src: S L289-307 (success view). Ring 68x68 + tick 32x32; title Garamond 30 small-caps, line-height normal, no letter-spacing */
+.mauth-web-success { display: flex; flex-direction: column; align-items: center; text-align: center; padding: var(--mauth-space-8) 0 0; }
+.mauth-web-success-ring {
+  width: var(--mauth-size-web-success-ring); height: var(--mauth-size-web-success-ring); border-radius: var(--mauth-radius-round);
+  background: var(--mauth-web-primary-ghost);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: var(--mauth-space-24);
+  animation: var(--mauth-animation-pop-in);
+}
+.mauth-web-success-ring .mauth-icon { width: var(--mauth-size-web-success-icon); height: var(--mauth-size-web-success-icon); color: var(--mauth-web-primary); }
+.mauth-web-success-title {
+  font-family: var(--mauth-font-serif);
+  font-size: var(--mauth-text-30); font-weight: var(--mauth-weight-medium);
+  font-variant-caps: small-caps;
+  margin-bottom: var(--mauth-space-8); color: var(--mauth-web-text);
+}
+.mauth-web-success-sub { font-size: var(--mauth-text-14); color: var(--mauth-web-text-2); line-height: var(--mauth-leading-web-body); }
+
+/* =====================================================================
+   PART 2 - MOBILE AUTHENTICATOR (light + dark)
+   source: hub/auth/makor-authenticator.html (A) + makor-authenticator-dark.html (D)
+   ===================================================================== */
+
+/* src: A L37-43 / D L37-43 (body) - document backdrop outside the phone shell + typography */
+.mauth-app {
+  font-family: var(--mauth-font-sans);
+  -webkit-font-smoothing: antialiased;
+  line-height: normal; /* FIX (stage B): same inheritance leak as .mauth-web */
+  font-size: var(--mauth-text-16);
+}
+.mauth-app-page {
+  background: var(--mauth-app-page-bg);
+  min-height: 100dvh;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* src: A L46-55 / D L46-54 (.shell) - phone frame: min(390px,100vw) x min(844px,100dvh), radius min(44px,4vw) */
+.mauth-app-shell {
+  width: var(--mauth-size-app-shell-w);
+  height: var(--mauth-size-app-shell-h);
+  background: var(--mauth-app-shell-bg);
+  border-radius: var(--mauth-radius-shell);
+  box-shadow: var(--mauth-shadow-app-shell);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  position: relative;
+}
+
+/* src: A L58-66 (.status-bar) - 44px, time + wifi + battery. No notch / dynamic island / home indicator exist. */
+.mauth-app-status-bar {
+  height: var(--mauth-size-app-status-bar); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--mauth-space-14) var(--mauth-space-28) 0;
+  color: var(--mauth-app-text);
+}
+.mauth-app-status-time { font-family: var(--mauth-font-mono); font-size: var(--mauth-text-16); font-weight: var(--mauth-weight-semibold); }
+.mauth-app-status-icons { display: flex; gap: var(--mauth-space-6); align-items: center; }
+.mauth-app-status-icons .mauth-icon { width: var(--mauth-size-app-status-icon); height: var(--mauth-size-app-status-icon); }
+/* src: A L334-338 (.status-bar--dark, !important in source) - active while the home screen is shown; no transition */
+.mauth-app-status-bar--home { background: var(--mauth-app-status-home-bg); color: var(--mauth-app-status-home-fg); }
+
+/* src: A L69-84 (.screens, .screen). Slide: active translateX(0)/opacity 1; others translateX(+-100%)/opacity 0 */
+.mauth-app-screens { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+.mauth-app-screen {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column;
+  overflow-y: auto; overflow-x: hidden;
+  scrollbar-width: none;
+  transition: transform var(--mauth-duration-screen) var(--mauth-ease-standard), opacity var(--mauth-duration-fade) var(--mauth-ease-default);
+  will-change: transform;
+  transform: translateX(100%); opacity: 0;           /* after the active screen */
+}
+.mauth-app-screen::-webkit-scrollbar { display: none; }
+.mauth-app-screen.is-active { transform: translateX(0); opacity: 1; }
+.mauth-app-screen.is-before { transform: translateX(-100%); opacity: 0; }
+
+/* src: A L125-131 (.logo-gradient) - shared by the launch tile and push-banner icon; the logo mark inside is white */
+.mauth-app-logo-gradient { background: var(--mauth-app-logo-gradient); }
+.mauth-app-logo-mark { color: var(--mauth-app-logo-glyph); }
+
+/* ---- Launch screen. src: A L181-205 (#s-launch), D L185-215 ---- */
+.mauth-app-launch {
+  position: absolute; inset: 0;
+  z-index: var(--mauth-z-app-launch);
+  background: var(--mauth-app-launch-bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: var(--mauth-space-20);
+  padding-bottom: 18%;
+  transition: opacity var(--mauth-duration-fade) var(--mauth-ease-default);
+  pointer-events: auto;
+}
+.mauth-app-launch.is-hidden { opacity: 0; pointer-events: none; }
+/* src: A L192 (#launch-canvas) - constellation.js presets "app-light" / "app-dark" */
+.mauth-app-launch-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.mauth-app-launch-icon {
+  width: var(--mauth-size-app-launch-icon); height: var(--mauth-size-app-launch-icon);
+  border-radius: var(--mauth-radius-launch-icon);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--mauth-shadow-app-launch-icon);
+  position: relative;
+}
+.mauth-app-launch-icon .mauth-icon { width: var(--mauth-size-app-launch-glyph-w); height: var(--mauth-size-app-launch-glyph-h); }
+.mauth-app-launch-name {
+  font-family: var(--mauth-font-sans); font-size: var(--mauth-text-20); font-weight: var(--mauth-app-launch-name-weight);
+  color: var(--mauth-app-primary); letter-spacing: var(--mauth-tracking-title);
+  text-align: center; line-height: var(--mauth-leading-app-snug);
+  position: relative;
+}
+
+/* ---- Face ID overlay. src: A L206-290, D L220-320 ---- */
+.mauth-app-faceid {
+  position: absolute; inset: 0;
+  z-index: var(--mauth-z-app-faceid);
+  opacity: 1; pointer-events: auto;
+  transition: opacity var(--mauth-duration-faceid-overlay) var(--mauth-ease-default);
+  display: flex; flex-direction: column;
+}
+.mauth-app-faceid.is-hidden { opacity: 0; pointer-events: none; }
+.mauth-app-faceid-blur {
+  position: absolute; inset: 0;
+  background: var(--mauth-app-faceid-blur-bg);
+  -webkit-backdrop-filter: var(--mauth-blur-faceid);
+  backdrop-filter: var(--mauth-blur-faceid);
+  pointer-events: none;
+}
+.mauth-app-faceid-wrap {
+  position: relative; z-index: var(--mauth-z-app-faceid-content);
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 0 var(--mauth-space-24) var(--mauth-space-80);
+  text-align: center;
+  gap: 0;
+}
+.mauth-app-faceid:not(.is-hidden) .mauth-app-faceid-blur { animation: var(--mauth-animation-blur-in); }
+.mauth-app-faceid:not(.is-hidden) .mauth-app-faceid-wrap { animation: var(--mauth-animation-faceid-content); }
+.mauth-app-faceid-bottom { display: flex; flex-direction: column; align-items: center; margin-top: var(--mauth-space-32); }
+/* card: light = transparent/no padding; dark = glass card (tokens). Dark radius/padding in the scope rule below. */
+.mauth-app-faceid-card {
+  background: var(--mauth-app-faceid-card-bg);
+  -webkit-backdrop-filter: var(--mauth-blur-faceid-card);
+  backdrop-filter: var(--mauth-blur-faceid-card);
+  border: var(--mauth-app-border-faceid-card);
+  box-shadow: var(--mauth-shadow-app-faceid-card);
+  padding: 0;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 0;
+  margin-bottom: var(--mauth-space-20);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+[data-theme="dark"] .mauth-app-faceid-card { /* src: D L260-270 (dark-only structure) */
+  border-radius: var(--mauth-radius-faceid-card);
+  padding: var(--mauth-space-24) var(--mauth-space-24) var(--mauth-space-20);
+}
+/* frame 180x180, r12, overflow hidden; the remote Lottie sits inside, bled by 14px so its edge is cropped */
+.mauth-app-faceid-frame {
+  width: var(--mauth-size-app-faceid); height: var(--mauth-size-app-faceid);
+  position: relative; cursor: pointer;
+  flex-shrink: 0; display: block;
+  overflow: hidden; border-radius: var(--mauth-radius-faceid);
+}
+/* src: D L287-296 - recolours the grey Lottie in dark (mix-blend-mode:color). Light: transparent layer (no effect). */
+.mauth-app-faceid-frame::after {
+  content: ''; position: absolute; inset: 0;
+  background: var(--mauth-app-faceid-tint);
+  mix-blend-mode: color;
+  z-index: var(--mauth-z-app-faceid-tint);
+  pointer-events: none;
+  border-radius: var(--mauth-radius-faceid);
+}
+/* src: A L264-268 (dotlottie-player geometry): apply this class to <dotlottie-player> (the documented remote dependency).
+   Lottie facts (authenticator.md 0, in-browser): remote https://lottie.host/2c89c12e-4c0d-41a6-ae13-30b2ce7a964a/kjwDIWFPeM.lottie,
+   150x148 artboard, 60 fps, 244.66 frames (4.08 s loop), JS stops at 2200 ms; tile #404042, white glyphs, blue scanning ring. */
+.mauth-app-faceid-lottie {
+  position: absolute; inset: calc(-1 * var(--mauth-size-app-faceid-bleed));
+  width: calc(100% + 2 * var(--mauth-size-app-faceid-bleed)); height: calc(100% + 2 * var(--mauth-size-app-faceid-bleed));
+}
+/* EXTENDED - placeholder for the documented-not-copied dotLottie: flat tile in the Lottie's card colour + a text label. Never an imitation of the animation. */
+.mauth-app-faceid-lottie--placeholder {
+  background: var(--mauth-app-faceid-lottie-card);
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  padding: var(--mauth-space-24);
+  color: var(--mauth-app-on-primary);
+  font-size: var(--mauth-text-12); font-weight: var(--mauth-weight-medium); line-height: var(--mauth-leading-app-snug);
+}
+.mauth-app-faceid-label { font-family: var(--mauth-font-sans); font-size: var(--mauth-text-20); font-weight: var(--mauth-weight-regular); color: var(--mauth-app-text); letter-spacing: var(--mauth-tracking-title); }
+
+/* ---- Secondary button ("Use Passcode"). src: A L277-290, D L305-318 ---- */
+.mauth-app-btn-secondary {
+  font-size: var(--mauth-text-14); font-weight: var(--mauth-weight-semibold);
+  color: var(--mauth-app-text-2);
+  background: var(--mauth-app-fallback-bg);
+  border: none; border-radius: var(--mauth-radius-control);
+  padding: var(--mauth-space-12) var(--mauth-space-28); cursor: pointer;
+  font-family: var(--mauth-font-sans);
+  letter-spacing: var(--mauth-tracking-tight);
+  margin-top: var(--mauth-space-12);
+  transition: background var(--mauth-duration-button-bg), color var(--mauth-duration-button-bg);
+  -webkit-tap-highlight-color: transparent;
+}
+.mauth-app-btn-secondary:hover, .mauth-app-btn-secondary.is-hover { background: var(--mauth-app-fallback-bg-hover); color: var(--mauth-app-text); }
+.mauth-app-btn-secondary:active, .mauth-app-btn-secondary.is-active { background: var(--mauth-app-fallback-bg-active); }
+
+/* ---- Primary button. src: A L144-154, D L146-156 (.btn-primary: 100% x 52, r4). .btn-danger is DEAD (no markup) - not carried. ---- */
+.mauth-app-btn {
+  width: 100%; height: var(--mauth-height-app-button);
+  background: var(--mauth-app-primary); border: none;
+  border-radius: var(--mauth-radius-control); font-family: var(--mauth-font-sans);
+  font-size: var(--mauth-text-16); font-weight: var(--mauth-weight-semibold); color: var(--mauth-app-on-primary);
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--mauth-space-8);
+  transition: background var(--mauth-duration-hover), transform var(--mauth-duration-press-app);
+}
+.mauth-app-btn:hover, .mauth-app-btn.is-hover { background: var(--mauth-app-primary-hover); }
+.mauth-app-btn:active, .mauth-app-btn.is-active { transform: scale(var(--mauth-scale-press-app)); }
+/* "Verifying..." loading label = disabled look (source sets disabled + text) */
+.mauth-app-btn:disabled, .mauth-app-btn.is-disabled, .mauth-app-btn.is-loading { background: var(--mauth-app-text-3); color: var(--mauth-app-text-2); cursor: not-allowed; }
+
+/* src: A L32-36 / D L32-36 (global :focus-visible on button/input/[tabindex]): 2px primary outline, offset 2px.
+   Source also forces border-radius:4px while focused (documented bug, NOT reproduced). Inputs are excluded: they use the
+   border + ring only (source's double ring is a documented bug). */
+.mauth-app-btn:focus-visible, .mauth-app-btn.is-focus,
+.mauth-app-btn-secondary:focus-visible, .mauth-app-btn-secondary.is-focus,
+.mauth-app-btn-copy:focus-visible, .mauth-app-btn-copy.is-focus,
+.mauth-app-session-signout:focus-visible, .mauth-app-session-signout.is-focus,
+.mauth-app-confirm-btn:focus-visible, .mauth-app-confirm-btn.is-focus,
+.mauth-app-block-link:focus-visible, .mauth-app-block-link.is-focus,
+.mauth-app-pw-back:focus-visible, .mauth-app-pw-back.is-focus,
+.mauth-app-input-toggle:focus-visible, .mauth-app-input-toggle.is-focus,
+.mauth-app [tabindex]:focus-visible {
+  outline: var(--mauth-focus-outline-width) solid var(--mauth-app-primary);
+  outline-offset: var(--mauth-focus-outline-offset);
+}
+
+/* ---- Home header / content card. src: A L293-326, L339-352 ---- */
+.mauth-app-screen--home { background: var(--mauth-app-home-gradient); padding: 0; overflow: hidden; }  /* src: A L329-333 */
+.mauth-app-home-banner {
+  display: flex; flex-direction: row; align-items: center;
+  justify-content: space-between;
+  padding: var(--mauth-space-14) var(--mauth-space-20) var(--mauth-space-16); gap: var(--mauth-space-10);
+  background: transparent;
+  flex-shrink: 0;
+}
+.mauth-app-home-banner-left { display: flex; align-items: center; gap: var(--mauth-space-10); }
+.mauth-app-home-icon {
+  width: var(--mauth-size-app-home-icon); height: var(--mauth-size-app-home-icon);
+  border-radius: var(--mauth-radius-home-icon);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  background: var(--mauth-app-glass-bg);
+  -webkit-backdrop-filter: var(--mauth-blur-glass-icon);
+  backdrop-filter: var(--mauth-blur-glass-icon);
+  border: var(--mauth-border-width-hairline) solid var(--mauth-app-glass-border);
+  box-shadow: var(--mauth-shadow-app-glass-icon);
+}
+.mauth-app-home-icon .mauth-icon { width: var(--mauth-size-app-home-glyph-w); height: var(--mauth-size-app-home-glyph-h); }
+.mauth-app-home-name { font-family: var(--mauth-font-sans); font-size: var(--mauth-text-20); font-weight: var(--mauth-weight-regular); color: var(--mauth-app-on-gradient); letter-spacing: var(--mauth-tracking-title); }
+.mauth-app-home-card {
+  background: var(--mauth-app-bg);
+  border-radius: var(--mauth-radius-home-card);
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.mauth-app-home-header { padding: var(--mauth-space-24) var(--mauth-space-24) var(--mauth-space-12); display: flex; align-items: center; justify-content: space-between; }
+.mauth-app-home-header-left { display: flex; flex-direction: column; gap: var(--mauth-space-2); }
+/* src: A L138-141 + L345 (.screen-title inside .home-header-left: 18/500, text-2, mt 6) */
+.mauth-app-home-title { font-family: var(--mauth-font-sans); font-size: var(--mauth-text-18); font-weight: var(--mauth-weight-medium); line-height: var(--mauth-leading-app-heading); color: var(--mauth-app-text-2); margin-top: var(--mauth-space-6); }
+.mauth-app-home-scroll { flex: 1; overflow-y: auto; padding: 0 var(--mauth-space-24) var(--mauth-space-32); scrollbar-width: none; }
+.mauth-app-home-scroll::-webkit-scrollbar { display: none; }
+
+/* ---- Section labels. src: A L390-393 (.other-sessions-label) + inline L728 (success colour), L757 (margin) ---- */
+.mauth-app-section-label {
+  font-size: var(--mauth-text-12); font-weight: var(--mauth-weight-bold); color: var(--mauth-app-text-3); text-transform: uppercase;
+  letter-spacing: var(--mauth-tracking-footer); margin-bottom: var(--mauth-space-10); padding: 0;
+}
+.mauth-app-section-label--active { color: var(--mauth-app-success); }
+.mauth-app-section-label--spaced { margin-top: var(--mauth-space-16); margin-bottom: var(--mauth-space-10); }
+
+/* ---- Session card. src: A L394-420 (.session-compact*) ; dark has no border/shadow. the .session-current and .session-row families are DEAD (not carried) ---- */
+.mauth-app-session {
+  background: var(--mauth-app-surface);
+  border-radius: var(--mauth-radius-card-sm); padding: var(--mauth-space-14);
+  display: flex; align-items: center; gap: var(--mauth-space-12);
+  margin-bottom: var(--mauth-space-8);
+  transition: opacity var(--mauth-duration-session-row), transform var(--mauth-duration-session-row);
+}
+/* row removal (JS inline): opacity 0 + scale(.97) over .23s ease, then removed */
+.mauth-app-session.is-removing { opacity: 0; transform: scale(var(--mauth-scale-session-exit)); transition: opacity var(--mauth-duration-session-row) var(--mauth-ease-default), transform var(--mauth-duration-session-row) var(--mauth-ease-default); }
+.mauth-app-session-flag {
+  width: var(--mauth-size-app-flag); height: var(--mauth-size-app-flag); border-radius: var(--mauth-radius-control);
+  background: var(--mauth-app-surface-2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: var(--mauth-text-12); font-weight: var(--mauth-weight-bold); color: var(--mauth-app-text-2);
+  letter-spacing: var(--mauth-tracking-label); text-align: center;
+  font-family: var(--mauth-font-sans);
+}
+.mauth-app-session-body { flex: 1; min-width: 0; }
+.mauth-app-session-loc { font-size: var(--mauth-text-14); font-weight: var(--mauth-weight-semibold); color: var(--mauth-app-text); }
+.mauth-app-session-meta { font-size: var(--mauth-text-12); color: var(--mauth-app-text-3); margin-top: var(--mauth-space-2); }
+.mauth-app-session-signout {
+  background: none; border: var(--mauth-border-width-hairline) solid var(--mauth-app-danger);
+  border-radius: var(--mauth-radius-control); font-family: var(--mauth-font-sans);
+  font-size: var(--mauth-text-12); font-weight: var(--mauth-weight-semibold); color: var(--mauth-app-danger);
+  padding: var(--mauth-space-8) var(--mauth-space-14); cursor: pointer; white-space: nowrap;
+  min-height: var(--mauth-height-app-chip);
+  -webkit-tap-highlight-color: transparent;
+}
+/* "Active now" session (London): src: A L729-755 (inline styles) - column card, 1.5px border, 16px padding */
+.mauth-app-session--active {
+  border: var(--mauth-border-width-field) solid var(--mauth-app-border);
+  flex-direction: column; align-items: stretch; gap: 0; padding: var(--mauth-space-16);
+}
+.mauth-app-session-head { display: flex; align-items: flex-start; gap: var(--mauth-space-10); margin-bottom: var(--mauth-space-14); }
+.mauth-app-session-head .mauth-app-dot { margin-top: var(--mauth-space-6); }
+.mauth-app-session-main { flex: 1; min-width: 0; }
+.mauth-app-session-specs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--mauth-space-10) var(--mauth-space-16);
+  background: var(--mauth-app-surface-2); border-radius: var(--mauth-radius-card-sm); padding: var(--mauth-space-12) var(--mauth-space-14);
+}
+.mauth-app-session-spec-label { font-size: var(--mauth-text-10); font-weight: var(--mauth-weight-bold); color: var(--mauth-app-text-3); text-transform: uppercase; letter-spacing: var(--mauth-tracking-spec); margin-bottom: var(--mauth-space-4); }
+.mauth-app-session-spec-value { font-size: var(--mauth-text-12); font-weight: var(--mauth-weight-semibold); color: var(--mauth-app-text); }
+.mauth-app-session-spec-value--mono { font-family: var(--mauth-font-mono); }
+/* src: A L365-374 (.session-dot + @keyframes dotpulse): 8x8, pulsing ring */
+.mauth-app-dot {
+  width: var(--mauth-size-app-dot); height: var(--mauth-size-app-dot); border-radius: var(--mauth-radius-round);
+  background: var(--mauth-app-primary); flex-shrink: 0;
+  box-shadow: var(--mauth-shadow-app-dot-ring);
+  animation: var(--mauth-animation-dot-pulse);
+}
+
+/* ---- Push-notification banner. src: A L87-122, D L87-124 ---- */
+.mauth-app-banner {
+  position: absolute; top: 0; left: 0; right: 0;
+  z-index: var(--mauth-z-app-banner); padding: var(--mauth-space-10) var(--mauth-space-10) 0;
+  transform: translateY(-130%);
+  transition: transform var(--mauth-duration-slide) var(--mauth-ease-slide);
+  pointer-events: none;
+}
+.mauth-app-banner.is-show { transform: translateY(0); pointer-events: auto; }   /* auto-dismiss 9000 ms (JS) */
+.mauth-app-banner-inner {
+  background: var(--mauth-app-banner-bg);
+  -webkit-backdrop-filter: var(--mauth-blur-banner);
+  backdrop-filter: var(--mauth-blur-banner);
+  border-radius: var(--mauth-radius-banner);
+  padding: var(--mauth-space-10) var(--mauth-space-12) var(--mauth-space-12);
+  border: var(--mauth-border-width-hairline) solid var(--mauth-app-banner-border);
+  box-shadow: var(--mauth-shadow-app-banner);
+  cursor: pointer;
+}
+.mauth-app-banner-top { display: flex; align-items: center; gap: var(--mauth-space-8); margin-bottom: var(--mauth-space-4); }
+.mauth-app-banner-appname { font-size: var(--mauth-text-12); font-weight: var(--mauth-weight-semibold); color: var(--mauth-app-banner-appname); text-transform: uppercase; letter-spacing: var(--mauth-tracking-banner); flex: 1; }
+.mauth-app-banner-time { font-size: var(--mauth-text-12); color: var(--mauth-app-banner-time); }
+.mauth-app-banner-content { display: flex; align-items: center; gap: var(--mauth-space-10); }
+.mauth-app-banner-icon { width: var(--mauth-size-app-banner-icon); height: var(--mauth-size-app-banner-icon); border-radius: var(--mauth-radius-banner-icon); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.mauth-app-banner-icon .mauth-icon { width: var(--mauth-size-app-banner-glyph-w); height: var(--mauth-size-app-banner-glyph-h); }
+.mauth-app-banner-body { flex: 1; min-width: 0; }
+.mauth-app-banner-title { font-size: var(--mauth-text-14); font-weight: var(--mauth-weight-bold); color: var(--mauth-app-banner-title); line-height: var(--mauth-leading-app-tight); }
+.mauth-app-banner-sub { font-size: var(--mauth-text-12); color: var(--mauth-app-banner-sub); margin-top: var(--mauth-space-2); line-height: var(--mauth-leading-app-snug); }
+
+/* ---- Password-fallback screen. src: A L423-468 ---- */
+.mauth-app-screen--pw { background: var(--mauth-app-surface); display: flex; flex-direction: column; }  /* src: A L424-427 */
+.mauth-app-pw-top { padding: var(--mauth-space-32) var(--mauth-space-24) var(--mauth-space-28); border-bottom: var(--mauth-border-width-hairline) solid var(--mauth-app-border); }
+.mauth-app-pw-back {
+  background: none; border: none; cursor: pointer;
+  font-family: var(--mauth-font-sans); font-size: var(--mauth-text-14); font-weight: var(--mauth-weight-medium);
+  color: var(--mauth-app-text-3); padding: var(--mauth-space-10) var(--mauth-space-8) var(--mauth-space-10) 0; display: flex; align-items: center; gap: var(--mauth-space-6);
+  margin-bottom: var(--mauth-space-16); min-height: var(--mauth-height-app-back);
+  -webkit-tap-highlight-color: transparent;
+}
+.mauth-app-pw-back .mauth-icon { width: var(--mauth-size-app-back-icon); height: var(--mauth-size-app-back-icon); }
+/* src: A L134-137 (.eyebrow) + inline margin-bottom:6px L795 */
+.mauth-app-eyebrow { font-size: var(--mauth-text-10); font-weight: var(--mauth-weight-bold); letter-spacing: var(--mauth-tracking-eyebrow-app); text-transform: uppercase; color: var(--mauth-app-primary); margin-bottom: var(--mauth-space-6); }
+/* src: A L138-141 + inline margin-top:0; margin-bottom:6px L796 (.screen-title on the pw screen: 32/500) */
+.mauth-app-title { font-family: var(--mauth-font-sans); font-size: var(--mauth-text-32); font-weight: var(--mauth-weight-medium); line-height: var(--mauth-leading-app-heading); color: var(--mauth-app-text); margin: 0 0 var(--mauth-space-6); }
+/* src: A L142 + inline margin:0; font-size:14px L797 (.screen-sub) */
+.mauth-app-subtitle { font-size: var(--mauth-text-14); color: var(--mauth-app-text-2); line-height: var(--mauth-leading-app-body); margin: 0; }
+.mauth-app-pw-form { padding: var(--mauth-space-28) var(--mauth-space-24) var(--mauth-space-32); flex: 1; display: flex; flex-direction: column; }
+.mauth-app-field { display: flex; flex-direction: column; gap: var(--mauth-space-6); margin-bottom: var(--mauth-space-16); }
+.mauth-app-label { font-size: var(--mauth-text-12); font-weight: var(--mauth-weight-semibold); color: var(--mauth-app-text-2); letter-spacing: var(--mauth-tracking-label); text-transform: uppercase; }
+.mauth-app-input-wrap { position: relative; }
+.mauth-app-input {
+  width: 100%; height: var(--mauth-height-app-input);
+  padding: 0 var(--mauth-space-44) 0 var(--mauth-space-14);
+  background: var(--mauth-app-surface-2); border: var(--mauth-border-width-field) solid var(--mauth-app-border);
+  border-radius: var(--mauth-radius-control);
+  font-family: var(--mauth-font-sans); font-size: var(--mauth-text-16); color: var(--mauth-app-text);
+  outline: none; transition: border-color var(--mauth-duration-field), box-shadow var(--mauth-duration-field);
+  -webkit-appearance: none; appearance: none;
+}
+.mauth-app-input:focus, .mauth-app-input.is-focus {
+  border-color: var(--mauth-app-primary);
+  background: var(--mauth-app-surface);
+  box-shadow: var(--mauth-shadow-app-focus-ring);
+  outline: none;               /* intended: ring only (source's global input:focus-visible adds a 2nd outline ring - documented bug) */
+}
+.mauth-app-input::placeholder { color: var(--mauth-app-text-3); }
+/* EXTENDED - not in prototype (no input hover / invalid state exists): hover border = app-text-3; invalid border = app-danger (no ring: no danger-ghost token exists in the app palette) */
+.mauth-app-input:hover:not(:focus):not([aria-invalid="true"]), .mauth-app-input.is-hover:not(:focus) { border-color: var(--mauth-app-text-3); }
+.mauth-app-input[aria-invalid="true"], .mauth-app-input.is-error { border-color: var(--mauth-app-danger); }
+.mauth-app-input-toggle {
+  position: absolute; right: var(--mauth-space-6); top: 50%; transform: translateY(-50%);
+  background: none; border: none; padding: 0; cursor: pointer; color: var(--mauth-app-text-3);
+  width: var(--mauth-size-app-toggle); height: var(--mauth-size-app-toggle); display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.mauth-app-input-toggle .mauth-icon { width: var(--mauth-size-app-toggle-icon); height: var(--mauth-size-app-toggle-icon); display: block; }
+.mauth-app-pw-submit { margin-top: auto; padding-top: var(--mauth-space-16); }
+
+/* ---- Sign-out confirm dialog. src: A L471-511, D L499-540 ---- */
+.mauth-app-confirm {
+  position: absolute; inset: 0;
+  background: var(--mauth-app-overlay-confirm);
+  z-index: var(--mauth-z-app-confirm);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--mauth-duration-dialog) var(--mauth-ease-default);
+}
+.mauth-app-confirm.is-show { opacity: 1; pointer-events: auto; }
+.mauth-app-confirm-dialog {
+  background: var(--mauth-app-surface);
+  border-radius: var(--mauth-radius-dialog);
+  border: var(--mauth-app-border-dialog);
+  width: calc(100% - 2 * var(--mauth-space-24));
+  max-width: var(--mauth-size-app-dialog-max);
+  padding: var(--mauth-space-20) var(--mauth-space-20) var(--mauth-space-12);
+  box-shadow: var(--mauth-shadow-app-dialog);
+  transform: scale(var(--mauth-scale-dialog-rest));
+  transition: transform var(--mauth-duration-dialog) var(--mauth-ease-default);
+  text-align: center;
+}
+.mauth-app-confirm.is-show .mauth-app-confirm-dialog { transform: scale(1); }
+.mauth-app-confirm-title { font-size: var(--mauth-text-16); font-weight: var(--mauth-weight-bold); color: var(--mauth-app-text); letter-spacing: var(--mauth-tracking-tight); margin-bottom: var(--mauth-space-6); }
+.mauth-app-confirm-body { font-size: var(--mauth-text-14); color: var(--mauth-app-text-2); line-height: var(--mauth-leading-app-compact); margin-bottom: var(--mauth-space-18); }
+.mauth-app-confirm-actions { display: flex; gap: var(--mauth-space-8); }
+.mauth-app-confirm-btn {
+  flex: 1; padding: var(--mauth-space-14) var(--mauth-space-8); border-radius: var(--mauth-radius-control);
+  font-family: var(--mauth-font-sans); font-size: var(--mauth-text-14); font-weight: var(--mauth-weight-semibold);
+  cursor: pointer; border: none; transition: opacity var(--mauth-duration-button-bg);
+  min-height: var(--mauth-height-app-confirm-button);
+  -webkit-tap-highlight-color: transparent;
+}
+.mauth-app-confirm-btn:active, .mauth-app-confirm-btn.is-active { opacity: var(--mauth-opacity-pressed-confirm); }
+.mauth-app-confirm-btn--cancel { background: var(--mauth-app-surface-2); color: var(--mauth-app-text-2); }
+.mauth-app-confirm-btn--danger { background: var(--mauth-app-danger); color: var(--mauth-app-on-danger); }
+
+/* ---- Bottom sheet with OTP. src: A L513-619, D L541-648 ---- */
+.mauth-app-sheet-overlay {
+  position: absolute; inset: 0;
+  background: var(--mauth-app-overlay-sheet);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--mauth-duration-sheet-overlay) var(--mauth-ease-default);
+  z-index: var(--mauth-z-app-sheet-overlay);
+}
+.mauth-app-sheet-overlay.is-show { opacity: 1; pointer-events: auto; }
+.mauth-app-sheet {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--mauth-app-surface);
+  border-radius: var(--mauth-radius-sheet);
+  border-top: var(--mauth-app-border-sheet-top);
+  transform: translateY(100%);
+  transition: transform var(--mauth-duration-slide) var(--mauth-ease-slide);
+  z-index: var(--mauth-z-app-sheet);
+  max-height: var(--mauth-size-app-sheet-max-h);
+  overflow: hidden;
+  box-shadow: var(--mauth-shadow-app-sheet);
+}
+.mauth-app-sheet.is-open { transform: translateY(0); }
+.mauth-app-sheet-handle { width: var(--mauth-size-app-handle-w); height: var(--mauth-size-app-handle-h); border-radius: var(--mauth-radius-control); background: var(--mauth-app-border); margin: var(--mauth-space-12) auto var(--mauth-space-4); flex-shrink: 0; }
+/* map: the SVG map art (app-map-light.svg / app-map-dark.svg, 358x160, slice) as a cover background so no markup is needed */
+.mauth-app-sheet-map {
+  flex-shrink: 0; height: var(--mauth-size-app-map-h); position: relative;
+  overflow: hidden; margin: 0 var(--mauth-space-16); border-radius: var(--mauth-radius-control);
+  background: var(--mauth-app-map-bg) url(assets/app-map-light.svg) center / cover no-repeat;
+}
+[data-theme="dark"] .mauth-app-sheet-map { background-image: url(assets/app-map-dark.svg); }  /* src: D L576 + map art swap */
+.mauth-app-map-pill {
+  position: absolute; bottom: var(--mauth-space-10); left: 50%; transform: translateX(-50%);
+  background: var(--mauth-app-pill-bg); -webkit-backdrop-filter: var(--mauth-blur-pill); backdrop-filter: var(--mauth-blur-pill);
+  border: var(--mauth-app-border-pill);
+  border-radius: var(--mauth-radius-control); padding: var(--mauth-space-6) var(--mauth-space-12) var(--mauth-space-6) var(--mauth-space-8);
+  display: flex; align-items: center; gap: var(--mauth-space-6);
+  font-size: var(--mauth-text-12); font-weight: var(--mauth-weight-semibold); color: var(--mauth-app-text);
+  box-shadow: var(--mauth-shadow-app-pill); white-space: nowrap;
+}
+.mauth-app-map-pill-dot { width: var(--mauth-size-app-dot); height: var(--mauth-size-app-dot); border-radius: var(--mauth-radius-round); background: var(--mauth-app-primary); flex-shrink: 0; }
+.mauth-app-sheet-body { overflow-y: auto; padding: var(--mauth-space-16) var(--mauth-space-20) var(--mauth-space-32); scrollbar-width: none; }
+.mauth-app-sheet-body::-webkit-scrollbar { display: none; }
+.mauth-app-sheet-title { font-size: var(--mauth-text-10); font-weight: var(--mauth-weight-bold); letter-spacing: var(--mauth-tracking-footer); text-transform: uppercase; color: var(--mauth-app-text-3); margin-bottom: var(--mauth-space-10); }
+.mauth-app-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--mauth-space-10); margin-bottom: var(--mauth-space-18); }
+.mauth-app-info-item { display: flex; flex-direction: column; gap: var(--mauth-space-4); }
+.mauth-app-info-label { font-size: var(--mauth-text-10); color: var(--mauth-app-text-3); font-weight: var(--mauth-weight-semibold); text-transform: uppercase; letter-spacing: var(--mauth-tracking-info); }
+.mauth-app-info-value { font-size: var(--mauth-text-14); color: var(--mauth-app-text); font-weight: var(--mauth-weight-semibold); }
+
+/* ---- OTP code card + display. src: A L581-609. NOT carried: .sheet-otp.used (CSS only, never applied) ---- */
+.mauth-app-code-card { background: var(--mauth-app-surface-2); border: var(--mauth-app-border-code-card); border-radius: var(--mauth-radius-card-sm); padding: var(--mauth-space-16); margin-bottom: var(--mauth-space-10); }
+.mauth-app-code-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--mauth-space-10); }
+.mauth-app-code-label { font-size: var(--mauth-text-12); font-weight: var(--mauth-weight-bold); color: var(--mauth-app-text-3); text-transform: uppercase; letter-spacing: var(--mauth-tracking-code); }
+/* expiry: text countdown 3:00 -> 0:00 (180 s); urgent (<= 30 s) = danger colour. Source declares .urgent BEFORE the base rule and
+   relies on specificity; here the base comes first so the intent is explicit. */
+.mauth-app-code-expiry { font-size: var(--mauth-text-16); font-weight: var(--mauth-weight-medium); color: var(--mauth-app-text-2); font-family: var(--mauth-font-sans); }
+.mauth-app-code-expiry.is-urgent { color: var(--mauth-app-danger); }
+/* the code: static "482 716" (one normal space, grouped 3+3), 44/500, letter-spacing .22em */
+.mauth-app-otp {
+  font-family: var(--mauth-font-sans); font-size: var(--mauth-text-44); font-weight: var(--mauth-weight-medium);
+  color: var(--mauth-app-text); letter-spacing: var(--mauth-tracking-otp);
+  display: flex; justify-content: center; align-items: center;
+  margin-bottom: var(--mauth-space-12);
+}
+/* copy button: 100% x 52, r8 (NOT the 4px primary), gap 10; states: rest / :active .85 / copied+disabled ("Copied!" 2s) */
+.mauth-app-btn-copy {
+  width: 100%; height: var(--mauth-height-app-button);
+  background: var(--mauth-app-primary); border: none; border-radius: var(--mauth-radius-card-sm);
+  font-family: var(--mauth-font-sans); font-size: var(--mauth-text-16); font-weight: var(--mauth-weight-semibold); color: var(--mauth-app-on-primary);
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: var(--mauth-space-10);
+  margin-top: var(--mauth-space-16);
+  -webkit-tap-highlight-color: transparent;
+}
+.mauth-app-btn-copy .mauth-icon { width: var(--mauth-size-app-copy-icon); height: var(--mauth-size-app-copy-icon); }
+.mauth-app-btn-copy:active, .mauth-app-btn-copy.is-active { opacity: var(--mauth-opacity-pressed-copy); }
+.mauth-app-btn-copy:disabled, .mauth-app-btn-copy.is-disabled, .mauth-app-btn-copy.is-copied { background: var(--mauth-app-text-3); color: var(--mauth-app-text-2); cursor: not-allowed; }
+.mauth-app-block-link {
+  display: block; width: 100%; text-align: center;
+  font-size: var(--mauth-text-14); color: var(--mauth-app-danger); font-weight: var(--mauth-weight-medium);
+  cursor: pointer; background: none; border: none;
+  font-family: var(--mauth-font-sans);
+  padding: var(--mauth-space-16) 0 var(--mauth-space-4);
+  text-decoration: underline; text-underline-offset: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+/* confirmed state (code used on the web sign-in): code card hidden, this block shown */
+.mauth-app-confirmed { text-align: center; padding: var(--mauth-space-12) 0; }
+.mauth-app-confirmed-icon {
+  width: var(--mauth-size-app-confirmed-icon); height: var(--mauth-size-app-confirmed-icon); border-radius: var(--mauth-radius-round);
+  background: var(--mauth-app-primary-ghost);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto var(--mauth-space-12);
+  color: var(--mauth-app-primary);
+}
+.mauth-app-confirmed-icon .mauth-icon { width: var(--mauth-size-app-confirmed-glyph); height: var(--mauth-size-app-confirmed-glyph); }
+.mauth-app-confirmed-title { font-size: var(--mauth-text-18); font-weight: var(--mauth-weight-bold); color: var(--mauth-app-text); margin-bottom: var(--mauth-space-4); }
+.mauth-app-confirmed-text { font-size: var(--mauth-text-14); color: var(--mauth-app-text-2); }
+
+/* ---- Toast. src: A L167-178, D L169-182 ---- */
+.mauth-app-toast {
+  position: absolute; bottom: var(--mauth-space-32); left: var(--mauth-space-16); right: var(--mauth-space-16);
+  background: var(--mauth-app-toast-bg); color: var(--mauth-app-toast-text);
+  border: var(--mauth-app-border-toast);
+  border-radius: var(--mauth-radius-control); padding: var(--mauth-space-14) var(--mauth-space-16);
+  font-size: var(--mauth-text-14); font-weight: var(--mauth-weight-medium);
+  transform: translateY(80px); opacity: 0;
+  transition: transform var(--mauth-duration-toast) var(--mauth-ease-standard), opacity var(--mauth-duration-toast) var(--mauth-ease-default);
+  z-index: var(--mauth-z-app-toast); text-align: center;
+  pointer-events: none;
+}
+.mauth-app-toast.is-show { transform: translateY(0); opacity: 1; }   /* visible 3000 ms (JS) */
+.mauth-app-toast--danger { background: var(--mauth-app-danger); border-color: var(--mauth-app-danger); color: var(--mauth-app-on-danger); }
+
+/* =====================================================================
+   KEYFRAMES - src: S L310-312, A L236-246, L371-374 (valid top-level rules; the old DS's `body.dark @keyframes` was invalid CSS)
+   ===================================================================== */
+@keyframes mauth-spin { to { transform: rotate(360deg); } }
+@keyframes mauth-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+@keyframes mauth-pop-in { 0% { transform: scale(.2); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes mauth-blur-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mauth-faceid-content-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mauth-dot-pulse {
+  0%, 100% { box-shadow: var(--mauth-shadow-app-dot-ring); }
+  50%      { box-shadow: var(--mauth-shadow-app-dot-ring-wide); }
+}
+
+/* EXTENDED - not in prototype (source: "no prefers-reduced-motion handling anywhere"): honours the OS setting by collapsing
+   every transition/animation duration; adds no new values. The constellation helper also stops under this setting. */
+@media (prefers-reduced-motion: reduce) {
+  .mauth-web *, .mauth-web *::before, .mauth-web *::after,
+  .mauth-app *, .mauth-app *::before, .mauth-app *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

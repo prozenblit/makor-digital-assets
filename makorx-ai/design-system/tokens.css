@@ -1,0 +1,817 @@
+/* =====================================================================
+   MakorX.AI HR app - design tokens (main HR system; Auth is a separate system)
+   Source of truth: makor-hr/employees.html (built app) - "src: employees.html L<n>" in each comment.
+   Generated from the same data as tokens.json (1:1). Light values on :root; dark pairs on body.dark
+   (the app's own mechanism: class "dark" on <body>, toggled by toggleDarkMode(); localStorage 'makor-dm').
+   .theme-light / .theme-dark re-assert a theme on a CONTAINER (used by the showcase to show both side by side).
+   The app defines only 2 CSS custom properties (--wfh-icon-bg, --off-icon-bg); every other value was a literal -
+   all names below are by ROLE. Values that are the same in both themes appear only in :root.
+   ===================================================================== */
+:root, .theme-light {
+
+  /* ---------- FONTS ---------- */
+  --font-primary: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; /* UI font everywhere. L13/L487; Google Fonts Geist 100..900 (L9), only 400/500/600/700/800 used */
+  --font-display: 'Lexend Exa', sans-serif; /* ONLY .nav-wordmark (18px) and .nav-sub (14px) in the nav lock-up. L22-23 */
+  --font-mono: monospace; /* Generic monospace, used once: .mf-value.mono (pool member UUID). L456. (.fc-value.mono is NOT monospace) */
+
+  /* ---------- TYPE SCALE (font-size) ---------- */
+  --font-size-9-5: 9.5px; /* .cc-absent-lbl (calendar absent label). L337 */
+  --font-size-10: 10px; /* micro labels: field-label, detail-stat-label, tt-stat-lbl, app-drop-section/badge, dir-you, dp-wd, wfh-status-pill, cc-date/cc-time, sidebar-label. L32,39,152,325,631 */
+  --font-size-11: 11px; /* req-status, wfh-prefs-badge, inline-badge, ev-badge, req-type-desc, tt-emp-dept, profile-drop-email, tt-section-lbl, wfh-cal-daylabel, wfh-day-label, day-date. L805,752,470,821 */
+  --font-size-12: 12px; /* status pills, dept badge, th, field/form labels, meta/secondary, req-label, btn-add-member. L104,122,123,408 */
+  --font-size-13: 13px; /* dense body (tt/rv/req cells), options in phone/combobox, rv-btn, tt-fill, btn-inline-add, dp-day, app/profile item names. L37,297,440,664 */
+  --font-size-14: 14px; /* BASE body, buttons, inputs, table cells, tabs, nav links. L13,56,71 */
+  --font-size-15: 15px; /* tt-confirm-title, dir-avatar initials. L379,699 */
+  --font-size-16: 16px; /* page titles (.left-title), modal-title A, detail-stat-value, calendar nav, tt-fillall-input, tt-det-name. L54,395,151,372 */
+  --font-size-17: 17px; /* .tt-fillall-title. L365 */
+  --font-size-18: 18px; /* drawer-name, modal-title B (dialog), drawer/sp avatars, nav wordmark, emp-qcard-name, modal-day-label. L22,133,137,982 */
+  --font-size-20: 20px; /* .req-success-title. L973 */
+  --font-size-21: 21px; /* .emp-qcard-avatar initials. L716 */
+  --font-size-22: 22px; /* .wfh-stat-num, today h1. L769,556 */
+  --font-size-26: 26px; /* .request-page-title, .ts-stat-value. L922,870 */
+  --font-size-28: 28px; /* .bal-number, .calc-result-number. L888,1018 */
+
+  /* ---------- FONT WEIGHT ---------- */
+  --font-weight-regular: 400; /* body, nav links, secondary text */
+  --font-weight-medium: 500; /* buttons (primary/outline/cta), field values, labels, badges (dept) */
+  --font-weight-semibold: 600; /* cancel buttons, names, active tab, status pills, rv-btn */
+  --font-weight-bold: 700; /* headings 14-16, th, modal-title A, section band, active profile-tab */
+  --font-weight-extrabold: 800; /* page titles 16-28, dialog titles, big numbers */
+
+  /* ---------- LINE HEIGHT ---------- */
+  --line-height-none: 1; /* nav wordmark/sub, wfh-stat-num, phone flag/code, bal-number */
+  --line-height-tight: 1.1; /* .ts-stat-value */
+  --line-height-heading: 1.2; /* drawer-name, tt-stat-val, sp-name, emp-qcard-name, cc-hrs */
+  --line-height-text-sm: 1.4; /* wfh-prefs-sub, emp-qcard-sub */
+  --line-height-text-md: 1.45; /* sidebar-text, field-note */
+  --line-height-body: 1.5; /* inherited from body (computed 21px at 14px). Text elements: 10px->15, 11->16.5, 12->18, 13->19.5, 14->21, 16->24, 18->27 */
+  --line-height-loose: 1.6; /* .tt-fillall-desc, .announce-body */
+  --line-height-control: normal; /* buttons, inputs, selects keep line-height:normal (L14 font-size inherit only) */
+
+  /* ---------- LETTER SPACING ---------- */
+  --letter-spacing-none: 0; /* default / card-title in My Info */
+  --letter-spacing-tight: -0.3px; /* .sp-name (profile name) */
+  --letter-spacing-record: 0.02em; /* .record-badge */
+  --letter-spacing-badge: 0.04em; /* wfh-status-pill, app-drop badge, dir-you, dp-wd */
+  --letter-spacing-cal-head: 0.05em; /* tt-cal-head span */
+  --letter-spacing-label: 0.06em; /* table headers, field-label, modal-section-title, detail-stat-label, tt-stat-lbl, wfh-day-label (0.72px at 12px) */
+  --letter-spacing-label-wide: 0.07em; /* tt-section-lbl, tt-cal-title, tt-fillall-lbl, ts-stat-label */
+  --letter-spacing-label-sidebar: 0.08em; /* sidebar-label, reminders-card-title */
+  --letter-spacing-label-menu: 0.10em; /* app-drop-section, dir-alpha-header (0.1em) */
+
+  /* ---------- SPACING (observed values) ---------- */
+  --space-2: 2px;
+  --space-3: 3px;
+  --space-4: 4px;
+  --space-5: 5px;
+  --space-6: 6px;
+  --space-7: 7px;
+  --space-8: 8px;
+  --space-9: 9px;
+  --space-10: 10px;
+  --space-11: 11px;
+  --space-12: 12px;
+  --space-13: 13px;
+  --space-14: 14px;
+  --space-16: 16px;
+  --space-18: 18px;
+  --space-20: 20px;
+  --space-22: 22px;
+  --space-24: 24px;
+  --space-28: 28px;
+  --space-32: 32px;
+  --space-36: 36px;
+  --space-40: 40px;
+  --space-60: 60px;
+  --space-80: 80px;
+
+  /* ---------- RADII ---------- */
+  --radius-base: 4px; /* EVERYTHING: cards, buttons, inputs, badges, dropdowns, modals, tabs (125 declarations) */
+  --radius-circle: 50%; /* avatars, nav-avatar, circular close buttons (tt-fillall-close, modal-backdrop .modal-close, emp-qcard-close), bal-action-btn, entry-remove, req-success-icon, dm-thumb, tt-section-dot, wfh today number disc */
+  --radius-switch: 8px; /* .dm-switch track (only radius above 4px except circles) */
+  --radius-hairline: 2px; /* scrollbar thumbs, .wfh-legend-dot */
+  --radius-bar-top: 2px 3px 0 0; /* .mini-bar */
+  --radius-phone-start: 4px 0 0 4px; /* .phone-code-btn */
+  --radius-phone-end: 0 4px 4px 0; /* .phone-number-input */
+  --radius-list-first: 4px 4px 0 0; /* .phone-code-opt:first-child */
+  --radius-list-last: 0 0 4px 4px; /* .phone-code-opt:last-child */
+  --radius-none: 0; /* #panel-myinfo .card */
+
+  /* ---------- BORDER WIDTHS ---------- */
+  --border-width-hairline: 1px; /* default border */
+  --border-width-medium: 1.5px; /* wfh-day-box, modal-backdrop close, emp-qcard-close, bal-action-btn, btn-req-send, calc-accrual-btn, btn-save, btn-discard-bar, entry-remove, dp-day.today */
+  --border-width-thick: 2px; /* req-type-btn, detail-tab underline */
+  --border-width-tab-underline: 2.5px; /* .profile-tab underline (computed 2px at DPR 1.5) */
+  --border-width-marker: 3px; /* pool-row.active border-left, inset active-row marker */
+
+  /* ---------- CONTROL HEIGHTS ---------- */
+  --control-h-icon-btn-xs: 24px; /* .inline-list-item-remove */
+  --control-h-icon-btn-sm: 28px; /* .dp-nav, .bal-action-btn, .entry-remove, .req-icon-sm */
+  --control-h-btn-xs: 30px; /* .rv-btn-approve/deny, .btn-add-member, rv-type-icon */
+  --control-h-btn-sm: 32px; /* .modal-close, .wfh-nav-btn, .eqa-btn, .req-tab, .tt-fill-save/cancel, .tt-fill-input */
+  --control-h-btn-bar: 34px; /* .btn-save-bar, .btn-discard-bar, .dp-day, .dp-year-item */
+  --control-h-btn: 36px; /* .btn-primary, .btn-outline, .hist-range-picker, .calc-accrual-btn (7px pad) */
+  --control-h-btn-lg: 38px; /* .btn-cancel, .btn-cta, .ts-btn*, .tt-btn-*, .tt-confirm-*, .btn-req-cancel, .dir-search/.dir-select, .phone-code-btn, .phone-number-input */
+  --control-h-input: 40px; /* .search-input (NOT 38), .cust-select__trigger, .modal-input/select, .field-value, .datepicker-input, .phone-input-wrap, .time-input, .ampm-select, .btn-req-send, .btn-save, .btn-close-calc, .req-success-btn*, .btn-inline-add */
+  --control-h-input-xl: 44px; /* .tt-fillall-input (16px text) */
+
+  /* ---------- SIZES / LAYOUT SKELETON ---------- */
+  --size-nav-height: 74px; /* fixed top nav. L17 */
+  --size-nav-pad-x: 40px; /* nav horizontal padding. L17 */
+  --size-nav-avatar: 42px; /* .nav-avatar. L28 */
+  --size-nav-logo: 32px; /* brand tile 32x32 rx4. L1728 */
+  --size-nav-apps-icon: 24px; /* apps launcher icon. L1727 */
+  --size-nav-gap-left: 80px; /* .nav-left gap. L18 */
+  --size-nav-gap-logo: 16px; /* .nav-logo-wrap gap. L19 */
+  --size-nav-gap-links: 32px; /* .nav-links gap. L24 */
+  --size-nav-gap-right: 10px; /* .nav-right gap. L27 */
+  --size-dropdown-top: 82px; /* app/profile dropdown top offset. L30,1029 */
+  --size-dropdown-gutter: 40px; /* app-drop left / profile-drop right. L30,1029 */
+  --size-app-drop-width: 226px; /* .app-drop. L30 */
+  --size-profile-drop-width: 220px; /* .profile-drop. L1029 */
+  --size-page-gutter: 210px; /* .page padding-left/right (fixed at every width). L43 */
+  --size-page-card-margin-y: 12px; /* .page-center margin. L44 */
+  --size-split-left: 54%; /* .split-left width. L45 */
+  --size-tt-list: 56%; /* .tt-list-panel flex-basis. L287 */
+  --size-body-wrap-max: 1400px; /* My Profile .body-wrap max-width. L494 */
+  --size-left-col: 360px; /* My Profile left column. L497 */
+  --size-myprofile-left-col-top: 16px; /* sticky top (L1026 wins over L497 90px) */
+  --size-search-min: 180px; /* .search-wrap min-width. L69 */
+  --size-search-max: 220px; /* .search-wrap max-width. L69 */
+  --size-select-dept: 152px; /* .cs-dept trigger. L86 */
+  --size-select-office: 124px; /* .cs-office trigger. L87 */
+  --size-select-status: 114px; /* .cs-status trigger. L88 */
+  --size-select-group: 136px; /* .cs-group / .pool-cs-group trigger. L89,483 */
+  --size-select-pool-company: 138px; /* .pool-cs-company. L480 */
+  --size-select-pool-team: 120px; /* .pool-cs-team. L481 */
+  --size-select-pool-desk: 112px; /* .pool-cs-desk. L482 */
+  --size-modal-a: 740px; /* modal family A width (max-height 82vh). L392 */
+  --size-modal-b: 560px; /* modal family B width (max-width 94vw). L980 */
+  --size-modal-pool: 680px; /* New Pool modal inline width */
+  --size-modal-member: 620px; /* Add Pool Member / calc modal inline width */
+  --size-modal-fill: 460px; /* fill modal inline width */
+  --size-modal-holder: 440px; /* Add holder modal inline width */
+  --size-dialog-fillall: 420px; /* .tt-fillall-box. L362 */
+  --size-dialog-confirm: 340px; /* .tt-confirm-box. L377 */
+  --size-dialog-success: 360px; /* .req-success-card (max-width 92vw). L971 */
+  --size-dialog-qcard: 520px; /* .emp-qcard. L712 */
+  --size-datepicker-width: 280px; /* .datepicker-cal. L654 */
+  --size-phone-drop-min: 200px; /* .phone-code-drop min-width; max-height 240px. L598 */
+  --size-combo-max-height: 200px; /* .pool-emp-drop max-height. L473 */
+  --size-balance-sidebar: 320px; /* .request-balance-sidebar. L948 */
+  --size-timesheet-sidebar: 190px; /* .timesheet-sidebar. L834 */
+  --size-switch-w: 32px; /* .dm-switch width. L1039 */
+  --size-switch-h: 18px; /* .dm-switch height */
+  --size-switch-thumb: 14px; /* .dm-thumb (travel 14px) */
+  --size-day-box: 38px; /* .wfh-day-box */
+  --size-icon-tile-28: 28px; /* .req-icon-sm */
+  --size-icon-tile-30: 30px; /* .rv-type-icon / .period-icon / .bal-sidebar-icon */
+  --size-icon-tile-36: 36px; /* .req-type-icon-lg */
+  --size-avatar-32: 32px; /* .manager-avatar */
+  --size-avatar-34: 34px; /* .tt-avatar */
+  --size-avatar-36: 36px; /* .emp-avatar / .rv-avatar */
+  --size-avatar-38: 38px; /* .holder-avatar (also reminder-icon square, ev-avatar) */
+  --size-avatar-42: 42px; /* .nav-avatar */
+  --size-avatar-44: 44px; /* .dir-avatar / .tt-det-avatar (calc-user-avatar is a 4px SQUARE) */
+  --size-avatar-48: 48px; /* .drawer-avatar */
+  --size-avatar-52: 52px; /* .sp-avatar */
+  --size-avatar-64: 64px; /* .emp-qcard-avatar / .req-success-icon */
+  --size-scrollbar: 6px; /* custom scrollbar width, radius 2px */
+
+  /* ---------- MOTION ---------- */
+  --duration-fast: 0.10s; /* row/menu-item background (app-drop-item, profile-drop-item, phone-code-opt, dp-day, pool-row, wfh-cell) */
+  --duration-base: 0.12s; /* buttons (opacity / background / border-color,color), tabs, modal-close, modal-input border+shadow, trigger border, req-tab, req-type-btn, wfh-day-box */
+  --duration-medium: 0.15s; /* field-value/datepicker/phone border+shadow, chevron/arrow rotation, profile-tab color, btn-save-bar, btn-req-send, tt overlays */
+  --duration-modal: 0.18s; /* .modal-overlay opacity, .modal translateY, .dm-switch bg, .dm-thumb translate */
+  --duration-toast: 0.20s; /* .toast opacity + transform */
+  --duration-backdrop: 0.25s; /* .req-success-backdrop opacity */
+  --duration-flash: 1.4s; /* dir-flash keyframes (ease-out) */
+  --easing-default: ease; /* every transition (implicit) */
+  --easing-flash: ease-out; /* dir-flash 1.4s only */
+
+  /* ---------- Z-INDEX ---------- */
+  --z-sticky-th: 1; /* sticky table headers */
+  --z-save-bar: 10; /* .save-bar */
+  --z-profile-view: 50; /* #myprofile-view */
+  --z-nav: 100; /* .top-nav */
+  --z-datepicker: 200; /* .datepicker-cal */
+  --z-phone-drop: 300; /* .phone-code-drop */
+  --z-qcard: 300; /* .emp-qcard-backdrop */
+  --z-select-panel: 500; /* .cust-select__panel */
+  --z-modal-backdrop: 800; /* .modal-backdrop (family B) */
+  --z-modal-overlay: 900; /* .modal-overlay (A), .req-success-backdrop */
+  --z-tt-overlay: 1000; /* .tt-fillall-overlay, .tt-confirm-overlay */
+  --z-dropdown: 9000; /* .app-drop, .profile-drop */
+  --z-combo: 9999; /* .pool-emp-drop */
+  --z-toast: 9999; /* .toast */
+
+  /* ---------- OPACITY ---------- */
+  --opacity-hover-filled: 0.85; /* hover of filled buttons (x9) + save bar */
+  --opacity-hover-link: 0.7; /* .nav-link:hover, .nav-apps-icon rest, .hist-range-icon rest */
+  --opacity-hover-text: 0.75; /* .add-entry-link:hover, .modal-add-entry:hover */
+  --opacity-disabled: 0.45; /* disabled buttons/controls: light = inline style opacity:0.45 (L2627,2651,2652); this var flips to 1 in body.dark (dark disabled buttons use explicit colours + opacity:1) */
+  --opacity-dimmed: 0.45; /* always-0.45 dimming (.pool-badge.grey for a 0 count; EXTENDED skeleton pulse low point). L436 */
+  --opacity-noaccess: 0.42; /* .app-drop-item-noaccess */
+  --opacity-icon-rest: 0.4; /* .sort-icon rest (1 when sorted) */
+  --opacity-picker-indicator: 0.38; /* native date indicator rest (hover 0.65) */
+  --opacity-faded: 0.3; /* .wfh-cell.faded */
+  --opacity-cal-time: 0.65; /* .cc-time */
+
+  /* ---------- COLOURS (light) ---------- */
+
+  /* -- surface -- */
+  --color-page-bg: #ffffff; /* Page background (body). src: employees.html L13/L487 | dark L1049 */
+  --color-nav-bg: #ffffff; /* Top nav bar. L17 | dark L1055 */
+  --color-surface: #ffffff; /* Cards / panels: split-left/right, tables wrap, detail header, stat bar, tabs bar, content card, sidebar. L45-46,97,131 | dark L1081-1082,1119,1159,1169,1174,1564,1545 */
+  --color-surface-elevated: #ffffff; /* Elevated: dropdowns, select panel, modals (A+B), datepicker, phone drop, quick card, toast (dark), btn-outline bg (dark). L30,81,392,654 | dark L1061,1071,1114,1194,1587,1610 */
+  --color-canvas: #f5f5f8; /* My Profile page canvas (#myprofile-view). L1025 | dark L1083 */
+  --color-pane-muted: #f5f5f8; /* Pool detail pane (inline #f5f5f8 in light, .split-right!important in dark). L2127 | dark L1082 */
+  --color-table-head-bg: #f5f5f8; /* Table header: emp-table th, records th, group-header row, pool group label. L104,225,95,422 | dark L1120,1187,1133,1216 */
+  --color-table-head-bg-alt: #f5f5f8; /* Table header of rv/tt/req/hist tables + tt-cal-head + wfh-cal-head (dark differs from table-head-bg). L243,296,799,910,329,772 | dark L1341,1262,1413,1445,1285,1534 */
+  --color-section-band-bg: #ffffff; /* Section band strip. L167 | dark L1179 */
+  --color-row-hover: #f5f5f8; /* Table row hover (emp, tt, pool-row). L112,299,424 | dark L1124,1264,1218 */
+  --color-row-active: #f5f5f8; /* Active / selected row (emp active-row, tt-selected, pool-row.active). L113,300,425 | dark L1125,1265,1219 */
+  --color-row-selected-hover: #ececf0; /* tt selected row hover. L300 | dark L1267 */
+  --color-row-hover-directory: #f5f7fa; /* Directory row hover (slightly bluer than row-hover in light). L697 | dark L1631 */
+  --color-row-new: #edf7f5; /* HR requests: new row tint. L247 | dark L1344 */
+  --color-row-new-hover: #e3f3f1; /* HR requests: new row hover. L248 | dark L1345 */
+  --color-menu-hover: #f5f5f8; /* Hover of menu items / options (app-drop, profile-drop, cust-select option, phone option, combobox item, phone-code-btn, wfh-nav-btn). L34,84,593,603,1036 | dark L1066,1072,1116,1607,1612,1246 */
+  --color-fill-subtle: #f5f5f8; /* Subtle fill: readonly field, sidebar-profile, wfh day box (unchecked), approval note, hover of the grey cancel variants. L633,509,760 | dark L1575,1552,1526,1483,1313 */
+  --color-fill-item: #f5f5f8; /* Inline list item (pool modals). L464 | dark L1238 */
+  --color-fill-neutral: #f5f5f8; /* Neutral icon tiles + hovers: upcoming-icon-wrap, period-icon, bal-sidebar-icon, modal-day-icon, dp-nav hover, modal-close hover. L896,851,955,987 | dark L1407,1500,1437,1378 */
+  --color-fill-badge: #e5e7ec; /* record-badge, mini-bar.empty fill. L140,876 | dark L1165,1489 */
+  --color-input-bg: #ffffff; /* Text input / select trigger / datepicker / time input background. L71,75,409,632,648 | dark L1104,1109,1201,1573,1582 (transparent) */
+  --color-control-bg-elevated: #ffffff; /* Control that sits on elevated surface: btn-outline, phone wrap/button, req-tab, wfh-nav-btn, circle close buttons, bal-action-btn, hist-range-picker. L56,588,592,740,794,983 | dark L1091,1604,1606,1514,1410,1374,1404,1448 */
+  --color-btn-cancel-bg: transparent; /* btn-cancel fill (dark gets a fill and loses its border). L61 | dark L1094 */
+  --color-btn-cancel-hover-bg: #f5f5f8; /* btn-cancel hover. L62 | dark L1095 */
+  --color-switch-track-off: #e5e7ec; /* Switch off-track. Light L1039; dark has NO rule in the source (track stays #e5e7ec) - dark value is DERIVED (record-badge/divider mapping #e5e7ec -> rgba(255,255,255,0.07)); owner to confirm */
+  --color-switch-thumb: #ffffff; /* Switch thumb (both modes). L1041 */
+  --color-avatar-square-bg: #e5e7ec; /* calc-user-avatar square tile. L1013 | dark L1502 */
+  --color-toast-bg: #1a1a1a; /* Toast. L826 | dark L1677 */
+  --color-toast-text: #ffffff; /* Toast text. L826 | dark L1677 */
+  --color-toast-border: transparent; /* Toast border colour (light has NO border; dark 1px). dark L1677 */
+  --color-day-chip-bg: #ffffff; /* Timesheet day chip. L857 | dark L1473 */
+  --color-day-chip-today-bg: #005268; /* Timesheet day chip (today). L858 | dark L1474 */
+  --color-approval-note-bg: var(--color-fill-subtle); /* Timesheet approval note. L867 | dark L1483 */
+
+  /* -- overlay -- */
+  --color-overlay-modal: rgba(0,0,0,0.28); /* Scrim of .modal-overlay (family A). L390 | dark L1193 */
+  --color-overlay-dialog: rgba(0,0,0,0.45); /* Scrim of .modal-backdrop (family B) and quick-card backdrop. L967,711 | dark L1370,1642 */
+  --color-overlay-timesheet: rgba(0,0,0,0.28); /* Scrim of .tt-fillall-overlay / .tt-confirm-overlay. L360,375; NO dark rule in the source -> stays 0.28 in dark (kept as rendered, flagged) */
+  --color-overlay-success: rgba(20,30,48,0.35); /* Scrim of the success popup (+ blur 6px). L969 | dark L1457 */
+
+  /* -- text -- */
+  --color-text-primary: #1a1a1a; /* Primary text. L13 | dark L1049 */
+  --color-text-black: #000000; /* Names / avatars / wordmark (pure black in light). L22,117,119 | dark L1056,1127,1131 */
+  --color-text-nav-link: #000000; /* Nav links. L25 | dark L1057 */
+  --color-text-item: #1a1a1a; /* Menu items, options, outline-button text, request cell text. L37,83,56,600 | dark L1074,1115,1091,1068,1611 */
+  --color-text-secondary: #7c8dac; /* Secondary text, subtitles, cancel buttons, icons. L23,61,408 | dark L1064,1094,1209 */
+  --color-text-tertiary: #a8b6cd; /* Tertiary: table headers, labels, muted values, disabled-ish text. L104,195,631 | dark L1120,1181,1572 */
+  --color-text-placeholder: #a8b6cd; /* Input placeholder. L410,609,649 | dark L1202,1583,1616 */
+  --color-text-placeholder-control: #7c8dac; /* Placeholder of search-input / time-input / cust-select placeholder-state. L72,75,997 | dark L1105,1109 */
+  --color-text-menu-section: #a8b6cd; /* Section label inside app dropdown. L32 | dark L1076 */
+  --color-text-dot: #e5e7ec; /* drawer-dot separator. L145 | dark L1166 */
+  --color-text-on-brand: #ffffff; /* Text on filled brand buttons. L58 | dark L1089 */
+  --color-text-on-brand-hover: #ffffff; /* Text on a hover-filled outline-brand button (dark keeps #fff on #0cb8d0). L962 | dark L1392,1444 */
+  --color-text-disabled-day: #d0d7e3; /* Datepicker other-month day. L666 | dark L1595 */
+  --color-text-disabled-weekend: #d1d5db; /* tt calendar weekday label for Fri/Sat. L330 | dark L1287 */
+  --color-text-empty-hours: #e5e7ec; /* Timesheet day-hours.empty. L865 | dark L1481 */
+  --color-text-on-today: rgba(255,255,255,0.65); /* Day chip date on today. L862 | dark L1478 */
+  --color-text-today-name: #ffffff; /* Day chip name on today. L860 | dark L1477 */
+
+  /* -- border -- */
+  --color-border-divider: #e5e7ec; /* Strong divider: nav bottom, header/tabs/footer/section-band lines, table-head bottom (46 dark uses). L17,52,155,394 | dark L1055,1085,1174,1195 */
+  --color-border-card: #e5e7ec; /* Card / panel outline (37 dark uses). L44,97,512 | dark L1080,1119,1545 */
+  --color-border-control: #e5e7ec; /* Control border: inputs, triggers, secondary buttons (37 dark uses). L71,75,409 | dark L1104,1109,1201 */
+  --color-border-row: #e5e7ec; /* Row separators of main tables / list rows. L109,244,297 | dark L1123,1342,1263 */
+  --color-border-popover: #e5e7ec; /* Popover / modal outline. L30,392,654 | dark L1061,1194,1587 */
+  --color-border-line: #e5e7ec; /* Fine lines: reminder rows, quick-card rows, event rows. L502,720 | dark L1548,1650 */
+  --color-border-line-faint: #f5f5f8; /* day-row, bal-sidebar-item separator. L855,953 | dark L1472,1436 */
+  --color-border-row-soft: #f5f5f8; /* req-table / hist-table row separator. L800,911 | dark L1414,1446 */
+  --color-border-row-upcoming: #f5f5f8; /* upcoming-row separator. L894 | dark L1406 */
+  --color-border-row-subtle: #f0f0f2; /* records-table td separator (only use of #f0f0f2). L226 | dark L1188 */
+  --color-border-strong: #c4cdd8; /* Cancel-button border (light #c4cdd8). dark: .btn-cancel loses the border entirely; tt/ts/req cancel variants use rgba(255,255,255,0.10). L61,353,383,839,959 | dark L1094,1312,1316,1332,1441,1469 */
+  --color-border-hover: #a8b6cd; /* Input / select / datepicker hover border. L77,634,650 | dark L1111,1576,1584 */
+  --color-border-hover-strong: #7c8dac; /* Hover border of close/icon circles + bal-action-btn. L893,984 | dark L1375,1405 */
+  --color-border-hover-tile: #7c8dac; /* req-type tile hover border. L817 | dark L1394 */
+  --color-border-hover-check: #7c8dac; /* wfh day-box hover border. L765 | dark L1529 */
+  --color-border-avatar-ring: rgba(0,0,0,0.30); /* Avatar ring (all initial avatars). L117,133,250 | dark L1131,1160,1346 */
+  --color-border-avatar-ring-inactive: #a8b6cd; /* Inactive avatar ring + text. L118,134 | dark L1132,1161 */
+  --color-border-brand-soft: #c1ecf0; /* dp-nav hover border, dp-day.today border. L660,670 | dark L1591,1599 */
+  --color-border-danger-soft: #fde8e6; /* entry-remove ring. L1000 | dark L1388 */
+  --color-cal-line-v: #f0f1f4; /* tt calendar cell vertical line. L332 | dark L1288 */
+  --color-cal-line-h: #f0f1f4; /* tt calendar cell horizontal line. L332 | dark L1288 */
+  --color-grid-line-v: #e5e7ec; /* wfh calendar cell vertical line. L775 | dark L1536 */
+  --color-divider-soft: #f0f1f4; /* sidebar-divider. L521 | dark L1559 */
+  --color-border-btn-save-disabled: #a8b6cd; /* Disabled-looking timesheet save button border. L1009 | dark L1390 */
+  --color-border-discard-bar: rgba(255,255,255,0.4); /* Discard button on the save bar (both modes). L643 */
+  --color-border-discard-bar-hover: rgba(255,255,255,0.7); /* Discard hover. L644 */
+  --color-text-discard-bar: rgba(255,255,255,0.75); /* Discard text on the save bar. L643 */
+
+  /* -- brand -- */
+  --color-brand: #005268; /* Brand: primary buttons, active tab/link, selected marker, focus border, icons, page titles in dialogs. L58,158,411 | dark L1089,1177,1206 */
+  --color-link: var(--color-brand); /* Link colour (fc-link, drawer-meta-link, manager-name). L143,219 | dark L1167,1183 */
+  --color-brand-hover-solid: #004257; /* Hover of a filled brand surface that is not opacity-based (dp-day.selected:hover). L669 | dark L1598 */
+  --color-brand-deep: #003d50; /* Deep brand: success back-button hover (dead), directory name hover (light). L698,979 | dark L1465 */
+  --color-tint-selected: #f0f8fa; /* Selected/current tint: app-drop current, phone option selected, dp-day hover. L35,604,665 | dark L1073,1613,1594 */
+  --color-tint-selected-08: #f0f8fa; /* req-type tile selected bg. L818 | dark L1395 */
+  --color-tint-chip: rgba(0,82,104,0.08); /* Active chip/tab: req-tab.active bg. L795 | dark L1411 */
+  --color-tint-dir-you: #f0f8fa; /* Directory "You" badge. L702 | dark L1635 */
+  --color-tint-today: #f0f8fa; /* wfh calendar today cell. L779 | dark L1538 */
+  --color-tint-badge-current: #e8f4f8; /* app-drop "Current" badge. L39 | dark L1078 */
+  --color-tint-action-hover: #f0f4f8; /* eqa-btn hover. L728 | dark L1654 */
+  --color-tint-hover-outline-calc: #f5f5f8; /* calc-accrual-btn hover. L1020 | dark L1508 */
+  --color-tint-flash: #e8f4f7; /* dir-flash keyframe highlight. L731 light #e8f4f7; the source is NOT dark-aware (light value flashes on the dark page - bug); dark value DERIVED = the app-drop current-badge tint (#e8f4f8 -> rgba(12,184,208,0.15), L1078) */
+  --color-save-bar-bg: #005268; /* Save bar. L638 | dark L1580 */
+  --color-save-bar-text: #ffffff; /* Save bar text. L638 | dark L1580 */
+  --color-wfh-today-num-bg: #005268; /* wfh calendar today number disc. L781 | dark L1540 */
+  --color-wfh-today-num-text: #ffffff; /* Number on that disc. L781 | dark L1540 */
+
+  /* -- focus -- */
+  --color-focus-ring: rgba(0,82,104,0.12); /* Focus ring colour (3px) of search, modal inputs, field-value, datepicker, phone wrap, time/date inputs. L73,411,635 | dark L1106,1206,1577 */
+  --color-focus-ring-dir: rgba(0,82,104,0.10); /* dir-search focus ring (3px, 0.10). L684 | dark L1620 */
+  --color-focus-ring-sm: rgba(0,82,104,0.1); /* tt-fill-input / tt-fillall-input focus ring (2px). L350,373 | dark L1310,1326 */
+
+  /* -- status -- */
+  --color-success-bg: #c1f0d5; /* Success / Active fill. L124 | dark L1136 */
+  --color-success-text: #179484; /* Success / Active text. L124 | dark L1136 */
+  --color-danger-bg: #fde8e6; /* Danger / Inactive fill. L125 | dark L1137 */
+  --color-danger-text: #da4d43; /* Danger / Inactive text; required-star colour. L125,927 | dark L1137 */
+  --color-warning-bg: #fef3c7; /* Warning / Pending fill (req-status, wfh-prefs). L806 | dark L1416 */
+  --color-warning-text: #d97706; /* Warning / Pending text. L806 | dark L1416 */
+  --color-info-bg: #dbeafe; /* Info / Office fill (wfh office pill). L784 | dark L1542 */
+  --color-info-text: #1d4ed8; /* Info / Office text. L784 | dark L1542 */
+  --color-danger-strong: #dc2626; /* Deny button, missing-day label, invalid border (inline JS #dc2626). L275,344,L4188 | dark L1101,1301 */
+  --color-danger-strong-hover-bg: #fef2f2; /* Deny hover fill. L276 | dark L1102 */
+  --color-approve: #16a34a; /* Approve button + HR "approved" text. L273,264 | dark L1099,1357 */
+  --color-approve-hover-bg: #f0fdf4; /* Approve hover fill. L274 | dark L1100 */
+  --color-success-calendar: #059669; /* Calendar normal-day text, approved tag. L340,387 | dark L1293,1335 */
+  --color-status-active-bg: var(--color-success-bg); /* .status-active / .active-badge / .inline-badge.active / .wfh-prefs-badge.approved. L124,451,471,753 | dark L1136,1154,1156,1522 */
+  --color-status-active-text: var(--color-success-text); /* Same elements.  */
+  --color-status-inactive-bg: var(--color-danger-bg); /* .status-inactive / .inactive-badge / .inline-badge.inactive. L125,452,472 | dark L1137,1155,1157 */
+  --color-status-inactive-text: var(--color-danger-text); /* Same elements. */
+  --color-request-new-bg: #d4eee9; /* .rv-status.new ("New" is #d4eee9, NOT rgba(0,82,104,0.08)). L262 | dark L1355 */
+  --color-request-new-text: #005268; /* .rv-status.new. L262 | dark L1355 */
+  --color-request-pending-bg: #fff8ec; /* .rv-status.pending. L263 | dark L1356 */
+  --color-request-pending-text: #d97706; /* .rv-status.pending. L263 | dark L1356 */
+  --color-request-approved-bg: #f0fdf4; /* .rv-status.approved. L264 | dark L1357 */
+  --color-request-approved-text: #16a34a; /* .rv-status.approved. L264 | dark L1357 */
+  --color-request-denied-bg: #f5f5f8; /* .rv-status.denied. L265 | dark L1358 */
+  --color-request-denied-text: #a8b6cd; /* .rv-status.denied. L265 | dark L1358 */
+  --color-myreq-pending-bg: var(--color-warning-bg); /* .req-status.pending / .wfh-prefs-badge.pending. L806,754 | dark L1416,1523 */
+  --color-myreq-pending-text: var(--color-warning-text); /* Same. */
+  --color-myreq-approved-bg: #c1f0d5; /* .req-status.approved (dark uses the 52,211,153 green, not 45,212,191). L807 | dark L1417 */
+  --color-myreq-approved-text: #179484; /* .req-status.approved. L807 | dark L1417 */
+  --color-myreq-denied-bg: var(--color-danger-bg); /* .req-status.denied. L808 | dark L1418 */
+  --color-myreq-denied-text: var(--color-danger-text); /* .req-status.denied. L808 | dark L1418 */
+  --color-timesheet-pending-bg: #fef3c7; /* .tt-badge-pending. L307 | dark L1272 */
+  --color-timesheet-pending-text: #92400e; /* .tt-badge-pending, .tt-section-lbl--pending. L307,293 | dark L1272,1259 */
+  --color-timesheet-pending-line: #fde68a; /* tt-section-lbl--pending::after. L293 | dark L1260 */
+  --color-timesheet-pending-dot: #f59e0b; /* tt-section-dot. L294 | dark L1261 */
+  --color-timesheet-approved-bg: #d1fae5; /* .tt-badge-approved. L308 | dark L1273 */
+  --color-timesheet-approved-text: #065f46; /* .tt-badge-approved. L308 | dark L1273 */
+  --color-timesheet-approved-tag: #059669; /* .tt-approved-tag. L387 | dark L1335 */
+  --color-wfh-pill-wfh-bg: #c1f0d5; /* .wfh-status-pill.wfh. L783 | dark L1541 */
+  --color-wfh-pill-wfh-text: #179484; /* .wfh-status-pill.wfh. L783 | dark L1541 */
+  --color-wfh-pill-office-bg: var(--color-info-bg); /* .wfh-status-pill.office. L784 | dark L1542 */
+  --color-wfh-pill-office-text: var(--color-info-text); /* .wfh-status-pill.office. L784 | dark L1542 */
+  --color-wfh-pending-day-bg: #fef3c7; /* wfh day box pending (checked, not approved). L762 | dark L1528 */
+  --color-wfh-pending-day-border: #f59e0b; /* wfh day box pending border. L762 | dark L1528 */
+  --color-wfh-pending-day-text: #d97706; /* wfh day box pending check. L762 | dark L1528 */
+  --color-wfh-day-checked-bg: #c1f0d5; /* wfh day box checked. L761 | dark L1527 */
+  --color-wfh-day-checked-border: #c1f0d5; /* wfh day box checked border. L761 | dark L1527 */
+  --color-wfh-day-checked-text: #179484; /* wfh day box checked icon. L761 | dark L1527 */
+  --color-wfh-icon-bg: #c1f0d5; /* Source custom property --wfh-icon-bg (+ wfh-stat-icon-wfh). L487-488,1712 | dark L488,1716 */
+  --color-wfh-icon-text: #179484; /* wfh-stat-icon-wfh svg stroke. L1713 | dark L1717 */
+  --color-off-icon-bg: #dbeafe; /* Source custom property --off-icon-bg (+ wfh-stat-icon-office). L487-488,1714 | dark L488,1718 */
+  --color-off-icon-text: #1d4ed8; /* wfh-stat-icon-office svg stroke. L1715 | dark L1719 */
+  --color-wfh-legend-wfh: #c1f0d5; /* wfh legend dot. L745 | dark L1517 */
+  --color-wfh-legend-office: #dbeafe; /* wfh legend dot. L746 | dark L1518 */
+  --color-success-icon-bg: #e8f5f3; /* req-success-icon. L972 | dark L1459 */
+  --color-success-icon-text: #179484; /* req-success-icon. L972 | dark L1459 */
+  --color-cal-out-bg: #f0f1f4; /* .cc-out. L338 | dark L1290 */
+  --color-cal-out-date: #b8c0cc; /* .cc-out .cc-date. L338; dark has NO working rule (specificity) -> light value leaks: dark value DERIVED (#2a3548 = existing dark disabled text); owner to confirm */
+  --color-cal-out-text: #c8d0da; /* .cc-out hrs/time, .cc-wknd date. L338-339; same leak -> derived dark value #2a3548 */
+  --color-cal-wknd-bg: #f5f5f8; /* .cc-wknd. L339 | dark L1291 */
+  --color-cal-normal-bg: #f0fdf8; /* .cc-normal. L340 | dark L1292 */
+  --color-cal-normal-text: #059669; /* .cc-normal hrs/time. L340 | dark L1293-1294 */
+  --color-cal-low-bg: #fffbeb; /* .cc-low. L341 | dark L1295 */
+  --color-cal-low-text: #d97706; /* .cc-low hrs/time. L341 | dark L1296-1297 */
+  --color-cal-off-bg: #fafafa; /* .cc-off / .cc-sick / wfh weekend uses fill below. L342-343 | dark L1302,1304 */
+  --color-cal-off-text: #a8b6cd; /* .cc-off/.cc-sick label, .cc-date. L342,334 | dark L1289,1303 */
+  --color-cal-missing-bg: #fff5f5; /* .cc-missing. L344 | dark L1298 */
+  --color-cal-missing-hover-bg: #ffe8e8; /* .cc-missing:hover. L344 | dark L1299 */
+  --color-cal-missing-date: #f87171; /* .cc-missing date. L344 | dark L1300 */
+  --color-cal-missing-label: #dc2626; /* .cc-missing label. L344 | dark L1301 */
+  --color-wfh-weekend-bg: #fafafa; /* wfh calendar weekend cell. L778 | dark L1537 */
+
+  /* -- department -- */
+  --color-dept-equities-bg: #cad8f4; /* Equities. DC L3508 | dark L1140 */
+  --color-dept-equities-text: #2456a0; /* Equities */
+  --color-dept-fixed-income-bg: #c1ecf0; /* Fixed Income. | dark L1141 */
+  --color-dept-fixed-income-text: #0d6e7a; /* Fixed Income */
+  --color-dept-technology-bg: #c8f0e0; /* Technology. | dark L1142 */
+  --color-dept-technology-text: #0d7a5f; /* Technology */
+  --color-dept-operations-bg: #fce8d0; /* Operations. | dark L1143 */
+  --color-dept-operations-text: #a35c18; /* Operations */
+  --color-dept-compliance-bg: #f0eafc; /* Compliance. | dark L1144 */
+  --color-dept-compliance-text: #6e42a0; /* Compliance */
+  --color-dept-finance-bg: #d8eef8; /* Finance. | dark L1145 */
+  --color-dept-finance-text: #1a5a7a; /* Finance */
+  --color-dept-unknown-bg: #f5f5f8; /* Unknown department (JS fallback #f5f5f8/#7c8dac; dark generic rule L1139). dark text #505a6c */
+  --color-dept-unknown-text: #7c8dac; /* Unknown department */
+  --color-dept-inactive-bg: #e5e7ec; /* Inactive employee (any dept): light JS inline #e5e7ec/#a8b6cd; dark INTENDED = generic grey rule (the source lets the dept rule win - bug, see notes) */
+  --color-dept-inactive-text: #a8b6cd; /* Inactive employee */
+  --color-pool-holders-bg: #cad8f4; /* .pool-badge.holders. L434 | dark L1224 */
+  --color-pool-holders-text: #2456a0; /* .pool-badge.holders */
+  --color-pool-members-bg: #c1ecf0; /* .pool-badge.members (dark cyan differs from Fixed Income). L435 | dark L1225 */
+  --color-pool-members-text: #0d6e7a; /* .pool-badge.members */
+
+  /* -- request-type -- */
+  --color-reqtype-annual-bg: #eff6ff; /* HR request type: annual leave tile (REQ_TYPE_META L3815). dark L1365 */
+  --color-reqtype-annual-text: #2563eb; /* annual */
+  --color-reqtype-sick-bg: #fef2f2; /* sick (L3816). dark L1366 */
+  --color-reqtype-sick-text: #dc2626; /* sick */
+  --color-reqtype-wfh-bg: #ecfdf5; /* wfh (L3817). dark L1367 */
+  --color-reqtype-wfh-text: #059669; /* wfh */
+  --color-reqtype-location-bg: #f0f4ff; /* location / Remote Office (L3818). dark L1368 */
+  --color-reqtype-location-text: #3b5fc0; /* location */
+  --color-reqtype-default-bg: #f5f5f8; /* Any other type: dark rule L1364; light has no rule (derived neutral) */
+  --color-reqtype-default-text: #7c8dac; /* Any other type */
+  --color-reqicon-timeoff-bg: #eff6ff; /* My Profile request list tile (.req-icon-sm, REQ_BG L4933): timeoff. L1694 | dark L1699 */
+  --color-reqicon-timeoff-text: #1d4ed8; /* timeoff (note: differs from reqtype-annual-text #2563eb) */
+  --color-reqicon-sick-bg: #fef2f2; /* sick. L1695 | dark L1700 */
+  --color-reqicon-sick-text: #da4d43; /* sick (differs from reqtype-sick-text #dc2626) */
+  --color-reqicon-location-bg: #f5f3ff; /* location. L1696 | dark L1701 */
+  --color-reqicon-location-text: #7c3aed; /* location (differs from reqtype-location-text #3b5fc0) */
+  --color-reqicon-default-bg: #f5f5f8; /* Any other type (dark rule L1698; light derived) */
+  --color-reqicon-default-text: #7c8dac; /* Any other type */
+  --color-reqtype-tile-lg-bg: #f5f5f8; /* .req-type-icon-lg dark fill L1690 (light fill is inline per type) */
+
+  /* -- scrollbar -- */
+  --color-scrollbar-thumb: rgba(0,0,0,0.10); /* tab-body, modal-body, pool-emp-drop. L47-49,398 | dark L1052 */
+  --color-scrollbar-thumb-list: rgba(0,0,0,0.08); /* rv-list, tt lists, phone drop. L238,288,598 | dark L1052 */
+  --color-scrollbar-thumb-table: rgba(0,0,0,0.12); /* emp-table tbody, pools-list, req/hist scroll. L100,421,797 | dark L1052 */
+  --color-scrollbar-thumb-faint: rgba(0,0,0,0.06); /* left-col. L497 | dark L1052 */
+  --color-scrollbar-thumb-hover: rgba(0,0,0,0.10); /* thumb hover (light has no hover rule; value = rest). dark L1053 */
+  --color-scrollbar-color-dark: rgba(255,255,255,0.08); /* body.dark scrollbar-color. L1049 */
+
+  /* -- surface -- */
+  --color-btn-primary-disabled-bg: #005268; /* Disabled btn-primary. Light: bg unchanged + opacity .45 (inline in the source); dark: L1090 */
+
+  /* -- text -- */
+  --color-btn-primary-disabled-text: #ffffff; /* Disabled btn-primary text. dark L1090 */
+
+  /* -- surface -- */
+  --color-btn-outline-disabled-bg: #ffffff; /* Disabled btn-outline. dark L1093 */
+
+  /* -- border -- */
+  --color-btn-outline-disabled-border: #e5e7ec; /* Disabled btn-outline border. dark L1093 */
+
+  /* -- text -- */
+  --color-btn-outline-disabled-text: #1a1a1a; /* Disabled btn-outline text. dark L1093 */
+
+  /* -- surface -- */
+  --color-save-bar-btn-bg: #ffffff; /* .btn-save-bar fill (unchanged in dark). L641 */
+
+  /* -- text -- */
+  --color-save-bar-btn-text: #005268; /* .btn-save-bar text (unchanged in dark: stays #005268 on the #0cb8d0 bar). L641 */
+  --color-text-discard-bar-hover: #ffffff; /* .btn-discard-bar hover text. L644 */
+  --color-text-close-hover: #005268; /* Hover colour of the circular close buttons (family B modal-close). L984 | dark L1375 */
+
+  /* -- surface -- */
+  --color-apps-icon-fill: transparent; /* .nav-apps-icon circle fill. L1727 | dark L1058 */
+  --color-apps-icon-stroke: #1a1a1a; /* .nav-apps-icon circle stroke (stroke-width 1.2). L1727 | dark L1058 */
+  --color-nav-avatar-bg: #f5f5f8; /* .nav-avatar fill. L28 | dark L1059 */
+
+  /* -- border -- */
+  --color-nav-avatar-border: #e5e7ec; /* .nav-avatar ring. L28 | dark L1059 */
+
+  /* -- text -- */
+  --color-text-search-icon: #005268; /* .search-icon colour (light brand, dark #505a6c). L70 | dark L1107 */
+
+  /* -- stage 2 additions (patterns) -- */
+  --color-text-card-title: #7c8dac; /* .card-title colour (My Info overrides it to primary). Stage 2. L561 | dark L1660 */
+  --color-text-pool-meta-value: #1a1a1a; /* .pool-meta-value (dark is the SECONDARY grey, light is primary). Stage 2. L431 | dark L1223 */
+  --color-text-hist-date: #1a1a1a; /* .hist-table td:first-child (date column). Stage 2. L911 | dark L1447 */
+  --color-text-hist-balance: #a8b6cd; /* .hist-table td.num:last-child (balance column; light keeps the faint num grey). Stage 2. L915 | dark L1454 */
+  --color-text-approved-date: #a8b6cd; /* .tt-approved-date. Stage 2. L1681 | dark L1683 */
+  --color-text-sidebar-small: #a8b6cd; /* .sidebar-text small (hire-date tenure line). The source has NO dark rule, so #a8b6cd shows in dark too (kept as rendered, flagged). Stage 2. L520 */
+  --color-text-day-date: #a8b6cd; /* .day-date (timesheet day chip). Stage 2. L861 | dark L1476 */
+  --color-text-wfh-daylabel: #7c8dac; /* .wfh-cal-daylabel. Stage 2. L773 | dark L1535 */
+  --color-text-dir-name-hover: #003d50; /* .dir-row:hover .dir-name. Stage 2. L698 | dark L1632 */
+  --color-text-group-label: #7c8dac; /* .group-header-row td, .pool-group-lbl (grouped list headers). Stage 2. L95,422 | dark L1133,1216 */
+  --color-reminder-birthday-bg: #fef3ec; /* .reminder-icon[data-kind=birthday] (inline background in the app; dark via the attribute-selector remap L1709). Stage 2. L2192 | dark L1709 */
+  --color-reminder-anniversary-bg: #eef2ff; /* .reminder-icon[data-kind=anniversary] (inline background in the app; dark via L1710). Stage 2. L2197 | dark L1710 */
+
+  /* ---------- SHADOWS (light) ---------- */
+  --shadow-page: 0 2px 8px rgba(0,0,0,0.06); /* .page-center card frame. L44 | dark L1080 */
+  --shadow-view: 0 2px 8px rgba(0,0,0,0.06); /* #requests-view / #timetracking-view frame. L233,281; NO dark rule (stays 0.06 - kept as rendered) */
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.06); /* .sidebar, .reminders-card. L499-500 | dark L1545-1546 */
+  --shadow-card-sm: 0 2px 8px rgba(0,0,0,0.05); /* .emp-table-wrap, #hrReqList, .tt-inner-card, .content-card-wrap. L97,241,290,530 | dark L1119,1340,1256,1564 */
+  --shadow-popover: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06); /* app-drop, profile-drop, cust-select panel, datepicker. L30,81,654,1029 | dark L1061,1071,1114,1587 */
+  --shadow-popover-sm: 0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06); /* phone-code-drop. L598 | dark L1610 */
+  --shadow-combo: 0 6px 20px rgba(0,0,0,0.12); /* pool-emp-drop (combobox). L473 | dark L1244 */
+  --shadow-modal: 0 8px 40px rgba(0,0,0,0.16); /* Modal family A (.modal-overlay .modal). L392; dark rule only sets background/border -> stays 0.16 (there is NO dark 0 8px 40px 0.5) */
+  --shadow-dialog-box: 0 8px 40px rgba(0,0,0,0.14); /* .tt-fillall-box. L362; no dark shadow rule */
+  --shadow-confirm-box: 0 8px 32px rgba(0,0,0,0.14); /* .tt-confirm-box. L377; no dark shadow rule */
+  --shadow-dialog: 0 24px 60px rgba(0,0,0,0.2); /* Modal family B (.modal-backdrop .modal) + .emp-qcard. L980,712 | dark L1371,1643 */
+  --shadow-success: 0 24px 64px rgba(0,0,0,0.30); /* .req-success-card. L971 | dark L1458 */
+  --shadow-thumb: 0 1px 3px rgba(0,0,0,0.20); /* .dm-thumb. L1041 */
+  --shadow-focus: 0 0 0 3px var(--color-focus-ring); /* Focus ring (3px). L73,411,635 */
+  --shadow-focus-dir: 0 0 0 3px var(--color-focus-ring-dir); /* dir-search focus. L684 */
+  --shadow-focus-sm: 0 0 0 2px var(--color-focus-ring-sm); /* tt-fill-input / tt-fillall-input focus. L350,373 */
+  --shadow-row-marker: inset 3px 0 0 var(--color-brand); /* Active-row marker on first cell. L114,300 | dark L1126,1266 */
+}
+
+/* ===== DARK (body.dark) - only values that differ + aliases/shadows that contain var() (custom properties resolve where declared, so they must be re-declared here) ===== */
+body.dark, .theme-dark {
+  --opacity-disabled: 1; /* dark disabled buttons: opacity:1!important + explicit colours. src: employees.html L1090,L1093 */
+
+  /* -- surface -- */
+  --color-page-bg: #111214;
+  --color-nav-bg: #18181c;
+  --color-surface: #202226;
+  --color-surface-elevated: #26292e;
+  --color-canvas: #111214;
+  --color-pane-muted: #202226;
+  --color-table-head-bg: #111214;
+  --color-table-head-bg-alt: #202226;
+  --color-section-band-bg: #111214;
+  --color-row-hover: rgba(255,255,255,0.03);
+  --color-row-active: rgba(255,255,255,0.04);
+  --color-row-selected-hover: rgba(255,255,255,0.06);
+  --color-row-hover-directory: rgba(255,255,255,0.03);
+  --color-row-new: rgba(12,184,208,0.06);
+  --color-row-new-hover: rgba(12,184,208,0.09);
+  --color-menu-hover: rgba(255,255,255,0.05);
+  --color-fill-subtle: rgba(255,255,255,0.04);
+  --color-fill-item: rgba(255,255,255,0.05);
+  --color-fill-neutral: rgba(255,255,255,0.06);
+  --color-fill-badge: rgba(255,255,255,0.07);
+  --color-input-bg: transparent;
+  --color-control-bg-elevated: #26292e;
+  --color-btn-cancel-bg: rgba(255,255,255,0.08);
+  --color-btn-cancel-hover-bg: rgba(255,255,255,0.13);
+  --color-switch-track-off: rgba(255,255,255,0.07);
+  --color-avatar-square-bg: #26292e;
+  --color-toast-bg: #26292e;
+  --color-toast-text: #e2e8f4;
+  --color-toast-border: rgba(255,255,255,0.10);
+  --color-day-chip-bg: #26292e;
+  --color-day-chip-today-bg: rgba(12,184,208,0.12);
+  --color-approval-note-bg: var(--color-fill-subtle);
+
+  /* -- overlay -- */
+  --color-overlay-modal: rgba(0,0,0,0.55);
+  --color-overlay-dialog: rgba(0,0,0,0.60);
+  --color-overlay-success: rgba(0,5,20,0.65);
+
+  /* -- text -- */
+  --color-text-primary: #e2e8f4;
+  --color-text-black: #e2e8f4;
+  --color-text-nav-link: #c8d4e8;
+  --color-text-item: #c8d4e8;
+  --color-text-secondary: #8a97aa;
+  --color-text-tertiary: #505a6c;
+  --color-text-placeholder: #505a6c;
+  --color-text-placeholder-control: #505a6c;
+  --color-text-menu-section: rgba(255,255,255,0.28);
+  --color-text-dot: rgba(255,255,255,0.28);
+  --color-text-on-brand: #111214;
+  --color-text-disabled-day: #2a3548;
+  --color-text-disabled-weekend: #2a3548;
+  --color-text-empty-hours: #2a3548;
+  --color-text-on-today: rgba(12,184,208,0.75);
+  --color-text-today-name: #0cb8d0;
+
+  /* -- border -- */
+  --color-border-divider: rgba(255,255,255,0.12);
+  --color-border-card: rgba(255,255,255,0.07);
+  --color-border-control: rgba(255,255,255,0.10);
+  --color-border-row: rgba(255,255,255,0.09);
+  --color-border-popover: rgba(255,255,255,0.08);
+  --color-border-line: rgba(255,255,255,0.06);
+  --color-border-line-faint: rgba(255,255,255,0.04);
+  --color-border-row-soft: rgba(255,255,255,0.03);
+  --color-border-row-upcoming: rgba(255,255,255,0.09);
+  --color-border-row-subtle: rgba(255,255,255,0.09);
+  --color-border-strong: rgba(255,255,255,0.10);
+  --color-border-hover: rgba(255,255,255,0.20);
+  --color-border-hover-strong: rgba(255,255,255,0.20);
+  --color-border-hover-tile: rgba(255,255,255,0.22);
+  --color-border-hover-check: rgba(255,255,255,0.25);
+  --color-border-avatar-ring: rgba(255,255,255,0.28);
+  --color-border-avatar-ring-inactive: #505a6c;
+  --color-border-brand-soft: rgba(12,184,208,0.40);
+  --color-border-danger-soft: rgba(248,113,113,0.30);
+  --color-cal-line-v: rgba(255,255,255,0.05);
+  --color-cal-line-h: rgba(255,255,255,0.09);
+  --color-grid-line-v: rgba(255,255,255,0.05);
+  --color-divider-soft: rgba(255,255,255,0.07);
+  --color-border-btn-save-disabled: rgba(255,255,255,0.10);
+
+  /* -- brand -- */
+  --color-brand: #0cb8d0;
+  --color-link: var(--color-brand);
+  --color-brand-hover-solid: #0aacc3;
+  --color-brand-deep: #0aacc3;
+  --color-tint-selected: rgba(12,184,208,0.10);
+  --color-tint-selected-08: rgba(12,184,208,0.08);
+  --color-tint-chip: rgba(12,184,208,0.12);
+  --color-tint-dir-you: rgba(12,184,208,0.12);
+  --color-tint-today: rgba(12,184,208,0.07);
+  --color-tint-badge-current: rgba(12,184,208,0.15);
+  --color-tint-action-hover: rgba(12,184,208,0.10);
+  --color-tint-hover-outline-calc: rgba(12,184,208,0.08);
+  --color-tint-flash: rgba(12,184,208,0.15);
+  --color-save-bar-bg: #0cb8d0;
+  --color-save-bar-text: #111214;
+  --color-wfh-today-num-bg: rgba(12,184,208,0.12);
+  --color-wfh-today-num-text: #0cb8d0;
+
+  /* -- focus -- */
+  --color-focus-ring: rgba(12,184,208,0.12);
+  --color-focus-ring-dir: rgba(12,184,208,0.10);
+  --color-focus-ring-sm: rgba(12,184,208,0.12);
+
+  /* -- status -- */
+  --color-success-bg: rgba(45,212,191,0.16);
+  --color-success-text: #2dd4bf;
+  --color-danger-bg: rgba(248,113,113,0.15);
+  --color-danger-text: #f87171;
+  --color-warning-bg: rgba(251,191,36,0.15);
+  --color-warning-text: #fbbf24;
+  --color-info-bg: rgba(96,165,250,0.18);
+  --color-info-text: #60a5fa;
+  --color-danger-strong: #f87171;
+  --color-danger-strong-hover-bg: rgba(248,113,113,0.10);
+  --color-approve: #34d399;
+  --color-approve-hover-bg: rgba(52,211,153,0.10);
+  --color-success-calendar: #34d399;
+  --color-status-active-bg: var(--color-success-bg);
+  --color-status-active-text: var(--color-success-text);
+  --color-status-inactive-bg: var(--color-danger-bg);
+  --color-status-inactive-text: var(--color-danger-text);
+  --color-request-new-bg: rgba(12,184,208,0.15);
+  --color-request-new-text: #0cb8d0;
+  --color-request-pending-bg: rgba(251,191,36,0.15);
+  --color-request-pending-text: #fbbf24;
+  --color-request-approved-bg: rgba(52,211,153,0.15);
+  --color-request-approved-text: #34d399;
+  --color-request-denied-bg: rgba(255,255,255,0.06);
+  --color-request-denied-text: #505a6c;
+  --color-myreq-pending-bg: var(--color-warning-bg);
+  --color-myreq-pending-text: var(--color-warning-text);
+  --color-myreq-approved-bg: rgba(52,211,153,0.15);
+  --color-myreq-approved-text: #34d399;
+  --color-myreq-denied-bg: var(--color-danger-bg);
+  --color-myreq-denied-text: var(--color-danger-text);
+  --color-timesheet-pending-bg: rgba(251,191,36,0.16);
+  --color-timesheet-pending-text: #fbbf24;
+  --color-timesheet-pending-line: rgba(251,191,36,0.25);
+  --color-timesheet-pending-dot: #fbbf24;
+  --color-timesheet-approved-bg: rgba(52,211,153,0.15);
+  --color-timesheet-approved-text: #34d399;
+  --color-timesheet-approved-tag: #34d399;
+  --color-wfh-pill-wfh-bg: rgba(45,212,191,0.18);
+  --color-wfh-pill-wfh-text: #2dd4bf;
+  --color-wfh-pill-office-bg: var(--color-info-bg);
+  --color-wfh-pill-office-text: var(--color-info-text);
+  --color-wfh-pending-day-bg: rgba(251,191,36,0.16);
+  --color-wfh-pending-day-border: rgba(251,191,36,0.50);
+  --color-wfh-pending-day-text: #fbbf24;
+  --color-wfh-day-checked-bg: rgba(45,212,191,0.20);
+  --color-wfh-day-checked-border: rgba(45,212,191,0.50);
+  --color-wfh-day-checked-text: #2dd4bf;
+  --color-wfh-icon-bg: rgba(23,148,132,0.22);
+  --color-wfh-icon-text: #2dd4bf;
+  --color-off-icon-bg: rgba(37,99,235,0.18);
+  --color-off-icon-text: #60a5fa;
+  --color-wfh-legend-wfh: rgba(45,212,191,0.50);
+  --color-wfh-legend-office: rgba(96,165,250,0.50);
+  --color-success-icon-bg: rgba(23,148,132,0.18);
+  --color-success-icon-text: #2dd4bf;
+  --color-cal-out-bg: rgba(255,255,255,0.02);
+  --color-cal-out-date: #2a3548;
+  --color-cal-out-text: #2a3548;
+  --color-cal-wknd-bg: rgba(255,255,255,0.01);
+  --color-cal-normal-bg: rgba(52,211,153,0.10);
+  --color-cal-normal-text: #34d399;
+  --color-cal-low-bg: rgba(251,191,36,0.10);
+  --color-cal-low-text: #fbbf24;
+  --color-cal-off-bg: rgba(255,255,255,0.02);
+  --color-cal-off-text: #505a6c;
+  --color-cal-missing-bg: rgba(248,113,113,0.10);
+  --color-cal-missing-hover-bg: rgba(248,113,113,0.16);
+  --color-cal-missing-label: #f87171;
+  --color-wfh-weekend-bg: rgba(255,255,255,0.01);
+
+  /* -- department -- */
+  --color-dept-equities-bg: rgba(99,152,255,0.16);
+  --color-dept-equities-text: #7aabff;
+  --color-dept-fixed-income-bg: rgba(45,212,191,0.14);
+  --color-dept-fixed-income-text: #2dd4bf;
+  --color-dept-technology-bg: rgba(52,211,153,0.14);
+  --color-dept-technology-text: #4ade80;
+  --color-dept-operations-bg: rgba(251,146,60,0.16);
+  --color-dept-operations-text: #fb923c;
+  --color-dept-compliance-bg: rgba(167,139,250,0.16);
+  --color-dept-compliance-text: #a78bfa;
+  --color-dept-finance-bg: rgba(96,186,240,0.16);
+  --color-dept-finance-text: #60baf0;
+  --color-dept-unknown-bg: rgba(255,255,255,0.06);
+  --color-dept-unknown-text: #505a6c;
+  --color-dept-inactive-bg: rgba(255,255,255,0.06);
+  --color-dept-inactive-text: #505a6c;
+  --color-pool-holders-bg: rgba(99,152,255,0.16);
+  --color-pool-holders-text: #7aabff;
+  --color-pool-members-bg: rgba(34,211,238,0.16);
+  --color-pool-members-text: #22d3ee;
+
+  /* -- request-type -- */
+  --color-reqtype-annual-bg: rgba(37,99,235,0.16);
+  --color-reqtype-annual-text: #60a5fa;
+  --color-reqtype-sick-bg: rgba(220,38,38,0.16);
+  --color-reqtype-sick-text: #f87171;
+  --color-reqtype-wfh-bg: rgba(5,150,105,0.16);
+  --color-reqtype-wfh-text: #4ade80;
+  --color-reqtype-location-bg: rgba(124,58,237,0.16);
+  --color-reqtype-location-text: #c4b5fd;
+  --color-reqtype-default-bg: rgba(255,255,255,0.06);
+  --color-reqtype-default-text: #8a97aa;
+  --color-reqicon-timeoff-bg: rgba(37,99,235,0.16);
+  --color-reqicon-timeoff-text: #60a5fa;
+  --color-reqicon-sick-bg: rgba(220,38,38,0.16);
+  --color-reqicon-sick-text: #f87171;
+  --color-reqicon-location-bg: rgba(124,58,237,0.16);
+  --color-reqicon-location-text: #c4b5fd;
+  --color-reqicon-default-bg: rgba(255,255,255,0.07);
+  --color-reqicon-default-text: #8a97aa;
+  --color-reqtype-tile-lg-bg: rgba(255,255,255,0.07);
+
+  /* -- scrollbar -- */
+  --color-scrollbar-thumb: rgba(255,255,255,0.09);
+  --color-scrollbar-thumb-list: rgba(255,255,255,0.09);
+  --color-scrollbar-thumb-table: rgba(255,255,255,0.09);
+  --color-scrollbar-thumb-faint: rgba(255,255,255,0.09);
+  --color-scrollbar-thumb-hover: rgba(255,255,255,0.28);
+
+  /* -- surface -- */
+  --color-btn-primary-disabled-bg: #26292e;
+
+  /* -- text -- */
+  --color-btn-primary-disabled-text: rgba(255,255,255,0.22);
+
+  /* -- surface -- */
+  --color-btn-outline-disabled-bg: #26292e;
+
+  /* -- border -- */
+  --color-btn-outline-disabled-border: rgba(255,255,255,0.06);
+
+  /* -- text -- */
+  --color-btn-outline-disabled-text: rgba(255,255,255,0.18);
+  --color-text-close-hover: #e2e8f4;
+
+  /* -- surface -- */
+  --color-apps-icon-fill: rgba(255,255,255,0.55);
+  --color-apps-icon-stroke: transparent;
+  --color-nav-avatar-bg: transparent;
+
+  /* -- border -- */
+  --color-nav-avatar-border: rgba(255,255,255,0.28);
+
+  /* -- text -- */
+  --color-text-search-icon: #505a6c;
+
+  /* -- stage 2 additions (patterns) -- */
+  --color-text-card-title: #505a6c;
+  --color-text-pool-meta-value: #8a97aa;
+  --color-text-hist-date: #8a97aa;
+  --color-text-hist-balance: #e2e8f4;
+  --color-text-approved-date: #8a97aa;
+  --color-text-day-date: #8a97aa;
+  --color-text-wfh-daylabel: #505a6c;
+  --color-text-dir-name-hover: #0cb8d0;
+  --color-text-group-label: #505a6c;
+  --color-reminder-birthday-bg: rgba(251,146,60,0.14);
+  --color-reminder-anniversary-bg: rgba(99,102,241,0.14);
+
+  /* -- shadows -- */
+  --shadow-page: 0 4px 24px rgba(0,0,0,0.50);
+  --shadow-view: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-card: none;
+  --shadow-card-sm: none;
+  --shadow-popover: 0 8px 32px rgba(0,0,0,0.50);
+  --shadow-popover-sm: 0 8px 24px rgba(0,0,0,0.50);
+  --shadow-combo: 0 6px 20px rgba(0,0,0,0.50);
+  --shadow-modal: 0 8px 40px rgba(0,0,0,0.16);
+  --shadow-dialog-box: 0 8px 40px rgba(0,0,0,0.14);
+  --shadow-confirm-box: 0 8px 32px rgba(0,0,0,0.14);
+  --shadow-dialog: 0 24px 60px rgba(0,0,0,0.60);
+  --shadow-success: 0 24px 64px rgba(0,0,0,0.60);
+  --shadow-focus: 0 0 0 3px var(--color-focus-ring);
+  --shadow-focus-dir: 0 0 0 3px var(--color-focus-ring-dir);
+  --shadow-focus-sm: 0 0 0 2px var(--color-focus-ring-sm);
+  --shadow-row-marker: inset 3px 0 0 var(--color-brand);
+}

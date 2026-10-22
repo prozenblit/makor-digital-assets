@@ -1,994 +1,1010 @@
-/* ============================================================
-   FX Engine Room — Component Styles
-   Requires: tokens.css loaded first
-   Dark mode only. Desktop only.
-   ============================================================ */
+/* ===== PART 1: TOKEN-LEVEL & CONTROLS ===== */
+/* FX Engine Room components.css - PART 1 (stage 1). Source: Figma file yuJA7DtjFKnqTZQcu2vKYN, page "Page 1", Section 3 (7114:14467).
+   Requires tokens.css (custom properties) and the Nunito font. Dark-mode, desktop-only.
+   Conventions:
+   - Every rule block starts with a figma-node-id comment (figma: <node ids>). Values are quoted from figma-spec/components.md + foundations.md.
+   - an EXTENDED - not in Figma comment marks anything Figma does not draw (focus, pressed, hover of inputs, disabled inputs ...).
+     Extensions use only existing tokens/patterns (white/black hover overlays, purple #A4A4FF focus ring, tint fills).
+   - Forced state classes for the showcase: .is-hover .is-focus .is-active .is-disabled (+ real :hover/:focus-visible/:active/:disabled).
+   - Strokes drawn "INSIDE" in Figma are reproduced with `box-shadow: inset 0 0 0 1px <colour>` (no layout effect, so hug widths stay exact).
+   - Figma text boxes use leading-trim CAP_HEIGHT with line-height AUTO. In CSS: line-height `normal` everywhere (= AUTO, Nunito ~1.364 x size).
+     Controls have FIXED heights with centred content, so no trim is needed (error <= 0.4px). For loose text placed at Figma's cap-box y use `.text-trim`
+     (`text-box: trim-both cap alphabetic`, Chrome 133+/Safari 18.2+) or give the element line-height = cap height. */
 
-/* ─── RESET ──────────────────────────────────────────────── */
+/* ---------- 0. Base / reset ---------- */
+/* figma: 4:7 (page BG #000000), Nunito everywhere; Figma has no default text style, Regular 14 (input text) is the body default - EXTENDED */
 *, *::before, *::after { box-sizing: border-box; }
+html { background: var(--color-surface-page); color-scheme: dark; }
+body { margin: 0; background: var(--color-surface-page); color: var(--color-text-primary); font: var(--type-input); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+button, input, select, textarea { font: inherit; color: inherit; margin: 0; }
+button { padding: 0; border: 0; background: none; cursor: pointer; }
+a { color: inherit; }
+img, svg { display: block; }
+.text-trim { text-box: trim-both cap alphabetic; } /* figma: leading trim CAP_HEIGHT (every text node) */
 
-body {
-  background: var(--color-bg);
-  color: var(--color-text-primary);
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  line-height: var(--leading-normal);
-  -webkit-font-smoothing: antialiased;
-}
+/* ---------- 1. Type scale: every real Figma tuple (Nunito; line-height AUTO; letter-spacing 0) ---------- */
+/* figma: foundations.md section 3 (22 tuples; counts in tokens.json typeScale). font: var(--type-<role>) */
+.t-table-cell      { font: var(--type-table-cell); }      /* Medium 12   - 6,855 nodes: blotter/widget cells, PnL */
+.t-cell            { font: var(--type-cell); }            /* Medium 14   - 1,692: admin cells/headers, tabs, widget title bar */
+.t-input           { font: var(--type-input); }           /* Regular 14  - 559: input value, placeholder, tooltip, chip */
+.t-label           { font: var(--type-label); }           /* Regular 12  - 416: field label, error message */
+.t-button          { font: var(--type-button); }          /* SemiBold 14 - 248: button label */
+.t-detail          { font: var(--type-detail); }          /* Medium 16   - 218: detail values, dashboard title */
+.t-body-16         { font: var(--type-body-16); }         /* Regular 16  - 64 */
+.t-title-modal     { font: var(--type-title-modal); }     /* Medium 18   - 58: modal title, section heading, breadcrumb current */
+.t-button-sm       { font: var(--type-button-sm); }       /* SemiBold 12 - 42: 24px buttons */
+.t-card-title      { font: var(--type-card-title); }      /* SemiBold 18 - 40: list item titles */
+.t-page-title      { font: var(--type-page-title); }      /* Medium 20   - 38: top-bar page title */
+.t-breadcrumb-link { font: var(--type-breadcrumb-link); text-decoration: underline; } /* Medium 18 underline - 13 */
+.t-heading-entity  { font: var(--type-heading-entity); }  /* Medium 24   - 11 */
+.t-note-italic     { font: var(--type-note-italic); }     /* Medium Italic 10 - 6 */
+.t-range-link      { font: var(--type-range-link); text-decoration: underline; }    /* Medium 14 underline - 6 */
+.t-auth-heading    { font: var(--type-auth-heading); }    /* Regular 18  - 4 */
+.t-micro           { font: var(--type-micro); }           /* Regular 8   - 3 */
+.t-link            { font: var(--type-link); text-decoration: underline; }          /* Regular 12 underline - 2 */
+.t-outlier-13      { font: var(--type-outlier-13); }      /* Regular 13  - 1 (outlier) */
+.t-outlier-20      { font: var(--type-outlier-20); }      /* Regular 20  - 1 (outlier) */
+.t-dev-tag         { font: var(--type-dev-tag); }         /* SemiBold 16 - 1 */
+.t-csv             { font: var(--type-csv); }             /* Inter Regular 12 - stray, csv button only */
+.fw-regular { font-weight: var(--font-weight-regular); } .fw-medium { font-weight: var(--font-weight-medium); } .fw-semibold { font-weight: var(--font-weight-semibold); }
+.t-right { text-align: right; } .t-center { text-align: center; } .t-left { text-align: left; } /* figma: right-aligned numerics 4,416; centred 1,951; left 3,904 */
+/* colour utilities (text) */
+.c-primary { color: var(--color-text-primary); } .c-secondary { color: var(--color-text-secondary); } .c-light { color: var(--color-text-light); }
+.c-purple { color: var(--color-action-primary); } .c-section { color: var(--color-text-section-label); } .c-teal { color: var(--color-action-teal); }
+.c-success { color: var(--color-status-success); } .c-danger { color: var(--color-status-danger); } .c-edit { color: var(--color-action-edit); }
+.c-link { color: var(--color-text-link); } .c-warning-yellow { color: var(--color-status-warning-yellow); } .c-caution { color: var(--color-text-caution); }
+.c-positive { color: var(--color-text-positive); } .c-negative { color: var(--color-text-negative); } .c-black { color: var(--color-black); } .c-error { color: var(--color-text-error); }
 
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-[tabindex]:focus-visible {
-  outline: 2px solid var(--color-brand);
-  outline-offset: 2px;
-  border-radius: var(--radius);
-}
-input:focus-visible { outline: none; }
+/* ---------- 2. ICONS: mask-based (recolourable via `color`), one class per exported monochrome asset ---------- */
+/* assets/MANIFEST.md lists node ids + colours. Usage: <i class="icon icon-search"></i>; colour = `color` (default inherits). Sizes = Figma node size. */
+.icon { display: inline-block; flex: none; width: var(--icon-w, 16px); height: var(--icon-h, 16px); background-color: currentColor; -webkit-mask: var(--icon-src) center / contain no-repeat; mask: var(--icon-src) center / contain no-repeat; vertical-align: middle; }
+.icon-caret-down-filled-11x6 { --icon-src: url(assets/caret-down-filled-11x6.currentColor.svg); --icon-w: 11px; --icon-h: 6px; }
+.icon-check { --icon-src: url(assets/check.currentColor.svg); --icon-w: 16px; --icon-h: 12px; }
+.icon-chevron-down-purple-10x6 { --icon-src: url(assets/chevron-down-purple-10x6.currentColor.svg); --icon-w: 10px; --icon-h: 6px; }
+.icon-chevron-down { --icon-src: url(assets/chevron-down.currentColor.svg); --icon-w: 12px; --icon-h: 7px; }
+.icon-chevron-right-filled { --icon-src: url(assets/chevron-right-filled.currentColor.svg); --icon-w: 8px; --icon-h: 14px; }
+.icon-chevron-right-grey-7x12 { --icon-src: url(assets/chevron-right-grey-7x12.currentColor.svg); --icon-w: 8px; --icon-h: 12px; }
+.icon-chevron-right-stroke { --icon-src: url(assets/chevron-right-stroke.currentColor.svg); --icon-w: 6px; --icon-h: 10px; }
+.icon-clock-16 { --icon-src: url(assets/clock-16.currentColor.svg); --icon-w: 16px; --icon-h: 16px; }
+.icon-close-16 { --icon-src: url(assets/close-16.currentColor.svg); --icon-w: 16px; --icon-h: 16px; }
+.icon-close-18 { --icon-src: url(assets/close-18.currentColor.svg); --icon-w: 18px; --icon-h: 18px; }
+.icon-corner-arrow-24 { --icon-src: url(assets/corner-arrow-24.currentColor.svg); --icon-w: 24px; --icon-h: 24px; }
+.icon-csv { --icon-src: url(assets/csv.currentColor.svg); --icon-w: 24px; --icon-h: 24px; }
+.icon-deleted-trades { --icon-src: url(assets/deleted-trades.currentColor.svg); --icon-w: 24px; --icon-h: 24px; }
+.icon-download-tray { --icon-src: url(assets/download-tray.currentColor.svg); --icon-w: 12px; --icon-h: 12px; }
+.icon-edit-pencil-purple-24x12 { --icon-src: url(assets/edit-pencil-purple-24x12.currentColor.svg); --icon-w: 24px; --icon-h: 12px; }
+.icon-edit-pencil { --icon-src: url(assets/edit-pencil.currentColor.svg); --icon-w: 32px; --icon-h: 32px; }
+.icon-entities { --icon-src: url(assets/entities.currentColor.svg); --icon-w: 24px; --icon-h: 24px; }
+.icon-eye-off { --icon-src: url(assets/eye-off.currentColor.svg); --icon-w: 18px; --icon-h: 18px; }
+.icon-eye { --icon-src: url(assets/eye.currentColor.svg); --icon-w: 18px; --icon-h: 13px; }
+.icon-filter-funnel-8 { --icon-src: url(assets/filter-funnel-8.currentColor.svg); --icon-w: 8px; --icon-h: 8px; }
+.icon-grip-dots-10x15 { --icon-src: url(assets/grip-dots-10x15.currentColor.svg); --icon-w: 10px; --icon-h: 15px; }
+.icon-grip-dots-10x16 { --icon-src: url(assets/grip-dots-10x16.currentColor.svg); --icon-w: 10px; --icon-h: 16px; }
+.icon-logo-fx-mark-50 { --icon-src: url(assets/logo-fx-mark-50.currentColor.svg); --icon-w: 50px; --icon-h: 50px; }
+.icon-logo-fxer-horizontal-black { --icon-src: url(assets/logo-fxer-horizontal-black.currentColor.svg); --icon-w: 272.163px; --icon-h: 73px; }
+.icon-logo-fxer-stacked-black-32x40 { --icon-src: url(assets/logo-fxer-stacked-black-32x40.currentColor.svg); --icon-w: 32px; --icon-h: 40.001px; }
+.icon-logo-fxer-stacked-dark { --icon-src: url(assets/logo-fxer-stacked-dark.currentColor.svg); --icon-w: 457px; --icon-h: 571.762px; }
+.icon-logo-fxer-stacked-purple { --icon-src: url(assets/logo-fxer-stacked-purple.currentColor.svg); --icon-w: 457px; --icon-h: 571.762px; }
+.icon-makor-m { --icon-src: url(assets/makor-m.currentColor.svg); --icon-w: 24px; --icon-h: 20px; }
+.icon-menu-tab-1 { --icon-src: url(assets/menu-tab-1.currentColor.svg); --icon-w: 24px; --icon-h: 24px; }
+.icon-search { --icon-src: url(assets/search.currentColor.svg); --icon-w: 16px; --icon-h: 16px; }
+.icon-settings { --icon-src: url(assets/settings.currentColor.svg); --icon-w: 24px; --icon-h: 24px; }
+.icon-sort-arrows-10x8 { --icon-src: url(assets/sort-arrows-10x8.currentColor.svg); --icon-w: 10px; --icon-h: 8px; }
+.icon-subtract { --icon-src: url(assets/subtract.currentColor.svg); --icon-w: 24px; --icon-h: 24px; }
+.icon-trash-red-32 { --icon-src: url(assets/trash-red-32.currentColor.svg); --icon-w: 32px; --icon-h: 32px; }
+.icon-user { --icon-src: url(assets/user.currentColor.svg); --icon-w: 32px; --icon-h: 32px; }
+.icon-warning { --icon-src: url(assets/warning.currentColor.svg); --icon-w: 14px; --icon-h: 12px; }
+
+/* ---------- 3. ASSETS: multi-colour / fixed-colour exports (no currentColor twin): background-image, never recoloured ---------- */
+.asset { display: inline-block; flex: none; width: var(--asset-w); height: var(--asset-h); background: var(--asset-src) center / contain no-repeat; vertical-align: middle; }
+.asset-action-bolt-circle-grey { --asset-src: url(assets/action-bolt-circle-grey.svg); --asset-w: 32px; --asset-h: 32px; }
+.asset-action-bolt-circle-yellow { --asset-src: url(assets/action-bolt-circle-yellow.svg); --asset-w: 32px; --asset-h: 32px; }
+.asset-action-download-chip { --asset-src: url(assets/action-download-chip.svg); --asset-w: 24px; --asset-h: 24px; }
+.asset-action-filter-circle { --asset-src: url(assets/action-filter-circle.svg); --asset-w: 32px; --asset-h: 32px; }
+.asset-action-refresh-chip { --asset-src: url(assets/action-refresh-chip.svg); --asset-w: 24px; --asset-h: 24px; }
+.asset-action-unlink-circle { --asset-src: url(assets/action-unlink-circle.svg); --asset-w: 32px; --asset-h: 32px; }
+.asset-action-warning-circle { --asset-src: url(assets/action-warning-circle.svg); --asset-w: 32px; --asset-h: 32px; }
+.asset-add-button-orange { --asset-src: url(assets/add-button-orange.svg); --asset-w: 32px; --asset-h: 24px; }
+.asset-arrow-up-circle-green { --asset-src: url(assets/arrow-up-circle-green.svg); --asset-w: 12px; --asset-h: 12px; }
+.asset-check-green-12x9 { --asset-src: url(assets/check-green-12x9.svg); --asset-w: 12px; --asset-h: 9px; }
+.asset-check-green { --asset-src: url(assets/check-green.svg); --asset-w: 16px; --asset-h: 12px; }
+.asset-checkbox-24-checked { --asset-src: url(assets/checkbox-24-checked.svg); --asset-w: 24px; --asset-h: 24px; }
+.asset-checkbox-24-indeterminate { --asset-src: url(assets/checkbox-24-indeterminate.svg); --asset-w: 24px; --asset-h: 24px; }
+.asset-checkbox-24-unchecked { --asset-src: url(assets/checkbox-24-unchecked.svg); --asset-w: 24px; --asset-h: 24px; }
+.asset-checkbox-checked { --asset-src: url(assets/checkbox-checked.svg); --asset-w: 16px; --asset-h: 16px; }
+.asset-checkbox-unchecked { --asset-src: url(assets/checkbox-unchecked.svg); --asset-w: 16px; --asset-h: 16px; }
+.asset-close-red-12 { --asset-src: url(assets/close-red-12.svg); --asset-w: 12px; --asset-h: 12px; }
+.asset-edit-pencil-hover { --asset-src: url(assets/edit-pencil-hover.svg); --asset-w: 32px; --asset-h: 32px; }
+.asset-email-sent-56x48 { --asset-src: url(assets/email-sent-56x48.svg); --asset-w: 56px; --asset-h: 48px; }
+.asset-hourglass-blue { --asset-src: url(assets/hourglass-blue.svg); --asset-w: 12px; --asset-h: 14px; }
+.asset-link-broken-yellow-14 { --asset-src: url(assets/link-broken-yellow-14.svg); --asset-w: 14px; --asset-h: 14px; }
+.asset-link-broken-yellow-14x13 { --asset-src: url(assets/link-broken-yellow-14x13.svg); --asset-w: 14px; --asset-h: 13px; }
+.asset-link-yellow-16x12 { --asset-src: url(assets/link-yellow-16x12.svg); --asset-w: 16px; --asset-h: 12px; }
+.asset-logo-fx-mark-512 { --asset-src: url(assets/logo-fx-mark-512.svg); --asset-w: 512px; --asset-h: 512px; }
+.asset-lucide-upload-download-green-16 { --asset-src: url(assets/lucide-upload-download-green-16.svg); --asset-w: 16px; --asset-h: 16px; }
+.asset-pagination-first-last { --asset-src: url(assets/pagination-first-last.svg); --asset-w: 24px; --asset-h: 12px; }
+.asset-report-file { --asset-src: url(assets/report-file.svg); --asset-w: 24px; --asset-h: 32px; }
+
+/* ---------- 4. FLAGS (5 exported SVGs; nested MasterFlag drawings, Rounded=yes r2 clip) ---------- */
+/* figma: MasterFlag Rounded=yes 584:265 (16x12 r2, clip); Entities uses 20x16. Flag colours are the flag drawings, ignored as tokens. <i class="flag flag-au"></i> */
+.flag { display: inline-block; flex: none; width: 16px; height: 12px; border-radius: var(--radius-2); overflow: hidden; background: var(--flag-src) center / cover no-repeat; vertical-align: middle; }
+.flag-au { --flag-src: url(assets/flags/au-australia.svg); width: 16px; height: 12px; }  /* au-australia.svg */
+.flag-jp { --flag-src: url(assets/flags/jp-japan.svg); width: 16px; height: 12px; }  /* jp-japan.svg */
+.flag-no { --flag-src: url(assets/flags/no-norway.svg); width: 16px; height: 12px; }  /* no-norway.svg */
+.flag-ph { --flag-src: url(assets/flags/ph-philippines.svg); width: 16px; height: 12px; }  /* ph-philippines.svg */
+.flag-us { --flag-src: url(assets/flags/us-united-states.svg); width: 20px; height: 16px; }  /* us-united-states.svg */
 
 
-/* ============================================================
-   BUTTONS
-   ============================================================ */
+/* ---------- 5. Surface contexts (SURFACE-AWARE fills) ---------- */
+/* figma: components.md 4.2. Library field fill is always #39393C but screens re-fill one step lighter than the surface behind:
+   page #000000 / panel #171719 -> #242428 | modal #242428 -> #39393C | inner panel #39393C -> #242428.
+   --input-fill drives .input/.select/.search/...; --checkbox-fill the unchecked checkbox. Nested contexts override. */
+:root { --input-fill: var(--color-input-fill); --checkbox-fill: var(--color-input-checkbox-fill); }
+.surface-page  { background: var(--color-surface-page);  --input-fill: var(--color-input-fill-on-page); }        /* figma: 4:7, top-bar Search 3648:7352 / Dropdown 3631:3888 #242428 */
+.surface-panel { background: var(--color-surface-panel); --input-fill: var(--color-input-fill-on-page); }        /* figma: 14:110, 5536:14887 (Dropdown 78x32 #242428) */
+.surface-modal { background: var(--color-surface-modal); --input-fill: var(--color-input-fill-on-modal); }      /* figma: 276:271, 5539:15235 (#39393C) */
+.surface-inner { background: var(--color-surface-inner-panel); --input-fill: var(--color-input-fill-on-inner-panel); --checkbox-fill: var(--color-input-checkbox-fill-inner); } /* figma: 5539:15219, 5539:15222 (#242428) */
+.surface-popover { background: var(--color-surface-popover); --input-fill: var(--color-input-fill-on-modal); }   /* figma: 6544:14756 filter popover search/dates #39393C */
 
+/* ---------- 6. BUTTONS ---------- */
+/* figma: 4398:15428 Purple (primary), 4398:15337 New/Add, 4398:15344 Cancel, 4398:15474 Outlined purple, 4398:15491 Button transparent, 4398:15498 Button transparent 2,
+   4398:15481 With dropdown, 6113:14388 Outlined red, 6113:14402 Outlined blue, 6113:14409 Outlined yellow, 6765:14816 status, 6804:14833 csv.
+   All text buttons: AL horizontal, gap 10 (8 for outlined/transparent), padding T11 R24 B11 L24, CENTER/CENTER, width HUG, height FIXED 32, label Nunito SemiBold 14 #000000.
+   Button state model drawn in Figma: Default / Hover / Disabled (Outlined red also Active). Hover is a WHITE overlay layer on the fill (0.2 / 0.3 / 0.4) or a tinted solid fill. */
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: var(--h-btn);
-  padding: 0 16px;
-  border: none;
-  border-radius: var(--radius);
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  cursor: pointer;
-  white-space: nowrap;
-  transition:
-    background var(--duration-fast) var(--ease-default),
-    border-color var(--duration-fast) var(--ease-default),
-    opacity    var(--duration-fast) var(--ease-default),
-    transform  var(--duration-instant) var(--ease-default);
-  position: relative;
-  overflow: hidden;
-}
-.btn:active { transform: scale(0.98); }
-
-/* Brand / Lavender fill (Log In, primary) */
-.btn-brand {
-  background: var(--color-brand);
-  color: var(--color-text-on-brand);
-}
-.btn-brand:hover   { background: var(--color-brand-hover); }
-.btn-brand.btn-lg  { height: var(--h-btn-lg); font-size: var(--text-md); width: 100%; }
-.btn-brand:disabled {
-  background: var(--color-disabled-bg);
-  color: var(--color-disabled-text);
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* Teal fill (New Trade, primary teal actions) */
-.btn-teal {
-  background: var(--color-teal);
-  color: var(--color-text-on-teal);
-}
-.btn-teal:hover   { opacity: 0.88; }
-.btn-teal:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* Teal outlined (Give-Up, Add Permissions) */
-.btn-teal-outline {
-  background: transparent;
-  color: var(--color-teal);
-  border: 1.5px solid var(--color-teal);
-}
-.btn-teal-outline:hover { background: var(--color-teal-ghost); }
-.btn-teal-outline:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* White / Cancel */
-.btn-cancel {
-  background: #FFFFFF;
-  color: var(--color-bg);
-  font-weight: var(--font-semibold);
-}
-.btn-cancel:hover { opacity: 0.90; }
-
-/* White outlined (Save Changes) */
-.btn-save {
-  background: transparent;
-  color: #FFFFFF;
-  border: 1.5px solid rgba(255, 255, 255, 0.60);
-}
-.btn-save:hover { border-color: #FFFFFF; background: rgba(255, 255, 255, 0.06); }
-
-/* Dark surface (tertiary) */
-.btn-dark {
-  background: var(--color-surface-raised);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
-}
-.btn-dark:hover { background: var(--color-surface-active); }
-
-/* Danger outlined */
-.btn-danger {
-  background: transparent;
-  color: var(--color-status-danger);
-  border: 1.5px solid var(--color-status-danger);
-}
-.btn-danger:hover { background: var(--color-status-danger-bg); }
-
-/* Small */
-.btn-sm {
-  height: var(--h-btn-sm);
-  padding: 0 10px;
-  font-size: 13px;
-}
-
-/* Amber icon button ("+") */
-.btn-add {
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: none;
-  border-radius: var(--radius);
-  background: var(--color-amber);
-  color: #000000;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: var(--font-bold);
-  line-height: 1;
-  transition: opacity var(--duration-fast);
-  flex-shrink: 0;
-}
-.btn-add:hover { opacity: 0.85; }
-
-/* Icon button (sidebar, toolbar) */
-.btn-icon {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: none;
-  border-radius: var(--radius);
-  background: transparent;
-  color: var(--color-text-secondary);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background var(--duration-fast), color var(--duration-fast);
-}
-.btn-icon:hover {
-  background: var(--color-brand-ghost);
-  color: var(--color-brand);
-}
-.btn-icon svg { width: var(--icon-md); height: var(--icon-md); }
-
-/* Link button (breadcrumbs, Forgot Password handled separately) */
-.btn-link {
-  background: none;
-  border: none;
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  color: var(--color-brand);
-  cursor: pointer;
-  padding: 2px 0;
-  transition: opacity var(--duration-fast);
-}
-.btn-link:hover { opacity: 0.75; }
-
-/* Loading state — spinner overlay on any .btn */
-.btn .btn-label     { }
-.btn .btn-spinner   {
-  width: 16px; height: 16px;
-  border: 2px solid rgba(255,255,255,0.25);
-  border-top-color: currentColor;
-  border-radius: 50%;
-  animation: spin 0.65s linear infinite;
-  display: none;
-  position: absolute;
-}
-.btn.loading .btn-label  { visibility: hidden; }
-.btn.loading .btn-spinner { display: block; }
-
-@keyframes spin { to { transform: rotate(360deg); } }
-
-
-/* ============================================================
-   INPUTS
-   ============================================================ */
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.field-label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  color: var(--color-text-secondary);
-  letter-spacing: 0.03em;
-}
-.field-wrap { position: relative; }
-
-.field-input {
-  width: 100%;
-  height: var(--h-input);
-  padding: 0 var(--space-5);
-  background: var(--color-surface-active);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  color: var(--color-text-primary);
-  outline: none;
-  transition:
-    border-color var(--duration-normal),
-    box-shadow   var(--duration-normal);
-  -webkit-appearance: none;
-}
-.field-input:focus {
-  border-color: var(--color-border-focus);
-  box-shadow: var(--shadow-focus);
-}
-.field-input::placeholder { color: var(--color-text-tertiary); }
-
-.field-input.error {
-  border-color: var(--color-status-danger);
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
-}
-
-.field-error {
-  font-size: var(--text-sm);
-  color: var(--color-status-danger);
-  margin-top: 2px;
-  display: none;
-}
-.field-error.show { display: block; }
-
-/* Password toggle */
-.field-toggle {
-  position: absolute;
-  right: 6px; top: 50%; transform: translateY(-50%);
-  width: 30px; height: 30px;
-  background: none; border: none;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  color: var(--color-text-tertiary);
-  transition: color var(--duration-fast);
-}
-.field-toggle:hover { color: var(--color-text-secondary); }
-.field-toggle svg { width: 16px; height: 16px; }
-
-/* Input with icon prefix */
-.field-input.with-prefix { padding-left: 32px; }
-.field-prefix-icon {
-  position: absolute;
-  left: 9px; top: 50%; transform: translateY(-50%);
-  color: var(--color-text-tertiary);
-  display: flex; align-items: center;
-  pointer-events: none;
-}
-.field-prefix-icon svg { width: 14px; height: 14px; }
-
-/* Mono input (account IDs, currency codes) */
-.field-input.input-mono {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  letter-spacing: var(--tracking-mono);
-}
-
-
-/* ============================================================
-   SELECT / DROPDOWN
-   ============================================================ */
-
-.select-wrap {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-}
-.select-wrap::after {
-  content: '';
-  position: absolute;
-  right: 12px; top: 50%; transform: translateY(-50%);
-  width: 0; height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 5px solid var(--color-text-tertiary);
-  pointer-events: none;
-}
-.select-native {
-  width: 100%;
-  height: var(--h-input);
-  padding: 0 32px 0 var(--space-5);
-  background: var(--color-surface-active);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  color: var(--color-text-primary);
-  outline: none;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  transition: border-color var(--duration-normal);
-}
-.select-native:focus { border-color: var(--color-border-focus); box-shadow: var(--shadow-focus); }
-.select-native option {
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-}
-
-
-/* ============================================================
-   TOGGLE (active/inactive switch)
-   ============================================================ */
-
-.toggle-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3);
-  cursor: pointer;
-  user-select: none;
-}
-
-.toggle-track {
-  width: 36px;
-  height: 20px;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  position: relative;
-  transition: background var(--duration-base), border-color var(--duration-base);
-  flex-shrink: 0;
-}
-.toggle-thumb {
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: var(--color-text-tertiary);
-  position: absolute;
-  top: 2px; left: 2px;
-  transition: transform var(--duration-base), background var(--duration-base);
-}
-.toggle-wrap.active .toggle-track {
-  background: var(--color-teal);
-  border-color: var(--color-teal);
-}
-.toggle-wrap.active .toggle-thumb {
-  background: #000000;
-  transform: translateX(16px);
-}
-.toggle-label {
-  font-size: var(--text-base);
-  color: var(--color-text-secondary);
-}
-.toggle-wrap.active .toggle-label { color: var(--color-text-primary); }
-
-
-/* ============================================================
-   RADIO BUTTON (Client / Market Maker)
-   ============================================================ */
-
-.radio-row {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3);
-  cursor: pointer;
-  user-select: none;
-}
-.radio-circle {
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  border: 1.5px solid var(--color-border);
-  background: transparent;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  transition: border-color var(--duration-fast);
-}
-.radio-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--color-teal);
-  opacity: 0;
-  transition: opacity var(--duration-fast);
-}
-.radio-row.selected .radio-circle {
-  border-color: var(--color-teal);
-}
-.radio-row.selected .radio-dot { opacity: 1; }
-.radio-label {
-  font-size: var(--text-base);
-  color: var(--color-text-secondary);
-}
-.radio-row.selected .radio-label { color: var(--color-text-primary); }
-
-
-/* ============================================================
-   CHECKBOX
-   ============================================================ */
-
-.checkbox-row {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3);
-  cursor: pointer;
-  user-select: none;
-}
-.cb-box {
-  width: 16px; height: 16px;
-  border-radius: 4px;
-  border: 1px solid var(--color-border);
-  background: transparent;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  transition: background var(--duration-fast), border-color var(--duration-fast);
-}
-.checkbox-row.checked .cb-box {
-  background: var(--color-teal);
-  border-color: var(--color-teal);
-}
-.cb-check {
-  width: 10px; height: 10px;
-  opacity: 0;
-  transition: opacity var(--duration-fast);
-}
-.checkbox-row.checked .cb-check { opacity: 1; }
-.cb-label {
-  font-size: var(--text-base);
-  color: var(--color-text-secondary);
-}
-.checkbox-row.checked .cb-label { color: var(--color-text-primary); }
-
-
-/* ============================================================
-   BADGES / PILLS
-   ============================================================ */
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 22px;
-  padding: 0 8px;
-  border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  white-space: nowrap;
-}
-
-/* Group (amber filled) */
-.badge-group {
-  background: var(--color-amber);
-  color: #000000;
-}
-
-/* Review badge variants */
-.badge-review-filled   { background: var(--color-amber); color: #000; }
-.badge-review-teal     { border: 1px solid var(--color-teal); color: var(--color-teal); background: transparent; }
-.badge-review-dark     { background: var(--color-surface-raised); color: var(--color-text-primary); }
-.badge-review-outlined { border: 1px solid var(--color-border); color: var(--color-text-secondary); background: transparent; }
-
-/* Status badges */
-.badge-active   { background: var(--color-status-success-bg); color: var(--color-status-success); }
-.badge-success  { background: var(--color-status-success-bg); color: var(--color-status-success); }
-.badge-danger   { background: var(--color-status-danger-bg);  color: var(--color-status-danger); }
-.badge-pending  { background: var(--color-status-pending-bg); color: var(--color-status-pending); }
-
-/* Account type badge (RBS, Client, Market Maker) */
-.badge-type {
-  background: var(--color-surface-raised);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-}
-
-
-/* ============================================================
-   SECTION LABEL (eyebrow pattern — FX Engine Room style)
-   ============================================================ */
-
-.section-label {
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-label);
-  color: var(--color-brand);  /* lavender — key difference from Enigma X */
-}
-
-
-/* ============================================================
-   BREADCRUMB
-   ============================================================ */
-
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: var(--text-sm);
-}
-.breadcrumb-link {
-  color: var(--color-brand);
-  font-weight: var(--font-medium);
-  cursor: pointer;
-  transition: opacity var(--duration-fast);
-}
-.breadcrumb-link:hover { opacity: 0.75; }
-.breadcrumb-sep {
-  color: var(--color-text-tertiary);
-  user-select: none;
-}
-.breadcrumb-current {
-  color: var(--color-text-primary);
-  font-weight: var(--font-medium);
-}
-
-
-/* ============================================================
-   LIST PANEL (Master / Entity List)
-   ============================================================ */
-
-.list-panel {
-  width: var(--w-list-panel);
-  flex-shrink: 0;
-  background: var(--color-surface);
-  border-right: 1px solid var(--color-divider);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.list-group-header {
-  padding: 8px 14px;
-  background: var(--color-surface);
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  color: var(--color-text-primary);
-  border-bottom: 1px solid var(--color-divider);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.list-section-label {
-  padding: 10px 14px 4px;
-}
-
-.list-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 8px 14px;
-  height: var(--h-list-item);
-  background: var(--color-surface-raised);
-  border-bottom: 1px solid var(--color-divider);
-  cursor: pointer;
-  transition: background var(--duration-fast);
-}
-.list-item:hover {
-  background: var(--color-surface-active);
-}
-.list-item.active {
-  background: var(--color-surface-active);
-}
-.list-item-name {
-  font-size: var(--text-base);
-  font-weight: var(--font-normal);
-  color: var(--color-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.list-item.active .list-item-name {
-  color: var(--color-brand);
-  font-weight: var(--font-medium);
-}
-.list-item-sub {
-  font-size: 12px;
-  color: var(--color-text-tertiary);
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-
-/* ============================================================
-   DETAIL PANEL
-   ============================================================ */
-
-.detail-panel {
-  flex: 1;
-  background: var(--color-surface);
-  overflow-y: auto;
-  padding: var(--space-7);
-}
-
-.detail-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-9);
-}
-
-.detail-title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  color: var(--color-text-primary);
-}
-
-.detail-section {
-  margin-bottom: var(--space-10);
-}
-
-.detail-section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-5);
-}
-
-/* Label-value pair */
-.field-pair {
-  display: grid;
-  grid-template-columns: 160px 1fr;
-  align-items: center;
-  gap: var(--space-5);
-  padding: var(--space-3) 0;
-  border-bottom: 1px solid var(--color-divider);
-}
-.field-pair:last-child { border-bottom: none; }
-.field-pair-label {
-  font-size: 13px;
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-}
-.field-pair-value {
-  font-size: var(--text-base);
-  color: var(--color-text-primary);
-}
-
-
-/* ============================================================
-   SIDEBAR (Icon Navigation)
-   ============================================================ */
-
-.app-sidebar {
-  width: var(--w-sidebar);
-  background: var(--color-sidebar-bg);
-  border-right: 1px solid var(--color-divider);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: var(--space-5) 0;
-  gap: var(--space-1);
-  flex-shrink: 0;
-  z-index: var(--z-sidebar);
-}
-
-.sidebar-icon {
-  width: 36px; height: 36px;
-  border-radius: var(--radius);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--color-text-tertiary);
-  cursor: pointer;
-  transition: background var(--duration-fast), color var(--duration-fast);
-}
-.sidebar-icon:hover {
-  background: var(--color-brand-ghost);
-  color: var(--color-brand);
-}
-.sidebar-icon.active {
-  background: var(--color-brand-dim);
-  color: var(--color-brand);
-}
-.sidebar-icon svg { width: var(--icon-lg); height: var(--icon-lg); }
-
-.sidebar-spacer { flex: 1; }
-
-
-/* ============================================================
-   FOOTER BAR
-   ============================================================ */
-
-.app-footer {
-  height: var(--h-footer);
-  background: var(--color-sidebar-bg);
-  border-top: 1px solid var(--color-divider);
-  display: flex;
-  align-items: center;
-  gap: var(--space-5);
-  padding: 0 var(--space-7);
-  flex-shrink: 0;
-  z-index: var(--z-footer);
-}
-.footer-logo {
-  font-size: 14px;
-  font-weight: var(--font-bold);
-  color: var(--color-text-primary);
-  background: var(--color-brand);
-  width: 22px; height: 22px;
-  border-radius: 4px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.footer-text {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-}
-.footer-spacer { flex: 1; }
-.footer-live {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-}
-.footer-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--color-status-success);
-  flex-shrink: 0;
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
-}
-
-
-/* ============================================================
-   PRODUCT PERMISSIONS GRID
-   ============================================================ */
-
-.permissions-grid {
-  width: 100%;
-  border-collapse: collapse;
-}
-.permissions-grid th {
-  padding: 6px 10px;
-  text-align: left;
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  color: var(--color-text-tertiary);
-  border-bottom: 1px solid var(--color-border);
-  white-space: nowrap;
-}
-.permissions-grid td {
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--color-divider);
-  vertical-align: middle;
-}
-.permissions-grid tbody tr:hover { background: var(--color-surface-raised); }
-.permissions-grid tbody tr:last-child td { border-bottom: none; }
-
-.perm-product {
-  color: var(--color-brand);
-  font-weight: var(--font-medium);
-  font-size: var(--text-base);
-}
-.perm-code {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--color-text-secondary);
-  letter-spacing: var(--tracking-mono);
-}
-
-
-/* ============================================================
-   TAG INPUT (chips with × remove)
-   ============================================================ */
-
-.tag-input-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  min-height: var(--h-input);
-  padding: 4px var(--space-5);
-  background: var(--color-surface-active);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  align-items: center;
-  transition: border-color var(--duration-normal), box-shadow var(--duration-normal);
-}
-.tag-input-wrap:focus-within {
-  border-color: var(--color-border-focus);
-  box-shadow: var(--shadow-focus);
-}
-
-.tag-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  height: 22px;
-  padding: 0 6px;
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  font-size: 12px;
-  color: var(--color-text-primary);
-  white-space: nowrap;
-}
-.tag-chip-remove {
-  width: 14px; height: 14px;
-  border: none;
-  background: none;
-  color: var(--color-text-tertiary);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 2px;
-  padding: 0;
-  font-size: 12px;
-  line-height: 1;
-  transition: color var(--duration-fast), background var(--duration-fast);
-}
-.tag-chip-remove:hover { color: var(--color-status-danger); background: var(--color-status-danger-bg); }
-
-.tag-input {
-  border: none;
-  background: transparent;
-  color: var(--color-text-primary);
-  font-family: var(--font-primary);
-  font-size: var(--text-base);
-  outline: none;
-  min-width: 80px;
-  flex: 1;
-  height: 22px;
-}
-.tag-input::placeholder { color: var(--color-text-tertiary); }
-
-
-/* ============================================================
-   CARD / PANEL
-   ============================================================ */
-
-.card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
-}
-.card-header {
-  padding: var(--space-5) var(--space-7);
-  border-bottom: 1px solid var(--color-divider);
-  display: flex;
-  align-items: center;
-  gap: var(--space-5);
-}
-.card-title {
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  color: var(--color-text-primary);
-  flex: 1;
-}
-.card-body { padding: var(--space-7); }
-
-
-/* ============================================================
-   TOAST
-   ============================================================ */
-
-.toast {
-  position: fixed;
-  bottom: 48px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  opacity: 0;
-  background: var(--color-surface-raised);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 12px 18px;
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: var(--z-toast);
-  box-shadow: var(--shadow-card-lg);
-  transition:
-    transform var(--duration-slide) var(--ease-screen),
-    opacity   var(--duration-enter) var(--ease-default);
-}
-.toast.show {
-  transform: translateX(-50%) translateY(0);
-  opacity: 1;
-}
-.toast.success { border-color: var(--color-status-success); color: var(--color-status-success); }
-.toast.danger  { border-color: var(--color-status-danger);  color: var(--color-status-danger); }
-
-
-/* ============================================================
-   DIVIDER
-   ============================================================ */
-
-.divider {
-  height: 1px;
-  background: var(--color-divider);
-  margin: var(--space-9) 0;
-}
-
-.divider-labeled {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: var(--space-9) 0;
-}
-.divider-labeled .divider-line {
-  flex: 1;
-  height: 1px;
-  background: var(--color-divider);
-}
-.divider-labeled .divider-text {
-  font-size: var(--text-sm);
-  color: var(--color-text-tertiary);
-}
-
-
-/* ============================================================
-   LOGIN CARD
-   ============================================================ */
-
-.login-page {
-  min-height: 100vh;
-  background: var(--color-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.login-card {
-  width: 360px;
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  padding: 40px 36px;
-  box-shadow: var(--shadow-dialog);
-}
-
-.login-brand {
-  text-align: center;
-  margin-bottom: 32px;
-}
-.login-brand-fx {
-  display: block;
-  font-size: 36px;
-  font-weight: var(--font-bold);
-  color: var(--color-brand);
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-.login-brand-sub {
-  display: block;
-  font-size: var(--text-lg);
-  font-weight: var(--font-medium);
-  color: var(--color-brand);
-  letter-spacing: 0.04em;
-  margin-top: 4px;
-}
-
-.login-form { display: flex; flex-direction: column; gap: 14px; }
-
-.login-forgot {
-  background: none;
-  border: none;
-  font-family: var(--font-primary);
-  font-size: var(--text-sm);
-  color: var(--color-status-danger);
-  cursor: pointer;
-  text-align: right;
-  padding: 0;
-  margin-top: -8px;
-  transition: opacity var(--duration-fast);
-}
-.login-forgot:hover { opacity: 0.75; }
+  --btn-fill: var(--color-action-primary);
+  --btn-text: var(--color-action-primary-text);
+  --btn-stroke: transparent;
+  --btn-fill-hover: var(--btn-fill);
+  --btn-hover-overlay: var(--color-action-hover-overlay-30);
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  gap: var(--space-10); height: var(--h-button); padding: var(--space-11) var(--space-24);
+  border: 0; border-radius: var(--radius-4);
+  background-color: var(--btn-fill); background-image: none;
+  box-shadow: inset 0 0 0 1px var(--btn-stroke);
+  color: var(--btn-text); font: var(--type-button); text-decoration: none; white-space: nowrap; cursor: pointer;
+}
+.btn:hover, .btn.is-hover {
+  background-color: var(--btn-fill-hover);
+  background-image: linear-gradient(var(--btn-hover-overlay), var(--btn-hover-overlay));
+}
+/* EXTENDED - not in Figma: pressed (only Outlined red has "active"). Derivation: the hover state + a black@0.2 shade layer (the csv hover overlay value). */
+.btn:active, .btn.is-active {
+  background-color: var(--btn-fill-hover);
+  background-image: linear-gradient(var(--color-action-shade-overlay-20), var(--color-action-shade-overlay-20)), linear-gradient(var(--btn-hover-overlay), var(--btn-hover-overlay));
+}
+/* EXTENDED - not in Figma: keyboard focus ring (no focus state drawn anywhere). Derivation: brand border colour #A4A4FF, 1px, 2px offset. */
+.btn:focus-visible, .btn.is-focus { outline: 1px solid var(--color-border-focus); outline-offset: 2px; }
+/* figma: every set - disabled = solid #707079 fill + #BABEC7 label, no stroke (outlined: stroke #707079, no fill) */
+.btn:disabled, .btn:disabled:hover, .btn:disabled:active, .btn.is-disabled, .btn.is-disabled:hover, .btn.is-disabled:active {
+  --btn-fill: var(--color-action-disabled-fill); --btn-fill-hover: var(--color-action-disabled-fill); --btn-text: var(--color-action-disabled-text);
+  --btn-stroke: transparent; --btn-hover-overlay: transparent;
+  background-color: var(--color-action-disabled-fill); background-image: none; cursor: not-allowed; outline: 0;
+}
+
+/* 6.1 Primary purple. figma: 4398:15428 set "Purple" (Default 4398:15429, hover 4398:15432 = #A4A4FF + #FFFFFF@0.3, disabled 4398:15435). 92x32 "Button", r4, no stroke.
+   This is the dominant primary action in screens ("Save Changes" 139x32, "Log In" 216x32: New/Add instance with fill override #A4A4FF, label stays #000000). */
+.btn-primary { --btn-fill: var(--color-action-primary); --btn-hover-overlay: var(--color-action-hover-overlay-30); }
+
+/* 6.2 Teal New/Add. figma: 4398:15337 (page original 28:23; Default 4398:15338 #30F0D6, Hover 4398:15340 = + #FFFFFF@0.4, Disabled 4398:15342). Library default teal; screens override the fill (see .btn-primary). */
+.btn-teal, .btn-add { --btn-fill: var(--color-action-teal); --btn-hover-overlay: var(--color-action-hover-overlay-40); }
+
+/* 6.3 Cancel (white/grey). figma: 4398:15344 (page original 29:110). Default 4398:15345 #E6E6E6, "Disabled #1" 4398:15347 = #E6E6E6 + #FFFFFF@0.3 (this is really HOVER - mis-named in Figma),
+   "Disabled #2" 4398:15349 = #707079 / #BABEC7 (the real disabled). Both variants are named "Property 1=Disabled" in Figma (naming bug, documented, not reproduced). */
+.btn-cancel { --btn-fill: var(--color-action-cancel); --btn-hover-overlay: var(--color-action-hover-overlay-30); }
+
+/* 6.4 Orange (Resend Link) and filled red (Delete). figma: "Resend Link" 126x32 = Primary instance fill override #FF9747 (5.x auth 2259:1398), "Amend" 80x24 #FF9747 / "Delete" 77x24 #FF7272 (6038:14417 row), label #000000.
+   Hover not drawn: EXTENDED - not in Figma: same white@0.3 overlay as the other filled buttons. */
+.btn-orange, .btn-edit-fill { --btn-fill: var(--color-action-edit); --btn-hover-overlay: var(--color-action-hover-overlay-30); }
+.btn-delete { --btn-fill: var(--color-action-delete); --btn-hover-overlay: var(--color-action-hover-overlay-30); }
+
+/* 6.5 Outlined purple. figma: 4398:15474 (Default 4398:15475 stroke 1 INSIDE #A4A4FF; hover 4398:15477 fill #39394E; disabled 4398:15479 stroke #707079, label #BABEC7). r3, gap 8, padding 11/24. */
+.btn-outline-purple { --btn-fill: transparent; --btn-text: var(--color-action-primary); --btn-stroke: var(--color-border-active); --btn-fill-hover: var(--color-action-transparent-fill); --btn-hover-overlay: transparent; gap: var(--space-8); border-radius: var(--radius-3); }
+
+/* 6.6 Button transparent (tinted purple). figma: 4398:15491 (Default 4398:15492 fill #39394E, no stroke; Hover 4398:15494 = #39394E + #FFFFFF@0.2 + stroke 1 INSIDE #A4A4FF; disabled 4398:15496 solid #707079). r3, gap 8. */
+.btn-transparent { --btn-fill: var(--color-action-transparent-fill); --btn-text: var(--color-action-primary); --btn-hover-overlay: var(--color-action-hover-overlay-20); gap: var(--space-8); border-radius: var(--radius-3); }
+.btn-transparent:hover, .btn-transparent.is-hover { --btn-stroke: var(--color-border-active); }
+
+/* 6.7 Outlined teal. figma: screens use stroke+text #30F0D6 {Add New} r3 ("Add Currency" 136x32, "Add Permission" 156x32, instance of 4398:15498 with overrides).
+   Library 4398:15498 "Button transparent 2" is RAW #00FEA9 (Default 4398:15499, hover fill #1B5244 4398:15501, disabled 4398:15503): kept as modifier .btn-outline-teal--library.
+   Hover for the #30F0D6 version is not drawn: EXTENDED - not in Figma: hover fill = existing variable "Green dark" #264342 (pattern of red dark / blue dark / yellow dark). */
+.btn-outline-teal { --btn-fill: transparent; --btn-text: var(--color-action-teal); --btn-stroke: var(--color-action-teal); --btn-fill-hover: var(--color-action-outlined-teal-hover); --btn-hover-overlay: transparent; gap: var(--space-8); border-radius: var(--radius-3); }
+.btn-outline-teal--library { --btn-text: var(--color-action-outlined-teal-library); --btn-stroke: var(--color-action-outlined-teal-library); --btn-fill-hover: var(--color-action-outlined-teal-library-hover); } /* figma: 4398:15499/15501, raw #00FEA9 / #1B5244 */
+
+/* 6.8 Split button "With dropdown" (teal + chevron). figma: 4398:15481 (Default 4398:15482 132x32 #30F0D6 r3 gap 8; hover 4398:15485 = + #FFFFFF@0.4 but r4 / gap 10 (Figma inconsistency, kept as .is-hover--alt-geometry);
+   disabled 4398:15488 #707079 / #BABEC7, chevron #BABEC7). Padding 11/20/11/24 (right 20 for the chevron). Chevron = assets/chevron-down (12x7, stroke #000 1.3). */
+.btn-with-dropdown { --btn-fill: var(--color-action-teal); --btn-hover-overlay: var(--color-action-hover-overlay-40); gap: var(--space-8); padding: var(--space-11) var(--space-20) var(--space-11) var(--space-24); border-radius: var(--radius-3); }
+.btn-with-dropdown.is-hover--alt-geometry { border-radius: var(--radius-4); gap: var(--space-10); } /* figma: hover variant 4398:15485 drawn r4 / gap 10 (alt, not dominant) */
+
+/* 6.9 24px chip-buttons (.btn-sm family). figma: Outlined red 6113:14388 (100x24 r2 gap 4 pad 11/16), Outlined blue 6113:14402 (86x24), Outlined yellow 6113:14409 (74x24), status 6765:14816 (96x24 r3),
+   New/Add 80x24, Allocate 86x24, Amend 80x24, Delete 77x24 (padding 11/20, label SemiBold 12). Radius 2 (status / Outlined purple "Clear Filters" 99x24 / transparent: r3 as in the 32px versions). */
+.btn-sm { height: var(--h-button-sm); padding: var(--space-11) var(--space-20); border-radius: var(--radius-2); font: var(--type-button-sm); }
+.btn-sm.btn-outline-purple { border-radius: var(--radius-3); padding: var(--space-11) var(--space-16); } /* figma: Outlined purple 24px "Clear Filters"/"All Cash" 99x24 = padding 11/16/11/16 (7022:14510; foundations.md tuple #25) - stage-3 BUG FIX: .btn-sm padding 20 made it 107 wide */
+.btn-sm.btn-with-dropdown { padding: var(--space-11) var(--space-16) var(--space-11) var(--space-20); } /* figma: With dropdown 112x24 pad 11/16/11/20 (4255:16182) */
+
+/* Outlined red "Review (12)" - figma: 6113:14388: Default 6113:14386 stroke+text #FD7557 / hover 6113:14389 fill #392C2D {red dark} / active 6136:14340 fill #5A3834 (raw) / disabled 6403:14741 stroke #707079, text #BABEC7. gap 4, padding 11/16 */
+.btn-outline-red { --btn-fill: transparent; --btn-text: var(--color-action-red); --btn-stroke: var(--color-action-red); --btn-fill-hover: var(--color-action-red-hover); --btn-hover-overlay: transparent;
+  height: var(--h-button-sm); padding: var(--space-11) var(--space-16); gap: var(--space-4); border-radius: var(--radius-2); font: var(--type-button-sm); }
+.btn-outline-red:active, .btn-outline-red.is-active { background-color: var(--color-action-red-active); background-image: none; } /* figma-drawn "active" variant 6136:14340 (fill #5A3834) */
+/* Outlined blue "Give-Up" - figma: 6113:14402: wrapper 86x24, stroke #60A8FF r2 gap 8 pad 11/20; hover 6113:14403 = wrapper fill #2A313D {blue dark}. */
+.btn-outline-blue { --btn-fill: transparent; --btn-text: var(--color-action-blue); --btn-stroke: var(--color-action-blue); --btn-fill-hover: var(--color-action-blue-hover); --btn-hover-overlay: transparent;
+  height: var(--h-button-sm); padding: var(--space-11) var(--space-20); gap: var(--space-8); border-radius: var(--radius-2); font: var(--type-button-sm); }
+/* Outlined yellow "Group" - figma: 6113:14409: wrapper 74x24, stroke #FEE274 r2 pad 11/20; Variant2 (hover) 6113:14410 = #3A3730 {yellow dark}. */
+.btn-outline-yellow { --btn-fill: transparent; --btn-text: var(--color-action-yellow); --btn-stroke: var(--color-action-yellow); --btn-fill-hover: var(--color-action-yellow-hover); --btn-hover-overlay: transparent;
+  height: var(--h-button-sm); padding: var(--space-11) var(--space-20); gap: var(--space-8); border-radius: var(--radius-2); font: var(--type-button-sm); }
+/* status dropdown chip-button - figma: 6765:14816: 96x24 fill #39394E r3 pad 11/20/11/24 gap 8, label SemiBold 12 #A4A4FF + chevron 10x6 (stroke #A4A4FF 1.3);
+   hover 6765:14820 = + #FFFFFF@0.2; disabled 6765:14823 = no fill, stroke 1 INSIDE #707079, label STAYS #A4A4FF (not greyed), chevron #BABEC7 (Figma inconsistency, reproduced). */
+.btn-status { --btn-fill: var(--color-action-transparent-fill); --btn-text: var(--color-action-primary); --btn-hover-overlay: var(--color-action-hover-overlay-20);
+  height: var(--h-button-sm); padding: var(--space-11) var(--space-20) var(--space-11) var(--space-24); gap: var(--space-8); border-radius: var(--radius-3); font: var(--type-button-sm); }
+/* disabled outlined variants: no fill, stroke #707079, label #BABEC7 (declared after the generic disabled rule) */
+.btn-outline-purple:disabled, .btn-outline-purple.is-disabled, .btn-outline-purple:disabled:hover, .btn-outline-purple.is-disabled:hover,
+.btn-outline-teal:disabled, .btn-outline-teal.is-disabled, .btn-outline-teal:disabled:hover, .btn-outline-teal.is-disabled:hover,
+.btn-outline-red:disabled, .btn-outline-red.is-disabled, .btn-outline-red:disabled:hover, .btn-outline-red.is-disabled:hover,
+.btn-outline-blue:disabled, .btn-outline-blue.is-disabled, .btn-outline-blue:disabled:hover, .btn-outline-blue.is-disabled:hover,
+.btn-outline-yellow:disabled, .btn-outline-yellow.is-disabled, .btn-outline-yellow:disabled:hover, .btn-outline-yellow.is-disabled:hover {
+  --btn-fill: transparent; --btn-fill-hover: transparent; --btn-stroke: var(--color-border-disabled); background-color: transparent;
+}
+.btn-status:disabled, .btn-status.is-disabled, .btn-status:disabled:hover, .btn-status.is-disabled:hover { --btn-fill: transparent; --btn-fill-hover: transparent; --btn-stroke: var(--color-border-disabled); --btn-text: var(--color-action-primary); background-color: transparent; }
+.btn-status:disabled .icon, .btn-status.is-disabled .icon { color: var(--color-action-disabled-text); }
+
+/* 6.10 Inline Cancel 48x20 "RBS". figma: 3661:4811 - 48x20, r2, padding 11/12/11/12, gap 10, SemiBold 12 #000000 {BG}, fill #E6E6E6 */
+.btn-xs { height: var(--h-button-xs); padding: 0 var(--space-12); border-radius: var(--radius-2); font: var(--type-button-sm); } /* Figma lists padding 11/12/11/12 on a FIXED 20px frame (vertical padding exceeds the height; text is clipped/centred): only the horizontal 12 is reproduced */
+
+/* 6.11 csv. figma: 6804:14833 - Default 6804:14832 61x24 fill #264A35 (raw) r2 gap 4 padding 7/8/7/8, icon lucide/upload 16x16 + "CSV" INTER Regular 12 #2BDF68 {Active};
+   hover 6804:14834 = #264A35 + #000000@0.2, HUG height 30 (Figma inconsistency: not reproduced, height stays 24; alt documented in --alt-hover-height). */
+.btn-csv { --btn-fill: var(--color-action-csv-fill); --btn-text: var(--color-status-success); --btn-hover-overlay: var(--color-action-shade-overlay-20); --alt-hover-height: 30px;
+  height: var(--h-button-sm); padding: var(--space-7, 7px) var(--space-8); gap: var(--space-4); border-radius: var(--radius-2); font: var(--type-csv); }
+
+/* 6.12 Icon-only buttons */
+/* Edit pencil - figma: set 4398:15364 (Default 4398:15365, Hover 4398:15367): 32x32, no fill, glyph #FF9747 {Edit} (20x20 at 6,6), hover glyph #FFBF8E (raw). */
+.btn-icon { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 32px; height: var(--h-icon-button); padding: 0; border: 0; border-radius: var(--radius-4); background: none; cursor: pointer; }
+.btn-edit { color: var(--color-action-edit); }
+.btn-edit:hover, .btn-edit.is-hover { color: var(--color-action-edit-hover); }
+/* Trash - figma: set 4398:15423 (Default 4398:15424, Hover 4398:15426): 32x32, glyph 18x18 at 7,7 #FF7272 {delete}; hover = + white@0.3 layer on the glyph. */
+.btn-trash { color: var(--color-action-delete); }
+.btn-trash:hover .icon, .btn-trash.is-hover .icon { background-image: linear-gradient(var(--color-action-hover-overlay-30), var(--color-action-hover-overlay-30)); }
+/* EXTENDED - not in Figma: focus ring for icon buttons (purple, 2px offset) */
+.btn-icon:focus-visible, .btn-icon.is-focus { outline: 1px solid var(--color-border-focus); outline-offset: 2px; }
+/* Amber "+" add button - figma: frames "Add " 5539:15220 / 5536:14901 / 5536:14987 / 2514:2892: 32x24 fill #FF9747 r4, plus 12x12 black at (10,6) (single exported asset add-button-orange.svg).
+   Hover not drawn: EXTENDED - not in Figma: white@0.3 layer (same as filled buttons). */
+.btn-add-icon { display: inline-block; flex: none; width: 32px; height: 24px; padding: 0; border: 0; border-radius: var(--radius-4); background: url(assets/add-button-orange.svg) center / 32px 24px no-repeat; cursor: pointer; }
+.btn-add-icon:hover, .btn-add-icon.is-hover { background-image: linear-gradient(var(--color-action-hover-overlay-30), var(--color-action-hover-overlay-30)), url(assets/add-button-orange.svg); }
+/* Square / round toolbar icon buttons - figma: Frame 25/26 3107:7140 / 5465:14281 / 4243:...:4255:16177: 32x32 fill #39393C {Separators} r4 (24px variants r4; blotter 32 round r16), inner 16x16 glyph #FF9747 / #A4A4FF / #FFDC51.
+   Hover not drawn: EXTENDED - not in Figma: white@0.2 layer (status recipe). */
+.btn-icon-chip { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--radius-4); background: var(--color-surface-circle-button); color: var(--color-action-edit); cursor: pointer; }
+.btn-icon-chip--round { border-radius: var(--radius-16); }
+.btn-icon-chip--24 { width: 24px; height: 24px; }
+.btn-icon-chip:hover, .btn-icon-chip.is-hover { background-image: linear-gradient(var(--color-action-hover-overlay-20), var(--color-action-hover-overlay-20)); }
+.btn-icon-chip:focus-visible, .btn-icon-chip.is-focus { outline: 1px solid var(--color-border-focus); outline-offset: 2px; }
+
+/* 6.13 Tabs (button-like). figma: set 4398:15351 (Active 4398:15352, Hover 4398:15354, "Not  Active" 4398:15356): AL H gap 8, padding 16/32/16/32, 102x42 (HUG/FIXED), Nunito Medium 14.
+   Active: no fill, bottom-only 2px INSIDE #A4A4FF, label #FFFFFF. Hover: fill #171719 {"Grey 2"} + same underline, label #FFFFFF. Not active: no fill/stroke, label #BABEC7 (ON_HOVER -> Hover variant, no transition).
+   Screens override: height 32, padding 12/24 (77 instances; .tab--32). One Activity set uses text 12 (6059:14340; .tab--12). */
+.tab { display: inline-flex; align-items: center; justify-content: flex-start; flex: none; gap: var(--space-8); height: var(--h-tab-admin); padding: var(--space-16) var(--space-32); border: 0; border-radius: 0; background: transparent; color: var(--color-text-light); font: var(--type-cell); white-space: nowrap; cursor: pointer; }
+.tab:hover, .tab.is-hover { background: var(--color-surface-tab-hover); color: var(--color-text-primary); box-shadow: inset 0 calc(-1 * var(--border-tab-underline)) 0 0 var(--color-border-active); }
+.tab.is-active, .tab[aria-selected="true"] { background: transparent; color: var(--color-text-primary); box-shadow: inset 0 calc(-1 * var(--border-tab-underline)) 0 0 var(--color-border-active); }
+.tab.is-active:hover, .tab[aria-selected="true"]:hover { background: var(--color-surface-tab-hover); }
+.tab--32 { height: var(--h-tab-widget); padding: var(--space-12) var(--space-24); }
+.tab--12 { font: var(--type-table-cell); }
+/* EXTENDED - not in Figma: keyboard focus ring on tabs (inset so the underline stays readable) */
+.tab:focus-visible, .tab.is-focus { outline: 1px solid var(--color-border-focus); outline-offset: -3px; }
+
+/* ---------- 7. FIELDS: Input / Search / Dropdown / Dates / Time / Password / Chips / Textarea ---------- */
+/* figma: 4398:15330 Input, 4398:15301 Search, 4398:15322 Dropdown, 4398:15316 Dates, 4398:15438 Time, 4398:15443 Password, 4398:15332 Input Error, 4398:15387 Chips (+ -with-label siblings).
+   Field = 32px tall frame, fill = "Inputs on modal" #39393C (library; SURFACE-AWARE in screens, see --input-fill), radius 4, no stroke, AL H gap 8, padding T8 R12 B8 L8; width FIXED per layout (library default 158).
+   Text Regular 14 #FFFFFF; placeholder #707079. Glyphs (search/clock/calendar/eye/caret) #A4A4FF. */
+.input, .search, .select, .input-date, .input-time, .input-password, .input-email {
+  --input-icon: var(--color-input-icon);
+  display: flex; align-items: center; justify-content: flex-start; flex: none; gap: var(--space-8);
+  width: var(--input-w, 158px); height: var(--h-input); padding: var(--space-8) var(--space-12) var(--space-8) var(--space-8);
+  border: 0; border-radius: var(--radius-4); background: var(--input-fill); box-shadow: none;
+  color: var(--color-input-text); font: var(--type-input); text-align: left; text-decoration: none; outline: 0;
+}
+.input .icon, .search .icon, .select .icon, .input-date .icon, .input-time .icon, .input-password .icon, .input-email .icon { color: var(--input-icon); }
+input.input::placeholder, .input__control::placeholder, input.search::placeholder { color: var(--color-input-placeholder); opacity: 1; }
+.placeholder, .is-placeholder { color: var(--color-input-placeholder); }
+.input__control { flex: 1 1 auto; min-width: 0; height: 100%; padding: 0; border: 0; outline: 0; background: transparent; color: inherit; font: inherit; }
+/* Search: padding 8 all, magnifier 16x16 stroke #A4A4FF - figma: 4398:15301 (HUG height; 158x32), 4398:15305 with label */
+.search { padding: var(--space-8); }
+/* Dropdown / Dates / Time / Password: SPACE_BETWEEN - figma: 4398:15322 (caret polygon, solid downward triangle #A4A4FF {Purple 1}), 4398:15316, 4398:15438 */
+.select, .input-date, .input-time, .input-password { justify-content: space-between; }
+.input-time { --input-w: 89px; }                                  /* figma: Time 89x44 (field 89x32), "10:25" + clock 16x16 */
+.input-password { --input-w: 216px; padding-left: var(--space-12); } /* figma: Password 216x44 each (4398:15444/15458); content starts x12; eye 18x12.43 at right 12 */
+.select__value { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* email-entry input - figma: 5536:14921, 5536:14985, 5580:14586, 3661:4970: 278-282x32, padding 8/4/8/8 (right 4 houses the 32x24 amber "+" flush right), SPACE_BETWEEN */
+.input-email { --input-w: 282px; justify-content: space-between; padding: var(--space-8) var(--space-4) var(--space-8) var(--space-8); }
+/* Password dots - figma: 10 ellipses 6x6 #BABEC7 {Light grey text}, pitch 12, group 114x6 (4398:15444). Static drawing of the hidden state; a real <input type=password> shows the browser bullets. */
+.password-dots { display: inline-block; flex: none; width: 114px; height: 6px; background: radial-gradient(circle at 3px 3px, var(--color-text-light) 0 3px, transparent 3.5px) 0 0 / 12px 6px repeat-x; }
+/* native <select class="select"> mapping - EXTENDED - not in Figma (Figma has no select popover): purple caret asset, same box */
+select.select { -webkit-appearance: none; appearance: none; padding-right: var(--space-12); background: var(--input-fill) url(assets/caret-down-filled-11x6.svg) right var(--space-12) center / 11px 6px no-repeat; }
+select.select option { background: var(--color-surface-dropdown-list); color: var(--color-text-primary); }
+/* Field stack: label (Regular 12 #707079) at y0, control at y12 (44 total) - figma: 4398:15305/15310/15325. Label box = cap height 8 (leading-trim); gap 4. Width FIXED per layout (158 default). */
+.field { --input-w: 100%; display: flex; flex-direction: column; gap: var(--space-4); width: var(--field-w, 158px); flex: none; }
+.field > * { --input-w: 100%; }                      /* controls inside a .field fill the field width (Figma: widths FIXED per layout; Time 89, Password 216 via --field-w) */
+.field--time { --field-w: 89px; } .field--password { --field-w: 216px; } .field--chips { --field-w: 186px; } /* figma: Time 89x44, Password 216x44, Chips 186x44 */
+.field__label { display: block; height: 8px; font: var(--type-label); line-height: 8px; color: var(--color-input-placeholder); white-space: nowrap; }
+.field__error { display: block; height: 8px; font: var(--type-label); line-height: 8px; color: var(--color-input-error-text); } /* figma: 4398:15332 "Error message" Regular 12 #FF7272 {Red} at y48 (4px under the field) -> 158x56 */
+/* Error: field stroke 1 INSIDE #FF7272 {delete}, fill unchanged - figma: 4398:15332; login "Incorrect Password" 2211:1835 */
+.input.is-error, .select.is-error, .search.is-error, .input-date.is-error, .input-time.is-error, .input-password.is-error, .field--error .input, .field--error .select, .field--error .input-password, .field--error .input-date, .field--error .input-time, .field--error .search { box-shadow: inset 0 0 0 1px var(--color-input-stroke-error); }
+/* Filled / locked field - figma: Vanilla MM / Swap MM locked fields and the "active/default-today" Dates: fill REMOVED + 1px INSIDE #707079, text #FFFFFF, caret/calendar #707079 (3994:..., components.md 4.2 / trading.md 4.2) */
+.input.is-locked, .select.is-locked, .search.is-locked, .input-date.is-locked, .input-time.is-locked, .input-password.is-locked { --input-icon: var(--color-input-stroke-locked); background: transparent; box-shadow: inset 0 0 0 1px var(--color-input-stroke-locked); }
+/* EXTENDED - not in Figma: disabled field (none drawn). Derivation: the drawn "locked" look (fill removed, 1px #707079) with secondary text. */
+.input:disabled, .input.is-disabled, .select.is-disabled, .search.is-disabled, .input-date.is-disabled, .input-time.is-disabled, .input-password.is-disabled { --input-icon: var(--color-input-stroke-locked); background: transparent; box-shadow: inset 0 0 0 1px var(--color-input-stroke-locked); color: var(--color-text-secondary); cursor: not-allowed; }
+/* EXTENDED - not in Figma: focus (none drawn). Derivation: 1px INSIDE #A4A4FF stroke at the same radius (the outlined-purple stroke); error stroke wins. */
+.input:focus, .input:focus-within, .input.is-focus, .select:focus, .select.is-focus, .search:focus-within, .search.is-focus, .input-date:focus-within, .input-date.is-focus, .input-time:focus-within, .input-time.is-focus, .input-password:focus-within, .input-password.is-focus, .input-email:focus-within, .input-email.is-focus { box-shadow: inset 0 0 0 1px var(--color-border-focus); }
+.input.is-error:focus, .input.is-error:focus-within, .input.is-error.is-focus, .field--error .input:focus-within, .field--error .input-password:focus-within { box-shadow: inset 0 0 0 1px var(--color-input-stroke-error); }
+/* EXTENDED - not in Figma: hover of fields (none drawn): not styled, cursor only */
+.select, .search, .input-date, .input-time { cursor: pointer; }
+.input-time { cursor: text; }
+/* small filter-popover search - figma: 6234:15090 205x24, r2, padding 8, gap 8, icon 12x12 (#A4A4FF stroke), "Search" Regular 12 #707079 */
+.input--sm { --input-w: 205px; height: var(--h-input-sm); padding: var(--space-8); border-radius: var(--radius-2); font: var(--type-label); }
+.input--sm .icon { --icon-w: 12px; --icon-h: 12px; }
+/* Textarea-like multi-select box - figma: 5580:14608 / 5580:14610 (592x72 / 592x34): fill #39393C r4 AL gap 10 padding 12/8/12/8, text Regular 14 white wrapping. Not a real textarea in Figma; <textarea class="textarea"> is the form mapping. */
+.textarea { display: block; width: var(--input-w, 592px); min-height: 34px; padding: var(--space-12) var(--space-8); border: 0; border-radius: var(--radius-4); background: var(--input-fill); color: var(--color-input-text); font: var(--type-input); resize: none; outline: 0; }
+.textarea:focus, .textarea.is-focus { box-shadow: inset 0 0 0 1px var(--color-border-focus); } /* EXTENDED - not in Figma: focus */
+
+/* Chips field - figma: 4398:15387 Chips (186x44: field 186x32 padding 4/8/4/8 gap 4, MIN/MIN) and 4398:15369 Chips with few rows (186x84: field 186x72 padding 8, gap 4, wrap; trailing text-entry "012345 |" Regular 14) */
+.chips-field { display: flex; flex-wrap: wrap; align-items: center; align-content: flex-start; flex: none; gap: var(--space-4); width: var(--input-w, 186px); min-height: var(--h-input); padding: var(--space-4) var(--space-8); border-radius: var(--radius-4); background: var(--input-fill); color: var(--color-input-text); font: var(--type-input); }
+.chips-field--multi { min-height: 72px; padding: var(--space-8); }
+.chips-field__entry { flex: 1 1 40px; min-width: 40px; border: 0; outline: 0; background: transparent; color: inherit; font: inherit; }
+.chips-field:focus-within, .chips-field.is-focus { box-shadow: inset 0 0 0 1px var(--color-border-focus); } /* EXTENDED - not in Figma: focus */
+
+/* ---------- 8. SELECTION CONTROLS ---------- */
+/* Checkbox - figma: set 4398:15418 (page original 89:160/161): 16x16, r2, no stroke. Unchecked 4398:15419 fill #39393C {Menu bar}; Checked 4398:15421 fill #A4A4FF + black tick 12x9 at (2,3) (asset checkbox-checked.svg).
+   Indeterminate "all" 4617:14314: fill #A4A4FF r2 + black 10px line, stroke 1.5 (asset checkbox-24-indeterminate.svg: 24x24 holder, box inset 4 -> cropped here to the 16x16 box).
+   THREE bound fill variants for unchecked (Figma): Menu bar #39393C (lists) / Inputs on modal #39393C (some modals) / Modal BG #242428 (on inner panels, --checkbox-fill via .surface-inner). Hover/disabled/focus not drawn. */
+.checkbox { -webkit-appearance: none; appearance: none; display: inline-block; flex: none; width: 16px; height: var(--h-checkbox); margin: 0; border: 0; border-radius: var(--radius-2); background: var(--checkbox-fill) center / 16px 16px no-repeat; cursor: pointer; vertical-align: middle; }
+.checkbox:checked, .checkbox.is-checked { background-image: url(assets/checkbox-checked.svg); }
+.checkbox:indeterminate, .checkbox.is-indeterminate { background-image: url(assets/checkbox-24-indeterminate.svg); background-size: 24px 24px; background-position: -4px -4px; }
+.checkbox--fill-menu-bar { --checkbox-fill: var(--color-menu-bar); }                 /* figma variable fill: Menu bar #39393C (4398:15419) */
+.checkbox--fill-inputs-on-modal { --checkbox-fill: var(--color-inputs-on-modal); }   /* figma variable fill: Inputs on modal #39393C */
+.checkbox--fill-modal-bg { --checkbox-fill: var(--color-modal-bg); }                 /* figma variable fill: Modal BG #242428 */
+.checkbox--outline { background: transparent; box-shadow: inset 0 0 0 1px var(--color-border-default); } /* figma: deselect-all "no trades selected" 4398:15505: fill none, stroke #39393C 1 INSIDE (in the filter popover it shows fill #39393C 6544:14762) */
+.checkbox--wide { width: 17px; }  /* figma: 17x16 stretched variant (16.93x16) in recipient rows - Figma drawing noise; kept as alt */
+/* EXTENDED - not in Figma: hover = white@0.2 layer (status recipe); focus ring purple */
+.checkbox:hover:not(:checked):not(:indeterminate):not(.is-checked):not(.is-indeterminate), .checkbox.is-hover:not(:checked) { background-image: linear-gradient(var(--color-action-hover-overlay-20), var(--color-action-hover-overlay-20)); }
+.checkbox:focus-visible, .checkbox.is-focus { outline: 1px solid var(--color-border-focus); outline-offset: 2px; }
+.checkbox:disabled, .checkbox.is-disabled { cursor: not-allowed; box-shadow: inset 0 0 0 1px var(--color-border-disabled); } /* EXTENDED - not in Figma: disabled = #707079 stroke */
+.checkbox-hit { display: inline-grid; place-items: center; width: 24px; height: 24px; flex: none; } /* figma: 24x24 hit-area frames 4617:14314/14317/14320 (box at 4,4) */
+.checkbox-field { display: inline-flex; align-items: center; gap: var(--space-8); color: var(--color-text-light); font: var(--type-input); cursor: pointer; }   /* figma: modal "Structured"/"PBA" Regular 14 #BABEC7, text at x+24 */
+.checkbox-field--white { color: var(--color-text-primary); }                                                                                  /* figma: recipient rows Regular 14 #FFFFFF */
+.checkbox-field--filter { color: var(--color-text-primary); font: var(--type-table-cell); }                                                    /* figma: filter / Widgets-menu checkbox labels Medium 12 #FFFFFF */
+.checkbox-field:has(.checkbox:checked), .checkbox-field.is-checked { color: var(--color-text-primary); }                                       /* figma: trading.md 4.5 label unchecked #BABEC7, checked #FFFFFF */
+/* deselect all - figma: set 4398:15505 (38x16): "trades selected" = indeterminate box + "(5)" Medium 12 #A4A4FF at x20,y4; "no trades selected" = outlined empty box */
+.deselect-all { display: inline-flex; align-items: center; gap: var(--space-4); height: 16px; color: var(--color-action-primary); font: var(--type-table-cell); }
+
+/* Radio - figma: set 4398:15358 (page original 52:27): 16x16 ellipse, stroke 1 INSIDE #A4A4FF, no fill; True adds dot 8x8 #A4A4FF at (4,4). Label Medium 14 #FFFFFF, 8px gap. Hover/disabled not drawn. */
+.radio { -webkit-appearance: none; appearance: none; position: relative; display: inline-block; flex: none; width: 16px; height: var(--h-radio); margin: 0; border: 0; border-radius: 50%; background: transparent; box-shadow: inset 0 0 0 1px var(--color-action-primary); cursor: pointer; vertical-align: middle; }
+.radio:checked::before, .radio.is-checked::before { content: ""; position: absolute; left: 4px; top: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--color-action-primary); }
+.radio:hover, .radio.is-hover { background: var(--color-action-transparent-fill); }  /* EXTENDED - not in Figma: hover = Purple 2 tint (Outlined purple hover recipe) */
+.radio:focus-visible, .radio.is-focus { outline: 1px solid var(--color-border-focus); outline-offset: 2px; } /* EXTENDED - not in Figma */
+.radio:disabled, .radio.is-disabled { box-shadow: inset 0 0 0 1px var(--color-border-disabled); cursor: not-allowed; } /* EXTENDED - not in Figma */
+.radio:disabled:checked::before, .radio.is-disabled.is-checked::before { background: var(--color-border-disabled); }
+.radio-field { display: inline-flex; align-items: center; gap: var(--space-8); color: var(--color-text-primary); font: var(--type-cell); cursor: pointer; }
+
+/* Switch - figma: set 4398:15402 + "Switch with text" 89:105 (screens instance 89:96): track 32x16 r12, knob ellipse 12x12 #FFFFFF.
+   true: track #2BDF68 {Active}, knob x=2,y=2, shadow #005F20@0.5 (-1,1) blur 3.   false (named "falce"): track #BABEC7 {Light grey text}, knob x=18 (Switch) / x=17 (Switch with text: 1px Figma inconsistency, kept as .switch-field), shadow #515151@0.5.
+   INVERTED KNOB NOTE: as drawn, ON has the knob on the LEFT (x=2) and OFF on the RIGHT (x=18) - opposite of the usual convention. Reproduced as drawn; .switch--conventional flips it (alt, not Figma). */
+.switch { -webkit-appearance: none; appearance: none; position: relative; display: inline-block; flex: none; width: 32px; height: var(--h-switch); margin: 0; border: 0; border-radius: var(--radius-12); background: var(--color-text-light); cursor: pointer; vertical-align: middle; }
+.switch::before { content: ""; position: absolute; top: 2px; left: 18px; width: var(--h-switch-knob); height: var(--h-switch-knob); border-radius: 50%; background: var(--color-text-primary); box-shadow: var(--shadow-switch-knob-off); }
+.switch:checked, .switch.is-on { background: var(--color-status-success); }
+.switch:checked::before, .switch.is-on::before { left: 2px; box-shadow: var(--shadow-switch-knob-on); }
+.switch--conventional::before { left: 2px; }                                        /* alt (NOT Figma): conventional OFF = knob left */
+.switch--conventional:checked::before, .switch--conventional.is-on::before { left: 18px; } /* alt (NOT Figma): conventional ON = knob right */
+.switch:focus-visible, .switch.is-focus { outline: 1px solid var(--color-border-focus); outline-offset: 2px; } /* EXTENDED - not in Figma */
+.switch:disabled, .switch.is-disabled { cursor: not-allowed; box-shadow: inset 0 0 0 1px var(--color-border-disabled); } /* EXTENDED - not in Figma */
+/* Switch with text - figma: 89:105: 80x16, label at x=40 (gap 8 after the 32 track), Medium 14: "Active" #FFFFFF when on, "Not Active" #BABEC7 when off */
+.switch-field { display: inline-flex; align-items: center; gap: var(--space-8); height: 16px; color: var(--color-text-light); font: var(--type-cell); cursor: pointer; }
+.switch-field:has(.switch:checked), .switch-field:has(.switch.is-on), .switch-field.is-on { color: var(--color-text-primary); }
+.switch-field .switch:not(:checked):not(.is-on)::before { left: 17px; } /* figma: knob x=17 in "Switch with text" false */
+
+/* ---------- 9. CHIPS / TAGS / BADGES ---------- */
+/* Chip - figma: 4398:15389 (82x24 HUG): fill #242428 {Modal BG}, r12, AL gap 8, padding 4/8/4/8, text Regular 14 white, close frame 16x16 (Union 11.6 #BABEC7). Sits inside a field of fill #39393C. */
+.chip { display: inline-flex; align-items: center; flex: none; gap: var(--space-8); height: var(--h-chip); padding: var(--space-4) var(--space-8); border-radius: var(--radius-12); background: var(--color-input-chip-fill); color: var(--color-text-primary); font: var(--type-input); white-space: nowrap; }
+.chip__close { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 16px; height: 16px; padding: 0; border: 0; background: none; color: var(--color-input-chip-close); cursor: pointer; }
+.chip__close:hover, .chip__close.is-hover { color: var(--color-text-primary); }  /* EXTENDED - not in Figma: chip close hover (none drawn) -> primary text colour */
+/* Pill chip - figma: 7047:14817 "ABN AMRO Bank N.V.": 188x32, fill #39393C {Inputs on modal}, r20, gap 8, padding T4 R8 B4 L16, Regular 14 white, close 16x16 #BABEC7 (on #242428 modal) */
+.chip--pill { height: var(--h-chip-pill); padding: var(--space-4) var(--space-8) var(--space-4) var(--space-16); border-radius: var(--radius-20); background: var(--color-input-chip-pill-fill); }
+/* DEV environment tag - figma: 6984:14477: 81x32, fill #FFB800@0.15 (raw), stroke #FEE274 {yellow} 1, r4, padding 11/24 gap 10, "DEV" SemiBold 16 #FEE274 */
+.tag-dev { display: inline-flex; align-items: center; justify-content: center; flex: none; gap: var(--space-10); height: var(--h-dev-tag); padding: var(--space-11) var(--space-24); border-radius: var(--radius-4); background: var(--color-surface-row-tint-amber); box-shadow: inset 0 0 0 1px var(--color-status-warning-yellow); color: var(--color-status-warning-yellow); font: var(--type-dev-tag); white-space: nowrap; }
+/* Status dot - figma: ellipses 12x12 (#707079 inactive / #2BDF68 active, Statics 12:...), 8x8 (blotter 50:35) */
+.status-dot { display: inline-block; flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--color-status-inactive); }
+.status-dot--active { background: var(--color-status-success); }
+.status-dot--sm { width: 8px; height: 8px; }
+
+/* ---------- 10. OVERLAYS: tooltip, menus, popovers, filter panel, scrollbar ---------- */
+/* Tooltip - figma: 18 frames "tooltip" (3107:6489, 3107:6491, 4402:16433, 6038:14722): fill #39393C {Inputs on modal} r4, AL CENTER/CENTER gap 10, padding 11/16/11/16, height 32 FIXED, hug width (145/140/191), Regular 14;
+   colour = severity: #FF9747 {Edit} ("Unallocated trade", "Bloomberg Disconnected"), #FFDC51 raw ("Ungrouped trade"). Shadow: effect style "tooltip shadow" (-1,2,4,0 @0.4) default; blotter variant (-2,2,4,1 @0.5). No arrow. */
+.tooltip { display: inline-flex; align-items: center; justify-content: center; flex: none; gap: var(--space-10); height: var(--h-tooltip); padding: var(--space-11) var(--space-16); border-radius: var(--radius-4); background: var(--color-surface-tooltip); box-shadow: var(--shadow-tooltip); color: var(--color-text-primary); font: var(--type-input); white-space: nowrap; }
+.tooltip--warning { color: var(--color-text-warning); }   /* #FF9747 */
+.tooltip--caution { color: var(--color-text-caution); }   /* #FFDC51 (raw) */
+.tooltip--strong-shadow { box-shadow: var(--shadow-tooltip-strong); } /* figma: 3107:6489 alt recipe */
+/* Popover surface - figma: right-click menu 3107:6493, filter popover 6544:14756: fill #242428 {Modal BG}, r8, shadow #000000@0.5 (-2,2) 4 spread 1, clip */
+.popover { background: var(--color-surface-popover); border-radius: var(--radius-8); box-shadow: var(--shadow-tooltip-strong); overflow: hidden; }
+/* Right-click menu - figma: 3107:6493 (183x120): rows 28 pitch, icon 12x12 #BABEC7 at x12 + label Medium 12 #FFFFFF at x32; hover row = rect 183x28 #39393C {Separators} (3107:6497) */
+.menu { display: flex; flex-direction: column; min-width: 183px; padding: 4px 0; }
+.menu__item { display: flex; align-items: center; gap: var(--space-8); height: var(--h-menu-item); padding: 0 var(--space-12); border: 0; background: transparent; color: var(--color-text-primary); font: var(--type-table-cell); text-align: left; white-space: nowrap; cursor: pointer; }
+.menu__item .icon { --icon-w: 12px; --icon-h: 12px; color: var(--color-text-light); }
+.menu__item:hover, .menu__item.is-hover { background: var(--color-surface-row-highlight); }
+.menu__item:focus-visible, .menu__item.is-focus { outline: 1px solid var(--color-border-focus); outline-offset: -1px; } /* EXTENDED - not in Figma: focus */
+/* Widgets dropdown menu - figma: 7069:14810 / 6136:14349: fill #242428 r4 shadow "tooltip shadow" (.4), items Medium 12 white, pitch 28 (rows y16/44/72), optional checkbox at x8, label at x32 */
+.menu--sm { border-radius: var(--radius-4); box-shadow: var(--shadow-tooltip); min-width: 77px; }
+.menu--sm .menu__item { padding: 0 var(--space-8); }
+.menu--sm .menu__item:hover { background: var(--color-input-fill-on-modal); } /* figma: highlight rect 77x24 fill {Inputs on modal} (7069:14810) */
+/* User menu - figma: 2277:1379 Frame 23 134x40: fill #39393C r4 shadow (-1,2,4,0 @0.4); item = logout glyph 16x16 #FF7272 at (12,12) + "Log Out" Regular 14 #FFFFFF at x36 (gap 8). Single item, no hover drawn. */
+.user-menu { display: flex; align-items: center; gap: var(--space-8); width: 134px; height: var(--h-user-menu); padding: 0 var(--space-12); border-radius: var(--radius-4); background: var(--color-surface-user-menu); box-shadow: var(--shadow-tooltip); color: var(--color-text-primary); font: var(--type-input); white-space: nowrap; cursor: pointer; }
+.user-menu:hover, .user-menu.is-hover { background-image: linear-gradient(var(--color-action-hover-overlay-20), var(--color-action-hover-overlay-20)); } /* EXTENDED - not in Figma: hover (white@0.2) */
+/* Dropdown list (open select) - figma: 1971:2821 158x118: fill #39393C r4 shadow (-2,2,4,0 @0.5); items Regular 14 pitch 26 (y12/38/63/89/115); selected "New York" #A4A4FF, others #FFFFFF; hover/selected row Rectangle 22 158x26 fill #242428 (at y30); scrollbar 4x102 track #707079 r16, thumb 4x15 #BABEC7 */
+.dropdown-list { display: flex; flex-direction: column; width: var(--input-w, 158px); max-height: 118px; padding: var(--space-4) 0 0; overflow: auto; border-radius: var(--radius-4); background: var(--color-surface-dropdown-list); box-shadow: var(--shadow-dropdown-list); }
+.dropdown-list__item { display: flex; align-items: center; flex: none; height: var(--h-dropdown-list-item); padding: 0 var(--space-8); border: 0; background: transparent; color: var(--color-text-primary); font: var(--type-input); text-align: left; white-space: nowrap; cursor: pointer; } /* padding-left 8 = visual estimate */
+.dropdown-list__item:hover, .dropdown-list__item.is-hover { background: var(--color-input-fill-on-page); }
+.dropdown-list__item.is-selected { color: var(--color-action-primary); }
+/* Filter checkbox-list popover - figma: 6544:14756 / 6234:14340 (237x256): fill #242428 r8 shadow (-2,2,4,1 @0.5) clip, inner padding 16; search 205x24 r2 (6234:15090, .input--sm); rows 16 high on a 32 pitch: checkbox + label Medium 12 #FFFFFF (label at x+24);
+   first row = deselect-all instance + "All". Date variant 6236:14733 (237x136): two Dates 205x44 with "From"/"To" labels at (16,16),(16,76). */
+.filter-panel { display: flex; flex-direction: column; gap: var(--space-16); width: 237px; padding: var(--space-16); overflow: hidden; border-radius: var(--radius-8); background: var(--color-surface-popover); box-shadow: var(--shadow-tooltip-strong); --input-fill: var(--color-input-fill-on-modal); }
+.filter-row { display: flex; align-items: center; flex: none; gap: var(--space-8); height: 16px; color: var(--color-text-primary); font: var(--type-table-cell); }
+/* Scrollbar - figma: Rectangle 20 etc. (3631:4905, 4243:16268): track 4px (Activity/Rates dash) or 8px (standalone Rates Widget / 1368x8 blotter) r12 #39393C {Inputs on modal} + shadow 0 4 4 @0.25 (4px variant), thumb same width r12 #707079 {Secondary text}.
+   Modal scroll 5580:14620: 4x308 track r35.61 shadow (0,11.87,11.87 @0.25). Thumb height/position set inline. */
+.scrollbar { position: relative; flex: none; width: 4px; border-radius: var(--radius-12); background: var(--color-surface-scrollbar-track); box-shadow: var(--shadow-scrollbar-thumb); }
+.scrollbar--8 { width: 8px; box-shadow: none; }
+.scrollbar--tall { border-radius: 35.61px; box-shadow: var(--shadow-scrollbar-thumb-tall); }
+.scrollbar__thumb { position: absolute; left: 0; top: 0; width: 100%; border-radius: inherit; background: var(--color-surface-scrollbar-thumb); box-shadow: none; }
+
+/* ---------- 11. Live indicator (Animation component set) ---------- */
+/* figma: 4398:15284 "Animation" (variants 4/3/2/1) + instance "Animation/1" 30x30 at footer right (38:152); static render = a solid 8px dot #2BDF68 at (11,11) in the 30x30.
+   Footer "Using indicative rates" overrides the fills to #FF9747 {Edit} (6038:13985) = .live-indicator--indicative. Variants: 1 three 8x8 dots / 2 dot 10 + ring 16 @0.2 + dot 12 / 3 dot 10 + rings 30 @0.1, 20 @0.2 / 4 dot 8 + ring 30 @0.05. */
+.live-indicator { --live-color: var(--color-status-live); position: relative; display: inline-block; flex: none; width: 30px; height: 30px; }
+.live-indicator::before { content: ""; position: absolute; left: 11px; top: 11px; width: 8px; height: 8px; border-radius: 50%; background: var(--live-color); }
+.live-indicator--indicative { --live-color: var(--color-status-warning); }
+/* EXTENDED - not in Figma: pulse animation (Figma gives frames but no timing). Ring grows 8 -> 30px while fading, ring alphas taken from the drawn frames (0.2 -> 0.05). */
+.live-indicator.is-pulse::after { content: ""; position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--live-color); opacity: 0; animation: fxer-pulse 1.6s ease-out infinite; }
+@keyframes fxer-pulse { 0% { transform: scale(0.267); opacity: 0.2; } 60% { transform: scale(1); opacity: 0.1; } 100% { transform: scale(1); opacity: 0.05; } }
+@media (prefers-reduced-motion: reduce) { .live-indicator.is-pulse::after { animation: none; } }
+
+/* ===== PART 2: PATTERNS — stage 2 appends below this line ===== */
+
+/* FX Engine Room components.css - PART 2 (stage 2): LAYOUT PATTERNS. Source: figma-spec/auth-shell.md, admin-entities.md, dashboard-widgets.md, trading.md.
+   Same conventions as PART 1: every block starts with a figma-node-id comment; "EXTENDED - not in Figma" marks anything the spec does not draw; only existing tokens.
+   Loose text that Figma positions by its cap-height box uses `.text-trim` (text-box: trim-both cap alphabetic) so margins measured cap-to-cap reproduce exactly. */
+
+/* ---------- P2.0 Extra icons (stage-2 re-exports + fixed-colour assets reused as masks: only the alpha channel is used, colour = `color`) ---------- */
+/* figma: calendar 4398:15320 (16x16 #A4A4FF), logout 2277:1382 (16x16 #FF7272) - re-exported in stage 2 (assets/MANIFEST.md) */
+.icon-calendar-16 { --icon-src: url(assets/calendar-16.currentColor.svg); --icon-w: 16px; --icon-h: 16px; }
+.icon-logout-16 { --icon-src: url(assets/logout-16.currentColor.svg); --icon-w: 16px; --icon-h: 16px; }
+/* figma: report-file 6882:15039 file-02-solid-rounded 24x32 (Reports sidebar icon, #A4A4FF active / #BABEC7 inactive) */
+.icon-report-file { --icon-src: url(assets/report-file.svg); --icon-w: 24px; --icon-h: 32px; }
+/* figma: Rates arrow 6234:14377 12x12 (circle with up arrow cut out); DOWN = the same vector flipped vertically (relativeTransform [[1,0,x],[0,-1,y+12]]) */
+.icon-arrow-circle { --icon-src: url(assets/arrow-up-circle-green.svg); --icon-w: 12px; --icon-h: 12px; }
+.icon-arrow-circle--down { transform: scaleY(-1); }
+/* figma: pagination first/last 3107:6943 24x12 (#707079) drawn as one asset; next chevron 3107:6946 = .icon-chevron-right-grey-7x12 (#BABEC7) */
+.icon-pagination-first-last { --icon-src: url(assets/pagination-first-last.svg); --icon-w: 24px; --icon-h: 12px; }
+.icon-check-green-12x9 { --icon-src: url(assets/check-green-12x9.svg); --icon-w: 12px; --icon-h: 9px; }
+.icon-email-sent { --icon-src: url(assets/email-sent-56x48.svg); --icon-w: 56px; --icon-h: 48px; } /* figma: Email Sent! 2281:1394, 56x48 #30F0D6 */
+.icon-logo-purple-login { --icon-src: url(assets/logo-fxer-stacked-purple.currentColor.svg); --icon-w: 52px; --icon-h: 61.26px; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; } /* figma: login logo group 2211:1839, 52x61.26 (non-uniform crop of the 457x571.76 master, as drawn) */
+.icon-csv-14 { --icon-src: url(assets/csv.currentColor.svg); --icon-w: 14px; --icon-h: 14px; } /* figma: 2958:3082 csv icon 14x14 per file row (first #A4A4FF, others #707079) - the csv asset (24x24 sidebar glyph) scaled to the 14px node size; visual estimate that it is the same drawing */
+.abs { position: absolute; left: var(--x, 0); top: var(--y, 0); } /* helper for screens Figma draws with absolute children: --x/--y = Figma coordinates relative to the positioned parent */
+
+/* ---------- P2.1 APP SHELL ---------- */
+/* figma: Trading Account 1920x1080 4031:18455 / 1440x1024 frames (Entity 3648:7418, Reports 6878:14782, Blotters 2281:1414) / 1280x1040 4164:14303.
+   Structure = 3 sibling frames: Frame 1 sidebar 56 wide (#39393C), Frame 2 logo block 72x56 (#A4A4FF, 16px wider than the sidebar), Frame 3 content canvas x56, radius 16/0/0/0, fill #000000.
+   The logo block sits UNDER the canvas: through the canvas' rounded top-left corner the purple shows (the 16px canvas-corner interaction). */
+.app { --app-w: 1440px; --app-h: 1024px; --app-gutter: 24px; position: relative; flex: none; width: var(--app-w); height: var(--app-h); overflow: hidden; background: var(--color-surface-page); color: var(--color-text-primary); font: var(--type-input); }
+.app--1280 { --app-w: 1280px; --app-h: 1040px; }   /* figma: Trading Account 4164:14303 (canonical) */
+.app--1920 { --app-w: 1920px; --app-h: 1080px; }   /* figma: Trading Account 4031:18455 (hidden/old) */
+.app--trading-account { --app-gutter: 16px; }       /* figma: 4164:14303 breadcrumb x16 / left panel x16 (1440 frames: x24) */
+/* Frame 1 "sidebar" - figma: 4031:18455 child, 56 x full height, fill #39393C {Menu bar}, no stroke/effects */
+.app__sidebar { position: absolute; left: 0; top: 0; bottom: 0; width: var(--layout-sidebar-width); background: var(--color-surface-sidebar); z-index: 0; }
+/* Frame 2 "logo block" - figma: 4031:18474: 72x56 at (0,0) fill #A4A4FF, child Frame 5 56x56 holding the 32x40 black logo at (12,8) */
+.app__logo { position: absolute; left: 0; top: 0; z-index: 1; width: var(--layout-logo-tile-width); height: var(--layout-logo-tile-height); background: var(--color-surface-logo-tile); color: var(--color-black); }
+.app__logo .icon { position: absolute; left: 12px; top: 8px; --icon-w: 32px; --icon-h: 40.001px; }
+.app__logo--widgets { width: 74px; height: 48px; } /* figma: dashboards 4243:15535/6038:13964 Frame 2 "74x48", logo 28x32 at (14,8) in a 56x48 Frame 5 (alt geometry of the widget dashboard) */
+.app__logo--widgets .icon { left: 14px; --icon-w: 28px; --icon-h: 32px; }
+/* Nav icons - figma: 24x24 at x16, first top y72 then pitch 56 (gap 32): 72/128/184/240/296/352. Inactive #BABEC7 {Light grey text}, ACTIVE = icon recoloured #A4A4FF {Primary purple}. No tile/bar/hover drawn. */
+.app__nav { position: absolute; left: 16px; top: var(--layout-sidebar-icon-first-y); display: flex; flex-direction: column; gap: 32px; z-index: 0; }
+.nav-item { display: block; flex: none; width: 24px; height: 24px; padding: 0; border: 0; background: none; color: var(--color-text-light); line-height: 0; text-decoration: none; cursor: pointer; }
+.nav-item .icon { --icon-w: 24px; --icon-h: 24px; }
+.nav-item.is-active, .nav-item[aria-current="page"] { color: var(--color-action-primary); }
+.nav-item--tall { height: 32px; }                  /* figma: Reports file icon "file-02-solid-rounded" 24x32 at (16,352) */
+.nav-item--tall .icon { --icon-h: 32px; }
+.nav-item:hover, .nav-item.is-hover { color: var(--color-text-primary); } /* EXTENDED - not in Figma: sidebar icon hover (none drawn) -> primary text colour */
+.nav-item.is-active:hover { color: var(--color-action-primary); }
+.nav-item:focus-visible, .nav-item.is-focus { outline: 1px solid var(--color-border-focus); outline-offset: 2px; } /* EXTENDED - not in Figma: focus ring (brand border colour) */
+/* Settings gear (bottom) - figma: instance of Settings 16:133, 24x24 at x16, y = H-40 (984 on 1024 / 1000 on 1040 / 1040 on 1080) => bottom edge 16px above the frame bottom. Colour visual estimate #BABEC7. Absent on Blotters. */
+.app__sidebar-bottom { position: absolute; left: 16px; bottom: 16px; z-index: 0; display: flex; flex-direction: column; gap: 16px; }
+/* Blotters only: two 24x24 status icons at x16 (y936 #FFDC51, y976 #707079 on 1024). TODO (stage 3): the status glyph is NOT exported yet - re-export from the Blotters Frame 1 of 2281:1414; colour classes are ready. */
+.nav-item--status-yellow { color: var(--color-text-caution); }  /* figma: #FFDC51 raw */
+.nav-item--status-grey { color: var(--color-text-secondary); }  /* figma: #707079 {Secondary text} */
+/* Frame 3 "content" - figma: x56, width W-56, radius [16,0,0,0], fill #000000 {BG}, clip. Column: top bar / strip / body (panel + footer). */
+.app__content { position: absolute; left: var(--layout-sidebar-width); top: 0; right: 0; bottom: 0; z-index: 2; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radius-canvas); background: var(--color-surface-page); }
+/* Frame 4 "top bar" - figma: full content width x 56, no fill, stroke 1px #39393C bottom only INSIDE; title Medium 20 #FFFFFF at x24 (cap y21 = centred); user icon 32x32 at 16px from the right, y12 */
+.app__topbar { flex: none; display: flex; align-items: center; gap: var(--space-16); height: var(--layout-topbar-height); padding: 1px var(--layout-margin-right) 0 var(--layout-margin-left); border-bottom: var(--border-hairline) solid var(--color-border-default); }
+.app__title { margin: 0; font: var(--type-page-title); color: var(--color-text-primary); white-space: nowrap; }
+.app__topbar-right { display: flex; align-items: center; gap: var(--topbar-gap, 16px); margin-left: auto; } /* figma: dashboard 6038:14703: icon buttons x654/702 (gap 16), P&L pill x750, Dropdown x1117 (gap 16), avatar x1336 (gap 16). Blotters 2281:1414: pill 755, dropdown 1122, avatar 1336 (gap 11 = --alt-gap-11, not canonical) */
+.app__topbar-right--alt-gap-11 { --topbar-gap: 11px; }
+.app__user { display: block; flex: none; width: 32px; height: 32px; padding: 0; border: 0; background: none; color: var(--color-text-light); line-height: 0; cursor: pointer; } /* figma: User vector 6:12 32x32 #BABEC7 (assets/user) */
+.app__user .icon { --icon-w: 32px; --icon-h: 32px; }
+.app__user:hover, .app__user.is-hover { color: var(--color-text-primary); }   /* EXTENDED - not in Figma: avatar hover (none drawn) */
+.app__user:focus-visible, .app__user.is-focus { outline: 1px solid var(--color-border-focus); outline-offset: 2px; } /* EXTENDED - not in Figma */
+/* Widgets dashboard top bar - figma: 6038:14703 / 4243:16272: 48 high, title "Dashboard" Nunito Medium 16 at x20, avatar y8 */
+.app--widgets .app__topbar { height: var(--layout-topbar-height-widgets); padding-left: 20px; }
+.app--widgets .app__title { font: var(--type-detail); }
+/* Strip between top bar and body (y56..104 = 48): holds the breadcrumb OR the toolbar (search + Add New at y64 h32). No fill, no divider (breadcrumb text at y73). */
+.app__strip { flex: none; display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 var(--layout-margin-right) 0 var(--app-gutter); }
+.app__strip--toolbar { padding-left: var(--layout-margin-right); } /* figma: list screens: Search at x16, Add New right margin 16 (3648:7348) */
+.app__strip--tabs { align-items: flex-end; padding-left: 0; } /* figma: Statics tabs at y62, 42 high: bottom-aligned in the strip; search/Add New y64 */
+.app__strip--tabs > :not(.tabs) { align-self: center; }
+.tabs { display: flex; align-items: flex-end; }
+/* Frame 7 body panel - figma: fill #171719 {BG Grey 1}, from y104 (y56 on Reports: no strip) to bottom; footer Frame 8 sits at its bottom */
+.app__body { position: relative; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; background: var(--color-surface-panel); }
+.app__main { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; }
+/* Frame 8 footer - figma: 46 high, fill #171719, stroke 1px #39393C TOP only INSIDE, AL H padding 8/12/8/12 SPACE_BETWEEN CENTER; left Group 24: Makor M 24x19.6 #BABEC7 at x12 + "FX Engine Room | Operated by Makor Group" Medium 14 #BABEC7 at x47 (gap 11); right: 30x30 Animation at right pad 12 */
+.app__footer { flex: none; display: flex; align-items: center; justify-content: space-between; height: var(--layout-footer-height); padding: var(--space-8) var(--space-12); border-top: var(--border-hairline) solid var(--color-border-default); background: var(--color-surface-panel); color: var(--color-text-light); font: var(--type-cell); }
+.app__footer--clear { background: transparent; }  /* figma: dashboard/flow frames: footer fill none (6038:13985) */
+.app__footer-brand { display: flex; align-items: center; gap: var(--space-11); white-space: nowrap; }
+.app__footer-brand .icon { --icon-w: 24px; --icon-h: 19.6px; }
+.app__footer-right { display: flex; align-items: center; color: var(--color-text-secondary); white-space: nowrap; } /* figma: "Using indicative rates" Medium 14 {Secondary text} then the 30x30 pulse (orange override) */
+/* User menu placement - figma: 2277:1379 Frame 23 at (1234,48) in a 1384 content frame: right edge 16px from the edge, overlapping the 56px top bar by 8. Component .user-menu in PART 1; the logout glyph is stage-2 asset (red). */
+.app__user-menu { position: absolute; right: var(--layout-margin-right); top: 48px; z-index: 10; }
+.user-menu .icon { --icon-w: 16px; --icon-h: 16px; color: var(--color-action-delete); }
+/* Breadcrumb - figma: items at y73 Medium 18; links #60A8FF {blue} UNDERLINE, current #BABEC7 no underline; separator chevron 8x14 #BABEC7, 8px gap each side. 1280 canonical Trading Account: links #A4A4FF {Primary purple} (.breadcrumb--purple). */
+.breadcrumb { display: flex; align-items: center; gap: var(--space-8); font: var(--type-breadcrumb-link); white-space: nowrap; }
+.breadcrumb a, .breadcrumb__link { color: var(--color-text-link); text-decoration: underline; cursor: pointer; }
+.breadcrumb__current { color: var(--color-text-light); text-decoration: none; }
+.breadcrumb .icon { color: var(--color-text-light); flex: none; }
+.breadcrumb--purple a, .breadcrumb--purple .breadcrumb__link { color: var(--color-text-link-inline); } /* figma: 4164:14303 "Entities"/"Bank of America" #A4A4FF (the 1440 frames use blue = default) */
+.breadcrumb a:hover, .breadcrumb__link:hover { text-decoration-thickness: 2px; } /* EXTENDED - not in Figma: link hover (none drawn) -> thicker underline, no new colour */
+.breadcrumb a:focus-visible { outline: 1px solid var(--color-border-focus); outline-offset: 2px; } /* EXTENDED - not in Figma */
+.app__topbar-center { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); } /* figma: Trader screen 3769:8602 DEV 81x32 at (652,12) (component .tag-dev) */
+/* Dashboard shell body - figma: 6038:13964: widgets start x8,y56 (8 under the 48 top bar), gutter 8, right margin 8, footer 46 at y978 (12 under the widgets) */
+.app__widgets { position: relative; flex: 1 1 auto; min-height: 0; margin: var(--layout-widget-gutter) var(--layout-widget-gutter) var(--space-12); }
+/* KPI pill "Option Premium / Total P&L" - figma: Group 129 6038:14704 / Rectangle 11: 351x32 fill #39394E r4; labels Medium 14 #7373BB at x15 / x183; values Medium 14 #A4A4FF at x127 / x253 */
+.kpi-pill { display: grid; grid-template-columns: 15px 112px 56px 70px 98px; align-items: center; flex: none; width: 351px; height: 32px; border-radius: var(--radius-4); background: var(--color-surface-row-highlight-card); font: var(--type-cell); white-space: nowrap; }
+.kpi-pill__label { color: var(--color-text-section-label); }
+.kpi-pill__value { color: var(--color-text-kpi-value); }
+.kpi-pill > :first-child { grid-column: 2; }
+.topbar-dropdown { --input-w: 203px; } /* figma: Dropdown 3631:3888 203x32 fill #242428 (surface-aware on the page) */
+
+/* Live pulse component "Animation" 4 variants (static frames) + loop - figma: 4398:15284 / 3631:3782: 30x30 box, three concentric circles centred at (15,15):
+   v1 a 8 / b 8 / c 8 (all #2BDF68) | v2 a 10, b 16 @0.2, c 12 | v3 a 10, b 30 @0.1, c 20 @0.2 | v4 a 8, b 40 @0.1 (-5,-5), c 30 @0.05. Rings are drawn with box-shadow spreads around the dot a. */
+.live-indicator--v1::before { left: 11px; top: 11px; width: 8px; height: 8px; box-shadow: none; }
+.live-indicator--v2::before { left: 10px; top: 10px; width: 10px; height: 10px; box-shadow: 0 0 0 1px var(--live-color), 0 0 0 3px color-mix(in srgb, var(--live-color) 20%, transparent); }
+.live-indicator--v3::before { left: 10px; top: 10px; width: 10px; height: 10px; box-shadow: 0 0 0 5px color-mix(in srgb, var(--live-color) 20%, transparent), 0 0 0 10px color-mix(in srgb, var(--live-color) 10%, transparent); }
+.live-indicator--v4::before { left: 11px; top: 11px; width: 8px; height: 8px; box-shadow: 0 0 0 11px color-mix(in srgb, var(--live-color) 5%, transparent), 0 0 0 16px color-mix(in srgb, var(--live-color) 10%, transparent); }
+/* Loop timing - figma prototype 3631:3795..3631:3783: 1 hold 0.1s -> 2 EASE_IN 0.05s | 2 hold 0.01s -> 3 EASE_IN_AND_OUT 0.3s | 3 hold 0.01s -> 4 EASE_IN_AND_OUT 0.3s | 4 hold 0.001s -> 1 DISSOLVE EASE_IN_AND_OUT 0.3s  => cycle 1.071s (this replaces the stage-1 EXTENDED .is-pulse when .live-indicator--loop is used) */
+.live-indicator--loop::before { animation: fxer-live-loop 1.071s linear infinite; }
+@keyframes fxer-live-loop {
+  0%      { left: 11px; top: 11px; width: 8px; height: 8px; box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent; animation-timing-function: ease-in; }
+  9.337%  { left: 11px; top: 11px; width: 8px; height: 8px; box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent; animation-timing-function: ease-in; }
+  14.006% { left: 10px; top: 10px; width: 10px; height: 10px; box-shadow: 0 0 0 1px var(--live-color), 0 0 0 3px color-mix(in srgb, var(--live-color) 20%, transparent); }
+  14.939% { left: 10px; top: 10px; width: 10px; height: 10px; box-shadow: 0 0 0 1px var(--live-color), 0 0 0 3px color-mix(in srgb, var(--live-color) 20%, transparent); animation-timing-function: ease-in-out; }
+  42.950% { left: 10px; top: 10px; width: 10px; height: 10px; box-shadow: 0 0 0 5px color-mix(in srgb, var(--live-color) 20%, transparent), 0 0 0 10px color-mix(in srgb, var(--live-color) 10%, transparent); }
+  43.884% { left: 10px; top: 10px; width: 10px; height: 10px; box-shadow: 0 0 0 5px color-mix(in srgb, var(--live-color) 20%, transparent), 0 0 0 10px color-mix(in srgb, var(--live-color) 10%, transparent); animation-timing-function: ease-in-out; }
+  71.895% { left: 11px; top: 11px; width: 8px; height: 8px; box-shadow: 0 0 0 11px color-mix(in srgb, var(--live-color) 5%, transparent), 0 0 0 16px color-mix(in srgb, var(--live-color) 10%, transparent); }
+  71.989% { left: 11px; top: 11px; width: 8px; height: 8px; box-shadow: 0 0 0 11px color-mix(in srgb, var(--live-color) 5%, transparent), 0 0 0 16px color-mix(in srgb, var(--live-color) 10%, transparent); animation-timing-function: ease-in-out; }
+  100%    { left: 11px; top: 11px; width: 8px; height: 8px; box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent; }
+}
+@media (prefers-reduced-motion: reduce) { .live-indicator--loop::before { animation: none; } }
+
+/* surface-aware fills inside the shell - figma: components.md 4.2: fields on the page (#000000) / panel (#171719) are #242428 */
+.app__content { --input-fill: var(--color-input-fill-on-page); }
+.app__body { --input-fill: var(--color-input-fill-on-page); }
+
+/* ---------- P2.2 AUTH CARDS (6 screens, 1440x1024 frames, fill #000000, card only - no shell) ---------- */
+/* figma: Log In 2211:1942, Log In Error 2211:1835, Change Password 2211:1877, Reset step 1 2192:1761, Email Sent! 2259:1398, New Password 2201:1724.
+   Card: fill #242428 {Modal BG}, radius 12, NO stroke, NO shadow, absolute children; centred in the frame (Figma offsets are drawing slop). Inner side padding: login 48 / others 32. */
+.auth-screen { display: grid; place-items: center; flex: none; width: var(--layout-frame-default-width); height: var(--layout-frame-default-height); background: var(--color-surface-page); }
+.auth-card { position: relative; display: flex; flex-direction: column; flex: none; border-radius: var(--radius-12); background: var(--color-surface-modal); box-shadow: none; color: var(--color-text-primary); font: var(--type-input); --input-fill: var(--color-input-fill-on-modal); --checkbox-fill: var(--color-input-checkbox-fill); }
+.auth-card .field { --field-w: 216px; }
+.auth-card__title { margin: 40px 0 0; text-align: center; font: var(--type-auth-heading); color: var(--color-text-primary); text-box: trim-both cap alphabetic; } /* figma: Regular 18 #FFFFFF, cap box y40 (Change/New password title sits 12.5px right of the card centre as drawn: --alt-title-offset, reproduced centred) */
+.auth-card__body { margin: 0; color: var(--color-text-light); font: var(--type-label); text-box: trim-both cap alphabetic; } /* figma: Regular 12 #BABEC7 (2 lines) */
+.auth-card__actions { display: flex; align-items: center; justify-content: space-between; }
+.btn-block { display: flex; width: 100%; }
+/* 1.1 Log In card 312x388 - figma: 2211:1943: logo 52x61.26 at (130,38.51), Username field (48,152) 216x44, Password (48,220), link row y272, button (48,324) 216x32, bottom margin 32 */
+.auth-card--login { width: var(--layout-login-card-width); height: var(--layout-login-card-height); padding: 38.51px var(--space-48) var(--space-32); }
+.auth-card--login .auth-logo { align-self: center; margin-bottom: 52.23px; color: var(--color-surface-logo-tile); }
+.auth-card--login .auth-logo.icon { flex: none; }
+.auth-field-stack { display: flex; flex-direction: column; gap: var(--space-24); } /* figma: field pitch 68 = 44 + 24 */
+.auth-row { display: flex; align-items: center; justify-content: space-between; height: 8px; margin-top: var(--space-8); font: var(--type-label); line-height: 8px; }
+.auth-link { color: var(--color-text-link-inline); font: var(--type-link); line-height: 8px; text-decoration: underline; cursor: pointer; margin-left: auto; } /* figma: "Forgot Password?" 97x8 at (167,272): Regular 12 #A4A4FF underline (purple, NOT red), right aligned to the field edge */
+.auth-link:hover { text-decoration-thickness: 2px; } /* EXTENDED - not in Figma: link hover */
+.auth-error { color: var(--color-text-error); } /* figma: "Incorrect Password" 103x8 at (48,272): Regular 12 #FF7272 */
+.auth-card--login .btn-block { margin-top: 44px; }
+/* 1.2 error variant: password box 1px INSIDE #FF7272 (reuses .field--error / .is-error from PART 1), message on the same row as the link */
+/* 1.3 Change / New password card 583x309 - figma: 2211:1878 / 2201:1725: left col x32 (216), rules box (272,85) 279x120, fields y85/y161 (pitch 76), buttons y245 */
+.auth-card--password { display: grid; grid-template-columns: 216px 279px; column-gap: var(--space-24); align-content: start; width: 583px; height: 309px; padding: 0 var(--space-32); }
+.auth-card--password .auth-card__title { grid-column: 1 / -1; margin: 40px 0 32.3px; }
+.auth-card--password .auth-card__fields { display: flex; flex-direction: column; gap: var(--space-32); }
+.auth-card--password .auth-card__actions { grid-column: 1 / -1; margin-top: 40px; }
+/* Password rules box - figma: Group 103 279x120, rect #171719 {BG Grey 1} r4; heading "Must contain at least:" Regular 12 #707079 at (16,12); rows bullet 4x4 #A4A4FF at x16, text Regular 12 #BABEC7 at +12, tick 12x9 #2BDF68 at x251; row tops 36/57/78 (pitch 21), 3rd rule wraps (text box 203 wide) */
+.rules-box { position: relative; width: 279px; height: 120px; border-radius: var(--radius-4); background: var(--color-surface-rules-box); font: var(--type-label); }
+.rules-box__title { position: absolute; left: 16px; top: 12px; margin: 0; color: var(--color-text-secondary); font: var(--type-label); line-height: 8px; white-space: nowrap; }
+.rules-box__list { position: absolute; left: 16px; right: 16px; top: 36px; margin: 0; padding: 0; list-style: none; }
+.rules-box__item { position: relative; max-width: 215px; margin: 0; padding-left: 12px; color: var(--color-text-light); text-box: trim-both cap alphabetic; }
+.rules-box__item + .rules-box__item { margin-top: 12.54px; }
+.rules-box__item::before { content: ""; position: absolute; left: 0; top: 2.23px; width: 4px; height: 4px; border-radius: 50%; background: var(--color-action-primary); }
+.rules-box__item .icon { position: absolute; left: 235px; top: -0.27px; color: var(--color-status-success); --icon-w: 12px; --icon-h: 9px; } /* tick x251 in the box = 235 inside the list (list starts x16); satisfied only (unsatisfied not drawn: .is-unmet EXTENDED below) */
+.rules-box__item.is-unmet .icon { display: none; } /* EXTENDED - not in Figma: unsatisfied rule = no tick (the unsatisfied state is not drawn) */
+.rules-box__item.is-unmet::before { background: var(--color-text-secondary); } /* EXTENDED - not in Figma: unmet bullet -> Secondary text */
+/* 1.4 Reset step 1 296x289 - figma: 2192:1762: title y40, body (32,93) 230x24, input (32,145) 232x32, buttons y225 (Back x32 w79 / Continue x156 w106) */
+.auth-card--reset { width: 296px; height: 289px; padding: 0 var(--space-32); }
+.auth-card--reset .auth-card__body { width: 230px; margin-top: 40.3px; }
+.auth-card--reset .input { --input-w: 232px; margin-top: 27.8px; }
+.auth-card--reset .auth-card__actions { width: 230px; margin-top: 48px; }
+/* 1.5 Email Sent! 371x255 - figma: 2281:1391: envelope 56x48 teal at (157,40), title y120 (91w centred), body Regular 14 #BABEC7 (32,157) 307w, buttons y191: Back x32 w79 / Resend Link x213 w126 (orange {Edit}) */
+.auth-card--sent { width: 371px; height: 255px; padding: 0 var(--space-32); }
+.auth-card--sent .icon-email-sent { align-self: center; margin-top: 40px; color: var(--color-action-teal); }
+.auth-card--sent .auth-card__title { margin-top: 32px; }
+.auth-card--sent .auth-card__body { margin-top: 24.3px; font: var(--type-input); color: var(--color-text-light); text-box: trim-both cap alphabetic; }
+.auth-card--sent .auth-card__actions { margin-top: 24.1px; }
+
+/* ---------- P2.3 ENTITIES: toolbar strip, tables, group cards, split panel ---------- */
+/* Entities list toolbar - figma: 3648:7348: Search 208x32 at (16,64) fill #242428, "Add New" 109x32 right margin 16 (strip y56..104) */
+.toolbar-search { --input-w: 208px; }
+/* Admin table - figma: 3648:7348 Frame 7 (0,104) 1384x919 #171719: header text y16 Medium 14 #707079 (42 high), rows 42 pitch, 1px #39393C lines, cell text Medium 14 #FFFFFF; columns Account ID x16 / Entity Name x256 / Country x598 / LEI x996 / Active x1289 (dot x1303) / edit x1315 */
+.table { display: block; width: 100%; font: var(--type-cell); color: var(--color-text-primary); }
+.table__row { display: grid; grid-template-columns: var(--cols); align-items: center; height: var(--layout-row-pitch); padding-left: var(--table-pad, 16px); border-bottom: var(--border-hairline) solid var(--color-border-default); }
+.table__row--head { color: var(--color-text-secondary); }
+.table__cell { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.table__cell--dot { overflow: visible; padding-left: 14px; line-height: 0; }
+.table__cell--regular { font-weight: var(--font-weight-regular); }
+.table__row.is-selected { background: var(--color-surface-row-highlight); } /* figma: Statics selected/hover row "Rectangle 11" 1382x41 #39393C {Separators} (3648/Static Clients 1:2) */
+.table__row:not(.table__row--head):hover { background: var(--color-surface-row-highlight); } /* EXTENDED - not in Figma: row hover = the drawn selected-row fill #39393C */
+.table--entities { --cols: 240px 342px 398px 293px 26px 32px; }
+.table__edit { justify-self: start; }
+/* Group card (account groups) - figma: Group 174 4164:14303 (16,172) 359x293: Rectangle 15 #242428 r4; header strip 359x45 #39393C r 4/4/0/0, title SemiBold 18 #FFFFFF at card x+16; rows 62 high (name Medium 16 #FFFFFF, type Medium 16 #707079, "|" Medium 12 #BABEC7, counterparty Medium 16 #BABEC7, line pitch 19);
+   dividers 1px #39393C; selected row = fill #39394E {Purple 2} full width, name #A4A4FF. Traders card: Rectangle 20 359x122, rows 61 apart, names SemiBold 18 at x+16. */
+.group-card { width: 100%; overflow: hidden; border-radius: var(--radius-4); background: var(--color-surface-card); }
+.group-card__head { display: flex; align-items: center; height: 45px; padding: 0 var(--space-16); border-radius: var(--radius-card-header); background: var(--color-surface-table-header); font: var(--type-card-title); color: var(--color-text-primary); }
+.group-card__row { position: relative; display: flex; flex-direction: column; justify-content: center; height: 62px; padding: 0 var(--space-16); background: transparent; color: var(--color-text-primary); cursor: pointer; }
+.group-card__row + .group-card__row { border-top: var(--border-hairline) solid var(--color-border-default); }
+.group-card__name { font: var(--type-detail); line-height: 19px; color: var(--color-text-primary); white-space: nowrap; }
+.group-card__meta { display: flex; align-items: center; gap: var(--space-8); font: var(--type-detail); line-height: 19px; white-space: nowrap; }
+.group-card__type { color: var(--color-text-secondary); }
+.group-card__sep { color: var(--color-text-light); font: var(--type-table-cell); }
+.group-card__party { color: var(--color-text-light); }
+.group-card__row.is-selected { background: var(--color-surface-row-highlight-card); }
+.group-card__row.is-selected .group-card__name { color: var(--color-action-primary); }
+.group-card__row:not(.is-selected):hover { background: var(--color-surface-row-highlight); } /* EXTENDED - not in Figma: row hover (none drawn) = #39393C {Separators}, the Statics highlighted-row fill */
+.group-card__row:focus-visible { outline: 1px solid var(--color-border-focus); outline-offset: -1px; } /* EXTENDED - not in Figma */
+.group-card--traders .group-card__row { height: 61px; }
+.group-card--traders .group-card__name { font: var(--type-card-title); line-height: normal; }  /* figma: trader names SemiBold 18 */
+.group-card--traders .group-card__row.is-selected:first-child { border-radius: var(--radius-card-header); } /* figma: Rectangle 21 radius 4/4/0/0 (Trader frame 3769:8602) */
+.group-card--inset-divider .group-card__row + .group-card__row { border-top: 0; }
+.group-card--inset-divider .group-card__row + .group-card__row::before { content: ""; position: absolute; left: 24px; right: 0; top: 0; height: 1px; background: var(--color-border-default); } /* alt (1440 frames 3648:7418): dividers start at card x+24 */
+/* Group badge - figma: inline Cancel instance "RBS" 48x20 3661:4811 (fill #E6E6E6 r2, SemiBold 12 #000000), shown next to the account name in the detail header */
+.group-badge { display: inline-flex; align-items: center; justify-content: center; flex: none; height: var(--h-button-xs); padding: 0 var(--space-12); border-radius: var(--radius-2); background: var(--color-action-cancel); color: var(--color-action-primary-text); font: var(--type-button-sm); white-space: nowrap; }
+/* Section label - figma: "Trading Accounts"/"Traders" Medium 18 #7373BB {Purple 3}, SENTENCE case (not the old uppercase) */
+.section-label { margin: 0; color: var(--color-text-section-label); font: var(--type-title-modal); white-space: nowrap; }
+.section-head { display: flex; align-items: center; justify-content: space-between; height: 32px; }
+
+/* Split panel (Entity / Trading Account / Trader) - figma CANONICAL 1280 4164:14303: left panel x16..375 (359), 1px divider "Line 4" #39393C at x399 full height, detail from x415 (793 wide), right pad 16.
+   Alt 1440 frames (3648:7418, 3657:4471, 3769:8602): left x24..448 (424), divider x488, detail x512 => --split-left:424px; --split-gap-l:40px; --split-gap-r:23px; padding-left 24. */
+.split { position: absolute; inset: 0; display: grid; grid-template-columns: var(--split-left, 359px) var(--split-gap-l, 24px) 1px var(--split-gap-r, 15px) minmax(0, 1fr); padding: 0 var(--layout-margin-right) 0 var(--app-gutter); }
+.split--alt-1440 { --split-left: 424px; --split-gap-l: 40px; --split-gap-r: 23px; padding-right: 0; } /* figma alt: 424 left panel, divider x488, detail x512 (older TA / Entity / Trader frames) */
+.split__left { grid-column: 1; min-width: 0; }
+.split__divider { grid-column: 3; background: var(--color-border-default); } /* figma: Line 4 1px #39393C */
+.split__right { position: relative; grid-column: 5; min-width: 0; }
+/* Left panel stack (Frame 7 coords): title y24, flag row y63, checkboxes y100, "Trading Accounts" row y132..164, card y172, 2nd card y481 (gap 16), "Traders" row y612 (24 under the cards), traders card y652 */
+.entity-title { margin: 24px 0 0; font: var(--type-heading-entity); color: var(--color-text-primary); text-box: trim-both cap alphabetic; } /* figma: "Bank of America" Medium 24 #FFFFFF at (16,24) */
+.entity-lei { display: flex; align-items: center; gap: var(--space-8); height: 16px; margin: 22.1px 0 0 2px; color: var(--color-text-light); font: var(--type-detail); } /* figma: flag 20x16 at (18,63) + LEI Medium 16 #BABEC7 at x46 */
+.entity-lei .flag { width: 20px; height: 16px; }
+.checkbox-row { display: flex; align-items: center; gap: var(--space-24); margin-top: 21px; height: 16px; } /* figma: "Swap Dealer" / "PBA" y100; groups 24 apart */
+.panel-stack > .section-head { margin-top: 16px; }
+.panel-stack > .group-card { margin-top: 8px; }
+.panel-stack > .group-card + .group-card { margin-top: 16px; } /* figma 1280: 465 -> 481 (1440 frames: 24 = --alt-card-gap-24) */
+.panel-stack > .group-card + .section-head { margin-top: 24px; }
+/* Detail header (right panel) - figma: title Medium 20 #FFFFFF (415,24); chip row y58: .group-badge + "Makor Securities London" Medium 16 #BABEC7 at x60; switches "Give Up" (997,32) / "Active" (1120,32) 80x16 each (43 apart); account-type radios y101 (Client x415, Market Maker x509 = 32 gap) */
+.detail__title { margin: 24px 0 0; font: var(--type-page-title); color: var(--color-text-primary); text-box: trim-both cap alphabetic; }
+.detail__sub { display: flex; align-items: center; gap: var(--space-12); height: 20px; margin-top: 15.9px; color: var(--color-text-light); font: var(--type-detail); }
+.detail__switches { position: absolute; top: 32px; right: 8px; display: flex; gap: 43px; }
+.detail__switches .switch-field { width: 80px; white-space: nowrap; } /* figma: Switch with text frames are 80x16 FIXED (label x40; "Give Up" overflows the frame) */
+.detail__actions { position: absolute; left: 8px; right: -3px; bottom: 24px; display: flex; align-items: center; justify-content: space-between; } /* figma: Close 84x32 at x423 (detail x+8), Save Changes 139x32 right edge x1211 (3px past the 1208 panel edge) y833 = 24 above the footer */
+.form-cols { display: grid; grid-template-columns: 242px 221px 298px; column-gap: var(--space-16); margin-top: 11px; } /* figma: columns x415 (242) / x673 (221) / x910 (298), top y85 */
+.form-cols__col .field { --field-w: 100%; } /* figma: TA detail fields are 242 wide (column width) */
+.form-cols__col { display: flex; flex-direction: column; gap: var(--space-16); min-width: 0; }
+.radio-row { display: flex; align-items: center; gap: var(--space-32); height: 16px; margin-top: 16px; }
+.field--page { gap: var(--space-8); } /* figma: TA page fields: label y133 -> control y149 (label 8 + 8) and stack pitch 64 (library modal stacks: gap 4, pitch 68) */
+.field-row { display: flex; gap: var(--space-8); }
+.field-row > * { --input-w: auto; }
+.checkbox-pair { display: grid; grid-template-columns: var(--cb-col, 131px) auto; align-items: center; height: 16px; } /* figma: TA "Structured" box x415 / "PBA" box x546; New Trading Account modal x32 / x171 (--cb-col:139px) */
+.panel-label.panel-label--modal { margin-bottom: 4px; } /* figma: modal panels: label y85 -> panel y97 (page panels: 8) */
+.panel-label { display: block; margin: 0 0 var(--space-8); color: var(--color-text-secondary); font: var(--type-label); line-height: 8px; white-space: nowrap; } /* figma: panel labels Regular 12 #707079 (label 8 high, 8 gap to the panel) */
+/* Lucera Drop Value panel - figma: 4138:14488 / Frame (673,101) 221x244 #242428 r4; row: Dropdown 61x32 at (12,12), Input 110x32 gap 8, trash 14x14 #FF7272 right pad 8; orange add 32x24 at bottom-right inset 12. Fields inside the panel are #39393C (on-modal rule). Empty: "No mapping values set" Regular 12 #707079 at (16,16). */
+.mapping-panel { position: relative; width: 221px; height: 244px; padding: var(--space-12); border-radius: var(--radius-4); background: var(--color-surface-card); --input-fill: var(--color-input-fill-on-modal); }
+.mapping-row { display: flex; align-items: center; gap: var(--space-8); height: 32px; }
+.icon-trash-14 { --icon-src: url(assets/trash-red-32.currentColor.svg); --icon-w: 24.889px; --icon-h: 24.889px; margin: -5.444px; color: var(--color-action-delete); } /* figma: trash vector 14x14 #FF7272 (the 32x32 asset's 18x18 glyph scaled to 14 and the box margin-cropped) */
+.mapping-panel .btn-add-icon { position: absolute; right: var(--space-12); bottom: var(--space-12); }
+.mapping-panel.surface-inner { background: var(--color-surface-inner-panel); --input-fill: var(--color-input-fill-on-inner-panel); } /* figma: New Trading Account 5536:14961 Lucera panel 221x388 fill #39393C {Inputs on modal}, nested dropdown/input #242428 - stage-3 gap fix (.mapping-panel later in the file overrode .surface-inner; .recipients.surface-inner already existed) */
+.mapping-panel__empty { margin: 4px; color: var(--color-text-secondary); font: var(--type-label); }
+/* Default Booking Recipients panel - figma: Group 150 (910,101) 298x244 #242428 r4; rows 16 high on a 32 pitch (pad 8), email Regular 14 #FFFFFF at x+12, checkbox right inset 12, dividers 1px #39393C; bottom add strip 298x48 (fill = panel, radius 0/0/4/4, shadow 0 -4 4 @0.25) with inner field 282x32 + orange "+".
+   On modals (New Entity 5535:14591 etc.) the panel is #39393C with #242428 dividers/inner field = .surface-inner. */
+.recipients { position: relative; width: 298px; height: 244px; border-radius: var(--radius-4); background: var(--color-surface-card); --input-fill: var(--color-input-fill-on-modal); --recipients-divider: var(--color-border-default); }
+.recipients.surface-inner { background: var(--color-surface-inner-panel); --input-fill: var(--color-input-fill-on-inner-panel); --checkbox-fill: var(--color-input-checkbox-fill-inner); --recipients-divider: var(--color-border-modal-divider); } /* figma: New Entity 5535:14591 panel #39393C, dividers + inner field #242428 */
+.recipients__row { display: flex; align-items: center; justify-content: space-between; height: 32px; padding: 0 var(--space-12); color: var(--color-text-primary); font: var(--type-input); box-shadow: inset 0 -1px 0 var(--recipients-divider); }
+.recipients__add { position: absolute; left: 0; right: 0; bottom: 0; height: 48px; padding: var(--space-8); border-radius: 0 0 var(--radius-4) var(--radius-4); background: inherit; box-shadow: var(--shadow-modal-footer); }
+.recipients__add .input-email { --input-w: 282px; }
+.recipients--short { height: 220px; } /* figma: New Entity panel 298x220 (rows y105/137/169 + strip) */
+/* Product Permissions card - figma: Frame 173 (415,412) 793x389 #242428 r4 clip: tab bar 42 high + divider y42; content tenor labels Regular 14 #707079 at x24, value boxes 733 wide #39393C r4 pad 12/8; scrollbar 4x299.5 at x781; bottom divider y333; "Add Permissions" outlined teal 156x32 at (12,345) */
+.perm-head { display: flex; align-items: center; justify-content: space-between; height: 24px; color: var(--color-text-secondary); font: var(--type-body-16); }
+.perm-total { display: flex; align-items: center; color: var(--color-text-primary); } /* figma: "Total limit  $100m" Regular 16 at x1031 + pencil frame 24x12 at x1184 (text starts 13px further left than this build: font metric / double space - visual estimate) */
+.perm-total > :nth-child(2) { margin-left: var(--space-8); }
+.perm-total__value { color: var(--color-text-link-inline); } /* figma: "$100m" #A4A4FF (range bound) */
+.perm-card { position: relative; width: 793px; height: 389px; overflow: hidden; border-radius: var(--radius-4); background: var(--color-surface-card); --input-fill: var(--color-input-fill-on-modal); }
+.perm-card.abs { position: absolute; }
+.perm-card__tabs { display: flex; align-items: flex-start; height: 43px; border-bottom: var(--border-hairline) solid var(--color-border-default); }
+.perm-card__body { padding: 15px 24px 0; }
+.perm-card__label { margin: 0 0 var(--space-8); color: var(--color-text-secondary); font: var(--type-input); text-box: trim-both cap alphabetic; }
+.perm-card__label ~ .perm-card__label { margin-top: 16px; }
+.value-box { width: 733px; padding: var(--space-12) var(--space-8); border-radius: var(--radius-4); background: var(--input-fill); color: var(--color-input-text); font: var(--type-input); text-box: trim-both cap alphabetic; word-break: break-word; } /* figma: Frame 180/181 733x72 / 733x34 fill #39393C r4 pad 12/8, text Regular 14 (3 lines = 72) */
+.perm-card__scroll { position: absolute; right: var(--space-8); top: 23px; height: 299.5px; }
+.perm-card__foot { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; padding: 11px var(--space-12) 0; border-top: var(--border-hairline) solid var(--color-border-default); }
+.detail__rule { position: absolute; left: 0; right: calc(-1 * var(--layout-margin-right)); top: 373px; height: 1px; background: var(--color-border-default); } /* figma: "Line 7" 4164:14519 in 4164:14303: 809 wide (x415 -> the canvas edge), 1px #39393C at body y373, above "Product Permissions" (found by screenshot comparison; not in the stage-1 spec text) */
+.limit-popover { position: relative; width: 146px; height: 95px; padding: var(--space-16); } /* figma: "Total Limit" 146x95 at (1070,408): fill #242428 r8 shadow (-2,2,4,1 @0.5); input 114x24 at (16,16), Save 114x24 at (16,55) */
+.limit-popover.abs { position: absolute; }
+.limit-popover .input--sm { --input-w: 114px; padding: var(--space-8) var(--space-12); justify-content: space-between; }
+.limit-popover .btn { width: 114px; margin-top: 15px; }
+.limit-popover .input--sm .unit { color: var(--color-text-secondary); }
+
+/* ---------- P2.4 MODALS ---------- */
+/* figma: Modal system trading.md 4.1 / admin-entities.md 9.0 (New Entity 5535:14591, New Trader 5539:15430, New Trading Account 5536:14961, Add Permissions 5587:14673 + 5580:14626, New Deal/Trade 5842:17240 ..., Allocate Block 2696:2682).
+   Overlay "Rectangle 29": 1384x1022 at (0,0) of the content frame (sidebar not covered), fill #000000@0.5 + BACKGROUND_BLUR 10. Modal: fill #242428, radius 12, clip, no stroke, NO shadow, centred in the content frame.
+   Header: title Medium 18 #FFFFFF centred, cap top y24; divider 1px #39393C at y61 (full width); content starts y85 (label cap top); side padding 32; column 172 / gap 24; row pitch 68 (44 + 24); buttons at last row bottom + 32, height 32, bottom padding 24. */
+.modal-overlay { position: absolute; left: 0; top: 0; z-index: 20; display: grid; place-items: center; width: 100%; height: calc(100% - 2px); background: var(--color-surface-scrim); -webkit-backdrop-filter: blur(var(--blur-modal-backdrop)); backdrop-filter: blur(var(--blur-modal-backdrop)); }
+.modal { position: relative; flex: none; width: var(--modal-w, 432px); overflow: hidden; border-radius: var(--radius-12); background: var(--color-surface-modal); box-shadow: none; color: var(--color-text-primary); font: var(--type-input); --input-fill: var(--color-input-fill-on-modal); --checkbox-fill: var(--color-input-checkbox-fill); }
+.modal__header { height: 62px; padding-top: 24px; border-bottom: var(--border-hairline) solid var(--color-border-default); text-align: center; }
+.modal__title { margin: 0; font: var(--type-title-modal); color: var(--color-text-primary); text-box: trim-both cap alphabetic; }
+.modal__body { display: grid; grid-template-columns: var(--modal-cols, repeat(2, 172px)); gap: var(--space-24); padding: 23px var(--layout-modal-inset) 0; }
+.modal__body .field { --field-w: 100%; }
+.modal__body .field--label-14 .field__label { height: 10px; font: var(--type-input); line-height: 10px; }
+.modal__body .field--label-14 { gap: var(--space-8); }   /* figma: Add Permissions 5587:14673: labels Regular 14 #707079 (not 12), control at label +18 */
+.modal__span-all { grid-column: 1 / -1; }
+.modal__footer { display: flex; align-items: center; padding: var(--modal-footer-gap, 32px) var(--layout-modal-inset) var(--space-24); }
+.modal__footer-end { margin-left: auto; }
+.modal__footer-switch { margin-left: 48px; }  /* figma: New Trader / New Trading Account: Active/Give-up switch at x172 (Cancel ends x124), vertically centred with the buttons */
+.modal--432 { --modal-w: 432px; } .modal--628 { --modal-w: 628px; --modal-cols: repeat(3, 172px); } .modal--372 { --modal-w: 372px; }
+.modal--new-entity { --modal-w: 572px; --modal-cols: 186px 298px; }                /* figma: 5535:14591 572x405 cols x32 (186) / x242 (298) */
+.modal--new-trader { --modal-w: 602px; --modal-cols: 298px 203px; }
+.modal--new-trader .modal__body { column-gap: 37px; } /* figma: 5539:15430 602x474: cols x32 (298) / x367 (Assignment) */
+.modal--new-account { --modal-w: 873px; --modal-cols: 242px 221px 298px; --cb-col: 139px; } /* figma: 5536:14961 873x573: cols x32 (242) / x298 (221) / x543 (298), gap 24 */
+.modal--add-permissions { --modal-w: 420px; --modal-cols: 158px 158px; --modal-footer-gap: 63px; } /* figma: 5587:14673 420x406: dropdowns 158 at x32/x230 (40 gap), buttons y350 */
+.modal--add-permissions .modal__body { column-gap: 40px; }
+.modal--add-permissions-alt { --modal-w: 510px; --modal-cols: 446px; --modal-footer-gap: 32px; }
+.modal--add-permissions-alt .field--currencies { margin-top: -8px; } /* figma alt 5580:14626: Tenor select y161..193 then Currencies label y209 (16 gap, not 24) */ /* figma ALT: 5580:14626 510x406: Product = 4 checkboxes (x32/110/218/363), Tenor stacked, Currencies box 446x91 */
+.modal--edit-user { --modal-w: 562px; --modal-cols: 237px 237px; }                 /* figma: 1945:2735 562x341 */
+.modal-label-14 { color: var(--color-text-secondary); font: var(--type-input); }
+.modal-checkboxes { display: grid; grid-template-columns: 78px 108px 145px auto; align-items: center; height: 16px; } /* figma: alt Add Permissions product row: boxes x32/110/218/363 */
+.modal-checkbox-row { display: flex; align-items: center; height: 16px; } /* figma: Conversion Trade 133x16 (33,357) */
+/* Segmented control Side / Client Side / Market Side / Put Call - figma: trading.md 4.3 (drawn from rectangles, 172x32): outline r4 stroke 1 INSIDE; left half 82.87x32 (radius 4/0/0/4, stroke 1 INSIDE = the divider); labels SemiBold 14 centred in each half.
+   BUY/SELL neutral outline+labels #FF9747 {Edit}; BUY selected: left half filled {Edit}, BUY #000000, SELL {Edit}. Put/Call neutral #A4A4FF. Put selected (Vanilla MM): left half filled #A4A4FF, outline {Secondary text}, PUT #000000, CALL #707079.
+   Market Side locked: outline {Secondary text}; selected half filled {Edit} (w89), selected label #242428 {Modal BG}, unselected #707079. */
+.segmented { --seg-stroke: var(--color-action-edit); --seg-fill: var(--color-action-edit); --seg-text: var(--color-action-edit); --seg-text-off: var(--color-action-edit); --seg-text-selected: var(--color-black);
+  display: flex; flex: none; width: 172px; height: 32px; overflow: hidden; border-radius: var(--radius-4); box-shadow: inset 0 0 0 1px var(--seg-stroke); font: var(--type-button); }
+.segmented__btn { display: flex; align-items: center; justify-content: center; flex: none; height: 100%; padding: 0; border: 0; background-color: transparent; color: var(--seg-text-off); font: inherit; cursor: pointer; }
+.segmented__btn:first-child { width: 82.87px; border-radius: var(--radius-segment-left); box-shadow: inset 0 0 0 1px var(--seg-stroke); }
+.segmented__btn:last-child { width: 89.13px; }
+.segmented__btn.is-selected { background-color: var(--seg-fill); color: var(--seg-text-selected); }
+.segmented--putcall { --seg-stroke: var(--color-action-primary); --seg-fill: var(--color-action-primary); --seg-text: var(--color-action-primary); --seg-text-off: var(--color-action-primary); }
+.segmented--locked { --seg-stroke: var(--color-text-secondary); --seg-text-off: var(--color-text-secondary); --seg-text-selected: var(--color-surface-modal); cursor: default; }
+.segmented--putcall.segmented--locked { --seg-text-selected: var(--color-black); }
+.segmented__btn:not(.is-selected):hover, .segmented__btn.is-hover { background-image: linear-gradient(var(--color-action-hover-overlay-20), var(--color-action-hover-overlay-20)); } /* EXTENDED - not in Figma: hover (none drawn) = white@0.2 (status-button recipe) */
+.segmented__btn.is-selected:hover { background-image: linear-gradient(var(--color-action-hover-overlay-30), var(--color-action-hover-overlay-30)); } /* EXTENDED - not in Figma: selected hover = white@0.3 (filled-button recipe) */
+.segmented--locked .segmented__btn:hover { background-image: none; }
+.segmented__btn:focus-visible, .segmented__btn.is-focus { outline: 1px solid var(--color-border-focus); outline-offset: 2px; } /* EXTENDED - not in Figma */
+/* "Market Side >" step-1 CTA - figma: With-dropdown frame 134x32 fill #707079 r3, SemiBold 14 #BABEC7, chevron-right 10x5 stroke #BABEC7 1.3; L24 R20 gap 8. Never drawn enabled. */
+.btn-market-side { --btn-fill: var(--color-action-disabled-fill); --btn-fill-hover: var(--color-action-disabled-fill); --btn-text: var(--color-action-disabled-text); --btn-hover-overlay: transparent; width: 134px; gap: var(--space-8); padding: var(--space-11) var(--space-20) var(--space-11) var(--space-24); border-radius: var(--radius-3); cursor: default; }
+.btn-market-side .icon { transform: rotate(-90deg); margin: 0 -2.5px; } /* chevron-down asset rotated: stroke 1.3, 7x12 */
+.btn-market-side.is-ready, .btn-market-side.is-ready:hover { --btn-fill: var(--color-action-teal); --btn-fill-hover: var(--color-action-teal); --btn-text: var(--color-action-primary-text); --btn-hover-overlay: var(--color-action-hover-overlay-40); cursor: pointer; } /* EXTENDED - not in Figma: enabled state = the library "With dropdown" teal */
+/* Allocate Block 372x385 - figma: 2696:2682: trade rows y85/y129 (pitch 44), heads "Quantity" x165 / "Trade Price" x252 Regular 12 #707079, values Medium 12 white; Search with label "Account" 308x44 at (32,185); Quantity/Price inputs 146x44 (gap 16) at y253; buttons y329 */
+.modal--allocate .modal__body { display: flex; flex-direction: column; gap: 0; }
+.alloc-trade { display: grid; grid-template-columns: 133px 87px auto; row-gap: 7.54px; font: var(--type-table-cell); }
+.alloc-trade > * { text-box: trim-both cap alphabetic; }
+.alloc-trade + .alloc-trade { margin-top: 19.5px; }
+.alloc-trade .is-head { color: var(--color-text-secondary); font: var(--type-label); }
+.alloc-trade__id { color: var(--color-text-primary); } .alloc-trade__id b { font-weight: inherit; color: var(--color-text-link-inline); }
+.modal--allocate .field { margin-top: 31.5px; --field-w: 308px; }
+.modal--allocate .alloc-pair { display: flex; gap: var(--space-16); margin-top: var(--space-24); }
+.modal--allocate .alloc-pair .field { margin-top: 0; --field-w: 146px; }
+/* ID Status popover 301x440 - figma: 3396:7300: fill #242428 r12; title "Deal 12345678" Medium 18 (24,24); close 16x16 at (261,24); rules y61 / y155 / y366 full width, y274 inset x24; headings Regular 16 #7373BB; items Regular 16; status tick 16x12 #2BDF68 / cross 12x12 #FF7272 at x217; action chip 24x24 at x253; PB tag 32x12 r2 #E6E6E6 (failed #707079) text Regular 8 black; meta Medium Italic 10 #707079; scrollbar 4px at x289 (thumb h128) */
+.id-status { position: relative; width: 301px; height: 440px; overflow: hidden; border-radius: var(--radius-12); background: var(--color-surface-popover); color: var(--color-text-primary); font: var(--type-body-16); }
+.id-status .abs { position: absolute; margin: 0; white-space: nowrap; text-box: trim-both cap alphabetic; }
+.id-status__title { font: var(--type-title-modal); }
+.id-status__title b, .id-status__trade b { font-weight: inherit; color: var(--color-text-link-inline); }
+.id-status__rule { position: absolute; left: 0; right: 0; top: var(--y); height: 1px; background: var(--color-border-default); }
+.id-status__rule--inset { left: 24px; }
+.id-status__heading { color: var(--color-text-section-label); font: var(--type-body-16); }
+.id-status__label { color: var(--color-text-light); }
+.id-status__meta { color: var(--color-text-secondary); font: var(--type-note-italic); }
+.id-status__close { position: absolute; left: 261px; top: 24px; width: 16px; height: 16px; color: var(--color-text-light); }
+.id-status__scroll { position: absolute; left: 289px; top: 62px; height: 372px; border-radius: 35.61px; }
+.pb-tag { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 12px; border-radius: var(--radius-2); background: var(--color-action-cancel); color: var(--color-surface-page); font: var(--type-micro); } /* figma: prime-broker tag 32x12 (HSBC 38x12) r2 #E6E6E6, Regular 8 {BG} */
+.pb-tag--failed { background: var(--color-text-secondary); }
+.pb-tag--wide { width: 38px; }
+.status-tick { --icon-w: 16px; --icon-h: 12px; color: var(--color-status-success); }
+
+/* ---------- P2.5 WIDGET CARDS (dashboard) ---------- */
+/* figma: 6038:13964 "WIdgets Dashboard New Sizes" (newer; 4243:15535 older without Activity): layout grid x8/y56 margins 8, gutter 8, rail 56, header 48, footer 46: Activity 1070x315 (8,56), Trades 1070x587 (8,379), Prices 290x911 (1086,55) */
+.widget-grid { display: grid; grid-template-columns: 1070px 290px; grid-template-rows: 315px 587px; gap: var(--layout-widget-gutter); height: 100%; }
+.widget-grid > .widget--tall { grid-row: 1 / span 2; grid-column: 2; }
+/* Widget card - figma: card FRAME fill #242428 {Modal BG}, radius 8, clip, no stroke, no shadow. Title bar Rectangle 18 height 32 fill #39393C {Inputs on modal}; title Nunito Medium 14 #FFFFFF at x16 (centred in 32);
+   drag handle "Union" 6-dot grid 10x16 #BABEC7 (50 px from the right edge to its left edge); close X 16x16 #BABEC7 (12 from the right; Activity 16); resize grip Frame 28 24x24 at the bottom-right (L corner stroke 2 #BABEC7);
+   scrollbar 4 wide (r12, track #39393C + shadow 0 4 4 @0.25, thumb #707079) at right 8 */
+.widget { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; border-radius: var(--radius-8); background: var(--color-surface-card); color: var(--color-text-primary); font: var(--type-table-cell); --input-fill: var(--color-input-fill-on-modal); }
+.widget__bar { display: flex; align-items: center; flex: none; gap: var(--widget-tools-gap, 12px); height: var(--h-widget-title-bar); padding: 0 var(--widget-pr, 12px) 0 var(--space-16); background: var(--color-surface-table-header); }
+.widget__title { margin: 0 auto 0 0; font: var(--type-cell); color: var(--color-text-primary); white-space: nowrap; }
+.widget__grip { display: block; flex: none; width: 10px; height: 16px; padding: 0; border: 0; background: none; color: var(--color-text-light); line-height: 0; cursor: grab; }
+.widget__close { display: block; flex: none; width: 16px; height: 16px; padding: 0; border: 0; background: none; color: var(--color-text-light); line-height: 0; cursor: pointer; }
+.widget__close .icon { --icon-w: 16px; --icon-h: 16px; }
+.widget__grip:hover, .widget__close:hover, .widget__resize:hover, .widget__grip.is-hover, .widget__close.is-hover, .widget__resize.is-hover { color: var(--color-text-primary); } /* EXTENDED - not in Figma: handle/close/grip hover (none drawn) -> primary text colour */
+.widget__grip:active { cursor: grabbing; } /* EXTENDED - not in Figma: cursor */
+.widget__close:focus-visible, .widget__grip:focus-visible, .widget__resize:focus-visible { outline: 1px solid var(--color-border-focus); outline-offset: 2px; } /* EXTENDED - not in Figma */
+.widget__resize { position: absolute; right: 0; bottom: 0; width: 24px; height: 24px; padding: 0; border: 0; background: none; color: var(--color-text-light); line-height: 0; cursor: nwse-resize; }
+.widget__resize .icon { --icon-w: 24px; --icon-h: 24px; }
+.widget__scroll { position: absolute; right: var(--space-8); top: var(--scroll-top, 96px); height: var(--scroll-h, 195px); }
+.widget__body { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.widget--activity { --widget-pr: 16px; --widget-tools-gap: 16px; }  /* figma: Activity 6038:13704: grip x1012 (58 from right), close x1038 (16 from right) */
+.widget--activity .widget__grip { height: 14.94px; }
+.widget.is-dragging { box-shadow: var(--shadow-tooltip-strong); } /* EXTENDED - not in Figma: drag-in-progress lift (the popover shadow recipe) */
+/* Activity Blotter (account P&L) - figma: 6038:13704 1070x315: tab row y32 h32 (two halves "Client" | "Market Maker", Medium 14 #A4A4FF centred), hairline y64, header text Medium 12 #707079 centred y72, hairline y88, rows pitch 28 + 1px #39393C, cell text Medium 12 #FFFFFF;
+   left half: Account left x31, Trades right edge x242, Volume right edge x391, P&L right edge x516; header centres 89.5 / 231.5 / 365 / 491.5. ZERO P&L = #707079 {Secondary text}. Vertical divider at widget x581 from y32 to the bottom. */
+.activity { position: absolute; inset: 0; display: grid; grid-template-columns: 581px 1px minmax(0, 1fr); }
+.activity__divider { grid-column: 2; margin-top: 32px; background: var(--color-border-default); }
+.activity__half { position: relative; min-width: 0; }
+.activity__half--left { grid-column: 1; } .activity__half--right { grid-column: 3; }
+.activity__title { display: flex; align-items: center; justify-content: center; height: 32px; color: var(--color-action-primary); font: var(--type-cell); } /* figma: "Client"/"Market Maker" fill #A4A4FF in BOTH halves (section titles, not toggles) */
+.activity__head, .activity__row { position: relative; height: 28px; border-bottom: var(--border-hairline) solid var(--color-border-default); font: var(--type-table-cell); }
+.activity__head { height: 24px; border-top: var(--border-hairline) solid var(--color-border-default); color: var(--color-text-secondary); }
+.activity__head > span { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; transform: translateX(-50%); white-space: nowrap; }
+.activity__row > span { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; white-space: nowrap; }
+.activity .a-acc { left: 31px; }
+.activity .a-trd, .activity .a-vol, .activity .a-pnl { left: 0; justify-content: flex-end; }
+.activity .a-trd { width: 242px; } .activity .a-vol { width: 391px; } .activity .a-pnl { width: 516px; }
+.activity__head .a-acc { left: 89.5px; } .activity__head .a-trd { left: 231.5px; width: auto; } .activity__head .a-vol { left: 365px; width: auto; } .activity__head .a-pnl { left: 491.5px; width: auto; }
+.activity .is-zero { color: var(--color-text-secondary); } /* figma: zero P&L {Secondary text}; non-zero {Primary text} */
+.activity__row:hover { background: var(--color-surface-row-highlight); } /* EXTENDED - not in Figma: row hover (none drawn) = #39393C */
+/* Rates widget (Prices) - figma: 6234:14341 standalone 290x794 (no title bar; header labels Medium 14, "Symbol" x54 / "Price" x197, line y34, row pitch 28 from y34, symbol x16, price right edge x232, arrow x236) and the dashboard card 6038:13992 (title bar + labels Medium 12 at x58/x201, line y56, symbol x17, price right edge x233, arrow x237).
+   Row: [flag 16x12 r2] [code Medium 12] "/" Medium 14 [flag] [code]; price Medium 12 right aligned in a 54 box + circle-arrow 12x12 (up #2BDF68 / down #FD7557, down = flipped icon). */
+.rates { position: relative; font: var(--type-table-cell); color: var(--color-text-primary); }
+.rates__head { position: relative; height: 24px; border-bottom: var(--border-hairline) solid var(--color-border-default); color: var(--color-text-secondary); font: var(--type-table-cell); }
+.rates__head > span { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; transform: translateX(-50%); }
+.rates__head .r-sym { left: 79px; } .rates__head .r-price { left: 214.5px; }
+.rates__row { position: relative; height: 28px; border-bottom: var(--border-hairline) solid var(--color-border-default); }
+.rates__symbol { position: absolute; left: 17px; top: 0; bottom: 0; display: flex; align-items: center; white-space: nowrap; }
+.rates__price { position: absolute; left: 0; top: 0; bottom: 0; width: 233px; display: flex; align-items: center; justify-content: flex-end; color: var(--color-status-up); }
+.rates__arrow { position: absolute; left: 237px; top: 8px; color: var(--color-status-up); }
+.rates__row.is-down .rates__price, .rates__row.is-down .rates__arrow { color: var(--color-status-down); }
+.rates__row:hover { background: var(--color-surface-row-highlight); } /* EXTENDED - not in Figma: row hover = #39393C */
+.rates--standalone .rates__head { height: 34px; font: var(--type-cell); border-bottom-width: 1px; }
+.rates--standalone .rates__head .r-sym { left: 78.5px; } .rates--standalone .rates__head .r-price { left: 213px; }
+.rates--standalone .rates__symbol { left: 16px; } .rates--standalone .rates__price { width: 232px; } .rates--standalone .rates__arrow { left: 236px; }
+.rates--standalone { width: 290px; height: 794px; overflow: hidden; border-radius: var(--radius-8); background: var(--color-surface-card); box-shadow: var(--shadow-tooltip-strong); }
+/* Symbol cell (currency pair with flags) - figma: Group 107x12: flag 16x12 r2, gap 4, code Medium 12 #FFFFFF, "/" Medium 14 (w5) at +55 (AUD ends at +46.5 in Nunito: gap 8.5), flag at +68 (8 after "/"); same in the blotter (3.6) */
+.symbol { display: inline-flex; align-items: center; white-space: nowrap; font: var(--type-table-cell); color: var(--color-text-primary); }
+.symbol .flag { margin-right: 4px; }
+.symbol__slash { width: 5px; margin: 0 8px 0 8.5px; text-align: center; font: var(--type-cell); }
+/* Filters side panel 241x906 - figma: 1253:2360: fill #242428 r8, shadow (-4,0,6 @0.4); title "Filter by" Medium 14 at (16,12); close 18x18 at (211,8); fields x16 w209 pitch 60 (44 + 16) from y46: Search with label / Dates / Dropdown / Chips */
+.filters-panel { position: relative; display: flex; flex-direction: column; gap: var(--space-16); width: 241px; height: 906px; padding: 46px var(--space-16) 0; border-radius: var(--radius-8); background: var(--color-surface-popover); box-shadow: var(--shadow-filters-panel); color: var(--color-text-primary); --input-fill: var(--color-input-fill-on-modal); }
+.filters-panel .field { --field-w: 209px; }
+.filters-panel__title { position: absolute; left: 16px; top: 12px; margin: 0; font: var(--type-cell); text-box: trim-both cap alphabetic; }
+.filters-panel__close { position: absolute; left: 211px; top: 8px; width: 18px; height: 18px; padding: 0; border: 0; background: none; color: var(--color-text-light); line-height: 0; cursor: pointer; }
+.filters-panel__close:hover { color: var(--color-text-primary); } /* EXTENDED - not in Figma: hover */
+.filter-panel--dates .field { --field-w: 205px; } .filter-panel--status { width: 158px; } /* figma: Date variant 6236:14733 237x136 (inputs 205x44 at (16,16)/(16,76)); status filter 6765:14776 158x144 (inner content not drawn in detail) */
+/* Pagination - figma: 3107:6943/6946: first-last icon 24x12 (#707079 dimmed), "Page 1" Medium 14 ("Page" #707079, "1" #BABEC7), next chevron 8x12 #BABEC7 (active); group centred ~x631..761 (130 wide). Gaps = visual estimate. */
+.pagination { display: flex; align-items: center; justify-content: center; gap: 26px; height: 16px; font: var(--type-cell); }
+.pagination__page { color: var(--color-text-secondary); } .pagination__page b { font-weight: inherit; color: var(--color-text-light); }
+.pagination__btn { display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 0; background: none; color: var(--color-text-light); line-height: 0; cursor: pointer; }
+.pagination__btn:disabled, .pagination__btn.is-disabled { color: var(--color-text-secondary); cursor: not-allowed; }
+.pagination__btn:not(:disabled):not(.is-disabled):hover { color: var(--color-text-primary); } /* EXTENDED - not in Figma: pagination hover (none drawn) -> primary text colour */
+.pagination__btn:focus-visible { outline: 1px solid var(--color-border-focus); outline-offset: 2px; } /* EXTENDED - not in Figma */
+/* Horizontal scrollbar - figma: Blotters 8 thick, track #39393C r12, thumb #707079 r12 (length 473.34 = 34.6%) */
+.scrollbar--h { width: auto; height: 8px; box-shadow: none; }
+.scrollbar--h .scrollbar__thumb { top: 0; bottom: 0; width: auto; height: 100%; }
+
+/* ---------- P2.6 TRADES BLOTTER / DELETED TRADES / CSV ---------- */
+/* Toolbar row - figma: Blotters 2281:1414 y64, all h32, label SemiBold 14: Group x8 (88) | Amend x104 (95) | Allocate x207 (102) | Give-Up x318 (102, outlined #00FEA9) | Delete x428 (91) ... New Trade x748 (132 HUG) | chips x904/944/984 (32 round) | Search x1040 (205) | Prices toggle x1277 (91).
+   Left group gap 8, right group gaps 24/8/8/24/32 ending 16 from the edge (the 1px drawing slop of x318 is not reproduced). */
+.toolbar { display: flex; align-items: center; justify-content: space-between; height: 32px; padding: 0 var(--layout-margin-right) 0 var(--space-8); }
+.toolbar__group { display: flex; align-items: center; gap: var(--space-8); }
+.toolbar__group > .ml-16 { margin-left: 16px; } .toolbar__group > .ml-24 { margin-left: 24px; } /* 8 + 16 = 24 / 8 + 24 = 32 */
+.btn-outline-teal--giveup { --btn-text: var(--color-action-outlined-teal-library); --btn-stroke: var(--color-action-outlined-teal-library); --btn-fill-hover: var(--color-action-outlined-teal-library-hover); } /* figma: Give-Up "Button transparent green" 3107:7139: stroke+text raw #00FEA9 (unbound) = the library teal; hover #1B5244 */
+.btn-toggle { padding: var(--space-11) var(--space-16) var(--space-11) var(--space-12); } /* figma: Prices toggle 3107:7158 91x32: stroke 1 #A4A4FF r3, icon 16x16 + "Prices" SemiBold 14 #A4A4FF, L12 R16 gap 8; default no fill, active ("rates clicked on" 2876:3113) fill #39394E. TODO: the 16x16 Prices glyph is not exported (icon slot left empty). */
+.btn-toggle.is-on, .btn-toggle[aria-pressed="true"] { --btn-fill: var(--color-action-transparent-fill); }
+.widget-toolbar { display: flex; align-items: center; gap: var(--space-8); height: 24px; margin-top: var(--space-8); padding: 0 var(--space-8); } /* figma: Trades widget 6038:14417 toolbar row y40 h24, SemiBold 12 buttons: Group x8 / Amend x90 / Give-Up x178 / Delete x272 / Review x410 / status x518 / Clear Filters x622 / Search x733 / New Trade x950 */
+/* Blotter table - figma: Blotter 3107:6695 1384x920 #171719: header 34 high + 1px rule, labels Medium 14 #707079 centred in their boxes (y12); rows pitch 28 + 1px #39393C, cell text Medium 12 #FFFFFF, NOT auto-layout (free-positioned cells): columns below are the drawn x positions.
+   Amounts: qty integer (sell negative with "-"), prices 4 dp, dates DD/MM/YYYY HH:mm:ss; BUY/SELL plain white (no colour coding); client truncated with ellipsis. */
+.blotter { --bx-cb: 8px; --bx-status: 32px; --bx-chev: 40px; --bx-ico: 46px; --bx-id: 76px; --bw-id: 51px; --bx-type: 160px; --bx-client: 238px; --bx-mm: 339px; --bx-side: 427px; --bx-qty: 480px; --bw-qty: 64px; --bx-sym: 583px; --bx-cp: 723px; --bw-cp: 46px; --bx-mp: 831px; --bw-mp: 46px; --bx-pnl: 943px; --bw-pnl: 39px; --bx-td: 999px; --bw-td: 117px; --bx-vd: 1134px; --bw-vd: 65px; --bx-pb: 1246px; --bw-pb: 24px; --bx-dir: 1318px;
+  --hx-id: 94px; --hw-id: 15px; --hx-type: 172px; --hw-type: 31px; --hx-client: 237px; --hw-client: 38px; --hx-mm: 314px; --hw-mm: 87px; --hx-side: 419px; --hw-side: 53px; --hx-qty: 490px; --hw-qty: 65px; --hx-sym: 613px; --hw-sym: 49px; --hx-cp: 710px; --hw-cp: 73px; --hx-mp: 802px; --hw-mp: 122px; --hx-pnl: 949px; --hw-pnl: 27px; --hx-td: 1023px; --hw-td: 70px; --hx-vd: 1132px; --hw-vd: 70px; --hx-pb: 1216px; --hw-pb: 83px; --hx-dir: 1322px; --hw-dir: 58px;
+  position: relative; width: 100%; overflow: hidden; background: var(--color-surface-panel); color: var(--color-text-primary); font: var(--type-table-cell); }
+.blotter--deleted { /* figma: Deleted trades 2936:3140: same grid, no checkbox/status columns; body x shifted left, header x as drawn */
+  --bx-id: 28px; --bx-type: 122px; --bx-client: 200px; --bx-mm: 301px; --bx-side: 389px; --bx-qty: 442px; --bx-sym: 543px; --bx-cp: 685px; --bx-mp: 793px; --bx-pnl: 905px; --bx-td: 961px; --bx-vd: 1096px; --bx-pb: 1208px; --bx-dir: 1280px;
+  --hx-id: 46px; --hx-type: 134px; --hx-client: 199px; --hx-mm: 276px; --hx-side: 381px; --hx-qty: 452px; --hx-sym: 575px; --hx-cp: 672px; --hx-mp: 764px; --hx-pnl: 911px; --hx-td: 985px; --hx-vd: 1094px; --hx-pb: 1178px; --hx-dir: 1284px; }
+.blotter__head, .blotter__row { position: relative; display: block; height: var(--layout-row-pitch-blotter); }
+.blotter__head { height: 34px; border-bottom: var(--border-hairline) solid var(--color-border-default); color: var(--color-text-secondary); font: var(--type-cell); }
+.blotter__row { border-bottom: var(--border-hairline) solid var(--color-border-default); }
+.blotter .c { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; white-space: nowrap; }
+.blotter .c-cb { left: var(--bx-cb); } .blotter .c-status { left: var(--bx-status); color: var(--color-action-teal); } .blotter .c-chev { left: var(--bx-chev); } .blotter .c-ico { left: var(--bx-ico); }
+.blotter .c-id { left: var(--bx-id); width: var(--bw-id); justify-content: flex-end; }
+.blotter .c-type { left: var(--bx-type); } .blotter .c-client { left: var(--bx-client); } .blotter .c-mm { left: var(--bx-mm); } .blotter .c-side { left: var(--bx-side); }
+.blotter .c-qty { left: var(--bx-qty); width: var(--bw-qty); justify-content: flex-end; } .blotter .c-sym { left: var(--bx-sym); }
+.blotter .c-cp { left: var(--bx-cp); width: var(--bw-cp); justify-content: flex-end; } .blotter .c-mp { left: var(--bx-mp); width: var(--bw-mp); justify-content: flex-end; }
+.blotter .c-pnl { left: var(--bx-pnl); width: var(--bw-pnl); justify-content: flex-end; } .blotter .c-td { left: var(--bx-td); width: var(--bw-td); justify-content: flex-end; }
+.blotter .c-vd { left: var(--bx-vd); width: var(--bw-vd); justify-content: flex-end; } .blotter .c-pb { left: var(--bx-pb); width: var(--bw-pb); justify-content: flex-end; } .blotter .c-dir { left: var(--bx-dir); }
+.blotter__head .c { justify-content: center; }
+.blotter__head .c-id { left: var(--hx-id); width: var(--hw-id); } .blotter__head .c-type { left: var(--hx-type); width: var(--hw-type); } .blotter__head .c-client { left: var(--hx-client); width: var(--hw-client); }
+.blotter__head .c-mm { left: var(--hx-mm); width: var(--hw-mm); } .blotter__head .c-side { left: var(--hx-side); width: var(--hw-side); } .blotter__head .c-qty { left: var(--hx-qty); width: var(--hw-qty); }
+.blotter__head .c-sym { left: var(--hx-sym); width: var(--hw-sym); } .blotter__head .c-cp { left: var(--hx-cp); width: var(--hw-cp); } .blotter__head .c-mp { left: var(--hx-mp); width: var(--hw-mp); }
+.blotter__head .c-pnl { left: var(--hx-pnl); width: var(--hw-pnl); } .blotter__head .c-td { left: var(--hx-td); width: var(--hw-td); } .blotter__head .c-vd { left: var(--hx-vd); width: var(--hw-vd); }
+.blotter__head .c-pb { left: var(--hx-pb); width: var(--hw-pb); } .blotter__head .c-dir { left: var(--hx-dir); width: var(--hw-dir); }
+.blotter__head .c-cb { left: 8px; justify-content: flex-start; } /* figma: select-all "deselect all" 38x16 at (8,9) */
+.blotter .c-trunc { overflow: hidden; text-overflow: ellipsis; }
+.c-link { color: var(--color-text-link); } /* figma: clickable ID (row 3) #60A8FF {blue} */
+/* Row states - figma: trading.md 3.5 (full-width rectangles behind the text): New = #30F0D6@0.15 + "New" Medium 12 #30F0D6 at x32; Ungrouped = #FFB800@0.15 + link-broken 14x14 #FFDC51 at x46; Unallocated = solid #242432 + warning 14x12 {Edit} at x46;
+   Group parent expanded = fill #242428 + child block (#39393C@0.8, 1px #707079 OUTSIDE) with child rows pitch 24 and text #BABEC7 (side/qty stay white); Selected = checkbox only (no row highlight); hover/focus/pressed NOT drawn. */
+.blotter__row--new { background: var(--color-surface-row-tint-teal); }
+.blotter__row--ungrouped { background: var(--color-surface-row-tint-amber); }
+.blotter__row--unallocated { background: var(--color-surface-row-unallocated); }
+.blotter__row--group-open { background: var(--color-surface-card); }
+.blotter__children { position: relative; background: var(--color-raw-panel-outline-80); box-shadow: 0 0 0 1px var(--color-border-disabled); }
+.blotter__children .blotter__row { height: 24px; color: var(--color-text-light); }
+.blotter__children .blotter__row .c-side, .blotter__children .blotter__row .c-qty { color: var(--color-text-primary); }
+.blotter__children .checkbox { --checkbox-fill: var(--color-input-checkbox-fill-inner); }
+.blotter__row:not(.blotter__row--new):not(.blotter__row--ungrouped):not(.blotter__row--unallocated):not(.blotter__row--group-open):hover { background: var(--color-surface-row-highlight); } /* EXTENDED - not in Figma: row hover (none drawn) = #39393C {Separators}, the drawn highlighted-row fill (file list 2958:3082) */
+.blotter__row.is-highlighted { background: var(--color-surface-row-highlight); } /* figma: file-download list "Rectangle 1368x27 #39393C" (row 1) */
+.blotter__row:focus-visible { outline: 1px solid var(--color-border-focus); outline-offset: -1px; } /* EXTENDED - not in Figma */
+.blotter .th-sort { display: inline-flex; align-items: center; margin-left: var(--space-6); color: var(--color-text-light); } /* EXTENDED - not in Figma: header sort/filter affordances (none drawn in the blotter; assets sort-arrows-10x8 / filter-funnel-8 exist in the file, 6234:15097/15099, colour Grey 4 #BABEC7); placement derived */
+.blotter .th-sort:hover { color: var(--color-text-primary); }
+.blotter__empty { display: flex; align-items: center; justify-content: center; height: 200px; color: var(--color-text-light); font: var(--type-detail); } /* EXTENDED - not in Figma: empty table = the drawn empty-state text style ("Select a trading account" Medium 16 #BABEC7, admin-entities 4) */
+.skeleton { display: block; height: 12px; border-radius: var(--radius-2); background: var(--color-surface-row-highlight); animation: fxer-skeleton 1.2s ease-in-out infinite; } /* EXTENDED - not in Figma: loading placeholder (#39393C) - Figma draws no loading state */
+@keyframes fxer-skeleton { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
+.empty-state { display: flex; align-items: center; justify-content: center; color: var(--color-text-light); font: var(--type-detail); text-align: center; } /* figma: "Select a trading account" Medium 16 #BABEC7 centred in the detail panel (3648:7418) */
+/* Blotter body container + pager placement - figma: pagination centred y845 (12 above the footer) */
+.blotter__pager { position: absolute; left: 0; right: 0; bottom: 12px; }
+/* CSV / file-download list - figma: 2958:3082 (HIDDEN duplicate; kept as pattern): Blotter 1368x906 at (8,59) fill #171719 r8; Search 205x32 at (12,8), circle 32x32 at (1326,8); header Medium 14 #707079 (Download x16, File x300, PB x644, Upload Date x876, File Size x1113); rows pitch 28; row 1 highlighted #39393C; csv icon 14x14 at x42 (first #A4A4FF, others #707079); filenames Medium 12 white, dates/size Regular 12 */
+.file-list { position: relative; width: 1368px; border-radius: var(--radius-8); background: var(--color-surface-panel); color: var(--color-text-primary); font: var(--type-table-cell); }
+.file-list__toolbar { display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 var(--space-16) 0 var(--space-12); }
+.file-list .fc { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; white-space: nowrap; }
+.file-list .fc-dl { left: 42px; color: var(--color-text-secondary); } .file-list .is-highlighted .fc-dl { color: var(--color-action-primary); }
+.file-list .fc-file { left: 300px; } .file-list .fc-pb { left: 644px; } .file-list .fc-date { left: 876px; font-weight: var(--font-weight-regular); } .file-list .fc-size { left: 1113px; font-weight: var(--font-weight-regular); }
+.file-list .blotter__head .fc-dl { left: 16px; color: var(--color-text-secondary); } /* header "Download" at x16 */
+/* Reports screen - figma: 6878:14782: body y56 (no strip); "Generate Report" Medium 16 at (24,24); form column x24 (225): Report Type y59, Date Start y127, Date End y195, Counterparty y263 (pitch 68), "Generate CSV" 154x32 at (24,331); Trade Types column x318: label, quick buttons "All Cash"/"All Options" Outlined purple 99x24 at x318/430, list 258x191 at y116 (rows pitch 32, checkbox x+15, label +24, scrollbar 4x169 right-8 thumb 114) */
+.report__title { position: absolute; left: 24px; top: 24px; margin: 0; font: var(--type-detail); color: var(--color-text-primary); text-box: trim-both cap alphabetic; }
+.report__form { position: absolute; left: 24px; top: 59px; display: flex; flex-direction: column; gap: var(--space-24); width: 225px; }
+.report__form .field { --field-w: 225px; }
+.report__types { position: absolute; left: 318px; top: 59px; width: 258px; }
+.report__types-label { display: block; color: var(--color-text-secondary); font: var(--type-input); text-box: trim-both cap alphabetic; } /* figma: "Trade Types" Regular 14 #707079 (vertical order label / quick buttons / list = visual estimate: node y's conflict) */
+.report__quick { display: flex; gap: 13px; margin-top: 10px; }
+.report__quick .btn { width: 99px; padding-inline: 0; } /* figma: "All Cash" / "All Options" Outlined purple 99x24 at x318 / x430 (fixed 99 each) */
+.report__form > .btn { align-self: flex-start; }
+.btn-with-dropdown--purple { --btn-fill: var(--color-action-primary); --btn-hover-overlay: var(--color-action-hover-overlay-30); } /* figma: "Generate CSV" 6878:14782 With dropdown 154x32 fill #A4A4FF {Purple 1} r3, download glyph 12x12 #000 at x122 */
+.check-list { position: relative; width: 258px; height: 191px; margin-top: 13px; overflow: hidden; border-radius: var(--radius-4); background: var(--color-surface-card); --checkbox-fill: var(--color-input-checkbox-fill); }
+.check-list__row { display: flex; align-items: center; gap: var(--space-8); height: 32px; padding-left: 15px; color: var(--color-text-primary); font: var(--type-cell); }
+.check-list__scroll { position: absolute; right: var(--space-8); top: 11px; height: 169px; }
+
+/* ---------- P2.7 ANIMATION LOOP: new B2B trade insertion (Section "Animation New trade" 2391:2768, component set "Component 1" 2380:2415, variants 1..8) ---------- */
+/* figma: every variant AFTER_TIMEOUT -> CHANGE_TO next, SMART_ANIMATE, easing EASE_IN_AND_OUT. hold/dur (s): 1: 0.6/0.2 | 2: 0.15/0.3 | 3: 0.3/0.2 | 4: 0.1/0.1 | 5: 0.25/0.2 | 6: 0.1/0.1 | 7: 1.0/0.1 | 8: 1.0/0.3 => loop 5.0 s.
+   v1->v2: existing rows shift DOWN 56px (2 rows x 28) | v2->v3: the 2 new rows are added, highlight (0,82 1368x55 #30F0D6) alpha 0 -> 0.1, "New" labels visible (x32, y92/y120, Medium 12 #30F0D6) | v3->v4 highlight 0 | v4->v5 0.1 | v5->v6 0 | v6->v7 0.1 | v7->v8 new rows nudge y90 -> 88 (h40 -> 44), checkboxes become visible, highlight stays 0.1 | v8->v1 rows removed, others shift back up 56px.
+   Keyframe offsets = cumulative seconds / 5s: 0.6 = 12%, 0.8 = 16%, 0.95 = 19%, 1.25 = 25%, 1.55 = 31%, 1.75 = 35%, 1.85 = 37%, 1.95 = 39%, 2.2 = 44%, 2.4 = 48%, 2.5 = 50%, 2.6 = 52%, 3.6 = 72%, 3.7 = 74%, 4.7 = 94%, 5.0 = 100%. Every segment eased ease-in-out (EASE_IN_AND_OUT). The 10% highlight is the animation value (static "New" tint in the table = 15%). */
+.blotter-anim { position: relative; width: 100%; overflow: hidden; background: var(--color-surface-panel); }
+.blotter-anim__rows { animation: fxer-anim-shift 5s ease-in-out infinite; }
+.blotter-anim__new { position: absolute; left: 0; top: 82px; width: 100%; height: 56px; }
+.blotter-anim__highlight { position: absolute; inset: 0 0 1px 0; background: var(--color-add-new); opacity: 0; animation: fxer-anim-highlight 5s ease-in-out infinite; } /* Rectangle 12 1368x55 {Add New} */
+.blotter-anim__new-rows { position: absolute; inset: 0; opacity: 0; animation: fxer-anim-new 5s ease-in-out infinite, fxer-anim-nudge 5s ease-in-out infinite; }
+.blotter-anim__label { opacity: 0; animation: fxer-anim-label 5s ease-in-out infinite; } /* "New" labels */
+.blotter-anim__check { opacity: 0; animation: fxer-anim-check 5s ease-in-out infinite; }
+@keyframes fxer-anim-shift { 0%, 12% { transform: translateY(0); } 16%, 94% { transform: translateY(56px); } 100% { transform: translateY(0); } }
+@keyframes fxer-anim-new { 0%, 19% { opacity: 0; } 25%, 94% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes fxer-anim-highlight { 0%, 19% { opacity: 0; } 25%, 31% { opacity: 0.1; } 35%, 37% { opacity: 0; } 39%, 44% { opacity: 0.1; } 48%, 50% { opacity: 0; } 52%, 94% { opacity: 0.1; } 100% { opacity: 0; } }
+@keyframes fxer-anim-label { 0%, 19% { opacity: 0; } 25%, 31% { opacity: 1; } 35%, 37% { opacity: 0; } 39%, 44% { opacity: 1; } 48%, 50% { opacity: 0; } 52%, 94% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes fxer-anim-check { 0%, 72% { opacity: 0; } 74%, 94% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes fxer-anim-nudge { 0%, 72% { transform: translateY(2px); } 74%, 100% { transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .blotter-anim__rows, .blotter-anim__highlight, .blotter-anim__new-rows, .blotter-anim__label, .blotter-anim__check { animation: none; } .blotter-anim__rows { transform: translateY(56px); } .blotter-anim__new-rows, .blotter-anim__label, .blotter-anim__check { opacity: 1; } .blotter-anim__highlight { opacity: 0.1; } }
+
+/* ---------- P2.8 Trader assignment + filter checkbox-list panel sizing ---------- */
+/* Assignment list - figma: New Trader 5539:15430: label "Assignment" Regular 13 #707079 (outlier size) at (367,85), checkbox rows y110/142/174 (16 high, pitch 32), label Medium 14 #FFFFFF at x+24 ("O RBS BOA" checked, "RBS EDGE BOA" checked, "RBS-BOA" unchecked #39393C);
+   Trader detail 3769:8602: label Regular 14 at (846,71), rows y97/129/161 (235.4 wide) */
+.assign-label { display: block; margin: 0 0 15.8px; color: var(--color-text-secondary); font: var(--type-outlier-13); line-height: 9px; white-space: nowrap; }
+.assign-list { display: flex; flex-direction: column; gap: var(--space-16); }
+.checkbox-field--assign { height: 16px; color: var(--color-text-primary); font: var(--type-cell); }
+.checkbox-field--assign:has(.checkbox:not(:checked)) { color: var(--color-text-primary); } /* figma: all three labels #FFFFFF in the Assignment list (unlike Structured/PBA) */
+.filter-panel--list { flex: none; height: 256px; } /* figma: 6544:14756 / 6234:14340 237x256: 7 rows at y56 + 32n, the last is clipped by the panel */
+.modal--new-trader .modal__body > .col { display: flex; flex-direction: column; min-width: 0; }

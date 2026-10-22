@@ -1,200 +1,202 @@
-/* ============================================================
-   Enigma X Auth — Component Library CSS
-   Scoped to: web sign-in portal + mobile authenticator app
-   Source: enigma-signin.html + enigma-authenticator.html
-   October 2026
+/* ==========================================================================
+   Enigma X AUTH design system - components.css
+   Requires tokens.css (--eauth-*). Assets: ./assets/ (mask icons, map).
+   Source of truth: HTML prototypes (no Figma); every block carries a
+   src: <file> L<lines> comment. "computed" = measured in a browser.
+   - web components      .web-*   (hub/auth/enigma-signin.html)
+   - mobile components   .app-*   (hub/auth/enigma-authenticator.html)
+   - shared icons        .eauth-icon + .eauth-i-<name>
+   State hooks: real pseudo-classes plus forced classes .is-hover .is-focus
+   .is-active .is-disabled, and the prototype's JS state classes renamed
+   .is-error .is-filled .is-loading .is-checked .is-warn .is-urgent .is-show
+   .is-open .is-hidden .is-active(view) (see components.md for the map).
+   EXTENDED = not in the prototypes, derived only from existing tokens.
+   EXCLUDED dead code (no markup in source): top nav, divider, secure-row,
+   phone pill, waiting badge/dots, session chip, btn-black, .btn-danger,
+   .home-avatar, .session-current*, .sheet-otp.used.
+   Light only.
+   ========================================================================== */
 
-   Import tokens.css before this file.
-   All values reference --auth-* custom properties.
-   Light mode only.
-   ============================================================ */
-
-/* ─── Reset ─── */
-*, *::before, *::after {
+/* ---- scoped reset (zero specificity) ----
+   src: enigma-signin.html L28; enigma-authenticator.html L30
+   *,*::before,*::after { box-sizing:border-box; margin:0; padding:0 } */
+:where(.web-page, .web-page *, .web-card, .web-card *,
+       .app-stage, .app-stage *, .app-shell, .app-shell *) {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
+.web-page *::before, .web-page *::after,
+.app-shell *::before, .app-shell *::after { box-sizing: border-box; }
 
-/* ─── Base ─── */
-html, body {
-  min-height: 100vh;
-  font-family: var(--auth-font-sans);
-  background: var(--auth-color-bg-web);
-  color: var(--auth-color-text-primary);
-  -webkit-font-smoothing: antialiased;
+/* ==========================================================================
+   ICONS - mask icons (BUILD_RULES 5). Colour = currentColor; size per component.
+   Files: assets/MANIFEST-web.md, assets/MANIFEST-app.md
+   ========================================================================== */
+/* src: assets/MANIFEST-*.md */
+.eauth-icon {
+  display: block;
+  flex-shrink: 0;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;  mask-repeat: no-repeat;
+  -webkit-mask-position: center;   mask-position: center;
+  -webkit-mask-size: contain;      mask-size: contain;
 }
+/* Enigma mark - byte-identical path in web and app (web 72px #7AEFEF, launch 108px #3DBFBF, banner/push white) */
+.eauth-i-logo          { -webkit-mask-image: url(assets/web-logo-enigma-mark.currentColor.svg);   mask-image: url(assets/web-logo-enigma-mark.currentColor.svg); }
+/* web (enigma-signin.html) */
+.eauth-i-eye-show      { -webkit-mask-image: url(assets/web-icon-eye-show.svg);                    mask-image: url(assets/web-icon-eye-show.svg); }
+.eauth-i-eye-hide      { -webkit-mask-image: url(assets/web-icon-eye-hide.svg);                    mask-image: url(assets/web-icon-eye-hide.svg); }
+.eauth-i-check-checkbox{ -webkit-mask-image: url(assets/web-icon-check-checkbox.currentColor.svg); mask-image: url(assets/web-icon-check-checkbox.currentColor.svg); }
+.eauth-i-clock         { -webkit-mask-image: url(assets/web-icon-clock.svg);                       mask-image: url(assets/web-icon-clock.svg); }
+.eauth-i-arrow-left    { -webkit-mask-image: url(assets/web-icon-arrow-left.svg);                  mask-image: url(assets/web-icon-arrow-left.svg); }
+.eauth-i-check-success { -webkit-mask-image: url(assets/web-icon-check-success.svg);               mask-image: url(assets/web-icon-check-success.svg); }
+/* app (enigma-authenticator.html) */
+.eauth-i-wifi          { -webkit-mask-image: url(assets/app-status-wifi.currentColor.svg);         mask-image: url(assets/app-status-wifi.currentColor.svg); }
+.eauth-i-battery       { -webkit-mask-image: url(assets/app-status-battery.currentColor.svg);      mask-image: url(assets/app-status-battery.currentColor.svg); }
+.eauth-i-back-arrow    { -webkit-mask-image: url(assets/app-back-arrow.svg);                       mask-image: url(assets/app-back-arrow.svg); }
+.eauth-i-eye           { -webkit-mask-image: url(assets/app-eye.svg);                              mask-image: url(assets/app-eye.svg); }
+.eauth-i-copy          { -webkit-mask-image: url(assets/app-copy.svg);                             mask-image: url(assets/app-copy.svg); }
+.eauth-i-check-confirmed{ -webkit-mask-image: url(assets/app-check-confirmed.currentColor.svg);    mask-image: url(assets/app-check-confirmed.currentColor.svg); }
 
-/* Focus rings */
-button:focus-visible,
-[tabindex]:focus-visible {
-  outline: 2px solid var(--auth-color-brand);
-  outline-offset: 2px;
-  border-radius: var(--auth-radius);
-}
-/* Inputs handle focus via border + box-shadow */
-input:focus-visible { outline: none; }
+/* ==========================================================================
+   WEB SIGN-IN  (.web-*)
+   ========================================================================== */
 
-
-/* ============================================================
-   WEB SIGN-IN PORTAL
-   ============================================================ */
-
-/* ─── Page layout ─── */
-.auth-page {
+/* ---- Page backdrop ---- src: enigma-signin.html L36-42, L45-52 */
+.web-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px;
+  padding: var(--eauth-size-web-page-pad);
+  background: var(--eauth-web-bg);
+  color: var(--eauth-web-text);
+  font-family: var(--eauth-font-sans);
+  -webkit-font-smoothing: antialiased;
 }
+/* EXTENDED - not in source: lets the page backdrop sit inside a showcase frame (drops the 100vh min-height) */
+.web-page--contained { min-height: 0; }
 
-/* ─── Top navigation bar ─── */
-.auth-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: var(--auth-h-nav);
-  background: var(--auth-color-nav-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--auth-color-border-web);
-  display: flex;
-  align-items: center;
-  padding: 0 32px;
-  z-index: var(--auth-z-nav);
-}
-
-.auth-nav-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.auth-nav-icon {
-  width: var(--auth-avatar-sm);
-  height: var(--auth-avatar-sm);
-  background: var(--auth-color-black);
-  border-radius: var(--auth-radius);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.auth-nav-icon svg {
-  width: var(--auth-icon-md);
-  height: var(--auth-icon-md);
-}
-
-.auth-nav-name {
-  font-size: var(--auth-text-md);
-  font-weight: var(--auth-font-bold);
-  color: var(--auth-color-text-primary);
-  letter-spacing: var(--auth-tracking-wide);
-}
-
-.auth-nav-name span {
-  color: var(--auth-color-brand);
-}
-
-/* ─── Sign-in card ─── */
-.auth-card {
+/* ---- Sign-in card ---- src: enigma-signin.html L79-87; computed card 440 wide, content 360 */
+.web-card {
   width: 100%;
-  max-width: var(--auth-card-max-width);
-  background: var(--auth-color-surface);
-  border-radius: var(--auth-radius-md);
-  box-shadow: var(--auth-shadow-card-lg);
-  padding: var(--auth-card-padding);
+  max-width: var(--eauth-size-web-card-max);
+  background: var(--eauth-web-surface);
+  border-radius: var(--eauth-radius-card);
+  box-shadow: var(--eauth-shadow-web-card);
+  padding: var(--eauth-size-web-card-pad);
+  font-family: var(--eauth-font-sans);
+  color: var(--eauth-web-text);
 }
-
+/* src: enigma-signin.html L87 - the ONLY media query in the prototype */
 @media (max-width: 500px) {
-  .auth-card { padding: var(--auth-card-padding-mobile); }
+  .web-card { padding: var(--eauth-size-web-card-pad-narrow); }
 }
+/* src: enigma-signin.html L478 (JS sets inline padding:32px on the success view; inline beats the media rule, so keep this AFTER it) */
+.web-card--success { padding: var(--eauth-size-web-card-pad-success); }
 
-/* ─── Card logo header ─── */
-.auth-card-logo-header {
+/* ---- Logo header ---- src: enigma-signin.html L90-93, markup L360-364 (computed header 136px incl 72px mark; hidden on success) */
+.web-card-logo {
   display: flex;
   justify-content: center;
-  padding: 36px 0 28px;
+  padding: var(--eauth-size-web-logo-pad);
+}
+.web-logo {                 /* src: markup L361 svg 72x72, fill #7AEFEF hard-coded */
+  width: var(--eauth-size-web-logo);
+  height: var(--eauth-size-web-logo);
+  color: var(--eauth-brand);
 }
 
-/* ─── View switching ─── */
-.auth-view { display: none; }
-.auth-view.active { display: block; }
+/* ---- View switching ---- src: enigma-signin.html L96-97 (no transition) */
+.web-view { display: none; }
+.web-view.is-active { display: block; }
 
-/* ─── Eyebrow label (web) ─── */
-.auth-eyebrow {
-  font-size: var(--auth-text-sm);
-  font-weight: var(--auth-font-semibold);
-  letter-spacing: var(--auth-tracking-wide);
+/* ---- Typography ---- src: enigma-signin.html L100-109 + inline L413-415 */
+.web-eyebrow {              /* effective: inline margin-bottom 6px + text-align center (L413) */
+  font-family: var(--eauth-font-sans);
+  font-size: var(--eauth-fs-14);
+  font-weight: var(--eauth-fw-semibold);
+  letter-spacing: var(--eauth-ls-eyebrow-web);
   text-transform: uppercase;
-  color: var(--auth-color-text-secondary-web);
-  margin-bottom: 8px;
-}
-
-/* ─── Card headings ─── */
-.auth-card-title {
-  font-size: var(--auth-text-3xl);
-  font-weight: var(--auth-font-bold);
-  line-height: var(--auth-leading-tight);
+  color: var(--eauth-web-text-2);
   margin-bottom: 6px;
+  text-align: center;
 }
-
-.auth-card-sub {
-  font-size: var(--auth-text-base);
-  color: var(--auth-color-text-secondary-web);
-  line-height: var(--auth-leading-relaxed);
+.web-title {                /* h1 login title L105 (+ center L107-109) */
+  font-size: var(--eauth-fs-24);
+  font-weight: var(--eauth-fw-bold);
+  line-height: var(--eauth-lh-tight);
+  color: var(--eauth-web-text);
+  margin-bottom: 6px;
+  text-align: center;
+}
+.web-title--otp { font-size: var(--eauth-fs-20); }   /* inline L414: h2 20px */
+.web-sub {                  /* L106 */
+  font-size: var(--eauth-fs-14);
+  color: var(--eauth-web-text-2);
+  line-height: var(--eauth-lh-body);
   margin-bottom: 28px;
+  text-align: center;
+}
+.web-sub--otp {             /* inline L415: line-height normal, margin-bottom 0 */
+  line-height: normal;
+  margin-bottom: 0;
 }
 
-/* ─── Text input field ─── */
-.auth-field {
+/* ---- Field ---- src: enigma-signin.html L112-114 (+ inline L381 mb 12 on password) */
+.web-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-bottom: 16px;
 }
-
-.auth-field-label {
-  font-size: var(--auth-text-sm);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-text-secondary-web);
-  letter-spacing: var(--auth-tracking-wide);
-  text-transform: uppercase;
+.web-field--tight { margin-bottom: 12px; }
+.web-field-label {          /* L113; text typed in caps in markup (no text-transform) */
+  font-size: var(--eauth-fs-12);
+  font-weight: var(--eauth-fw-semibold);
+  color: var(--eauth-web-text-2);
+  letter-spacing: var(--eauth-ls-field-label);
 }
+.web-field-wrap { position: relative; }
 
-.auth-field-wrap { position: relative; }
-
-.auth-field-input {
+/* ---- Input ---- src: enigma-signin.html L115-133, L35, inline L376/L385 */
+.web-input {
   width: 100%;
-  height: var(--auth-h-input);
-  padding: 0 44px 0 14px;
-  background: var(--auth-color-surface-2);
-  border: 1.5px solid var(--auth-color-border-web);
-  border-radius: var(--auth-radius);
-  font-family: var(--auth-font-sans);
-  font-size: var(--auth-text-md);
-  color: var(--auth-color-text-primary);
+  height: var(--eauth-h-web-input);
+  padding: 0 14px;          /* email: inline padding-right 14px (L376) */
+  background: var(--eauth-web-surface-2);
+  border: var(--eauth-border-input) var(--eauth-web-border);
+  border-radius: var(--eauth-radius-control);
+  font-family: var(--eauth-font-sans);
+  font-size: var(--eauth-fs-16);
+  font-weight: var(--eauth-fw-regular);
+  color: var(--eauth-web-text);
   outline: none;
-  transition: border-color var(--auth-duration-normal), box-shadow var(--auth-duration-normal);
+  transition: border-color var(--eauth-dur-180), box-shadow var(--eauth-dur-180);
   -webkit-appearance: none;
+  appearance: none;
+}
+.web-input--password { padding-right: 44px; }       /* L117 base / inline L385 */
+.web-input::placeholder { color: var(--eauth-web-text-3); }   /* L132 */
+/* EXTENDED - not in source (no hover rule exists): hover = text-3 border, placed before focus/error so they win */
+.web-input:hover, .web-input.is-hover { border-color: var(--eauth-web-text-3); }
+.web-input:focus, .web-input.is-focus, .web-input:focus-visible {   /* L127-131, L35 (outline stays none) */
+  border-color: var(--eauth-brand);
+  background: var(--eauth-web-surface);
+  box-shadow: var(--eauth-shadow-ring);
+  outline: none;
+}
+/* error L133 (wins over focus by source order: red border + red ring, white bg while focused).
+   [aria-invalid=true] alias is EXTENDED - not in source */
+.web-input.is-error, .web-input[aria-invalid="true"] {
+  border-color: var(--eauth-web-danger);
+  box-shadow: var(--eauth-shadow-web-ring-error);
 }
 
-.auth-field-input:focus {
-  border-color: var(--auth-color-border-focus);
-  background: var(--auth-color-surface);
-  box-shadow: var(--auth-shadow-focus);
-}
-
-.auth-field-input::placeholder { color: var(--auth-color-text-tertiary-web); }
-
-.auth-field-input.error {
-  border-color: var(--auth-color-danger-web);
-  box-shadow: 0 0 0 4px var(--auth-color-danger-bg-web);
-}
-
-/* Password toggle button */
-.auth-field-toggle {
+/* ---- Password toggle ---- src: enigma-signin.html L134-142, markup L386-389 (44x44, svg 18x18) */
+.web-field-toggle {
   position: absolute;
   right: 6px;
   top: 50%;
@@ -203,37 +205,44 @@ input:focus-visible { outline: none; }
   border: none;
   padding: 0;
   cursor: pointer;
-  color: var(--auth-color-text-tertiary-web);
+  color: var(--eauth-web-text-3);
   width: 44px;
   height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color var(--auth-duration-fast);
+  transition: color var(--eauth-dur-120);
   -webkit-tap-highlight-color: transparent;
 }
+.web-field-toggle:hover, .web-field-toggle.is-hover { color: var(--eauth-web-text-2); }
+.web-field-toggle .eauth-icon { width: 18px; height: 18px; display: block; }
+/* Two icons in markup; the pressed (password visible) state swaps them (prototype swaps inline display, L386-389) */
+.web-field-toggle .eauth-i-eye-hide { display: none; }
+.web-field-toggle.is-pressed .eauth-i-eye-show, .web-field-toggle[aria-pressed="true"] .eauth-i-eye-show { display: none; }
+.web-field-toggle.is-pressed .eauth-i-eye-hide, .web-field-toggle[aria-pressed="true"] .eauth-i-eye-hide { display: block; }
 
-.auth-field-toggle:hover { color: var(--auth-color-text-secondary-web); }
-.auth-field-toggle svg { width: var(--auth-icon-lg); height: var(--auth-icon-lg); display: block; }
-
-/* Field error message */
-.auth-field-error {
-  font-size: var(--auth-text-sm);
-  color: var(--auth-color-danger-web);
+/* ---- Field error ---- src: enigma-signin.html L143-144 (10px below the input incl. 6px field gap) */
+.web-field-error {
+  font-size: var(--eauth-fs-12);
+  color: var(--eauth-web-danger);
   margin-top: 4px;
   display: none;
 }
-.auth-field-error.show { display: block; }
+.web-field-error.is-show { display: block; }
 
-/* ─── Checkbox row ─── */
-.auth-row-between {
+/* ---- Row ---- src: enigma-signin.html L147 */
+.web-row-between {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 40px;
 }
 
-.auth-checkbox-row {
+/* ---- Checkbox ("Keep me signed in") ---- src: enigma-signin.html L148-158, markup L395-400.
+   Source is <label onclick> + <div> with NO input (not keyboard reachable = bug).
+   Intended markup here: label > input[type=checkbox] (visually hidden) + box + text. Looks identical. */
+.web-checkbox {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -241,478 +250,360 @@ input:focus-visible { outline: none; }
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
-
-.auth-cb-box {
+.web-checkbox-input {
+  position: absolute;
+  opacity: 0;
   width: 16px;
   height: 16px;
-  border-radius: var(--auth-radius-sm);
+  margin: 0;
+  pointer-events: none;
+}
+.web-checkbox-box {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--eauth-radius-checkbox);
   flex-shrink: 0;
-  border: 1px solid var(--auth-color-text-tertiary-web);
-  background: var(--auth-color-surface);
+  border: var(--eauth-border-checkbox) var(--eauth-web-text-3);
+  background: var(--eauth-web-surface);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--auth-duration-fast), border-color var(--auth-duration-fast);
+  transition: background var(--eauth-dur-120), border-color var(--eauth-dur-120);
+}
+.web-checkbox-tick {        /* L156 svg 10x10 opacity 0; stroke black (L397) */
+  width: 10px;
+  height: 10px;
+  color: var(--eauth-web-tick);
+  opacity: 0;
+  transition: opacity var(--eauth-dur-120);
+}
+.web-checkbox.is-checked .web-checkbox-box,
+.web-checkbox-input:checked + .web-checkbox-box {      /* L155 */
+  background: var(--eauth-brand);
+  border-color: var(--eauth-brand);
+}
+.web-checkbox.is-checked .web-checkbox-tick,
+.web-checkbox-input:checked + .web-checkbox-box .web-checkbox-tick { opacity: 1; }
+/* EXTENDED - not in source (no checkbox focus style): the page's focus ring recipe (2px brand, offset 2px) */
+.web-checkbox-input:focus-visible + .web-checkbox-box,
+.web-checkbox.is-focus .web-checkbox-box {
+  outline: 2px solid var(--eauth-brand);
+  outline-offset: 2px;
+}
+.web-checkbox-label {       /* L158 */
+  font-size: var(--eauth-fs-14);
+  color: var(--eauth-web-text);
+  font-weight: var(--eauth-fw-regular);
 }
 
-.auth-checkbox-row.checked .auth-cb-box {
-  background: var(--auth-color-brand);
-  border-color: var(--auth-color-brand);
-}
-
-.auth-cb-box svg { width: 10px; height: 10px; opacity: 0; transition: opacity var(--auth-duration-fast); }
-.auth-checkbox-row.checked .auth-cb-box svg { opacity: 1; }
-
-.auth-cb-label {
-  font-size: var(--auth-text-base);
-  color: var(--auth-color-text-primary);
-  font-weight: var(--auth-font-normal);
-}
-
-/* ─── Link button ─── */
-.auth-link-btn {
+/* ---- Link button ("Forgot password?", "Resend notification") ---- src: enigma-signin.html L159-167 */
+.web-link-btn {
   background: none;
   border: none;
-  font-family: var(--auth-font-sans);
-  font-size: var(--auth-text-base);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-brand-dim);
+  font-family: var(--eauth-font-sans);
+  font-size: var(--eauth-fs-14);
+  font-weight: var(--eauth-fw-semibold);
+  color: var(--eauth-brand-hover);
   cursor: pointer;
   padding: 6px 2px;
-  transition: opacity var(--auth-duration-fast);
+  transition: opacity var(--eauth-dur-120);
   text-decoration: underline;
   text-underline-offset: 4px;
   -webkit-tap-highlight-color: transparent;
 }
-.auth-link-btn:hover { opacity: 0.75; }
-.auth-link-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+.web-link-btn:hover, .web-link-btn.is-hover { opacity: .75; }
+.web-link-btn:disabled, .web-link-btn.is-disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 
-/* ─── Primary button ─── */
-.auth-btn {
+/* ---- Button ---- src: enigma-signin.html L170-189 */
+.web-btn {
   width: 100%;
-  height: var(--auth-h-btn);
+  height: var(--eauth-h-web-btn);
   border: none;
-  border-radius: var(--auth-radius);
-  font-family: var(--auth-font-sans);
-  font-size: var(--auth-text-md);
-  font-weight: var(--auth-font-semibold);
+  border-radius: var(--eauth-radius-control);
+  font-family: var(--eauth-font-sans);
+  font-size: var(--eauth-fs-16);
+  font-weight: var(--eauth-fw-semibold);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: background var(--auth-duration-fast), transform var(--auth-duration-instant), opacity var(--auth-duration-fast);
+  transition: background var(--eauth-dur-120), transform var(--eauth-dur-80), opacity var(--eauth-dur-120);
   position: relative;
   overflow: hidden;
 }
-
-.auth-btn-primary {
-  background: var(--auth-color-brand);
-  color: var(--auth-color-black);
-}
-
-.auth-btn-primary:hover  { background: var(--auth-color-brand-dim); }
-.auth-btn-primary:active { transform: scale(0.98); }
-.auth-btn-primary:disabled {
-  background: var(--auth-color-disabled-bg);
-  color: var(--auth-color-text-secondary-web);
+.web-btn--primary { background: var(--eauth-brand); color: var(--eauth-web-black); }   /* L178 */
+.web-btn--primary:hover, .web-btn--primary.is-hover { background: var(--eauth-brand-hover); }  /* L179 */
+.web-btn--primary:active, .web-btn--primary.is-active { transform: scale(.98); }               /* L180 */
+/* L182 disabled wins over hover. .is-loading = the prototype always sets disabled together with .loading, so it renders grey */
+.web-btn--primary:disabled, .web-btn--primary.is-disabled, .web-btn--primary.is-loading {
+  background: var(--eauth-web-disabled);
+  color: var(--eauth-web-text-2);
   cursor: not-allowed;
 }
-
-.auth-btn-black { background: var(--auth-color-black); color: #fff; }
-.auth-btn-black:hover  { opacity: 0.88; }
-.auth-btn-black:active { transform: scale(0.98); }
-
-/* Loading spinner */
-.auth-btn .auth-spinner {
+.web-btn--spaced { margin-top: 40px; }               /* inline L439 on Verify */
+.web-btn-spinner {                                    /* L183-187 */
   width: 18px;
   height: 18px;
-  border: 2.5px solid rgba(0, 0, 0, 0.15);
-  border-top-color: var(--auth-color-black);
-  border-radius: 50%;
-  animation: auth-spin var(--auth-duration-spinner) linear infinite;
+  border: var(--eauth-border-spinner) var(--eauth-web-spinner-track);
+  border-top-color: var(--eauth-web-black);
+  border-radius: var(--eauth-radius-circle);
+  animation: var(--eauth-anim-spin);
   display: none;
 }
-.auth-btn.loading .auth-btn-label { visibility: hidden; }
-.auth-btn.loading .auth-spinner { display: block; position: absolute; }
+.web-btn.is-loading .web-btn-label { visibility: hidden; }              /* L188 */
+.web-btn.is-loading .web-btn-spinner { display: block; position: absolute; }  /* L189 */
 
-/* ─── Divider ─── */
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 20px 0;
-}
-.auth-divider-line { flex: 1; height: 2px; background: var(--auth-color-border-web); }
-.auth-divider-text { font-size: var(--auth-text-sm); color: var(--auth-color-text-tertiary-web); font-weight: var(--auth-font-medium); }
-
-/* ─── Security badge ─── */
-.auth-secure-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 24px;
-}
-.auth-secure-row svg { width: var(--auth-icon-sm); height: var(--auth-icon-sm); color: var(--auth-color-brand); }
-.auth-secure-row span { font-size: var(--auth-text-sm); color: var(--auth-color-text-tertiary-web); font-weight: var(--auth-font-medium); }
-
-/* ─── Phone notification pill (web) ─── */
-.auth-phone-graphic {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 28px;
-}
-
-.auth-phone-pill {
-  background: var(--auth-color-black);
-  border-radius: var(--auth-radius-md);
-  padding: 14px 20px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  max-width: 300px;
-  width: 100%;
-  position: relative;
-}
-
-.auth-phone-app-icon {
-  width: var(--auth-avatar-lg);
-  height: var(--auth-avatar-lg);
-  border-radius: var(--auth-radius-xl);
-  background: var(--auth-color-brand-ghost);
-  border: 1px solid var(--auth-color-brand-ghost-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.auth-phone-app-icon svg { width: var(--auth-icon-xl); height: var(--auth-icon-xl); }
-
-.auth-phone-notif-text { flex: 1; min-width: 0; }
-.auth-phone-notif-app { font-size: var(--auth-text-sm); font-weight: var(--auth-font-semibold); color: rgba(255,255,255,.5); letter-spacing: var(--auth-tracking-wide); }
-.auth-phone-notif-msg  { font-size: var(--auth-text-base); font-weight: var(--auth-font-semibold); color: #fff; line-height: var(--auth-leading-snug); margin-top: 2px; }
-
-.auth-phone-notif-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--auth-radius-full);
-  background: var(--auth-color-brand);
-  flex-shrink: 0;
-  animation: auth-pulse-dot var(--auth-anim-dot-pulse) ease-in-out infinite;
-}
-
-/* ─── OTP input slots (web) ─── */
-.auth-otp-slots {
+/* ---- OTP slots ---- src: enigma-signin.html L243-268, L271-274, markup L418-426 */
+.web-otp-slots {
   display: flex;
   gap: 8px;
   margin: 28px 0 12px;
 }
-
-.auth-otp-slot {
+.web-otp-slot {
   flex: 1;
   min-width: 0;
-  height: var(--auth-h-otp-slot);
-  background: var(--auth-color-surface);
-  border: 1.5px solid var(--auth-color-border-web);
-  border-radius: var(--auth-radius-md);
-  font-family: var(--auth-font-mono);
-  font-size: var(--auth-text-3xl);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-text-primary);
+  height: var(--eauth-h-web-slot);
+  background: var(--eauth-web-surface);
+  border: var(--eauth-border-input) var(--eauth-web-border);
+  border-radius: var(--eauth-radius-card);
+  font-family: var(--eauth-font-mono);
+  font-size: var(--eauth-fs-24);
+  font-weight: var(--eauth-fw-semibold);   /* DM Mono 600 does not exist: synthetic bold, as rendered */
+  color: var(--eauth-web-text);
   text-align: center;
-  caret-color: var(--auth-color-brand);
+  caret-color: var(--eauth-brand);
   outline: none;
-  transition:
-    border-color var(--auth-duration-base),
-    box-shadow var(--auth-duration-base),
-    background var(--auth-duration-base),
-    transform var(--auth-duration-fast);
+  transition: border-color var(--eauth-dur-150), box-shadow var(--eauth-dur-150), background var(--eauth-dur-150), transform var(--eauth-dur-100);
   -webkit-appearance: none;
+  appearance: none;
 }
-
-.auth-otp-slot:focus,
-.auth-otp-slot:focus-visible {
-  border-color: var(--auth-color-border-focus);
-  background: var(--auth-color-surface);
-  box-shadow: var(--auth-shadow-focus);
-  transform: scale(var(--auth-anim-otp-scale));
+.web-otp-slot:focus, .web-otp-slot:focus-visible, .web-otp-slot.is-focus {   /* L260-266 */
+  border-color: var(--eauth-brand);
+  background: var(--eauth-web-surface);
+  box-shadow: var(--eauth-shadow-ring);
+  transform: scale(1.05);
   outline: none;
 }
-
-.auth-otp-slot.filled { border-color: var(--auth-color-brand); background: var(--auth-color-surface); }
-.auth-otp-slot.has-error {
-  border-color: var(--auth-color-danger-web);
-  background: #fef2f2;
-  animation: auth-shake var(--auth-duration-otp-shake) ease;
+.web-otp-slot.is-filled { border-color: var(--eauth-brand); background: var(--eauth-web-surface); }   /* L267 */
+.web-otp-slot.is-error {                                                                              /* L268 */
+  border-color: var(--eauth-web-danger);
+  background: var(--eauth-web-danger-bg);
+  animation: var(--eauth-anim-shake);
 }
-
-.auth-otp-sep {
+.web-otp-sep {              /* L271-274, glyph "·" */
   display: flex;
   align-items: center;
   padding: 0 2px;
-  color: var(--auth-color-text-tertiary-web);
-  font-size: 22px;
-  font-weight: var(--auth-font-bold);
+  color: var(--eauth-web-text-3);
+  font-size: var(--eauth-fs-22);
+  font-weight: var(--eauth-fw-bold);
   user-select: none;
 }
-
-.auth-otp-error-msg {
-  font-size: var(--auth-text-base);
-  color: var(--auth-color-danger-web);
-  font-weight: var(--auth-font-medium);
+.web-otp-error {            /* L277-282 */
+  font-size: var(--eauth-fs-14);
+  color: var(--eauth-web-danger);
+  font-weight: var(--eauth-fw-medium);
   text-align: center;
   min-height: 20px;
   margin-bottom: 8px;
   display: none;
 }
-.auth-otp-error-msg.show { display: block; }
+.web-otp-error.is-show { display: block; }
 
-/* ─── Timer row ─── */
-.auth-timer-row {
+/* ---- Timer row ---- src: enigma-signin.html L285-293, markup L431-437 */
+.web-timer-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: var(--auth-text-base);
-  color: var(--auth-color-text-tertiary-web);
+  font-size: var(--eauth-fs-14);
+  color: var(--eauth-web-text-3);
   margin-bottom: 16px;
 }
-
-.auth-timer-label { display: flex; align-items: center; gap: 6px; }
-.auth-timer-label svg { width: var(--auth-icon-sm); height: var(--auth-icon-sm); }
-
-.auth-timer-value {
-  font-family: var(--auth-font-mono);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-text-secondary-web);
+.web-timer-label { display: flex; align-items: center; gap: 6px; }
+.web-timer-label .eauth-icon { width: 14px; height: 14px; }
+.web-timer-value {
+  font-family: var(--eauth-font-mono);
+  font-weight: var(--eauth-fw-semibold);   /* synthetic bold on DM Mono 500, as rendered */
+  color: var(--eauth-web-text-2);
 }
-.auth-timer-value.warn { color: var(--auth-color-danger-web); }
+.web-timer-value.is-warn { color: var(--eauth-web-danger); }   /* <=30s and also when it reads "Expired" */
 
-/* ─── Waiting badge ─── */
-.auth-waiting-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--auth-color-brand-ghost);
-  border-radius: var(--auth-radius-pill);
-  padding: 6px 14px;
-  font-size: var(--auth-text-sm);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-brand);
-  letter-spacing: var(--auth-tracking-wide);
-  margin-bottom: 20px;
-}
-
-.auth-waiting-dots span {
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--auth-color-brand);
-  margin: 0 1.5px;
-  animation: auth-dot-bounce var(--auth-anim-dot-bounce) ease-in-out infinite;
-}
-.auth-waiting-dots span:nth-child(2) { animation-delay: var(--auth-anim-dot-bounce-delay-2); }
-.auth-waiting-dots span:nth-child(3) { animation-delay: var(--auth-anim-dot-bounce-delay-3); }
-
-/* ─── Step indicator / eyebrow ─── */
-.auth-step-eyebrow {
-  font-size: var(--auth-text-sm);
-  font-weight: var(--auth-font-semibold);
-  letter-spacing: var(--auth-tracking-wide);
-  text-transform: uppercase;
-  color: var(--auth-color-text-secondary-web);
-  margin-bottom: 6px;
-  text-align: center;
-}
-
-/* ─── Success ring ─── */
-.auth-success-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 0;
-}
-
-.auth-success-ring {
-  width: var(--auth-avatar-3xl);
-  height: var(--auth-avatar-3xl);
-  border-radius: var(--auth-radius-full);
-  background: var(--auth-color-brand-ghost);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 24px;
-  animation: auth-pop-in var(--auth-duration-success) var(--auth-ease-spring);
-}
-
-.auth-success-ring svg { width: var(--auth-icon-4xl); height: var(--auth-icon-4xl); color: var(--auth-color-brand); }
-.auth-success-title { font-size: var(--auth-text-2xl); font-weight: var(--auth-font-bold); margin-bottom: 6px; }
-.auth-success-sub   { font-size: var(--auth-text-base); color: var(--auth-color-text-secondary-web); line-height: var(--auth-leading-relaxed); }
-
-/* ─── Session chip (web success) ─── */
-.auth-session-chip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--auth-color-surface-2);
-  border-radius: var(--auth-radius-pill);
-  padding: 8px 18px;
-  font-size: var(--auth-text-base);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-text-secondary-web);
-  margin-bottom: 28px;
-}
-
-.auth-session-chip .auth-live-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--auth-radius-full);
-  background: var(--auth-color-brand);
-  animation: auth-pulse-dot var(--auth-anim-dot-pulse) ease-in-out infinite;
-}
-
-/* ─── Back button ─── */
-.auth-back-btn {
+/* ---- Back button (text + arrow) ---- src: enigma-signin.html inline L444-449 (no class, no hover in source) */
+.web-back-btn {
   background: none;
   border: none;
   cursor: pointer;
   width: 100%;
   margin-top: 16px;
   padding: 10px 0;
-  color: var(--auth-color-text-secondary-web);
+  color: var(--eauth-web-text-2);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-family: var(--auth-font-sans);
-  font-size: var(--auth-text-base);
-  font-weight: var(--auth-font-medium);
+  font-family: var(--eauth-font-sans);
+  font-size: var(--eauth-fs-14);
+  font-weight: var(--eauth-fw-medium);
   -webkit-tap-highlight-color: transparent;
 }
+.web-back-btn .eauth-icon { width: 16px; height: 16px; }
 
+/* ---- Success / "Identity verified" ---- src: enigma-signin.html L319-332, markup L456-464 */
+.web-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0;
+}
+.web-success-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--eauth-radius-circle);
+  background: var(--eauth-brand-ghost);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  animation: var(--eauth-anim-pop-in);
+}
+.web-success-icon { width: 34px; height: 34px; color: var(--eauth-brand); }
+.web-success-title {
+  font-size: var(--eauth-fs-22);
+  font-weight: var(--eauth-fw-bold);
+  color: var(--eauth-web-text);
+  margin-bottom: 6px;
+}
+.web-success-sub {
+  font-size: var(--eauth-fs-14);
+  color: var(--eauth-web-text-2);
+  line-height: var(--eauth-lh-body);
+  margin-bottom: 0;
+}
 
-/* ============================================================
-   MOBILE AUTHENTICATOR
-   ============================================================ */
+/* ---- Focus ring (buttons) ---- src: enigma-signin.html L29-33 (2px #7AEFEF, offset 2px, radius 4px).
+   Inputs/slots handle focus with border+ring (L35). The 4px radius is applied only to the radius-0 controls
+   (link, toggle, back) so a focus ring never changes a component's own radius. */
+.web-btn:focus-visible, .web-btn.is-focus,
+.web-link-btn:focus-visible, .web-link-btn.is-focus,
+.web-field-toggle:focus-visible, .web-field-toggle.is-focus,
+.web-back-btn:focus-visible, .web-back-btn.is-focus {
+  outline: 2px solid var(--eauth-brand);
+  outline-offset: 2px;
+}
+.web-link-btn:focus-visible, .web-link-btn.is-focus,
+.web-field-toggle:focus-visible, .web-field-toggle.is-focus,
+.web-back-btn:focus-visible, .web-back-btn.is-focus { border-radius: var(--eauth-radius-control); }
 
-/* ─── Mobile shell ─── */
-.auth-shell {
-  width: min(var(--auth-shell-width), 100vw);
-  height: min(var(--auth-shell-height), 100dvh);
-  background: var(--auth-color-bg-mobile);
-  border-radius: var(--auth-radius-shell);
-  box-shadow: var(--auth-shadow-mobile);
+/* ==========================================================================
+   MOBILE AUTHENTICATOR  (.app-*)
+   ========================================================================== */
+
+/* ---- Stage (the prototype's <body>) ---- src: enigma-authenticator.html L37-43 */
+.app-stage {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--eauth-app-bg);
+  font-family: var(--eauth-font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+/* EXTENDED - not in source: stage inside a showcase frame */
+.app-stage--contained { min-height: 0; }
+
+/* ---- Phone frame ("shell") ---- src: enigma-authenticator.html L46-55.
+   Not scaled: shrinks to the window below 390x844. No notch, no home indicator, no bezel. */
+.app-shell {
+  width: var(--eauth-size-app-shell-w);
+  height: var(--eauth-size-app-shell-h);
+  background: var(--eauth-app-bg);
+  border-radius: var(--eauth-radius-shell);
+  box-shadow: var(--eauth-shadow-app-shell);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   position: relative;
+  font-family: var(--eauth-font-sans);
+  color: var(--eauth-app-text);
 }
 
-/* ─── iOS status bar ─── */
-.auth-status-bar {
-  height: var(--auth-h-status-bar);
+/* ---- Status bar ---- src: enigma-authenticator.html L58-66, L313-314; markup L633-639 */
+.app-status-bar {
+  height: var(--eauth-h-app-status-bar);
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 14px 28px 0;
-  color: var(--auth-color-text-primary);
+  color: var(--eauth-app-text);
+}
+.app-status-time {
+  font-family: var(--eauth-font-mono);
+  font-size: var(--eauth-fs-16);
+  font-weight: var(--eauth-fw-semibold);   /* synthetic bold on DM Mono 500 */
+}
+.app-status-icons { display: flex; gap: 6px; align-items: center; }
+.app-status-icons .eauth-icon { width: 16px; height: 16px; }
+.app-status-bar.is-chrome {                  /* .status-bar--teal (home); the source uses !important */
+  background: var(--eauth-brand-chrome);
+  color: var(--eauth-app-on-chrome);
 }
 
-.auth-status-bar .auth-status-time {
-  font-family: var(--auth-font-mono);
-  font-size: var(--auth-text-md);
-  font-weight: var(--auth-font-semibold);
-}
-
-.auth-status-icons { display: flex; gap: 6px; align-items: center; }
-.auth-status-icons svg { width: var(--auth-icon-md); height: var(--auth-icon-md); fill: var(--auth-color-text-primary); }
-
-.auth-status-bar--teal {
-  background: var(--auth-color-brand-dark) !important;
-  color: rgba(255,255,255,0.9) !important;
-}
-.auth-status-bar--teal .auth-status-icons svg { fill: rgba(255,255,255,0.9) !important; }
-
-/* ─── Screen stack ─── */
-.auth-screens {
-  flex: 1;
-  min-height: 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.auth-screen {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: none;
-  transition:
-    transform var(--auth-duration-screen) var(--auth-ease-screen),
-    opacity var(--auth-duration-enter) ease;
-  will-change: transform;
-}
-.auth-screen::-webkit-scrollbar { display: none; }
-
-/* ─── Launch screen ─── */
-.auth-launch-screen {
+/* ---- Launch / splash ---- src: enigma-authenticator.html L176-192, markup L625-630 */
+.app-launch {
   position: absolute;
   inset: 0;
-  z-index: var(--auth-z-launch);
-  background: var(--auth-color-launch-bg);
+  z-index: var(--eauth-z-launch);
+  background: var(--eauth-white);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 40px;
+  gap: var(--eauth-size-app-launch-gap);
   padding-bottom: 18%;
-  transition: opacity var(--auth-duration-enter) ease;
+  transition: opacity var(--eauth-dur-300) var(--eauth-ease-ease);
   pointer-events: auto;
 }
-.auth-launch-screen.hidden { opacity: 0; pointer-events: none; }
-
-.auth-launch-app-name {
-  font-size: var(--auth-text-lg);
-  font-weight: var(--auth-font-bold);
-  color: var(--auth-color-text-primary);
-  letter-spacing: var(--auth-tracking-tight);
+.app-launch.is-hidden { opacity: 0; pointer-events: none; }
+.app-launch-logo { width: var(--eauth-size-app-launch-logo); height: var(--eauth-size-app-launch-logo); color: var(--eauth-brand-chrome); }   /* svg 108x108 fill #3DBFBF (L626-627) */
+.app-launch-name {
+  font-size: var(--eauth-fs-18);
+  font-weight: var(--eauth-fw-bold);
+  color: var(--eauth-app-text);
+  letter-spacing: var(--eauth-ls-tight);
 }
 
-/* ─── Face ID overlay ─── */
-.auth-faceid-overlay {
+/* ---- Face ID overlay ---- src: enigma-authenticator.html L194-262, markup L664-693.
+   The animation is a THIRD-PARTY dotLottie (remote host): documented, never copied - see components.md.
+   .app-faceid-placeholder is a clearly labelled stand-in (EXTENDED). */
+.app-faceid {
   position: absolute;
   inset: 0;
-  z-index: var(--auth-z-faceid);
+  z-index: var(--eauth-z-faceid);
   opacity: 1;
   pointer-events: auto;
-  transition: opacity 0.25s ease;
+  transition: opacity var(--eauth-dur-250) var(--eauth-ease-ease);
   display: flex;
   flex-direction: column;
 }
-.auth-faceid-overlay.hidden { opacity: 0; pointer-events: none; }
-
-.auth-faceid-blur-bg {
+.app-faceid.is-hidden { opacity: 0; pointer-events: none; }
+.app-faceid-blur {
   position: absolute;
   inset: 0;
-  background: rgba(235, 235, 235, 0.12);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: var(--eauth-app-faceid-tint);
+  -webkit-backdrop-filter: var(--eauth-blur-faceid);
+  backdrop-filter: var(--eauth-blur-faceid);
   pointer-events: none;
 }
-
-.auth-faceid-overlay:not(.hidden) .auth-faceid-blur-bg {
-  animation: auth-blur-fade-in var(--auth-duration-blur) ease both;
-}
-
-.auth-faceid-wrap {
+.app-faceid-wrap {
   position: relative;
-  z-index: 1;
+  z-index: var(--eauth-z-faceid-content);
   flex: 1;
   min-height: 0;
   display: flex;
@@ -723,12 +614,9 @@ input:focus-visible { outline: none; }
   text-align: center;
   gap: 0;
 }
-
-.auth-faceid-overlay:not(.hidden) .auth-faceid-wrap {
-  animation: auth-faceid-content-in var(--auth-duration-enter) ease var(--auth-anim-faceid-delay) both;
-}
-
-.auth-faceid-card {
+.app-faceid:not(.is-hidden) .app-faceid-blur { animation: var(--eauth-anim-blur-fade-in); }          /* L226-228 */
+.app-faceid:not(.is-hidden) .app-faceid-wrap { animation: var(--eauth-anim-faceid-content-in); }    /* L234-236 */
+.app-faceid-card {
   background: transparent;
   padding: 0;
   display: flex;
@@ -739,387 +627,410 @@ input:focus-visible { outline: none; }
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-
-.auth-fid-wrapper {
-  width: var(--auth-avatar-fid);
-  height: var(--auth-avatar-fid);
+.app-faceid-anim {          /* .fid-wrapper L255-261: 180x180 box that holds the Lottie player */
+  width: var(--eauth-size-app-faceid);
+  height: var(--eauth-size-app-faceid);
   position: relative;
   cursor: pointer;
   flex-shrink: 0;
   display: block;
 }
-
-.auth-faceid-locked-label {
-  font-size: var(--auth-text-md);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-text-primary);
-  letter-spacing: var(--auth-tracking-tight);
-}
-
-.auth-faceid-fallback-link {
-  font-size: var(--auth-text-base);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-text-secondary);
-  background: rgba(0, 0, 0, 0.06);
-  border: none;
-  border-radius: var(--auth-radius);
-  padding: 12px 28px;
-  cursor: pointer;
-  font-family: var(--auth-font-sans);
-  letter-spacing: var(--auth-tracking-tight);
-  margin-top: 12px;
-  transition: background var(--auth-duration-base), color var(--auth-duration-base);
-  -webkit-tap-highlight-color: transparent;
-}
-.auth-faceid-fallback-link:hover  { background: rgba(0,0,0,.10); color: var(--auth-color-text-primary); }
-.auth-faceid-fallback-link:active { background: rgba(0,0,0,.15); }
-
-/* ─── Push notification banner ─── */
-.auth-push-banner {
+/* EXTENDED - not in source: labelled placeholder for the external Lottie (never an imitation of it) */
+.app-faceid-placeholder {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  z-index: var(--auth-z-banner);
-  padding: 10px 10px 0;
-  transform: translateY(-130%);
-  transition: transform var(--auth-duration-sheet) var(--auth-ease-banner);
-  pointer-events: none;
-}
-.auth-push-banner.show { transform: translateY(0); pointer-events: auto; }
-
-.auth-push-banner-inner {
-  background: rgba(0, 0, 0, 0.20);
-  backdrop-filter: blur(48px);
-  -webkit-backdrop-filter: blur(48px);
-  border-radius: var(--auth-radius-2xl-alt);
-  padding: 10px 12px 12px;
-  border: 1px solid var(--auth-color-border-ghost);
-  box-shadow: var(--auth-shadow-banner);
-  cursor: pointer;
-}
-
-.auth-push-banner-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.auth-push-banner-appname {
-  font-size: var(--auth-text-sm);
-  font-weight: var(--auth-font-semibold);
-  color: rgba(255, 255, 255, 0.80);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  flex: 1;
-}
-
-.auth-push-banner-time { font-size: var(--auth-text-sm); color: rgba(255,255,255,0.60); }
-
-.auth-push-banner-content { display: flex; align-items: center; gap: 10px; }
-
-.auth-push-banner-app-icon {
-  width: var(--auth-avatar-xl);
-  height: var(--auth-avatar-xl);
-  border-radius: var(--auth-radius-xl);
-  background: var(--auth-color-brand-dark);
-  flex-shrink: 0;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 16px;
+  text-align: center;
+  border: 1.5px dashed var(--eauth-app-text-3);
+  border-radius: var(--eauth-radius-card);
+  background: var(--eauth-app-surface);
+  color: var(--eauth-app-text-2);
+  font-size: var(--eauth-fs-12);
+  font-weight: var(--eauth-fw-semibold);
+  line-height: var(--eauth-lh-confirm-body);
 }
-.auth-push-banner-app-icon svg { width: var(--auth-icon-xl); height: var(--auth-icon-xl); }
+.app-faceid-label {         /* L265-269 */
+  font-size: var(--eauth-fs-16);
+  font-weight: var(--eauth-fw-semibold);
+  color: var(--eauth-app-text);
+  letter-spacing: var(--eauth-ls-tight-sm);
+}
+.app-faceid-bottom { display: flex; flex-direction: column; align-items: center; margin-top: 32px; }   /* L241 */
+.app-faceid-fallback {      /* "Use Passcode" pill L273-286 */
+  font-size: var(--eauth-fs-14);
+  font-weight: var(--eauth-fw-semibold);
+  color: var(--eauth-app-text-2);
+  background: var(--eauth-app-pill-bg);
+  border: none;
+  border-radius: var(--eauth-radius-control);
+  padding: 12px 28px;
+  cursor: pointer;
+  font-family: var(--eauth-font-sans);
+  letter-spacing: var(--eauth-ls-tight-sm);
+  margin-top: 12px;
+  transition: background var(--eauth-dur-150), color var(--eauth-dur-150);
+  -webkit-tap-highlight-color: transparent;
+}
+.app-faceid-fallback:hover, .app-faceid-fallback.is-hover { background: var(--eauth-app-pill-bg-hover); color: var(--eauth-app-text); }
+.app-faceid-fallback:active, .app-faceid-fallback.is-active { background: var(--eauth-app-pill-bg-active); }
 
-.auth-push-banner-body { flex: 1; min-width: 0; }
-.auth-push-banner-title { font-size: var(--auth-text-base); font-weight: var(--auth-font-bold); color: rgba(255,255,255,1.0); line-height: var(--auth-leading-snug); }
-.auth-push-banner-sub   { font-size: var(--auth-text-sm); color: rgba(255,255,255,0.78); margin-top: 2px; line-height: 1.4; }
+/* ---- Screen stack + navigation ---- src: enigma-authenticator.html L69-86, L945-955 */
+.app-screens { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+.app-screen {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  transition: transform var(--eauth-dur-380) var(--eauth-ease-screen), opacity var(--eauth-dur-300) var(--eauth-ease-ease);
+  will-change: transform;
+  transform: translateX(0);
+  opacity: 1;
+}
+.app-screen::-webkit-scrollbar { display: none; }
+.app-screen--home { background: var(--eauth-app-bg); padding: 0; }                       /* L312 */
+.app-screen--pw   { background: var(--eauth-app-surface); transform: translateX(100%); opacity: 0; }   /* L86, L401 */
+/* navigation positions (the prototype sets these inline via goToScreen: current / earlier in order / later in order) */
+.app-screen.is-current { transform: translateX(0);     opacity: 1; }
+.app-screen.is-before  { transform: translateX(-100%); opacity: 0; }
+.app-screen.is-after   { transform: translateX(100%);  opacity: 0; }
 
-/* ─── Home logo banner ─── */
-.auth-home-logo-banner {
+/* ---- Home: logo banner ---- src: enigma-authenticator.html L289-309, markup L700-708 */
+.app-home-banner {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 20px;
+  padding: 14px 20px 14px;
   gap: 10px;
-  background: var(--auth-color-brand-dark);
+  background: var(--eauth-brand-chrome);
   flex-shrink: 0;
 }
-
-.auth-home-logo-banner-left { display: flex; align-items: center; gap: 10px; }
-
-.auth-home-logo-icon {
-  width: var(--auth-avatar-xl);
-  height: var(--auth-avatar-xl);
-  background: rgba(255, 255, 255, 0.22);
-  border-radius: var(--auth-radius-lg);
+.app-home-banner-left { display: flex; align-items: center; gap: 10px; }
+.app-home-logo-tile {
+  width: 44px;
+  height: 44px;
+  background: var(--eauth-app-logo-tile);
+  border-radius: var(--eauth-radius-logo-tile);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-
-.auth-home-logo-name {
-  font-size: var(--auth-text-md);
-  font-weight: var(--auth-font-bold);
-  color: #fff;
-  letter-spacing: var(--auth-tracking-tight);
+.app-home-logo { width: 30px; height: 30px; color: var(--eauth-white); }
+.app-home-logo-name {
+  font-size: var(--eauth-fs-16);
+  font-weight: var(--eauth-fw-bold);
+  color: var(--eauth-white);
+  letter-spacing: var(--eauth-ls-tight);
 }
 
-/* ─── Mobile eyebrow ─── */
-.auth-eyebrow-mobile {
-  font-size: var(--auth-text-xs);
-  font-weight: var(--auth-font-bold);
-  letter-spacing: var(--auth-tracking-eyebrow);
+/* ---- Home: header + scroll ---- src: enigma-authenticator.html L315-321, L327-328 */
+.app-home-header {
+  padding: 24px 24px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.app-home-header-left { display: flex; flex-direction: column; gap: 2px; }
+.app-home-title {           /* .screen-title (base 24px never effective) overridden to 20px, L136+L321 */
+  font-size: var(--eauth-fs-20);
+  font-weight: var(--eauth-fw-bold);
+  line-height: var(--eauth-lh-tight);
+  color: var(--eauth-app-text);
+  margin-top: 6px;
+}
+.app-home-scroll { flex: 1; overflow-y: auto; padding: 0 24px 32px; scrollbar-width: none; }
+.app-home-scroll::-webkit-scrollbar { display: none; }
+
+/* ---- List group label ---- src: enigma-authenticator.html L366-369, inline L731/L720 */
+.app-list-label {
+  font-size: var(--eauth-fs-12);
+  font-weight: var(--eauth-fw-bold);
+  color: var(--eauth-app-text-3);
   text-transform: uppercase;
-  color: var(--auth-color-brand-dark);
+  letter-spacing: var(--eauth-ls-group-label);
+  margin-bottom: 10px;
+  padding: 0;
 }
+.app-list-label--active { color: var(--eauth-app-success); }   /* "Active now" inline L720 */
+.app-list-label--spaced { margin-top: 16px; }                  /* "Recent sign-ins" inline L731 */
 
-/* ─── Screen titles (mobile) ─── */
-.auth-screen-title {
-  font-size: var(--auth-text-3xl);
-  font-weight: var(--auth-font-bold);
-  line-height: var(--auth-leading-tight);
-  color: var(--auth-color-text-primary);
-  margin-top: 6px;
-}
-
-.auth-screen-sub {
-  font-size: var(--auth-text-base);
-  color: var(--auth-color-text-secondary);
-  line-height: var(--auth-leading-relaxed);
-  margin-top: 6px;
-}
-
-/* ─── Avatar / initials ─── */
-.auth-avatar {
-  width: var(--auth-avatar-md);
-  height: var(--auth-avatar-md);
-  border-radius: var(--auth-radius-full);
-  background: var(--auth-color-brand);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--auth-text-base);
-  font-weight: var(--auth-font-bold);
-  color: var(--auth-color-black-mobile);
-}
-
-/* ─── Session live dot ─── */
-.auth-session-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--auth-radius-full);
-  background: var(--auth-color-brand);
-  flex-shrink: 0;
-  box-shadow: var(--auth-shadow-dot-pulse);
-  animation: auth-dotpulse var(--auth-anim-dot-pulse) ease infinite;
-}
-
-/* ─── Session compact card (mobile) ─── */
-.auth-session-compact {
-  background: var(--auth-color-surface);
-  border-radius: var(--auth-radius-md);
-  padding: 14px;
+/* ---- Session card (compact row) ---- src: enigma-authenticator.html L370-397, markup L750-780 */
+.app-session {
+  background: var(--eauth-app-surface);
+  border-radius: var(--eauth-radius-card);
+  padding: 14px 14px;
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 8px;
-  transition: opacity var(--auth-duration-session), transform var(--auth-duration-session);
+  transition: opacity var(--eauth-dur-230), transform var(--eauth-dur-230);
 }
-
-.auth-session-compact-flag {
-  width: var(--auth-avatar-md);
-  height: var(--auth-avatar-md);
-  border-radius: var(--auth-radius);
-  background: var(--auth-color-surface-2);
+/* removal state: JS sets inline opacity 0 + scale(.97) at .23s, removes at 230ms (L1172-1174) */
+.app-session.is-removing { opacity: 0; transform: scale(.97); }
+.app-session-flag {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--eauth-radius-control);
+  background: var(--eauth-app-surface-2);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: var(--auth-text-sm);
-  font-weight: var(--auth-font-bold);
-  color: var(--auth-color-text-secondary);
-  letter-spacing: var(--auth-tracking-wide);
+  font-size: var(--eauth-fs-12);
+  font-weight: var(--eauth-fw-bold);
+  color: var(--eauth-app-text-2);
+  letter-spacing: var(--eauth-ls-field-label);
   text-align: center;
-  font-family: var(--auth-font-sans);
+  font-family: var(--eauth-font-sans);
 }
-
-.auth-session-compact-body { flex: 1; min-width: 0; }
-.auth-session-compact-loc  { font-size: var(--auth-text-base); font-weight: var(--auth-font-semibold); color: var(--auth-color-text-primary); }
-.auth-session-compact-meta { font-size: var(--auth-text-sm); color: var(--auth-color-text-tertiary); margin-top: 2px; }
-
-.auth-session-compact-signout {
+.app-session-body { flex: 1; min-width: 0; }
+.app-session-loc  { font-size: var(--eauth-fs-14); font-weight: var(--eauth-fw-semibold); color: var(--eauth-app-text); }
+.app-session-meta { font-size: var(--eauth-fs-12); color: var(--eauth-app-text-3); margin-top: 2px; }
+.app-signout {              /* "Sign out" outline button L389-396 (no hover/active in source) */
   background: none;
-  border: 1px solid var(--auth-color-danger);
-  border-radius: var(--auth-radius);
-  font-family: var(--auth-font-sans);
-  font-size: var(--auth-text-sm);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-danger);
+  border: var(--eauth-border-signout) var(--eauth-app-danger);
+  border-radius: var(--eauth-radius-control);
+  font-family: var(--eauth-font-sans);
+  font-size: var(--eauth-fs-12);
+  font-weight: var(--eauth-fw-semibold);
+  color: var(--eauth-app-danger);
   padding: 8px 14px;
   cursor: pointer;
   white-space: nowrap;
-  min-height: var(--auth-h-btn-sm);
+  min-height: 36px;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ─── Primary button (mobile) ─── */
-.auth-btn-primary-mobile {
-  width: 100%;
-  height: var(--auth-h-btn-mobile);
-  background: var(--auth-color-brand);
-  border: none;
-  border-radius: var(--auth-radius);
-  font-family: var(--auth-font-sans);
-  font-size: var(--auth-text-md);
-  font-weight: var(--auth-font-semibold);
-  color: #000;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: background var(--auth-duration-fast), transform var(--auth-duration-instant);
+/* ---- Current-device card ("Active now" London) ---- src: enigma-authenticator.html inline L722-749 (inline styles promoted to classes)
+   Hidden until a web sign-in is confirmed; revealed with opacity+scale(.97) -> 1, .3s ease (L1148-1151) */
+.app-session--current {
+  transition: opacity var(--eauth-dur-300) var(--eauth-ease-ease), transform var(--eauth-dur-300) var(--eauth-ease-ease);
+  border: var(--eauth-border-london-card) var(--eauth-app-border);
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 16px;
 }
-.auth-btn-primary-mobile:hover  { background: #5ADADA; }
-.auth-btn-primary-mobile:active { transform: scale(0.98); }
-.auth-btn-primary-mobile:disabled { background: var(--auth-color-text-tertiary); color: var(--auth-color-text-secondary); cursor: not-allowed; }
-
-/* ─── Danger button ─── */
-.auth-btn-danger {
-  width: 100%;
-  height: var(--auth-h-btn-danger);
-  background: transparent;
-  border: 1.5px solid var(--auth-color-danger);
-  border-radius: var(--auth-radius);
-  font-family: var(--auth-font-sans);
-  font-size: var(--auth-text-base);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-danger);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background var(--auth-duration-fast);
+.app-session--current.is-entering { opacity: 0; transform: scale(.97); }
+.app-session-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+.app-session-head-body { flex: 1; min-width: 0; }
+.app-session-dot {          /* live dot L341-350 */
+  width: 8px;
+  height: 8px;
+  border-radius: var(--eauth-radius-circle);
+  background: var(--eauth-brand);
+  flex-shrink: 0;
+  margin-top: 6px;          /* inline L724 */
+  box-shadow: var(--eauth-shadow-ring);
+  animation: var(--eauth-anim-dotpulse);
 }
-.auth-btn-danger:hover { background: var(--auth-color-danger-bg); }
+.app-session-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  background: var(--eauth-app-surface-2);
+  border-radius: var(--eauth-radius-card);
+  padding: 12px 14px;
+}
+.app-session-detail-label {
+  font-size: var(--eauth-fs-10);
+  font-weight: var(--eauth-fw-bold);
+  color: var(--eauth-app-text-3);
+  text-transform: uppercase;
+  letter-spacing: var(--eauth-ls-detail-label);
+  margin-bottom: 4px;
+}
+.app-session-detail-value { font-size: var(--eauth-fs-12); font-weight: var(--eauth-fw-semibold); color: var(--eauth-app-text); }
+.app-session-detail-value--mono { font-family: var(--eauth-font-mono); }   /* IP value, L747 (synthetic bold) */
 
-/* ─── Toast ─── */
-.auth-toast {
-  position: absolute;
-  bottom: 32px;
-  left: 16px;
-  right: 16px;
-  background: var(--auth-color-black-mobile);
-  color: #fff;
-  border-radius: var(--auth-radius);
-  padding: 14px 16px;
-  font-size: var(--auth-text-base);
-  font-weight: var(--auth-font-medium);
-  transform: translateY(80px);
-  opacity: 0;
-  transition: transform var(--auth-duration-slide) var(--auth-ease-screen), opacity var(--auth-duration-slide) ease;
-  z-index: var(--auth-z-toast);
+/* ---- Empty state ---- src: enigma-authenticator.html L397, markup L777.
+   Intended trigger: show when no .app-session sign-in row remains (source selector bug, see build-notes). */
+.app-sessions-empty {
+  font-size: var(--eauth-fs-14);
+  color: var(--eauth-app-text-3);
   text-align: center;
+  padding: 20px 0;
+  display: none;
+}
+.app-sessions-empty.is-show { display: block; }
+
+/* ---- Push-notification banner ---- src: enigma-authenticator.html L88-129, markup L643-661 (covers the status bar; z 300) */
+.app-push {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: var(--eauth-z-push);
+  padding: 10px 10px 0;
+  transform: translateY(-130%);
+  transition: transform var(--eauth-dur-420) var(--eauth-ease-sheet);
   pointer-events: none;
 }
-.auth-toast.show { transform: translateY(0); opacity: 1; }
-.auth-toast.danger { background: var(--auth-color-danger); }
+.app-push.is-show { transform: translateY(0); pointer-events: auto; }    /* auto-dismiss after 9000ms (JS) */
+.app-push-inner {
+  background: var(--eauth-app-push-glass);
+  -webkit-backdrop-filter: var(--eauth-blur-push);
+  backdrop-filter: var(--eauth-blur-push);
+  border-radius: var(--eauth-radius-banner);
+  padding: 10px 12px 12px;
+  border: var(--eauth-border-push) var(--eauth-app-push-border);
+  box-shadow: var(--eauth-shadow-app-push);
+  cursor: pointer;
+}
+.app-push-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.app-push-appname {
+  font-size: var(--eauth-fs-12);
+  font-weight: var(--eauth-fw-semibold);
+  color: var(--eauth-app-push-appname);
+  text-transform: uppercase;
+  letter-spacing: var(--eauth-ls-push-appname);
+  flex: 1;
+}
+.app-push-time { font-size: var(--eauth-fs-12); color: var(--eauth-app-push-time); }
+.app-push-content { display: flex; align-items: center; gap: 10px; }
+.app-push-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--eauth-radius-icon-tile);
+  background: var(--eauth-brand-chrome);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.app-push-logo { width: 22px; height: 22px; color: var(--eauth-white); }   /* CSS 22px wins over the 26px attrs (L126) */
+.app-push-body { flex: 1; min-width: 0; }
+.app-push-title { font-size: var(--eauth-fs-14); font-weight: var(--eauth-fw-bold); color: var(--eauth-app-push-title); line-height: var(--eauth-lh-push-title); }
+.app-push-sub   { font-size: var(--eauth-fs-12); color: var(--eauth-app-push-sub); margin-top: 2px; line-height: var(--eauth-lh-push-sub); }
 
-/* ─── Bottom sheet ─── */
-.auth-sheet-overlay {
+/* ---- Bottom sheet: overlay + sheet + handle + map ---- src: enigma-authenticator.html L497-543, markup L836-886 */
+.app-sheet-overlay {
   position: absolute;
   inset: 0;
-  background: var(--auth-color-surface-overlay);
+  background: var(--eauth-app-sheet-overlay);
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--auth-duration-screen) ease;
-  z-index: var(--auth-z-sheet-overlay);
+  transition: opacity var(--eauth-dur-350) var(--eauth-ease-ease);
+  z-index: var(--eauth-z-sheet-overlay);
 }
-.auth-sheet-overlay.show { opacity: 1; pointer-events: auto; }
-
-.auth-bottom-sheet {
+.app-sheet-overlay.is-show { opacity: 1; pointer-events: auto; }          /* not clickable to dismiss (no handler) */
+.app-sheet {                /* display:block (not flex) in source */
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  background: var(--auth-color-surface);
-  border-radius: var(--auth-radius-md) var(--auth-radius-md) 0 0;
+  background: var(--eauth-app-surface);
+  border-radius: var(--eauth-radius-card) var(--eauth-radius-card) 0 0;
   transform: translateY(100%);
-  transition: transform var(--auth-duration-sheet) var(--auth-ease-sheet);
-  z-index: var(--auth-z-sheet);
+  transition: transform var(--eauth-dur-420) var(--eauth-ease-sheet);
+  z-index: var(--eauth-z-sheet);
   max-height: 88%;
   overflow: hidden;
-  box-shadow: var(--auth-shadow-sheet);
+  box-shadow: var(--eauth-shadow-app-sheet);
 }
-.auth-bottom-sheet.open { transform: translateY(0); }
-
-.auth-sheet-handle {
+.app-sheet.is-open { transform: translateY(0); }
+.app-sheet-handle {
   width: 36px;
   height: 4px;
-  border-radius: var(--auth-radius);
-  background: var(--auth-color-border);
+  border-radius: var(--eauth-radius-control);
+  background: var(--eauth-app-border);
   margin: 12px auto 4px;
-  flex-shrink: 0;
 }
-
-/* ─── OTP code display (bottom sheet) ─── */
-.auth-sheet-code-card {
-  background: var(--auth-color-surface-2);
-  border-radius: var(--auth-radius-md);
-  padding: 16px;
-  margin-bottom: 10px;
+.app-sheet-map {
+  height: var(--eauth-size-app-map-h);
+  position: relative;
+  overflow: hidden;
+  margin: 0 16px;
+  border-radius: var(--eauth-radius-control);
+  background: var(--eauth-app-border);
 }
-
-.auth-sheet-code-header {
+/* the map is assets/app-map-london.svg (preserveAspectRatio xMidYMid slice = object-fit: cover) */
+.app-sheet-map > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.app-map-pill {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--eauth-app-map-pill-bg);
+  -webkit-backdrop-filter: var(--eauth-blur-map-pill);
+  backdrop-filter: var(--eauth-blur-map-pill);
+  border-radius: var(--eauth-radius-control);
+  padding: 6px 12px 6px 8px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 6px;
+  font-size: var(--eauth-fs-12);
+  font-weight: var(--eauth-fw-semibold);
+  color: var(--eauth-app-text);
+  box-shadow: var(--eauth-shadow-app-map-pill);
+  white-space: nowrap;
+}
+.app-map-dot { width: 8px; height: 8px; border-radius: var(--eauth-radius-circle); background: var(--eauth-brand); flex-shrink: 0; }
+
+/* ---- Sheet body: details ---- src: enigma-authenticator.html L546-563 */
+.app-sheet-body { overflow-y: auto; padding: 16px 20px 32px; scrollbar-width: none; }
+.app-sheet-body::-webkit-scrollbar { display: none; }
+.app-sheet-title {
+  font-size: var(--eauth-fs-10);
+  font-weight: var(--eauth-fw-bold);
+  letter-spacing: var(--eauth-ls-group-label);
+  text-transform: uppercase;
+  color: var(--eauth-app-text-3);
   margin-bottom: 10px;
 }
-
-.auth-sheet-code-label {
-  font-size: var(--auth-text-sm);
-  font-weight: var(--auth-font-bold);
-  color: var(--auth-color-text-tertiary);
+.app-sheet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.app-sheet-item { display: flex; flex-direction: column; gap: 4px; }
+.app-sheet-item-label {
+  font-size: var(--eauth-fs-10);
+  color: var(--eauth-app-text-3);
+  font-weight: var(--eauth-fw-semibold);
   text-transform: uppercase;
-  letter-spacing: var(--auth-tracking-label);
+  letter-spacing: var(--eauth-ls-info-label);
 }
+.app-sheet-item-value { font-size: var(--eauth-fs-14); color: var(--eauth-app-text); font-weight: var(--eauth-fw-semibold); }
 
-.auth-sheet-otp {
-  font-family: var(--auth-font-mono);
-  font-size: var(--auth-text-4xl);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-text-primary);
-  letter-spacing: var(--auth-tracking-mono);
+/* ---- OTP code card ---- src: enigma-authenticator.html L565-593, markup L899-923 (no ring/progress; text countdown only) */
+.app-code-card { background: var(--eauth-app-surface-2); border-radius: var(--eauth-radius-card); padding: 16px; margin-bottom: 10px; }
+.app-code-card.is-fading { opacity: 0; transition: opacity var(--eauth-dur-200); }   /* confirmed flow: JS inline transition .2s, opacity 0 (L1284) */
+.app-code-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.app-code-label {
+  font-size: var(--eauth-fs-12);
+  font-weight: var(--eauth-fw-bold);
+  color: var(--eauth-app-text-3);
+  text-transform: uppercase;
+  letter-spacing: var(--eauth-ls-eyebrow-web);
+}
+.app-code-expiry {
+  font-size: var(--eauth-fs-14);
+  font-weight: var(--eauth-fw-semibold);   /* synthetic bold on DM Mono 500 */
+  color: var(--eauth-app-text-2);
+  font-family: var(--eauth-font-mono);
+}
+.app-code-expiry.is-urgent { color: var(--eauth-app-danger); }   /* <=30s */
+.app-code-otp {              /* "482 716" (hard-coded in source) */
+  font-family: var(--eauth-font-mono);
+  font-size: var(--eauth-fs-38);
+  font-weight: var(--eauth-fw-semibold);   /* synthetic bold on DM Mono 500 */
+  color: var(--eauth-app-text);
+  letter-spacing: var(--eauth-ls-otp);
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 12px;
 }
-.auth-sheet-otp.used {
-  color: var(--auth-color-text-tertiary);
-  text-decoration: line-through;
-  letter-spacing: 0.10em;
-  font-size: 26px;
-}
-
-.auth-sheet-code-expiry {
-  font-size: var(--auth-text-base);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-text-secondary);
-  font-family: var(--auth-font-mono);
-}
-.auth-sheet-code-expiry.urgent { color: var(--auth-color-danger); }
-
-.auth-sheet-copy-btn {
+.app-copy-btn {
   width: 100%;
-  height: var(--auth-h-btn-mobile);
-  background: var(--auth-color-brand);
+  height: var(--eauth-h-app-btn);
+  background: var(--eauth-brand);
   border: none;
-  border-radius: var(--auth-radius-md);
-  font-family: var(--auth-font-sans);
-  font-size: var(--auth-text-md);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-black-mobile);
+  border-radius: var(--eauth-radius-card);
+  font-family: var(--eauth-font-sans);
+  font-size: var(--eauth-fs-16);
+  font-weight: var(--eauth-fw-semibold);
+  color: var(--eauth-app-black);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1128,122 +1039,199 @@ input:focus-visible { outline: none; }
   margin-top: 16px;
   -webkit-tap-highlight-color: transparent;
 }
-.auth-sheet-copy-btn:active { opacity: 0.85; }
-.auth-sheet-copy-btn:disabled { background: var(--auth-color-text-tertiary); color: var(--auth-color-text-secondary); cursor: not-allowed; }
-
-/* ─── Sheet confirmed state ─── */
-.auth-sheet-confirmed {
+.app-copy-btn .eauth-icon { width: 18px; height: 18px; }                 /* L923 svg 18x18 */
+.app-copy-btn:active, .app-copy-btn.is-active { opacity: .85; }          /* L592; no hover, no transition in source */
+.app-copy-btn:disabled, .app-copy-btn.is-disabled, .app-copy-btn.is-copied {   /* "✓ Copied!" 2000ms window (text char, no icon) */
+  background: var(--eauth-app-disabled-bg);
+  color: var(--eauth-app-disabled-text);
+  cursor: not-allowed;
+}
+.app-block-link {            /* "This wasn't me - Block sign-in" L594-603 (no hover) */
+  display: block;
+  width: 100%;
   text-align: center;
-  padding: 12px 0;
+  font-size: var(--eauth-fs-14);
+  color: var(--eauth-app-danger);
+  font-weight: var(--eauth-fw-medium);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: var(--eauth-font-sans);
+  padding: 16px 0 4px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.auth-sheet-confirmed-icon {
-  width: var(--auth-avatar-2xl);
-  height: var(--auth-avatar-2xl);
-  border-radius: var(--auth-radius-full);
-  background: var(--auth-color-brand-ghost);
+/* ---- Confirmed state (inside the sheet) ---- src: enigma-authenticator.html L605-617, JS markup L1289-1298 */
+.app-confirmed { text-align: center; padding: 12px 0; }
+.app-confirmed-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--eauth-radius-circle);
+  background: var(--eauth-brand-ghost);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 12px;
 }
-.auth-sheet-confirmed-icon svg { width: 28px; height: 28px; fill: var(--auth-color-brand); }
+.app-confirmed-check { width: 28px; height: 28px; color: var(--eauth-brand); }   /* #7AEFEF on #7AEFEF18: low contrast, as designed */
+.app-confirmed-title { font-size: var(--eauth-fs-18); font-weight: var(--eauth-fw-bold); color: var(--eauth-app-text); margin-bottom: 4px; }
+.app-confirmed-text  { font-size: var(--eauth-fs-14); color: var(--eauth-app-text-2); }
 
-.auth-sheet-confirmed h3 { font-size: 18px; font-weight: var(--auth-font-bold); color: var(--auth-color-text-primary); margin-bottom: 4px; }
-.auth-sheet-confirmed p  { font-size: var(--auth-text-base); color: var(--auth-color-text-secondary); }
-
-/* ─── Sign-out confirmation dialog ─── */
-.auth-confirm-overlay {
+/* ---- Sign-out confirmation dialog ---- src: enigma-authenticator.html L446-495, markup L824-833 */
+.app-confirm {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.40);
-  z-index: var(--auth-z-dialog);
+  background: var(--eauth-app-confirm-overlay);
+  z-index: var(--eauth-z-confirm);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--auth-duration-confirm) ease;
+  transition: opacity var(--eauth-dur-200) var(--eauth-ease-ease);
 }
-.auth-confirm-overlay.show { opacity: 1; pointer-events: auto; }
-
-.auth-confirm-dialog {
-  background: var(--auth-color-surface);
-  border-radius: var(--auth-radius-2xl);
+.app-confirm.is-show { opacity: 1; pointer-events: auto; }               /* overlay tap does not dismiss */
+.app-confirm-dialog {
+  background: var(--eauth-app-surface);
+  border-radius: var(--eauth-radius-dialog);
   width: calc(100% - 48px);
-  max-width: 320px;
+  max-width: var(--eauth-size-app-dialog-max);
   padding: 20px 20px 12px;
-  box-shadow: var(--auth-shadow-dialog);
-  transform: scale(0.95);
-  transition: transform var(--auth-duration-confirm) ease;
+  box-shadow: var(--eauth-shadow-app-dialog);
+  transform: scale(.95);
+  transition: transform var(--eauth-dur-200) var(--eauth-ease-ease);
   text-align: center;
 }
-.auth-confirm-overlay.show .auth-confirm-dialog { transform: scale(1); }
-
-.auth-confirm-title {
-  font-size: var(--auth-text-md);
-  font-weight: var(--auth-font-bold);
-  color: var(--auth-color-text-primary);
-  letter-spacing: var(--auth-tracking-tight);
+.app-confirm.is-show .app-confirm-dialog { transform: scale(1); }
+.app-confirm-title {
+  font-size: var(--eauth-fs-16);
+  font-weight: var(--eauth-fw-bold);
+  color: var(--eauth-app-text);
+  letter-spacing: var(--eauth-ls-tight-sm);
   margin-bottom: 6px;
 }
-.auth-confirm-body {
-  font-size: var(--auth-text-base);
-  color: var(--auth-color-text-secondary);
-  line-height: var(--auth-leading-normal);
+.app-confirm-body {
+  font-size: var(--eauth-fs-14);
+  color: var(--eauth-app-text-2);
+  line-height: var(--eauth-lh-confirm-body);
   margin-bottom: 18px;
 }
-
-.auth-confirm-actions { display: flex; gap: 8px; }
-
-.auth-confirm-btn {
+.app-confirm-actions { display: flex; gap: 8px; }
+.app-confirm-btn {
   flex: 1;
   padding: 14px 8px;
-  border-radius: var(--auth-radius);
-  font-family: var(--auth-font-sans);
-  font-size: var(--auth-text-base);
-  font-weight: var(--auth-font-semibold);
+  border-radius: var(--eauth-radius-control);
+  font-family: var(--eauth-font-sans);
+  font-size: var(--eauth-fs-14);
+  font-weight: var(--eauth-fw-semibold);
   cursor: pointer;
   border: none;
-  transition: opacity var(--auth-duration-base);
+  transition: opacity var(--eauth-dur-150);
   min-height: 44px;
   -webkit-tap-highlight-color: transparent;
 }
-.auth-confirm-btn:active { opacity: 0.7; }
-.auth-confirm-btn-cancel { background: var(--auth-color-surface-2); color: var(--auth-color-text-secondary); }
-.auth-confirm-btn-danger { background: var(--auth-color-danger); color: #fff; }
+.app-confirm-btn:active, .app-confirm-btn.is-active { opacity: .7; }
+.app-confirm-btn--cancel { background: var(--eauth-app-surface-2); color: var(--eauth-app-text-2); }
+.app-confirm-btn--danger { background: var(--eauth-app-danger); color: var(--eauth-white); }
 
-/* ─── Password fallback input (mobile) ─── */
-.auth-mobile-input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
-.auth-mobile-input-group label {
-  font-size: var(--auth-text-sm);
-  font-weight: var(--auth-font-semibold);
-  color: var(--auth-color-text-secondary);
-  letter-spacing: var(--auth-tracking-wide);
+/* ---- Toast (2 variants: default black, --danger) ---- src: enigma-authenticator.html L161-173 (single instance, 3000ms) */
+.app-toast {
+  position: absolute;
+  bottom: 32px;
+  left: 16px;
+  right: 16px;
+  background: var(--eauth-app-black);
+  color: var(--eauth-white);
+  border-radius: var(--eauth-radius-control);
+  padding: 14px 16px;
+  font-size: var(--eauth-fs-14);
+  font-weight: var(--eauth-fw-medium);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: transform var(--eauth-dur-280) var(--eauth-ease-screen), opacity var(--eauth-dur-280) var(--eauth-ease-ease);
+  z-index: var(--eauth-z-toast);
+  text-align: center;
+  pointer-events: none;
+}
+.app-toast.is-show { transform: translateY(0); opacity: 1; }
+.app-toast--danger { background: var(--eauth-app-danger); }
+
+/* ---- Password-fallback screen ---- src: enigma-authenticator.html L399-444, markup L783-819 */
+.app-fb-top { padding: 32px 24px 28px; border-bottom: var(--eauth-border-divider) var(--eauth-app-border); }
+.app-fb-back {              /* "Back to Face ID" L408-414 (no hover) */
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--eauth-font-sans);
+  font-size: var(--eauth-fs-14);
+  font-weight: var(--eauth-fw-medium);
+  color: var(--eauth-app-text-3);
+  padding: 10px 8px 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+}
+.app-fb-back .eauth-icon { width: 15px; height: 15px; }
+.app-eyebrow {              /* L132-135 + inline margin-bottom 6px (L791) */
+  font-size: var(--eauth-fs-10);
+  font-weight: var(--eauth-fw-bold);
+  letter-spacing: var(--eauth-ls-eyebrow-app);
+  text-transform: uppercase;
+  color: var(--eauth-brand-chrome);
+  margin-bottom: 6px;
+}
+.app-screen-title {         /* pw title: base 24px never effective; inline 22px, margin 0 0 6px (L792) */
+  font-size: var(--eauth-fs-22);
+  font-weight: var(--eauth-fw-bold);
+  line-height: var(--eauth-lh-tight);
+  color: var(--eauth-app-text);
+  margin: 0 0 6px;
+}
+.app-screen-sub {           /* L137 + inline margin 0, 14px (L793) */
+  font-size: var(--eauth-fs-14);
+  color: var(--eauth-app-text-2);
+  line-height: var(--eauth-lh-body);
+  margin: 0;
+}
+.app-fb-form { padding: 28px 24px 32px; flex: 1; display: flex; flex-direction: column; }
+.app-input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.app-input-label {          /* L417-420 (text-transform uppercase; unlike web, caps come from CSS) */
+  font-size: var(--eauth-fs-12);
+  font-weight: var(--eauth-fw-semibold);
+  color: var(--eauth-app-text-2);
+  letter-spacing: var(--eauth-ls-field-label);
   text-transform: uppercase;
 }
-.auth-mobile-input-wrap { position: relative; }
-.auth-mobile-input-field {
+.app-input-wrap { position: relative; }
+.app-input {                /* L422-436; NO error state exists in the source */
   width: 100%;
-  height: var(--auth-h-input);
+  height: var(--eauth-h-app-input);
   padding: 0 44px 0 14px;
-  background: var(--auth-color-surface-2);
-  border: 1.5px solid var(--auth-color-border);
-  border-radius: var(--auth-radius);
-  font-family: var(--auth-font-sans);
-  font-size: var(--auth-text-md);
-  color: var(--auth-color-text-primary);
+  background: var(--eauth-app-surface-2);
+  border: var(--eauth-border-input) var(--eauth-app-border);
+  border-radius: var(--eauth-radius-control);
+  font-family: var(--eauth-font-sans);
+  font-size: var(--eauth-fs-16);
+  color: var(--eauth-app-text);
   outline: none;
-  transition: border-color var(--auth-duration-normal), box-shadow var(--auth-duration-normal);
+  transition: border-color var(--eauth-dur-180), box-shadow var(--eauth-dur-180);
   -webkit-appearance: none;
+  appearance: none;
 }
-.auth-mobile-input-field:focus {
-  border-color: var(--auth-color-border-focus);
-  background: var(--auth-color-surface);
-  box-shadow: var(--auth-shadow-focus);
+.app-input::placeholder { color: var(--eauth-app-text-3); }
+/* EXTENDED - not in source (no hover rule): hover = text-3 border, before focus so focus wins */
+.app-input:hover, .app-input.is-hover { border-color: var(--eauth-app-text-3); }
+.app-input:focus, .app-input.is-focus {
+  border-color: var(--eauth-brand);
+  background: var(--eauth-app-surface);
+  box-shadow: var(--eauth-shadow-ring);
 }
-.auth-mobile-input-field::placeholder { color: var(--auth-color-text-tertiary); }
-.auth-mobile-input-toggle {
+.app-input-toggle {         /* L437-443: 44x44 at right 6px, svg 18x18; icon never changes (no eye-off exists) */
   position: absolute;
   right: 6px;
   top: 50%;
@@ -1252,7 +1240,7 @@ input:focus-visible { outline: none; }
   border: none;
   padding: 0;
   cursor: pointer;
-  color: var(--auth-color-text-tertiary);
+  color: var(--eauth-app-text-3);
   width: 44px;
   height: 44px;
   display: flex;
@@ -1260,67 +1248,68 @@ input:focus-visible { outline: none; }
   justify-content: center;
   -webkit-tap-highlight-color: transparent;
 }
-.auth-mobile-input-toggle svg { width: var(--auth-icon-lg); height: var(--auth-icon-lg); display: block; }
+.app-input-toggle .eauth-icon { width: 18px; height: 18px; display: block; }
+.app-fb-submit { margin-top: auto; padding-top: 16px; }
 
-/* ─── Sheet block link ─── */
-.auth-sheet-block-link {
-  display: block;
+/* ---- Primary button ---- src: enigma-authenticator.html L139-149 (used once: "Confirm Identity"; label "Verifying…" while loading) */
+.app-btn {
   width: 100%;
-  text-align: center;
-  font-size: var(--auth-text-base);
-  color: var(--auth-color-danger);
-  font-weight: var(--auth-font-medium);
-  cursor: pointer;
-  background: none;
+  height: var(--eauth-h-app-btn);
   border: none;
-  font-family: var(--auth-font-sans);
-  padding: 16px 0 4px;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  -webkit-tap-highlight-color: transparent;
+  border-radius: var(--eauth-radius-control);
+  font-family: var(--eauth-font-sans);
+  font-size: var(--eauth-fs-16);
+  font-weight: var(--eauth-fw-semibold);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background var(--eauth-dur-120), transform var(--eauth-dur-80);
+}
+.app-btn--primary { background: var(--eauth-brand); color: var(--eauth-app-black); }
+.app-btn--primary:hover, .app-btn--primary.is-hover { background: var(--eauth-brand-hover); }   /* L147: #5ADADA, the only mobile hover colour */
+.app-btn--primary:active, .app-btn--primary.is-active { transform: scale(.98); }
+.app-btn--primary:disabled, .app-btn--primary.is-disabled {
+  background: var(--eauth-app-disabled-bg);
+  color: var(--eauth-app-disabled-text);
+  cursor: not-allowed;
 }
 
-
-/* ============================================================
-   KEYFRAME ANIMATIONS
-   ============================================================ */
-
-@keyframes auth-spin {
-  to { transform: rotate(360deg); }
+/* ---- Focus ring (all mobile buttons + inputs) ---- src: enigma-authenticator.html L32-36
+   2px solid #3DBFBF, offset 2px. Inputs ALSO keep their border+ring focus, giving the double ring the prototype renders
+   (flagged in build-notes; kept because unsure bug vs design). The source's border-radius:4px is applied only to the
+   radius-0 controls so rings never change a component's own radius (e.g. the 8px copy button). */
+.app-shell :is(button, input):is(:focus-visible, .is-focus) {
+  outline: 2px solid var(--eauth-brand-chrome);
+  outline-offset: 2px;
+}
+.app-shell :is(.app-fb-back, .app-input-toggle, .app-block-link):is(:focus-visible, .is-focus) {
+  border-radius: var(--eauth-radius-control);
 }
 
-@keyframes auth-shake {
-  0%, 100% { transform: translateX(0); }
-  25%       { transform: translateX(-6px); }
-  75%       { transform: translateX(6px); }
+/* ==========================================================================
+   KEYFRAMES (names prefixed eauth-)
+   ========================================================================== */
+/* src: enigma-signin.html L349-351 */
+@keyframes eauth-spin    { to { transform: rotate(360deg); } }
+@keyframes eauth-shake   { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+@keyframes eauth-pop-in  { 0% { transform: scale(.2); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+/* src: enigma-authenticator.html L229-232, L237-240, L347-350 */
+@keyframes eauth-blur-fade-in        { from { opacity: 0; } to { opacity: 1; } }
+@keyframes eauth-faceid-content-in   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes eauth-dotpulse {
+  0%, 100% { box-shadow: var(--eauth-shadow-ring); }
+  50%      { box-shadow: var(--eauth-shadow-app-dot-halo-end); }
 }
 
-@keyframes auth-pop-in {
-  0%   { transform: scale(0.2); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes auth-pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.4; transform: scale(1.4); }
-}
-
-@keyframes auth-dotpulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(122, 239, 239, 0.094); }
-  50%       { box-shadow: 0 0 0 6px transparent; }
-}
-
-@keyframes auth-dot-bounce {
-  0%, 100% { transform: translateY(0); opacity: 0.4; }
-  50%       { transform: translateY(-4px); opacity: 1; }
-}
-
-@keyframes auth-blur-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes auth-faceid-content-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+/* ==========================================================================
+   EXTENDED - reduced motion (not in either prototype): no transitions/animations
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .web-page *, .web-card *, .app-shell *, .app-shell {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
 }

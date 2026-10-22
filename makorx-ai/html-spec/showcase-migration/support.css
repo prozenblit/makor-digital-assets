@@ -1,0 +1,80 @@
+body{margin:0}
+/* ===== platform tokens -> showcase kit (mapped on .sk-app so body.dark reaches it) ===== */
+.sk-app{
+  --sk-bg:var(--color-canvas);--sk-surface:var(--color-surface);--sk-surface-2:var(--color-fill-subtle);--sk-border:var(--color-border-divider);
+  --sk-text:var(--color-text-primary);--sk-text-muted:var(--color-text-secondary);--sk-accent:var(--color-brand);--sk-accent-text:var(--color-text-on-brand);
+  --sk-code-bg:var(--color-fill-badge);
+  --sk-badge-extended:var(--color-warning-text);--sk-badge-alt:var(--color-text-secondary);--sk-badge-documented:var(--color-success-text);--sk-badge-outside:var(--color-info-text);
+  --sk-info:var(--color-info-text);--sk-warn:var(--color-warning-text);--sk-ok:var(--color-success-text);--sk-bad:var(--color-danger-text);
+  --sk-font:var(--font-primary);--sk-mono-font:var(--font-mono);--sk-radius:var(--radius-base);--sk-shadow:var(--shadow-card-sm);
+  --sk-stage-bg:var(--color-surface);
+}
+/* the app sets no color-scheme: keep UA-styled controls inside demos identical to the app (the kit's built-in dark set would switch it) */
+html[data-sk-theme="dark"]{color-scheme:normal}
+
+/* ===== demo support (showcase-only helpers; not part of the app or components.css) ===== */
+.sc-cell{display:block}
+.sc-ovf{position:relative;overflow:hidden;transform:translateZ(0);background:var(--color-page-bg);border:1px solid var(--color-border-card);border-radius:var(--radius-base)}
+.sc-rel{position:relative}
+.sc-bgc{background:var(--color-surface);border:1px solid var(--color-border-card);border-radius:var(--radius-base)}
+.sc-raw{margin:0 0 24px;min-width:0}
+.sc-ext-why{color:var(--color-text-tertiary)}
+/* frame adaptations ONLY: 100vh -> 1080px (selectors moved from .sc-frame to the kit's .sk-frame__inner) */
+.sk-frame__inner{background:var(--color-page-bg);color:var(--color-text-primary)}
+.sk-frame.is-100 .sk-frame__inner{transform:translateZ(0)} /* keep position:fixed overlays inside the frame at 100% */
+.sk-frame__inner .page{height:1006px;padding-top:0}
+.sk-frame__inner .content-card-wrap{height:972px}
+.sk-frame__inner .left-col{max-height:974px}
+.sk-frame__inner .modal{max-height:885.6px}
+/* foundations */
+.sk-table-wrap .sk-table td{vertical-align:middle}
+.sk-table-wrap .sk-table--decisions td{vertical-align:top}
+.sk-table .sc-cm,.sc-cm{font-size:var(--font-size-12);line-height:1.35;color:var(--color-text-secondary)}
+.sk-h3 .sc-count{margin-left:6px;padding:1px 6px;border-radius:var(--radius-base);background:var(--color-fill-badge);color:var(--color-text-secondary);font-size:var(--font-size-11);letter-spacing:0;font-weight:var(--font-weight-semibold)}
+.sc-card__t .sc-count{margin-left:6px;padding:1px 6px;border-radius:var(--radius-base);background:var(--color-fill-badge);color:var(--color-text-secondary);font-size:var(--font-size-11);letter-spacing:0}
+.sc-raw code,.sc-card code,.sc-kv code{font-family:var(--font-mono);font-size:.92em;padding:1px 5px;border-radius:var(--radius-base);background:var(--color-fill-subtle);color:var(--color-text-primary);word-break:break-word}
+.sc-swp{display:inline-flex;align-items:center;gap:6px;padding:5px;margin-right:8px;border:1px solid var(--color-border-card);border-radius:var(--radius-base);vertical-align:middle}
+.sc-swp i{display:block;width:44px;height:24px;border-radius:var(--radius-hairline);box-shadow:inset 0 0 0 1px var(--color-border-card)}
+.sc-val{font-family:var(--font-mono);font-size:var(--font-size-11);color:var(--color-text-secondary);word-break:break-all}
+.sc-pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.sc-pair__panel{display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid var(--color-border-card);border-radius:var(--radius-base)}
+.sc-pair__t{font-size:var(--font-size-11);font-weight:var(--font-weight-bold);text-transform:uppercase;letter-spacing:var(--letter-spacing-label);color:var(--color-text-secondary)}
+.sc-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.sc-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.sc-card{padding:16px;border:1px solid var(--color-border-card);border-radius:var(--radius-base);background:var(--color-surface)}
+.sc-card__t{margin-bottom:8px;font-size:var(--font-size-11);font-weight:var(--font-weight-bold);color:var(--color-text-tertiary)}
+.sc-kv{display:flex;justify-content:space-between;gap:8px;padding:3px 0;font-size:var(--font-size-12);color:var(--color-text-secondary)}
+.sc-tsample{white-space:nowrap}
+.sc-sp-list{display:grid;gap:6px}
+.sc-sp{display:grid;grid-template-columns:130px 1fr 50px;align-items:center;gap:12px;font-size:var(--font-size-12);color:var(--color-text-secondary)}
+.sc-sp__bar{display:block;height:10px;border-radius:var(--radius-hairline);background:var(--color-brand)}
+.sc-hbar{display:block;width:60px;border-radius:var(--radius-hairline);background:var(--color-brand)}
+.sc-fxhead,.sc-fxrow{display:grid;grid-template-columns:minmax(260px,1.2fr) 1fr 1fr;gap:0;align-items:stretch}
+.sc-fxhead{font-size:var(--font-size-11);font-weight:var(--font-weight-bold);text-transform:uppercase;color:var(--color-text-tertiary);padding:0 0 6px}
+.sc-fxrow{border-top:1px solid var(--color-border-line)}
+.sc-fxrow__l{padding:12px 12px 12px 0}
+.sc-fxrow__b{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:16px}
+.sc-fxbox{display:block;width:120px;height:52px;border-radius:var(--radius-base);background:var(--color-surface-elevated)}
+.sc-opbox{display:inline-block;padding:4px 10px;border-radius:var(--radius-base);background:var(--color-brand);color:var(--color-text-on-brand)}
+.sc-mo{display:inline-block;position:relative;width:200px;height:28px;border:1px solid var(--color-border-control);border-radius:var(--radius-base);cursor:pointer}
+.sc-mo i{position:absolute;left:2px;top:2px;width:22px;height:22px;border-radius:var(--radius-base);background:var(--color-brand);transition:transform var(--d)}
+.sc-mo:hover i{transform:translateX(174px)}
+.sc-layout{position:relative;width:768px;height:432px;border:1px solid var(--color-border-divider);border-radius:var(--radius-base);background:var(--color-page-bg);font-size:var(--font-size-11);color:var(--color-text-secondary);overflow:hidden}
+.sc-layout__nav{position:absolute;left:0;right:0;top:0;height:30px;display:flex;align-items:center;padding:0 16px;background:var(--color-nav-bg);border-bottom:1px solid var(--color-border-divider);color:var(--color-text-primary)}
+.sc-layout__gut{position:absolute;top:30px;bottom:0;width:84px;display:flex;align-items:center;justify-content:center;background:var(--color-fill-subtle);color:var(--color-text-tertiary)}
+.sc-layout__card{position:absolute;left:84px;right:84px;top:35px;bottom:5px;display:flex;border:1px solid var(--color-border-card);border-radius:var(--radius-base);box-shadow:var(--shadow-page);overflow:hidden;background:var(--color-surface)}
+.sc-layout__l{width:54%;padding:12px;border-right:1px solid var(--color-border-card);color:var(--color-text-primary)}
+.sc-layout__r{flex:1;padding:12px;color:var(--color-text-primary)}
+.sc-layout small{color:var(--color-text-tertiary)}
+.sc-layout__m{position:absolute;left:90px;bottom:12px;color:var(--color-text-tertiary)}
+.sc-z{display:grid;gap:4px;margin-bottom:8px}
+.sc-z__row{display:grid;grid-template-columns:150px 1fr 50px 1fr;align-items:center;gap:12px;font-size:var(--font-size-12);color:var(--color-text-secondary)}
+.sc-z__row i{display:block;height:12px;width:var(--w);border-radius:var(--radius-hairline);background:var(--color-brand)}
+.sc-z__row em{font-style:normal;color:var(--color-text-tertiary)}
+.sc-ic__pair{display:flex;align-items:center;gap:16px;color:var(--color-text-primary)}
+.sk-icon__sample{min-height:64px;font-size:var(--font-size-11)} /* the old .sc-ic card set 11px for its sample */
+.sk-sample__box{background:var(--color-tint-selected);box-shadow:inset 0 0 0 1px var(--color-brand)}
+.sk-table--decisions tr.sc-flagrow td{background:var(--color-warning-bg)}
+#f-radii .sk-sample__box{width:72px;height:72px}
+.sk-section>a[id]:empty{display:block;scroll-margin-top:calc(var(--sk-topbar-h) + 16px)} /* alias anchors for the pre-migration section ids */
+.sk-screen{scroll-margin-top:calc(var(--sk-topbar-h) + 16px)} /* deep links to a frame (#d-scr-...-2560) must clear the sticky top bar */

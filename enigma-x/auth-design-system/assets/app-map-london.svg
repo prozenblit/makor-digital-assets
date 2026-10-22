@@ -1,0 +1,42 @@
+<svg viewBox="0 0 358 160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <!-- Base background -->
+  <rect width="358" height="160" fill="#DEE8ED"/>
+  <!-- City blocks -->
+  <rect x="10" y="8" width="60" height="28" rx="3" fill="#C8D6DF"/>
+  <rect x="78" y="8" width="44" height="28" rx="3" fill="#C8D6DF"/>
+  <rect x="130" y="8" width="52" height="22" rx="3" fill="#C8D6DF"/>
+  <rect x="190" y="8" width="38" height="28" rx="3" fill="#C8D6DF"/>
+  <rect x="236" y="8" width="62" height="22" rx="3" fill="#C8D6DF"/>
+  <rect x="306" y="8" width="44" height="28" rx="3" fill="#C8D6DF"/>
+  <rect x="10" y="44" width="38" height="36" rx="3" fill="#C8D6DF"/>
+  <rect x="56" y="44" width="56" height="36" rx="3" fill="#C8D6DF"/>
+  <rect x="120" y="44" width="28" height="18" rx="3" fill="#C8D6DF"/>
+  <rect x="156" y="44" width="44" height="36" rx="3" fill="#C8D6DF"/>
+  <rect x="208" y="44" width="32" height="20" rx="3" fill="#C8D6DF"/>
+  <rect x="248" y="44" width="50" height="36" rx="3" fill="#C8D6DF"/>
+  <rect x="306" y="44" width="44" height="36" rx="3" fill="#C8D6DF"/>
+  <!-- Thames river -->
+  <path d="M0 100 Q60 90 120 105 Q180 120 240 105 Q300 90 358 100 L358 125 Q300 115 240 130 Q180 145 120 130 Q60 115 0 125 Z" fill="#A8BECD" opacity=".9"/>
+  <path d="M0 105 Q60 95 120 110 Q180 125 240 110 Q300 95 358 105" fill="none" stroke="#94AABB" stroke-width="1.5"/>
+  <!-- Waterloo Bridge hint -->
+  <rect x="158" y="98" width="42" height="6" rx="3" fill="#A8BECD"/>
+  <!-- Bottom city blocks -->
+  <rect x="10" y="134" width="52" height="22" rx="3" fill="#C8D6DF"/>
+  <rect x="70" y="134" width="40" height="22" rx="3" fill="#C8D6DF"/>
+  <rect x="118" y="134" width="62" height="22" rx="3" fill="#C8D6DF"/>
+  <rect x="188" y="134" width="44" height="22" rx="3" fill="#C8D6DF"/>
+  <rect x="240" y="134" width="56" height="22" rx="3" fill="#C8D6DF"/>
+  <rect x="304" y="134" width="46" height="22" rx="3" fill="#C8D6DF"/>
+  <!-- Roads -->
+  <line x1="0" y1="88" x2="358" y2="88" stroke="#F7F8F8" stroke-width="5"/>
+  <line x1="179" y1="0" x2="179" y2="88" stroke="#F7F8F8" stroke-width="5"/>
+  <line x1="179" y1="128" x2="179" y2="160" stroke="#F7F8F8" stroke-width="4"/>
+  <line x1="0" y1="40" x2="358" y2="40" stroke="#F7F8F8" stroke-width="3.5"/>
+  <!-- Green park patch -->
+  <rect x="20" y="50" width="28" height="22" rx="4" fill="#8BEEC8" opacity=".5"/>
+  <!-- Drop pin -->
+  <circle cx="179" cy="68" r="14" fill="#3DBFBF" opacity=".18"/>
+  <circle cx="179" cy="68" r="8" fill="#3DBFBF"/>
+  <circle cx="179" cy="68" r="3.5" fill="white"/>
+  <path d="M179 76 L179 84" stroke="#3DBFBF" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

@@ -1,257 +1,244 @@
-/* ============================================================
-   Enigma X Auth — Design Tokens
-   Scoped to: web sign-in portal + mobile authenticator app
-   Source: enigma-signin.html + enigma-authenticator.html
-   October 2026
-
-   This is the AUTH-SPECIFIC design system.
-   For trading desktop components (order books, bid/ask panels,
-   tickers, blotter) see: enigma-x/design-system/tokens.css
-
-   Usage: import this file before any auth component styles.
-   Light mode only — no dark mode variant.
-   ============================================================ */
-
+/* ==========================================================================
+   Enigma X AUTH design system - tokens.css
+   Source of truth: HTML prototypes (no Figma)
+     web    hub/auth/enigma-signin.html        (spec: enigma-x/auth-html-spec/web-signin.md)
+     mobile hub/auth/enigma-authenticator.html (spec: enigma-x/auth-html-spec/authenticator.md)
+   Prefix: --eauth-   Light only (no dark theme, no prefers-color-scheme in either prototype).
+   Generated together with tokens.json from one table (they are identical).
+   "web" and "app" colour groups are separate because the prototypes reuse the
+   same --c-* names with different values per surface; tokens.json > prototypeVariables
+   holds the faithful --c-* -> --eauth-* map.
+   JS timing constants (1300ms, 180s, ...) live in tokens.json > timing only.
+   Fonts: Google Fonts link (verbatim from both prototypes):
+   https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@500;600&display=swap
+   (DM Mono 600 is not published: font-weight:600 on DM Mono is a synthetic bold - reproduced as rendered.)
+   ========================================================================== */
 :root {
-
-  /* ----------------------------------------------------------
-     BRAND
-     Source: both HTML files — #7AEFEF appears in all active
-     states, buttons, focus rings, and live indicators.
-  ---------------------------------------------------------- */
-  --auth-color-brand:          #7AEFEF;  /* primary teal — buttons, focus, active states, live dots */
-  --auth-color-brand-dark:     #3DBFBF;  /* deeper teal — mobile eyebrow text, header bg, hover states */
-  --auth-color-brand-dim:      #5ADADA;  /* mid teal — primary button hover (web portal) */
-  --auth-color-brand-ghost:    rgba(122, 239, 239, 0.094); /* #7AEFEF18 — focus rings, badge bg, ghost fills */
-  --auth-color-brand-ghost-border: rgba(45, 218, 197, 0.30); /* subtle teal border on phone pill icons */
-
-  /* ----------------------------------------------------------
-     SURFACES
-     Web portal bg is #EBEBEB (warmer), authenticator bg is
-     #F7F8F8 (cooler blue-gray). Surface and Surface-2 unify
-     at the authenticator's value — correct for both contexts.
-  ---------------------------------------------------------- */
-  --auth-color-bg-web:         #EBEBEB;  /* web sign-in page background */
-  --auth-color-bg-mobile:      #F7F8F8;  /* mobile authenticator shell background */
-  --auth-color-bg:             #F7F8F8;  /* canonical default — use this unless context-specific */
-  --auth-color-surface:        #FFFFFF;  /* cards, modals, bottom sheets, OTP slots */
-  --auth-color-surface-2:      #F7F8F8;  /* inputs default bg, raised sections, code card */
-  --auth-color-surface-overlay: rgba(0, 0, 0, 0.45); /* bottom sheet + confirm overlay bg */
-  --auth-color-nav-bg:         rgba(255, 255, 255, 0.85); /* frosted glass top nav */
-  --auth-color-launch-bg:      #FFFFFF;  /* launch screen — solid white */
-
-  /* ----------------------------------------------------------
-     TEXT
-     Web portal uses slightly different text colors (Tailwind-
-     derived) vs authenticator (bespoke blue-gray scale).
-     Authenticator values used as canonical — they are more
-     considered for the blue-gray surface palette.
-  ---------------------------------------------------------- */
-  --auth-color-text-primary:   #1A1F36;  /* body text, headings — blue-tinted near-black */
-  --auth-color-text-secondary: #7C9CAC;  /* subtitles, labels, muted text (authenticator) */
-  --auth-color-text-secondary-web: #6B7280; /* muted text on web portal (slightly warmer gray) */
-  --auth-color-text-tertiary:  #A8BECD;  /* placeholders, timestamps, fine print (authenticator) */
-  --auth-color-text-tertiary-web: #9CA3AF; /* placeholders on web portal */
-  --auth-color-text-on-brand:  #000000;  /* text ON the brand color (button labels, mobile) */
-  --auth-color-text-on-brand-web: #1A1A1A; /* text on brand color, web portal */
-  --auth-color-text-on-dark:   #FFFFFF;  /* text on dark surfaces */
-  --auth-color-black:          #1A1A1A;  /* web portal black (nav icon bg, btn-black) */
-  --auth-color-black-mobile:   #000000;  /* authenticator black (button text on brand, phone pill) */
-
-  /* ----------------------------------------------------------
-     BORDERS
-  ---------------------------------------------------------- */
-  --auth-color-border:         #DEE8ED;  /* authenticator — all cards, inputs, dividers */
-  --auth-color-border-web:     #E2E2E2;  /* web portal border (slightly warmer) */
-  --auth-color-border-focus:   #7AEFEF;  /* input focus border — both platforms */
-  --auth-color-border-ghost:   rgba(255, 255, 255, 0.14); /* push banner glass border */
-
-  /* ----------------------------------------------------------
-     STATUS
-  ---------------------------------------------------------- */
-  --auth-color-danger:         #E5686A;  /* authenticator — error borders, destructive actions */
-  --auth-color-danger-web:     #EF4444;  /* web portal — error borders (brighter red) */
-  --auth-color-danger-bg:      rgba(229, 104, 106, 0.06);  /* danger hover bg */
-  --auth-color-danger-bg-web:  rgba(239, 68, 68, 0.08);   /* error field bg on web portal */
-  --auth-color-success:        #4DCC9B;  /* authenticator — success states, active session label */
-  --auth-color-disabled-bg:    #D1D5DB;  /* disabled button background */
-  --auth-color-disabled-text:  #6B7280;  /* disabled button text */
-
-  /* ----------------------------------------------------------
-     TYPOGRAPHY
-  ---------------------------------------------------------- */
-  --auth-font-sans:  'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --auth-font-mono:  'DM Mono', 'Courier New', monospace;
-
-  /* Size scale — exact values from source */
-  --auth-text-xs:    10px;   /* mobile eyebrow labels, sheet section titles, micro metadata */
-  --auth-text-sm:    12px;   /* form labels, badges, timestamps, push banner app name */
-  --auth-text-base:  14px;   /* body, buttons, link buttons, push notification text */
-  --auth-text-md:    16px;   /* primary inputs, nav brand, primary buttons, status bar time */
-  --auth-text-lg:    18px;   /* launch app name */
-  --auth-text-xl:    20px;   /* OTP screen heading, home screen title */
-  --auth-text-2xl:   22px;   /* success title, password fallback heading */
-  --auth-text-3xl:   24px;   /* card titles (web), OTP heading (web), screen-title */
-  --auth-text-4xl:   38px;   /* OTP code display — always DM Mono */
-
-  /* Font weights */
-  --auth-font-normal:   400;
-  --auth-font-medium:   500;
-  --auth-font-semibold: 600;
-  --auth-font-bold:     700;
-
-  /* Line heights */
-  --auth-leading-tight:   1.2;   /* card titles, success titles */
-  --auth-leading-snug:    1.35;  /* push notification title, phone notif text */
-  --auth-leading-normal:  1.45;  /* confirm dialog body */
-  --auth-leading-relaxed: 1.55;  /* card subtitles, screen subtitles */
-
-  /* Letter spacing */
-  --auth-tracking-tight:   -0.02em;  /* home logo name, face ID label */
-  --auth-tracking-none:     0;
-  --auth-tracking-wide:     0.04em;  /* web eyebrow, nav brand, field labels */
-  --auth-tracking-wider:    0.07em;  /* session row labels */
-  --auth-tracking-widest:   0.10em;  /* other-sessions header */
-  --auth-tracking-label:    0.08em;  /* session current label, code label */
-  --auth-tracking-eyebrow:  0.12em;  /* mobile eyebrow (10px, 700, uppercase) */
-  --auth-tracking-mono:     0.18em;  /* OTP code display */
-
-  /* ----------------------------------------------------------
-     CONTROL HEIGHTS
-  ---------------------------------------------------------- */
-  --auth-h-input:       48px;   /* all text inputs — both platforms */
-  --auth-h-btn:         50px;   /* primary button — web portal */
-  --auth-h-btn-mobile:  52px;   /* primary button — mobile authenticator */
-  --auth-h-btn-danger:  48px;   /* danger outline button */
-  --auth-h-btn-sm:      36px;   /* compact buttons (session sign-out) */
-  --auth-h-chip:        32px;   /* pill badges, waiting badge */
-  --auth-h-nav:         56px;   /* top navigation bar */
-  --auth-h-otp-slot:    58px;   /* OTP input slots (web) */
-  --auth-h-status-bar:  44px;   /* iOS status bar */
-
-  /* ----------------------------------------------------------
-     AVATAR / ICON SIZES
-  ---------------------------------------------------------- */
-  --auth-avatar-sm:   28px;   /* nav icon logo */
-  --auth-avatar-md:   36px;   /* user avatar (home screen), session flag */
-  --auth-avatar-lg:   40px;   /* phone notification icon */
-  --auth-avatar-xl:   44px;   /* push banner icon, mobile header icon */
-  --auth-avatar-2xl:  56px;   /* sheet confirmed icon */
-  --auth-avatar-3xl:  72px;   /* success ring (web) */
-  --auth-avatar-4xl:  108px;  /* launch screen logo */
-  --auth-avatar-fid:  180px;  /* Face ID lottie wrapper */
-
-  --auth-icon-xs:    10px;
-  --auth-icon-sm:    14px;
-  --auth-icon-md:    16px;
-  --auth-icon-lg:    18px;   /* password toggle, resend icon */
-  --auth-icon-xl:    22px;   /* phone app icon svg, push banner icon */
-  --auth-icon-2xl:   26px;   /* push banner logo svg */
-  --auth-icon-3xl:   30px;   /* mobile header logo svg */
-  --auth-icon-4xl:   34px;   /* success ring svg */
-
-  /* ----------------------------------------------------------
-     SPACING
-  ---------------------------------------------------------- */
-  --auth-space-1:    4px;
-  --auth-space-2:    6px;
-  --auth-space-3:    8px;
-  --auth-space-4:    10px;
-  --auth-space-5:    12px;
-  --auth-space-6:    14px;
-  --auth-space-7:    16px;
-  --auth-space-8:    18px;
-  --auth-space-9:    20px;
-  --auth-space-10:   24px;
-  --auth-space-12:   28px;
-  --auth-space-14:   32px;
-  --auth-space-16:   40px;
-
-  /* ----------------------------------------------------------
-     CARD / LAYOUT
-  ---------------------------------------------------------- */
-  --auth-card-max-width:       440px;   /* sign-in card max width */
-  --auth-card-padding:         0 40px 36px; /* card padding — desktop */
-  --auth-card-padding-mobile:  0 24px 28px; /* card padding — mobile (≤500px) */
-  --auth-shell-width:          390px;   /* mobile authenticator shell target width */
-  --auth-shell-height:         844px;   /* mobile authenticator shell target height */
-  --auth-shell-radius:         44px;    /* mobile shell border radius (max) */
-
-  /* ----------------------------------------------------------
-     BORDER RADIUS
-     The universal radius is 4px everywhere except where noted.
-  ---------------------------------------------------------- */
-  --auth-radius:          4px;    /* UNIVERSAL — buttons, inputs, toasts, badges, nav icon */
-  --auth-radius-sm:       2px;    /* checkbox */
-  --auth-radius-md:       8px;    /* OTP slots, bottom sheet, code card, session compact (mobile), phone pill */
-  --auth-radius-lg:       10px;   /* mobile header icon, session flag */
-  --auth-radius-xl:       12px;   /* phone app icon, push banner app icon, session compact flag */
-  --auth-radius-2xl:      14px;   /* sign-out confirm dialog */
-  --auth-radius-2xl-alt:  22px;   /* push notification banner inner */
-  --auth-radius-pill:     999px;  /* waiting badge, session chip, live dot pill */
-  --auth-radius-full:     50%;    /* avatars, live dots, success ring, confirmed icon */
-  --auth-radius-shell:    min(44px, 4vw); /* mobile shell — responsive */
-
-  /* ----------------------------------------------------------
-     SHADOWS
-  ---------------------------------------------------------- */
-  --auth-shadow-card:      0 2px 10px rgba(0, 0, 0, 0.06);
-  --auth-shadow-card-lg:   0 4px 24px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --auth-shadow-sheet:     0 -8px 40px rgba(0, 0, 0, 0.18);
-  --auth-shadow-dialog:    0 8px 40px rgba(0, 0, 0, 0.20);
-  --auth-shadow-mobile:    0 24px 64px rgba(0, 0, 0, 0.18), 0 0 0 2px rgba(0, 0, 0, 0.07);
-  --auth-shadow-focus:     0 0 0 4px rgba(122, 239, 239, 0.094);
-  --auth-shadow-dot-pulse: 0 0 0 4px rgba(122, 239, 239, 0.094);
-  --auth-shadow-banner:    0 6px 32px rgba(0, 0, 0, 0.18), inset 0 2px 0 rgba(255, 255, 255, 0.22);
-  --auth-shadow-map-pill:  0 2px 8px rgba(0, 0, 0, 0.12);
-
-  /* ----------------------------------------------------------
-     TRANSITIONS
-  ---------------------------------------------------------- */
-  --auth-duration-instant: 0.08s;   /* button :active scale */
-  --auth-duration-fast:    0.12s;   /* color/opacity changes, hover */
-  --auth-duration-base:    0.15s;   /* borders, backgrounds (OTP slots) */
-  --auth-duration-normal:  0.18s;   /* inputs, focus rings */
-  --auth-duration-enter:   0.20s;   /* face ID content fade-in */
-  --auth-duration-slide:   0.28s;   /* toast slide */
-  --auth-duration-screen:  0.38s;   /* screen push transitions */
-  --auth-duration-sheet:   0.42s;   /* bottom sheet + push banner slide */
-  --auth-duration-blur:    0.65s;   /* face ID blur fade-in */
-  --auth-duration-spinner: 0.65s;   /* loading spinner rotation */
-  --auth-duration-otp-shake: 0.35s; /* OTP error shake */
-  --auth-duration-success: 0.45s;   /* success ring pop-in */
-  --auth-duration-confirm: 0.20s;   /* sign-out confirm dialog */
-  --auth-duration-session: 0.23s;   /* session card remove */
-  --auth-duration-code-used: 0.30s; /* code used → confirmed state */
-
-  --auth-ease-default: ease;
-  --auth-ease-screen:  cubic-bezier(0.4, 0, 0.2, 1);
-  --auth-ease-sheet:   cubic-bezier(0.32, 0, 0.04, 1);
-  --auth-ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
-  --auth-ease-banner:  cubic-bezier(0.32, 0, 0.04, 1);
-
-  /* ----------------------------------------------------------
-     ANIMATION TIMINGS
-  ---------------------------------------------------------- */
-  --auth-anim-dot-pulse:   2s;    /* live dot pulse (ease-in-out, infinite) */
-  --auth-anim-dot-bounce:  0.9s;  /* waiting dots bounce */
-  --auth-anim-dot-bounce-delay-2: 0.15s;
-  --auth-anim-dot-bounce-delay-3: 0.30s;
-  --auth-anim-otp-scale:   1.05;  /* OTP slot focus scale */
-  --auth-anim-toast-dismiss: 3000ms; /* auto-dismiss delay */
-  --auth-anim-banner-dismiss: 9000ms; /* push banner auto-dismiss */
-  --auth-anim-faceid-delay: 0.25s; /* face ID content fade-in delay */
-
-  /* ----------------------------------------------------------
-     Z-INDEX STACK
-  ---------------------------------------------------------- */
-  --auth-z-base:         0;
-  --auth-z-launch:       40;   /* launch screen */
-  --auth-z-faceid:       50;   /* face ID overlay */
-  --auth-z-nav:          100;  /* top navigation bar */
-  --auth-z-sheet-overlay: 100; /* bottom sheet overlay */
-  --auth-z-sheet:        101;  /* bottom sheet */
-  --auth-z-dialog:       200;  /* sign-out confirm dialog */
-  --auth-z-banner:       300;  /* push notification banner */
-  --auth-z-toast:        999;  /* toast */
+  /* color / brand */
+  --eauth-brand: #7AEFEF; /* Brand teal (light). web --c-primary (enigma-signin.html L15), app --c-primary (enigma-authenticator.html L16). Primary button bg, input/slot focus + filled border, caret, checkbox checked, success ring icon, live dot, loc dot, confirmed-check glyph; web card logo fill is hard-coded #7AEFEF (enigma-signin.html L362) */
+  --eauth-brand-chrome: #3DBFBF; /* Brand teal (deep) = app --c-primary-dark (enigma-authenticator.html L17); --c-primary-dim (L18) is identical and has 0 uses. Home banner + status bar, eyebrow text, push-banner icon tile, focus-visible outline (L33), launch logo fill (hard-coded L627), map pin. NOT used on web. */
+  --eauth-brand-hover: #5ADADA; /* Hover teal. web --c-primary-dim (enigma-signin.html L16): .btn-primary:hover bg (L179) AND .link-btn text colour (L161). App: hard-coded in .btn-primary:hover (enigma-authenticator.html L147). The ONLY hover colour in either prototype (not #3DBFBF). */
+  --eauth-brand-ghost: #7AEFEF18; /* 8-digit hex = rgba(122,239,239,0.094) (computed). web --c-primary-ghost (enigma-signin.html L17), app (enigma-authenticator.html L19). Focus ring 4px, success ring bg, confirmed-icon bg, live-dot halo. */
+  --eauth-white: #FFFFFF; /* Literal #fff/white: toast text (enigma-authenticator.html L164), launch bg (L180), home logo name (L307), confirm danger text (L494), logo glyphs on chrome tiles. Raw in source (no token). */
+  /* color / web */
+  --eauth-web-bg: #EBEBEB; /* web --c-bg (enigma-signin.html L12). Page background (html/body L36-42). */
+  --eauth-web-surface: #FFFFFF; /* web --c-surface (enigma-signin.html L13). Card, checkbox box, OTP slot bg, focused input bg. */
+  --eauth-web-surface-2: #F5F5F5; /* web --c-surface-2 (enigma-signin.html L14). Input resting bg. */
+  --eauth-web-black: #1A1A1A; /* web --c-black (enigma-signin.html L18). Text on primary button, spinner arc. */
+  --eauth-web-text: #1A1F36; /* web --c-text (enigma-signin.html L19). Body, headings, input text, OTP digits. */
+  --eauth-web-text-2: #6B7280; /* web --c-text-2 (enigma-signin.html L20). Sub text, field labels, eyebrow, timer value, disabled button text, back button. */
+  --eauth-web-text-3: #9CA3AF; /* web --c-text-3 (enigma-signin.html L21). Placeholder, toggle rest, timer row text, OTP separator, checkbox border. */
+  --eauth-web-border: #E2E2E2; /* web --c-border (enigma-signin.html L22). Input and OTP slot border. */
+  --eauth-web-danger: #EF4444; /* web --c-danger (enigma-signin.html L23). Field/OTP error text and borders, expiring timer. */
+  --eauth-web-disabled: #D1D5DB; /* web --c-disabled (enigma-signin.html L24). Disabled primary button bg (also the loading look). */
+  --eauth-web-danger-ring: rgba(239,68,68,.08); /* Raw in source (enigma-signin.html L133): error input ring 0 0 0 4px. */
+  --eauth-web-danger-bg: #fef2f2; /* Raw in source (enigma-signin.html L268): OTP slot error bg (rgb 254,242,242). */
+  --eauth-web-spinner-track: rgba(0,0,0,.15); /* Raw in source (enigma-signin.html L185): spinner track border. */
+  --eauth-web-tick: #000000; /* Raw in source: checkbox tick SVG stroke="black" (enigma-signin.html L397); differs from web-black #1A1A1A. */
+  /* color / app */
+  --eauth-app-bg: #F7F8F8; /* app --c-bg (enigma-authenticator.html L13). Shell + home screen + page background. */
+  --eauth-app-surface: #FFFFFF; /* app --c-surface (enigma-authenticator.html L14). Session cards, sheet, dialog, password screen. */
+  --eauth-app-surface-2: #F7F8F8; /* app --c-surface-2 (enigma-authenticator.html L15). Same value as app-bg. Input bg, flag tile, code card, cancel button, detail grid. */
+  --eauth-app-black: #000000; /* app --c-black (enigma-authenticator.html L20). Toast bg, button label on brand fill (btn-primary L143 and copy L587). */
+  --eauth-app-text: #1A1F36; /* app --c-text (enigma-authenticator.html L21). Body, headings. */
+  --eauth-app-text-2: #7C9CAC; /* app --c-text-2 (enigma-authenticator.html L22). Secondary text/labels, disabled button text. */
+  --eauth-app-text-3: #A8BECD; /* app --c-text-3 (enigma-authenticator.html L23). Tertiary, placeholders, timestamps, disabled button bg, back link. */
+  --eauth-app-border: #DEE8ED; /* app --c-border (enigma-authenticator.html L24). Input border, London card border, pw header divider, sheet handle, map base. */
+  --eauth-app-danger: #E5686A; /* app --c-danger (enigma-authenticator.html L25). Sign out, block link, urgent timer, danger toast, destructive confirm. */
+  --eauth-app-success: #4DCC9B; /* app --c-success (enigma-authenticator.html L26). "Active now" label only. */
+  --eauth-app-disabled-bg: #A8BECD; /* Disabled button bg = app --c-text-3 (enigma-authenticator.html L149, L593). */
+  --eauth-app-disabled-text: #7C9CAC; /* Disabled button text = app --c-text-2 (enigma-authenticator.html L149, L593). */
+  /* color / app-overlays */
+  --eauth-app-pill-bg: rgba(0,0,0,.06); /* Raw (enigma-authenticator.html L276): Use Passcode pill rest. */
+  --eauth-app-pill-bg-hover: rgba(0,0,0,.10); /* Raw (enigma-authenticator.html L285): pill hover. */
+  --eauth-app-pill-bg-active: rgba(0,0,0,.15); /* Raw (enigma-authenticator.html L286): pill active. */
+  --eauth-app-faceid-tint: rgba(235,235,235,.12); /* Raw (enigma-authenticator.html L209): Face ID blur layer tint. */
+  --eauth-app-logo-tile: rgba(255,255,255,.22); /* Raw (enigma-authenticator.html L301): home banner logo tile. */
+  --eauth-app-push-glass: rgba(0,0,0,0.20); /* Raw (enigma-authenticator.html L99): push banner glass. */
+  --eauth-app-push-border: rgba(255,255,255,0.14); /* Raw (enigma-authenticator.html L104): push banner border. */
+  --eauth-app-push-highlight: rgba(255,255,255,0.22); /* Raw (enigma-authenticator.html L107): push banner inset top highlight. */
+  --eauth-app-push-appname: rgba(255,255,255,0.80); /* Raw (enigma-authenticator.html L115). */
+  --eauth-app-push-time: rgba(255,255,255,0.60); /* Raw (enigma-authenticator.html L118). */
+  --eauth-app-push-title: rgba(255,255,255,1.0); /* Raw (enigma-authenticator.html L128). */
+  --eauth-app-push-sub: rgba(255,255,255,0.78); /* Raw (enigma-authenticator.html L129). */
+  --eauth-app-on-chrome: rgba(255,255,255,0.9); /* Raw (enigma-authenticator.html L313-314): status bar text/icons on the chrome-teal bar. */
+  --eauth-app-map-pill-bg: rgba(255,255,255,.92); /* Raw (enigma-authenticator.html L535). */
+  --eauth-app-sheet-overlay: rgba(0,0,0,.45); /* Raw (enigma-authenticator.html L500). */
+  --eauth-app-confirm-overlay: rgba(0,0,0,.4); /* Raw (enigma-authenticator.html L449). */
+  /* color / dependency */
+  --eauth-dep-faceid-card: #404042; /* DOCUMENTATION ONLY. Card colour inside the third-party Face ID Lottie (fill rgb(64,64,66), computed; enigma-authenticator.html L677). Not drawn by this system; never use in components. */
+  /* font */
+  --eauth-font-sans: 'DM Sans', -apple-system, sans-serif; /* --font-sans in both prototypes (enigma-signin.html L25, enigma-authenticator.html L27). Loaded: DM Sans 400/500/600/700 (Google Fonts link enigma-signin.html L9). */
+  --eauth-font-mono: 'DM Mono', monospace; /* --font-mono (enigma-signin.html L26, enigma-authenticator.html L28). Used ONLY for: web OTP slots + #web-timer; app status time, OTP code, code countdown, London-card IP. Loaded face: DM Mono 500 only (600 is not published at Google), so every font-weight:600 on DM Mono is a synthetic bold. */
+  /* font size */
+  --eauth-fs-10: 10px; /* app: eyebrow (L133), London detail label (inline L734), sheet section title (L553), sheet info label (L562) */
+  --eauth-fs-12: 12px; /* web: field label/error; app: push app name/time/sub, flag tile, sign-out, input label, map pill, code label, list group label */
+  --eauth-fs-14: 14px; /* web: sub, checkbox label, link btn, OTP error, timer row, back btn; app: buttons, sub, toast, meta values */
+  --eauth-fs-16: 16px; /* web: input text, btn label; app: status time, btn labels, input text, confirm title, face-id label, home name */
+  --eauth-fs-18: 18px; /* app: launch app name (L190), confirmed h3 (L616) */
+  --eauth-fs-20: 20px; /* web OTP title (inline L414); app home title (L321) */
+  --eauth-fs-22: 22px; /* web success title (L331), OTP separator glyph (L273); app pw title (inline L792) */
+  --eauth-fs-24: 24px; /* web login title (L105), web OTP digit (L253) */
+  --eauth-fs-38: 38px; /* app OTP code (L577) */
+  /* font weight */
+  --eauth-fw-regular: 400; /* body, input text */
+  --eauth-fw-medium: 500; /* web back button + OTP error msg; app toast, back link, block link. (DM Mono 500 is the only DM Mono face loaded) */
+  --eauth-fw-semibold: 600; /* labels, buttons, link btn, OTP digits (synthetic on DM Mono) */
+  --eauth-fw-bold: 700; /* titles, eyebrow, group labels */
+  /* line height */
+  --eauth-lh-tight: 1.2; /* titles (enigma-signin.html L105; enigma-authenticator.html L136) - computed 28.8px at 24px */
+  --eauth-lh-push-title: 1.3; /* push title (enigma-authenticator.html L128) */
+  --eauth-lh-push-sub: 1.4; /* push sub (enigma-authenticator.html L129) */
+  --eauth-lh-confirm-body: 1.45; /* confirm body (enigma-authenticator.html L475) */
+  --eauth-lh-body: 1.55; /* web card sub, success sub (enigma-signin.html L106, L332); app screen sub (enigma-authenticator.html L137) */
+  /* letter spacing */
+  --eauth-ls-field-label: .04em; /* web field label (L113), app input label (L419), flag tile (L383) */
+  --eauth-ls-eyebrow-web: .08em; /* web eyebrow (L102), app code label (L574) */
+  --eauth-ls-eyebrow-app: .12em; /* app eyebrow (L133) */
+  --eauth-ls-group-label: .1em; /* app list group label (L368), sheet section title (L553) */
+  --eauth-ls-detail-label: .09em; /* app London detail label (inline L734) */
+  --eauth-ls-info-label: .07em; /* app sheet info label (L562) */
+  --eauth-ls-otp: .18em; /* app OTP code 38px (L578) */
+  --eauth-ls-push-appname: .02em; /* app push app name (L116) */
+  --eauth-ls-tight: -.02em; /* launch app name (L191), home logo name (L308) */
+  --eauth-ls-tight-sm: -.01em; /* face-id label (L268), passcode pill (L280), confirm title (L470) */
+  /* spacing (observed values) */
+  --eauth-space-2: 2px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-4: 4px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-6: 6px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-8: 8px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-10: 10px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-12: 12px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-14: 14px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-16: 16px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-18: 18px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-20: 20px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-24: 24px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-28: 28px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-32: 32px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-36: 36px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  --eauth-space-40: 40px; /* observed padding/margin/gap value in the prototypes (no spacing tokens exist in source) */
+  /* radius */
+  --eauth-radius-checkbox: 2px; /* web checkbox box (enigma-signin.html L150) */
+  --eauth-radius-control: 4px; /* web: input, primary btn, focus ring; app: buttons, input, toast, flag tile, map, map pill, handle, passcode pill, focus ring */
+  --eauth-radius-card: 8px; /* web: card (L83), OTP slot (L251); app: session card (L372), code card (L567), copy btn (L586), sheet top corners (L510), London detail grid (inline) */
+  --eauth-radius-logo-tile: 10px; /* app home logo tile (enigma-authenticator.html L302) */
+  --eauth-radius-icon-tile: 12px; /* app push icon tile (enigma-authenticator.html L122) */
+  --eauth-radius-dialog: 14px; /* app confirm dialog (enigma-authenticator.html L458) */
+  --eauth-radius-banner: 22px; /* app push banner inner (enigma-authenticator.html L102) */
+  --eauth-radius-circle: 50%; /* web success ring, spinner; app live dot, loc dot, confirmed icon */
+  --eauth-radius-shell: min(44px, 4vw); /* app phone frame (enigma-authenticator.html L50): 24px at 600px viewport, 15px at 375px, 44px at >=1100px (computed) */
+  /* control heights */
+  --eauth-h-web-input: 48px; /* enigma-signin.html L116 */
+  --eauth-h-web-btn: 50px; /* enigma-signin.html L171 */
+  --eauth-h-web-slot: 58px; /* enigma-signin.html L248 */
+  --eauth-h-web-toggle: 44px; /* enigma-signin.html L137 (44x44) */
+  --eauth-h-app-input: 48px; /* enigma-authenticator.html L423 */
+  --eauth-h-app-btn: 52px; /* enigma-authenticator.html L140 (btn-primary) and L585 (copy btn) */
+  --eauth-h-app-status-bar: 44px; /* enigma-authenticator.html L59 */
+  --eauth-h-app-signout: 36px; /* enigma-authenticator.html L394 (min-height) */
+  --eauth-h-app-flag: 36px; /* enigma-authenticator.html L378 (36x36 tile) */
+  --eauth-h-app-confirm-btn: 44px; /* enigma-authenticator.html L484 (min-height) */
+  --eauth-h-app-back: 44px; /* enigma-authenticator.html L412 (min-height); toggle 44x44 (L440) */
+  /* sizes */
+  --eauth-size-web-card-max: 440px; /* card max-width (enigma-signin.html L81) */
+  --eauth-size-web-card-pad: 0 40px 36px; /* card padding (enigma-signin.html L85) */
+  --eauth-size-web-card-pad-narrow: 0 24px 28px; /* card padding at max-width:500px (enigma-signin.html L87) */
+  --eauth-size-web-card-pad-success: 32px; /* success view: JS sets inline card padding (enigma-signin.html L478) */
+  --eauth-size-web-page-pad: 24px 16px; /* .page padding (enigma-signin.html L51) */
+  --eauth-size-web-logo: 72px; /* logo svg 72x72 (enigma-signin.html L361) */
+  --eauth-size-web-logo-pad: 36px 0 28px; /* logo header padding (enigma-signin.html L92) */
+  --eauth-size-web-checkbox: 16px; /* enigma-signin.html L150 */
+  --eauth-size-web-checkbox-tick: 10px; /* enigma-signin.html L156 */
+  --eauth-size-web-field-icon: 18px; /* eye icon (enigma-signin.html L142) */
+  --eauth-size-web-clock-icon: 14px; /* enigma-signin.html L291 */
+  --eauth-size-web-back-icon: 16px; /* enigma-signin.html L449 */
+  --eauth-size-web-spinner: 18px; /* enigma-signin.html L184 */
+  --eauth-size-web-success-ring: 72px; /* enigma-signin.html L324 */
+  --eauth-size-web-success-icon: 34px; /* enigma-signin.html L330 */
+  --eauth-size-web-otp-gap: 8px; /* enigma-signin.html L244 */
+  --eauth-size-app-shell-w: min(390px, 100vw); /* enigma-authenticator.html L47 */
+  --eauth-size-app-shell-h: min(844px, 100dvh); /* enigma-authenticator.html L48 */
+  --eauth-size-app-status-icon: 16px; /* enigma-authenticator.html L66 */
+  --eauth-size-app-launch-logo: 108px; /* enigma-authenticator.html L626 */
+  --eauth-size-app-launch-gap: 40px; /* enigma-authenticator.html L183 */
+  --eauth-size-app-faceid: 180px; /* fid wrapper and Lottie player (enigma-authenticator.html L256, L680) */
+  --eauth-size-app-home-tile: 44px; /* enigma-authenticator.html L300 */
+  --eauth-size-app-home-logo: 30px; /* enigma-authenticator.html L704 */
+  --eauth-size-app-push-tile: 44px; /* enigma-authenticator.html L122 */
+  --eauth-size-app-push-logo: 22px; /* CSS wins over the width/height=26 attributes (enigma-authenticator.html L126) */
+  --eauth-size-app-dot: 8px; /* enigma-authenticator.html L342 */
+  --eauth-size-app-handle-w: 36px; /* enigma-authenticator.html L521 */
+  --eauth-size-app-handle-h: 4px; /* enigma-authenticator.html L521 */
+  --eauth-size-app-map-h: 160px; /* enigma-authenticator.html L528 */
+  --eauth-size-app-confirmed-icon: 56px; /* enigma-authenticator.html L610 */
+  --eauth-size-app-confirmed-check: 28px; /* enigma-authenticator.html L615 */
+  --eauth-size-app-dialog-max: 320px; /* enigma-authenticator.html L460 */
+  --eauth-size-app-copy-icon: 18px; /* enigma-authenticator.html L923 */
+  --eauth-size-app-back-icon: 15px; /* enigma-authenticator.html L788 */
+  --eauth-size-app-eye-icon: 18px; /* enigma-authenticator.html L443 */
+  /* borders (width + style; colour is a separate token) */
+  --eauth-border-input: 1.5px solid; /* web .field-input (enigma-signin.html L119) and app .input-field (enigma-authenticator.html L425); colour = border token (web #E2E2E2, app #DEE8ED). Device px: 1.5px computes 1.33333px at DPR 1.5/2 */
+  --eauth-border-checkbox: 1px solid; /* web .cb-box (enigma-signin.html L151), colour web-text-3 */
+  --eauth-border-signout: 1px solid; /* app sign-out button (enigma-authenticator.html L390), colour app-danger */
+  --eauth-border-divider: 1px solid; /* app pw header bottom (enigma-authenticator.html L406), colour app-border */
+  --eauth-border-push: 1px solid; /* app push banner (enigma-authenticator.html L104) */
+  --eauth-border-london-card: 1.5px solid; /* app London card inline style (enigma-authenticator.html L722), colour app-border */
+  --eauth-border-spinner: 2.5px solid; /* web spinner (enigma-signin.html L185). Computes 2px at DPR 1.5. */
+  --eauth-border-focus-outline: 2px solid; /* global focus-visible outline, offset 2px: web enigma-signin.html L30 (brand), app enigma-authenticator.html L33 (chrome #3DBFBF) */
+  /* shadows */
+  --eauth-shadow-web-card: 0 4px 24px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04); /* enigma-signin.html L84 */
+  --eauth-shadow-ring: 0 0 0 4px #7AEFEF18; /* input/slot focus ring (enigma-signin.html L130, L263; enigma-authenticator.html L434) and app dot halo rest (L344) */
+  --eauth-shadow-web-ring-error: 0 0 0 4px rgba(239,68,68,.08); /* enigma-signin.html L133 */
+  --eauth-shadow-app-shell: 0 24px 64px rgba(0,0,0,.18), 0 0 0 2px rgba(0,0,0,.07); /* enigma-authenticator.html L51 (the 2px ring is box-shadow, not border) */
+  --eauth-shadow-app-push: 0 6px 32px rgba(0,0,0,0.18), inset 0 2px 0 rgba(255,255,255,0.22); /* enigma-authenticator.html L105-107 */
+  --eauth-shadow-app-dialog: 0 8px 40px rgba(0,0,0,.2); /* enigma-authenticator.html L462 */
+  --eauth-shadow-app-sheet: 0 -8px 40px rgba(0,0,0,.18); /* enigma-authenticator.html L516 */
+  --eauth-shadow-app-map-pill: 0 2px 8px rgba(0,0,0,.12); /* enigma-authenticator.html L539 */
+  --eauth-shadow-app-dot-halo-end: 0 0 0 6px transparent; /* dotpulse 50% keyframe (enigma-authenticator.html L349) */
+  /* backdrop blur */
+  --eauth-blur-push: blur(48px); /* enigma-authenticator.html L100-101 */
+  --eauth-blur-faceid: blur(6px); /* enigma-authenticator.html L210-211 */
+  --eauth-blur-map-pill: blur(8px); /* enigma-authenticator.html L535 (no -webkit- prefix in source) */
+  /* durations */
+  --eauth-dur-80: .08s; /* btn transform (web L175, app L145) */
+  --eauth-dur-100: .1s; /* web OTP slot transform (L257) */
+  --eauth-dur-120: .12s; /* web toggle colour, checkbox, link opacity, btn bg/opacity; app btn bg */
+  --eauth-dur-150: .15s; /* web OTP slot; app passcode pill, confirm btn */
+  --eauth-dur-180: .18s; /* web + app input border/shadow */
+  --eauth-dur-200: .2s; /* app Face-ID content fade, confirm overlay/dialog, code card fade */
+  --eauth-dur-230: .23s; /* app session row removal (L375) */
+  --eauth-dur-250: .25s; /* app #s-faceid opacity (L201) and Face-ID content delay */
+  --eauth-dur-280: .28s; /* app toast (L168) */
+  --eauth-dur-300: .3s; /* app screen opacity (L79), launch fade (L185), London card reveal */
+  --eauth-dur-350: .35s; /* app sheet overlay (L502); web shake */
+  --eauth-dur-380: .38s; /* app screen slide (L79) */
+  --eauth-dur-420: .42s; /* app push banner + bottom sheet slide (L93, L512) */
+  --eauth-dur-450: .45s; /* web success pop-in (L328) */
+  --eauth-dur-650: .65s; /* web spinner (L186); app Face-ID blur fade-in (L227) */
+  --eauth-dur-2400: 2.4s; /* app live-dot pulse (L345) */
+  /* easings */
+  --eauth-ease-screen: cubic-bezier(.4,0,.2,1); /* app screen slide (enigma-authenticator.html L79) and toast (L168) */
+  --eauth-ease-sheet: cubic-bezier(.32,0,.04,1); /* app push banner (L93) and bottom sheet (L512) */
+  --eauth-ease-pop: cubic-bezier(.34,1.56,.64,1); /* web success ring pop-in (enigma-signin.html L328) */
+  --eauth-ease-ease: ease; /* default keyword easing (shake .35s, dotpulse 2.4s, fades, field transitions with no easing = ease) */
+  --eauth-ease-linear: linear; /* web spinner */
+  /* animations (keyframes are defined in components.css) */
+  --eauth-anim-spin: eauth-spin .65s linear infinite; /* web spinner (enigma-signin.html L186; @keyframes L349) */
+  --eauth-anim-shake: eauth-shake .35s ease; /* web OTP slot error (enigma-signin.html L268; @keyframes L350: 0%,100% translateX(0), 25% -6px, 75% 6px) */
+  --eauth-anim-pop-in: eauth-pop-in .45s cubic-bezier(.34,1.56,.64,1); /* web success ring (enigma-signin.html L328; @keyframes L351: 0% scale(.2) opacity 0 -> 100% scale(1) opacity 1) */
+  --eauth-anim-blur-fade-in: eauth-blur-fade-in .65s ease both; /* app Face-ID blur layer (enigma-authenticator.html L227; keyframes L229-232) */
+  --eauth-anim-faceid-content-in: eauth-faceid-content-in .2s ease .25s both; /* app Face-ID content (enigma-authenticator.html L235; keyframes L237-240) */
+  --eauth-anim-dotpulse: eauth-dotpulse 2.4s ease infinite; /* app live dot (enigma-authenticator.html L345; keyframes L347-350: 0%,100% box-shadow 0 0 0 4px ghost, 50% 0 0 0 6px transparent). NOT 2s ease-in-out (that is the web dead pulse-dot). */
+  /* z-index stack */
+  --eauth-z-faceid-content: 1; /* .faceid-wrap inside the overlay (enigma-authenticator.html L217) */
+  --eauth-z-launch: 40; /* enigma-authenticator.html L179 */
+  --eauth-z-faceid: 50; /* enigma-authenticator.html L199 */
+  --eauth-z-sheet-overlay: 100; /* enigma-authenticator.html L503 */
+  --eauth-z-sheet: 101; /* enigma-authenticator.html L513 */
+  --eauth-z-confirm: 200; /* enigma-authenticator.html L450 */
+  --eauth-z-push: 300; /* enigma-authenticator.html L91 (banner covers the status bar and renders above sheet + dialog) */
+  --eauth-z-toast: 999; /* enigma-authenticator.html L169 */
+  /* breakpoints (documentation; cannot be used inside @media) */
+  --eauth-bp-web-narrow: (max-width: 500px); /* the ONLY @media in either prototype (enigma-signin.html L87): card padding 0 24px 28px. Media queries cannot use var(); literal in components.css. */
 }
