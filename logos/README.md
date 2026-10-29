@@ -2,7 +2,7 @@
 
 Company logos as SVG, always available in the hub. Add every new logo here (one file per logo/variant, kebab-case names, transparent background, no redrawing).
 
-Source: Figma file "for-hub", page "logos" (https://www.figma.com/design/t9G0IpI9gKxShi9T0WsVUp/for-hub?node-id=57-646), exported 2026-10-29. All logos are black (`fill="black"`), transparent background, exported at the Figma size.
+Source: Figma file "for-hub", page "logos" (https://www.figma.com/design/t9G0IpI9gKxShi9T0WsVUp/for-hub?node-id=57-646), exported 2026-10-29. Black logos (`fill="black"`), transparent background, exported at the Figma size. Every logo also has a white copy, same file name plus `-white` (e.g. `og-full-white.svg`): identical geometry and size, only `fill="white"` instead of `fill="black"`; made 2026-10-29 for dark backgrounds.
 
 | File | Figma node | Size (px) |
 |---|---|---|

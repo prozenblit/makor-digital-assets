@@ -15,8 +15,7 @@
     .logo-stage { height: 130px; display: flex; align-items: center; justify-content: center; padding: 20px; background: #fff; border-bottom: 1px solid var(--border); }
     .logo-stage img { max-width: 100%; max-height: 100%; display: block; }
     .logo-stage.dark { background: #111827; }
-    .logo-stage.dark img { filter: invert(1); }
-    .logo-info { padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+        .logo-info { padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
     .logo-name { font-size: 13px; font-weight: 600; }
     .logo-meta { font-size: 11px; color: var(--muted); }
     .logo-actions { display: flex; gap: 6px; padding: 0 14px 14px; }
@@ -40,7 +39,7 @@
 
 <div class="page">
   <div class="logo-toolbar">
-    <span>SVG, black on transparent. Files live in the <code>logos/</code> folder.</span>
+    <span>SVG on transparent, black plus a white copy of each ("White" button). Files live in the <code>logos/</code> folder.</span>
     <button class="logo-btn" id="bg-toggle" type="button">Preview on dark</button>
   </div>
   <div id="groups"></div>
@@ -61,13 +60,14 @@
       <div class="logo-grid">
         ${g.files.map(([file, label, size]) => `
           <div class="logo-card">
-            <div class="logo-stage"><img src="../logos/${file}" alt="${g.company} ${label}"></div>
+            <div class="logo-stage"><img src="../logos/${file}" data-black="../logos/${file}" data-white="../logos/${file.replace(".svg","-white.svg")}" alt="${g.company} ${label}"></div>
             <div class="logo-info">
               <span class="logo-name">${label}</span>
               <span class="logo-meta">${file} · ${size} px</span>
             </div>
             <div class="logo-actions">
               <a class="logo-btn" href="../logos/${file}" download="${file}">Download</a>
+              <a class="logo-btn" href="../logos/${file.replace(".svg","-white.svg")}" download="${file.replace(".svg","-white.svg")}">White</a>
               <button class="logo-btn" type="button" data-copy="${file}">Copy SVG</button>
             </div>
           </div>`).join('')}
@@ -76,7 +76,10 @@
 
   document.getElementById('bg-toggle').addEventListener('click', e => {
     const dark = e.target.textContent === 'Preview on dark';
-    document.querySelectorAll('.logo-stage').forEach(s => s.classList.toggle('dark', dark));
+    document.querySelectorAll('.logo-stage').forEach(s => {
+      s.classList.toggle('dark', dark);
+      const img = s.querySelector('img'); img.src = dark ? img.dataset.white : img.dataset.black;
+    });
     e.target.textContent = dark ? 'Preview on light' : 'Preview on dark';
   });
 
