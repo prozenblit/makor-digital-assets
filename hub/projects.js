@@ -13,7 +13,9 @@ const PROJECTS = {
       name: "MakorX.AI",
       designSystem: true,
       dsId: "makorx-ai",
-      platformLinks: [],
+      platformLinks: [
+        { type: "figma", label: "Figma Design File", url: "https://www.figma.com/design/qLvCCFgKO85vqiKxVTcqJE/Makor-X.AI?node-id=28-287" }
+      ],
       apps: [
         {
           id: "hr",
