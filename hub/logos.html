@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logos — Makor Digital Assets</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <base href="/hub/">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .logo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .logo-card { border: 1px solid var(--border); border-radius: 8px; background: #fff; overflow: hidden; display: flex; flex-direction: column; }
+    .logo-stage { height: 130px; display: flex; align-items: center; justify-content: center; padding: 20px; background: #fff; border-bottom: 1px solid var(--border); }
+    .logo-stage img { max-width: 100%; max-height: 100%; display: block; }
+    .logo-stage.dark { background: #111827; }
+    .logo-stage.dark img { filter: invert(1); }
+    .logo-info { padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+    .logo-name { font-size: 13px; font-weight: 600; }
+    .logo-meta { font-size: 11px; color: var(--muted); }
+    .logo-actions { display: flex; gap: 6px; padding: 0 14px 14px; }
+    .logo-btn { font: inherit; font-size: 11px; font-weight: 500; padding: 4px 10px; border: 1px solid var(--border); border-radius: 20px; background: #fff; color: var(--text); cursor: pointer; }
+    .logo-btn:hover { border-color: #c9ced6; color: var(--brand); }
+    .logo-group { margin-bottom: 28px; }
+    .logo-group h2 { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+    .logo-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <span class="nav-back" onclick="window.location.href='index.html'">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 12L6 8l4-4"/></svg>
+    All assets
+  </span>
+  <span class="nav-divider">/</span>
+  <span class="nav-title">Logos</span>
+</nav>
+
+<div class="page">
+  <div class="logo-toolbar">
+    <span>SVG, black on transparent. Files live in the <code>logos/</code> folder.</span>
+    <button class="logo-btn" id="bg-toggle" type="button">Preview on dark</button>
+  </div>
+  <div id="groups"></div>
+</div>
+
+<script>
+  // Add new logos here and drop the SVG into the logos/ folder (see logos/README.md).
+  const LOGOS = [
+    { company: "Makor",            files: [["makor-group-full.svg", "Group, full", "60 × 34"], ["makor-only-logo.svg", "Mark only", "38 × 28"]] },
+    { company: "OG",               files: [["og-full.svg", "Full", "54 × 34"], ["og-only-logo.svg", "Mark only", "20 × 28"]] },
+    { company: "Churchill Capital", files: [["churchill-capital-full.svg", "Full", "28 × 32"], ["churchill-capital-only-logo.svg", "Mark only", "24 × 28"]] },
+    { company: "Enigma",           files: [["enigma-full.svg", "Full", "118 × 24"], ["enigma-full-logo-up.svg", "Full, stacked", "87 × 54"], ["enigma-only-logo.svg", "Mark only", "28 × 28"]] }
+  ];
+
+  document.getElementById('groups').innerHTML = LOGOS.map(g => `
+    <section class="logo-group">
+      <h2>${g.company}</h2>
+      <div class="logo-grid">
+        ${g.files.map(([file, label, size]) => `
+          <div class="logo-card">
+            <div class="logo-stage"><img src="../logos/${file}" alt="${g.company} ${label}"></div>
+            <div class="logo-info">
+              <span class="logo-name">${label}</span>
+              <span class="logo-meta">${file} · ${size} px</span>
+            </div>
+            <div class="logo-actions">
+              <a class="logo-btn" href="../logos/${file}" download="${file}">Download</a>
+              <button class="logo-btn" type="button" data-copy="${file}">Copy SVG</button>
+            </div>
+          </div>`).join('')}
+      </div>
+    </section>`).join('');
+
+  document.getElementById('bg-toggle').addEventListener('click', e => {
+    const dark = e.target.textContent === 'Preview on dark';
+    document.querySelectorAll('.logo-stage').forEach(s => s.classList.toggle('dark', dark));
+    e.target.textContent = dark ? 'Preview on light' : 'Preview on dark';
+  });
+
+  document.getElementById('groups').addEventListener('click', async e => {
+    const b = e.target.closest('[data-copy]');
+    if (!b) return;
+    const text = await (await fetch('../logos/' + b.dataset.copy)).text();
+    try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; }
+    catch { b.textContent = 'Copy failed'; }
+    setTimeout(() => b.textContent = 'Copy SVG', 1500);
+  });
+</script>
+</body>
+</html>

@@ -162,7 +162,7 @@
           const clickable = p.status !== 'wip' && p.status !== 'placeholder';
           html += `
             <div class="flat-card${!clickable ? ' dimmed' : ''}"
-                 ${clickable ? `onclick="goTo('${section}/${p.id}')"` : ''}>
+                 ${clickable ? `onclick="${p.href ? `location.href='${p.href}'` : `goTo('${section}/${p.id}')`}"` : ''}>
               <div class="flat-top">
                 <span class="flat-name">${p.name}</span>
                 ${statusBadge(p.status)}

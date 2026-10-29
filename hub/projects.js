@@ -1,9 +1,10 @@
-const SECTIONS = ["platforms", "decks", "marketing"];
+const SECTIONS = ["platforms", "decks", "marketing", "logos"];
 
 const SECTION_LABELS = {
   platforms: "Platforms & Apps",
   decks: "Decks",
-  marketing: "Marketing & Events"
+  marketing: "Marketing & Events",
+  logos: "Logos"
 };
 
 const PROJECTS = {
@@ -561,6 +562,17 @@ const PROJECTS = {
       name: "Marketing Materials",
       description: "Event posters, social cards, and client templates — coming soon",
       status: "placeholder",
+      assets: []
+    }
+  ],
+
+  logos: [
+    {
+      id: "company-logos",
+      name: "Company Logos",
+      description: "SVG logos — Makor, OG, Churchill Capital, Enigma. Full and mark-only versions, download or copy the SVG.",
+      status: "live",
+      href: "logos.html",
       assets: []
     }
   ]
